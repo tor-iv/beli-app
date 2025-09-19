@@ -19,7 +19,7 @@ Build a mobile-first web app that clones Beli's core functionality with enhanced
 3. **Add** (+ icon, center, in circle) - Add new restaurant
 4. **Search** (magnifying glass in diamond) - Discover restaurants  
 5. **Leaderboard** (trophy icon) - Rankings and competitions
-6. **Profile** (user avatar, circular) - Your profile and stats
+6. **Profile** (user avata`r, circular) - Your profile and stats
 
 ### Top Bar Structure
 - Left: User name (e.g., "Tor Cox")

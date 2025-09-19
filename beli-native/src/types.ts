@@ -103,7 +103,7 @@ export interface FeedItem {
   createdAt?: Date; // Add optional createdAt for compatibility
   images?: string[]; // Add optional images for compatibility
   companions?: User[]; // Add optional companions for group visits
-  type: 'visit' | 'review' | 'recommendation' | 'follow' | 'want_to_try';
+  type: 'visit' | 'review' | 'recommendation' | 'follow' | 'want_to_try' | 'bookmark';
 }
 
 export interface Activity extends FeedItem {

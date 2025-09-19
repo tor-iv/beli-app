@@ -56,6 +56,8 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
         return 'wants to try';
       case 'recommendation':
         return 'recommends';
+      case 'bookmark':
+        return 'bookmarked';
       default:
         return 'posted about';
     }
@@ -92,7 +94,7 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
         >
           <Avatar
             source={{ uri: activity.user.avatar }}
-            size="large"
+            size="medium"
             style={styles.avatar}
           />
           <View style={styles.userText}>
@@ -100,38 +102,40 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
               <Text style={styles.username}>{activity.user.displayName}</Text>
               <Text style={styles.actionText}> {getActivityTypeText()} </Text>
               <Text style={styles.restaurantNameInline}>{activity.restaurant.name}</Text>
+              {activity.type === 'bookmark' && (
+                <Text style={styles.actionText}> and 1 other</Text>
+              )}
               {activity.companions && activity.companions.length > 0 && (
                 <Text style={styles.actionText}> with {activity.companions[0].displayName}</Text>
               )}
             </View>
             {/* Restaurant Details - moved inside userText */}
-            <View style={styles.restaurantDetails}>
-              <View style={styles.locationInfo}>
-                <Ionicons
-                  name={getRestaurantTypeIcon() as any}
-                  size={12}
-                  color={theme.colors.textSecondary}
-                  style={styles.restaurantIcon}
-                />
-                <RNText style={styles.locationText}>
-                  • {activity.restaurant.location.neighborhood}, {activity.restaurant.location.city}
-                </RNText>
-              </View>
-              <View style={styles.visitInfo}>
-                <Ionicons
-                  name="repeat-outline"
-                  size={12}
-                  color={theme.colors.textSecondary}
-                  style={styles.visitIcon}
-                />
-                <RNText style={styles.visitText}>
-                  1 visit
-                </RNText>
-              </View>
+            <View style={styles.locationInfo}>
+              <Ionicons
+                name={getRestaurantTypeIcon() as any}
+                size={12}
+                color={theme.colors.textSecondary}
+                style={styles.restaurantIcon}
+              />
+              <RNText style={styles.locationText}>
+                • {activity.restaurant.location.neighborhood}, {activity.restaurant.location.city}
+              </RNText>
+            </View>
+            {/* Visit count on separate line */}
+            <View style={styles.visitInfo}>
+              <Ionicons
+                name="repeat-outline"
+                size={12}
+                color={theme.colors.textSecondary}
+                style={styles.visitIcon}
+              />
+              <RNText style={styles.visitText}>
+                1 visit
+              </RNText>
             </View>
           </View>
         </Pressable>
-        {activity.rating > 0 && (
+        {activity.rating > 0 && activity.type !== 'bookmark' && (
           <View style={styles.ratingContainer}>
             <RatingBubble rating={activity.rating} size="small" />
           </View>
@@ -139,10 +143,10 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
       </View>
 
       {/* Notes/Comment */}
-      {activity.comment && (
+      {activity.comment && activity.comment.trim() && (
         <View style={styles.notesSection}>
-          <RNText style={styles.notesLabel}>Notes:</RNText>
           <RNText style={styles.comment}>
+            <RNText style={styles.notesLabel}>Notes: </RNText>
             {activity.comment}
           </RNText>
         </View>
@@ -170,25 +174,25 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
           <Pressable style={styles.actionButton} onPress={onLike}>
             <Ionicons
               name={isLiked ? "heart" : "heart-outline"}
-              size={18}
+              size={20}
               color={isLiked ? theme.colors.error : theme.colors.textSecondary}
             />
           </Pressable>
           <Pressable style={styles.actionButton} onPress={onComment}>
-            <Ionicons name="chatbubble-outline" size={18} color={theme.colors.textSecondary} />
+            <Ionicons name="chatbubble-outline" size={20} color={theme.colors.textSecondary} />
           </Pressable>
           <Pressable style={styles.actionButton}>
-            <Ionicons name="paper-plane-outline" size={18} color={theme.colors.textSecondary} />
+            <Ionicons name="paper-plane-outline" size={20} color={theme.colors.textSecondary} />
           </Pressable>
         </View>
         <View style={styles.rightActions}>
           <Pressable style={styles.actionButton}>
-            <Ionicons name="add-circle-outline" size={18} color={theme.colors.textSecondary} />
+            <Ionicons name="add-circle-outline" size={20} color={theme.colors.textSecondary} />
           </Pressable>
           <Pressable style={styles.actionButton} onPress={onBookmark}>
             <Ionicons
               name={isBookmarked ? "bookmark" : "bookmark-outline"}
-              size={18}
+              size={20}
               color={isBookmarked ? theme.colors.primary : theme.colors.textSecondary}
             />
           </Pressable>
@@ -218,25 +222,32 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: theme.colors.cardBackground,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
 
   content: {
     paddingHorizontal: theme.spacing.lg,
-    paddingTop: 10,
-    paddingBottom: 6,
+    paddingTop: 14,
+    paddingBottom: 12,
   },
 
   separator: {
-    height: 1,
+    height: 0.5,
     backgroundColor: theme.colors.borderLight,
+    opacity: 0.5,
     marginHorizontal: theme.spacing.lg,
+    marginBottom: 8,
   },
 
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: 2,
+    marginBottom: 4,
   },
 
   userInfo: {
@@ -260,23 +271,23 @@ const styles = StyleSheet.create({
   },
 
   username: {
-    fontWeight: theme.typography.weights.bold,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 18,
   },
 
   actionText: {
     color: theme.colors.textPrimary,
-    fontWeight: 'normal',
-    fontSize: 16,
+    fontWeight: '400',
+    fontSize: 15,
     lineHeight: 18,
   },
 
   restaurantNameInline: {
-    fontWeight: theme.typography.weights.bold,
+    fontWeight: '700',
     color: theme.colors.textPrimary,
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 18,
   },
 
@@ -285,11 +296,10 @@ const styles = StyleSheet.create({
   },
 
   restaurantDetails: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'column',
     marginTop: 1,
     marginBottom: 2,
-    gap: theme.spacing.sm,
+    gap: 2,
   },
 
   locationInfo: {
@@ -307,11 +317,13 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontFamily: theme.typography.fontFamily.primary,
     lineHeight: 16,
+    fontWeight: '400',
   },
 
   visitInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 1,
   },
 
   visitIcon: {
@@ -324,24 +336,26 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontFamily: theme.typography.fontFamily.primary,
     lineHeight: 16,
+    fontWeight: '400',
   },
 
   notesSection: {
-    marginTop: 8,
+    marginTop: 6,
+    marginBottom: 2,
   },
 
   notesLabel: {
-    fontWeight: theme.typography.weights.bold,
+    fontWeight: '700',
     color: theme.colors.textPrimary,
-    marginBottom: 4,
-    fontSize: 16,
+    fontSize: 15,
   },
 
   comment: {
     lineHeight: 18,
     color: theme.colors.textPrimary,
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: theme.typography.fontFamily.primary,
+    fontWeight: '400',
   },
 
   imagesSection: {
@@ -365,19 +379,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 12,
   },
 
   leftActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 16,
   },
 
   rightActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 10,
   },
 
   actionButton: {
@@ -386,12 +400,13 @@ const styles = StyleSheet.create({
   },
 
   timestampSection: {
-    marginTop: 6,
+    marginTop: 8,
     marginBottom: 2,
   },
 
   timestamp: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textSecondary,
+    fontWeight: '400',
   },
 });

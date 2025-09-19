@@ -49,9 +49,15 @@ export default function FeedScreen() {
         <View style={styles.headerIcons}>
           <Pressable style={styles.iconButton}>
             <Ionicons name="calendar-outline" size={24} color={colors.textPrimary} />
+            <View style={styles.notificationBadge}>
+              <Text style={styles.badgeText}>1</Text>
+            </View>
           </Pressable>
           <Pressable style={styles.iconButton}>
             <Ionicons name="notifications-outline" size={24} color={colors.textPrimary} />
+            <View style={styles.notificationBadge}>
+              <Text style={styles.badgeText}>1</Text>
+            </View>
           </Pressable>
           <Pressable style={styles.iconButton}>
             <Ionicons name="menu-outline" size={24} color={colors.textPrimary} />
@@ -87,17 +93,19 @@ export default function FeedScreen() {
         </Pressable>
       </View>
 
-      {/* Invite Section */}
-      <Pressable style={styles.inviteCard}>
-        <View style={styles.inviteIcon}>
-          <Ionicons name="mail-outline" size={24} color={colors.textPrimary} />
-        </View>
-        <View style={styles.inviteContent}>
-          <Text style={styles.inviteTitle}>Invite or nominate friends</Text>
-          <Text style={styles.inviteSubtitle}>Invite friends to Beli or nominate to Supper Club</Text>
-        </View>
-        <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
-      </Pressable>
+      {/* Invite Section - Hidden for now */}
+      {false && (
+        <Pressable style={styles.inviteCard}>
+          <View style={styles.inviteIcon}>
+            <Ionicons name="mail-outline" size={24} color={colors.textPrimary} />
+          </View>
+          <View style={styles.inviteContent}>
+            <Text style={styles.inviteTitle}>Invite or nominate friends</Text>
+            <Text style={styles.inviteSubtitle}>Invite friends to Beli or nominate to Supper Club</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+        </Pressable>
+      )}
 
       {/* Featured Lists */}
       <View style={styles.featuredSection}>
@@ -218,6 +226,23 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     marginLeft: spacing.md,
+    position: 'relative',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#FF3B30',
+    borderRadius: 8,
+    width: 16,
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: colors.white,
+    fontSize: 10,
+    fontWeight: 'bold',
   },
 
   // Search Bar Styles
@@ -227,12 +252,12 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.sm,
   },
   searchBar: {
-    backgroundColor: colors.borderLight,
-    borderRadius: 20,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: 12,
   },
   searchIcon: {
     marginRight: spacing.sm,
@@ -252,13 +277,13 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   actionButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 20,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    backgroundColor: '#2C5F5F',
+    borderRadius: 25,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: 6,
   },
   actionButtonText: {
     color: colors.white,
@@ -300,7 +325,7 @@ const styles = StyleSheet.create({
 
   // Featured Lists Styles
   featuredSection: {
-    marginTop: spacing.md,
+    marginTop: spacing.sm,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -362,7 +387,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
-    marginTop: spacing.md,
+    marginTop: spacing.sm,
   },
   feedTitle: {
     fontSize: 13,
@@ -375,11 +400,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.cardWhite,
     borderRadius: 20,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderWidth: 1.5,
+    borderColor: colors.borderMedium,
     gap: spacing.xs,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   scBadgeSmall: {
     backgroundColor: colors.primary,
@@ -404,6 +434,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   listContent: {
-    paddingBottom: spacing.xl,
+    paddingBottom: spacing.lg,
   },
 });

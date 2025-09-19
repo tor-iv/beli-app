@@ -38,9 +38,9 @@ export const RatingBubble: React.FC<RatingBubbleProps> = ({
       width: bubbleSize,
       height: bubbleSize,
       borderRadius: bubbleSize / 2,
-      backgroundColor: theme.colors.cardBackground,
+      backgroundColor: theme.colors.white,
       borderWidth: 1.5,
-      borderColor: theme.colors.borderLight,
+      borderColor: '#E0E0E0',
     },
     style,
   ];

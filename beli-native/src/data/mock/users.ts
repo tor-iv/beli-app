@@ -311,6 +311,7 @@ export const mockUsers: User[] = [
       beenCount: 123,
       wantToTryCount: 167,
       currentStreak: 1,
+      totalReviews: 67,
     },
     location: {
       city: 'New York',
@@ -399,6 +400,7 @@ export const mockUsers: User[] = [
       beenCount: 145,
       wantToTryCount: 112,
       currentStreak: 2,
+      totalReviews: 89,
     },
     location: {
       city: 'New York',
@@ -451,6 +453,52 @@ export const mockUsers: User[] = [
     dietaryRestrictions: [],
     dislikedCuisines: ['Chain Restaurants'],
     memberSince: new Date('2023-01-25'),
+  },
+  {
+    id: '21',
+    username: 'jack_foodie',
+    displayName: 'Jack',
+    avatar: 'https://i.pravatar.cc/150?img=21',
+    bio: 'Food explorer 🍽️ | Always trying new spots | Group dining enthusiast',
+    stats: {
+      followers: 156,
+      following: 298,
+      rank: 1789,
+      beenCount: 89,
+      wantToTryCount: 234,
+      currentStreak: 2,
+      totalReviews: 89,
+    },
+    location: {
+      city: 'New York',
+      state: 'NY',
+    },
+    dietaryRestrictions: [],
+    dislikedCuisines: [],
+    memberSince: new Date('2023-08-15'),
+  },
+  {
+    id: '22',
+    username: 'lucas_jerez',
+    displayName: 'Lucas Jerez',
+    avatar: 'https://i.pravatar.cc/150?img=22',
+    bio: 'Mediterranean cuisine lover 🫒 | Sharing great meals with friends',
+    stats: {
+      followers: 134,
+      following: 189,
+      rank: 2045,
+      beenCount: 67,
+      wantToTryCount: 156,
+      currentStreak: 1,
+      totalReviews: 67,
+    },
+    location: {
+      city: 'New York',
+      state: 'NY',
+    },
+    dietaryRestrictions: [],
+    dislikedCuisines: ['Spicy Food'],
+    memberSince: new Date('2023-06-22'),
   },
 ];
 

@@ -18,6 +18,59 @@ export interface ActivityComment {
 }
 
 export const mockActivities: Activity[] = [
+  // New activities that match the target design
+  {
+    id: 'ryan_san_marzano',
+    restaurant: mockRestaurants.find(r => r.id === '31')!, // San Marzano
+    user: mockUsers.find(u => u.displayName === 'Ryan Tanaka')!,
+    rating: 9.7,
+    comment: 'It was so good and so cheap',
+    photos: [],
+    tags: ['Ukrainian', 'Good Value'],
+    timestamp: new Date(Date.now() - 37 * 60 * 1000), // 37 minutes ago
+    type: 'visit',
+    interactions: {
+      likes: ['1', '3', '6'],
+      comments: [],
+      bookmarks: ['1'],
+    },
+  },
+  {
+    id: 'jack_bookmark_jua',
+    restaurant: mockRestaurants.find(r => r.id === '32')!, // Jua
+    user: mockUsers.find(u => u.id === '21')!, // Jack user
+    rating: 0, // No rating for bookmark
+    comment: '',
+    photos: [],
+    tags: [],
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+    type: 'bookmark',
+    interactions: {
+      likes: [],
+      comments: [],
+      bookmarks: ['1'],
+    },
+  },
+  {
+    id: 'jack_omars_lucas',
+    restaurant: mockRestaurants.find(r => r.id === '33')!, // Omar's Mediterranean Cuisine
+    user: mockUsers.find(u => u.id === '21')!, // Jack user
+    companions: [mockUsers.find(u => u.id === '22')!], // Lucas Jerez
+    rating: 7.3,
+    comment: 'Ok I\'ve always kinda been an Omar\'s hater but I gotta hand it to them this place...',
+    photos: [
+      'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400',
+      'https://images.unsplash.com/photo-1551782450-17144efb9c50?w=400'
+    ],
+    tags: ['Mediterranean', 'Changed Opinion'],
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+    type: 'visit',
+    interactions: {
+      likes: ['1', '4', '7'],
+      comments: [],
+      bookmarks: ['1', '4'],
+    },
+  },
   {
     id: '1',
     restaurant: mockRestaurants.find(r => r.id === '2')!, // Prince Street Pizza
