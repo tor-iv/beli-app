@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, Pressable, Dimensions, Modal, TextInput, ScrollView } from 'react-native';
+import MapView, { Marker, Region } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing } from '../theme';
 import {
@@ -183,6 +184,29 @@ const summarizeSelectionLabels = (labels: string[], fallbackLabel: string) => {
   return `${labels[0]} +${labels.length - 1}`;
 };
 
+const NYC_REGION: Region = {
+  latitude: 40.728334,
+  longitude: -73.998045,
+  latitudeDelta: 0.09,
+  longitudeDelta: 0.06,
+};
+
+const COORDINATE_OVERRIDES: Record<string, { lat: number; lng: number; neighborhood?: string }> = {
+  maido: { lat: 40.7339, lng: -74.0027, neighborhood: 'West Village' },
+  'mérito': { lat: 40.7324, lng: -74.001, neighborhood: 'West Village' },
+  merito: { lat: 40.7324, lng: -74.001, neighborhood: 'West Village' },
+  "l'artusi": { lat: 40.7346, lng: -74.0062, neighborhood: 'West Village' },
+  "anton's": { lat: 40.7355, lng: -74.0063, neighborhood: 'West Village' },
+  cowgirl: { lat: 40.7339, lng: -74.0068, neighborhood: 'West Village' },
+};
+
+const getScoreColor = (score?: number) => {
+  if (typeof score !== 'number') return colors.primary;
+  if (score >= 7) return colors.ratingExcellent;
+  if (score >= 4) return colors.ratingAverage;
+  return colors.ratingPoor;
+};
+
 type ListType =
   | 'been'
   | 'want'
@@ -199,6 +223,7 @@ export default function ListsScreen() {
 
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [selectedTab, setSelectedTab] = useState<ListType>('been');
   const [selectedCategory, setSelectedCategory] = useState<ListCategory>('restaurants');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
@@ -287,6 +312,19 @@ export default function ListsScreen() {
   const selectedPriceLabels = selectedPriceTiers
     .map(id => PRICE_LOOKUP[id])
     .filter(Boolean) as string[];
+
+  const mapMarkers = useMemo(() => {
+    return restaurants
+      .map(restaurant => {
+        const key = restaurant.name.toLowerCase();
+        const override = COORDINATE_OVERRIDES[key];
+        const coordinates = override ?? restaurant.location?.coordinates;
+        if (!coordinates) return null;
+        const neighborhood = override?.neighborhood ?? restaurant.location.neighborhood;
+        return { restaurant, coordinates, neighborhood };
+      })
+      .filter((entry): entry is { restaurant: Restaurant; coordinates: { lat: number; lng: number }; neighborhood: string } => entry !== null);
+  }, [restaurants]);
 
   const cityFilterDisplay = selectedCityLabels.length > 0
     ? summarizeSelectionLabels(selectedCityLabels, 'City')
@@ -792,9 +830,20 @@ export default function ListsScreen() {
     setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
   };
 
+  const handleSearchPress = () => {
+    console.log('Search lists');
+  };
+
   const handleViewMap = () => {
-    // Navigate to map view
-    console.log('Navigate to map view');
+    setViewMode(prev => (prev === 'list' ? 'map' : 'list'));
+  };
+
+  const handleMapFilterPress = () => {
+    console.log('Map filters');
+  };
+
+  const handleMapLocatePress = () => {
+    console.log('Locate user');
   };
 
   const handleShare = () => {
@@ -1068,45 +1117,90 @@ export default function ListsScreen() {
         ]}
       />
 
-      {/* Sort Controls */}
-      <View style={styles.sortSection}>
-        <SortToggle
-          sortBy="Score"
-          sortOrder={sortOrder}
-          onPress={handleSortToggle}
-        />
-        <Pressable style={styles.searchButton}>
-          <Ionicons name="search" size={18} color={colors.textSecondary} />
-        </Pressable>
-      </View>
-
-      {/* Restaurant List */}
-      <FlatList
-        style={styles.content}
-        contentContainerStyle={styles.listContentContainer}
-        data={restaurants}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item, index }) => (
-          <RestaurantListItem
-            restaurant={item}
-            rank={index + 1}
-            showDistance={true}
-            showStatus={true}
-            isOpen={item.isOpen}
-            closingTime={item.closingTime}
+      {viewMode === 'list' && (
+        <View style={styles.sortSection}>
+          <SortToggle
+            sortBy="Score"
+            sortOrder={sortOrder}
+            onPress={handleSortToggle}
           />
-        )}
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={10}
-        updateCellsBatchingPeriod={100}
-        windowSize={10}
-      />
+          <Pressable style={styles.searchButton} onPress={handleSearchPress}>
+            <Ionicons name="search" size={18} color={colors.textSecondary} />
+          </Pressable>
+        </View>
+      )}
+
+      {viewMode === 'list' ? (
+        <FlatList
+          style={styles.content}
+          contentContainerStyle={styles.listContentContainer}
+          data={restaurants}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item, index }) => (
+            <RestaurantListItem
+              restaurant={item}
+              rank={index + 1}
+              showDistance={true}
+              showStatus={true}
+              isOpen={item.isOpen}
+              closingTime={item.closingTime}
+            />
+          )}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          updateCellsBatchingPeriod={100}
+          windowSize={10}
+        />
+      ) : (
+        <View style={[styles.content, styles.mapContainer]}>
+          <MapView
+            style={styles.map}
+            initialRegion={NYC_REGION}
+          >
+            {mapMarkers.map(({ restaurant, coordinates, neighborhood }) => {
+              const scoreColor = getScoreColor(restaurant.rating);
+              return (
+                <Marker
+                  key={restaurant.id}
+                  coordinate={{
+                    latitude: coordinates.lat,
+                    longitude: coordinates.lng,
+                  }}
+                  title={restaurant.name}
+                  description={`${neighborhood} • ${restaurant.rating.toFixed(1)}`}
+                >
+                  <View style={[styles.markerContainer, { backgroundColor: scoreColor }]}>
+                    <Text style={styles.markerText}>{restaurant.rating.toFixed(1)}</Text>
+                  </View>
+                </Marker>
+              );
+            })}
+          </MapView>
+
+          <View style={styles.mapControlsContainer} pointerEvents="box-none">
+            <View style={styles.mapControlsWrapper}>
+              <Pressable style={styles.mapControlCircle} onPress={handleMapFilterPress}>
+                <Ionicons name="options-outline" size={20} color={colors.textPrimary} />
+              </Pressable>
+
+              <Pressable style={styles.mapControlSearch} onPress={handleSearchPress}>
+                <Text style={styles.mapControlSearchText}>Search Here</Text>
+              </Pressable>
+
+              <Pressable style={styles.mapControlCircle} onPress={handleMapLocatePress}>
+                <Ionicons name="navigate-outline" size={20} color={colors.textPrimary} />
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      )}
 
       <ViewMapButton
         onPress={handleViewMap}
         style={{ bottom: mapButtonOffset }}
         variant="floating"
+        viewMode={viewMode}
       />
 
       <Modal
@@ -1698,6 +1792,83 @@ const styles = StyleSheet.create({
 
   listContentContainer: {
     paddingBottom: spacing['4xl'],
+  },
+
+  mapContainer: {
+    backgroundColor: colors.white,
+  },
+
+  map: {
+    flex: 1,
+  },
+
+  markerContainer: {
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    borderRadius: spacing.borderRadius.full,
+    borderWidth: 2,
+    borderColor: colors.white,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 6,
+  },
+
+  markerText: {
+    color: colors.white,
+    fontSize: typography.sizes.base,
+    fontWeight: typography.weights.semibold,
+    textAlign: 'center',
+  },
+
+  mapControlsContainer: {
+    position: 'absolute',
+    top: spacing.xl,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+
+  mapControlsWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  mapControlCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: spacing.xs,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+
+  mapControlSearch: {
+    minWidth: 148,
+    borderRadius: spacing.borderRadius.full,
+    backgroundColor: colors.white,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    marginHorizontal: spacing.xs,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+
+  mapControlSearchText: {
+    color: colors.primary,
+    fontSize: typography.sizes.base,
+    fontWeight: typography.weights.semibold,
+    textAlign: 'center',
   },
 
   viewMapButton: {},

@@ -8,6 +8,7 @@ interface ViewMapButtonProps {
   style?: ViewStyle;
   testID?: string;
   variant?: 'inline' | 'floating';
+  viewMode?: 'list' | 'map';
 }
 
 export const ViewMapButton: React.FC<ViewMapButtonProps> = ({
@@ -15,8 +16,12 @@ export const ViewMapButton: React.FC<ViewMapButtonProps> = ({
   style,
   testID,
   variant = 'inline',
+  viewMode = 'list',
 }) => {
   const isFloating = variant === 'floating';
+  const isMapView = viewMode === 'map';
+  const iconName = isMapView ? 'list-outline' : 'map-outline';
+  const label = isMapView ? 'View List' : 'View Map';
 
   return (
     <View
@@ -37,9 +42,9 @@ export const ViewMapButton: React.FC<ViewMapButtonProps> = ({
         onPress={onPress}
       >
         <View style={styles.iconContainer}>
-          <Ionicons name="map-outline" size={18} color={theme.colors.white} />
+          <Ionicons name={iconName} size={18} color={theme.colors.white} />
         </View>
-        <Text style={styles.text}>View Map</Text>
+        <Text style={styles.text}>{label}</Text>
       </Pressable>
     </View>
   );

@@ -36,6 +36,36 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
   },
   {
     userId: '1',
+    restaurantId: '233', // L'Artusi
+    status: 'been',
+    rating: 9.1,
+    notes: 'Handmade pastas and olive oil cake are must-orders.',
+    visitDate: new Date('2024-02-04'),
+    createdAt: new Date('2024-02-04'),
+    tags: ['Date Night', 'Italian'],
+  },
+  {
+    userId: '1',
+    restaurantId: '234', // Anton's
+    status: 'been',
+    rating: 6.2,
+    notes: 'Cozy vibe but some dishes were inconsistent.',
+    visitDate: new Date('2024-01-22'),
+    createdAt: new Date('2024-01-22'),
+    tags: ['Comfort Food'],
+  },
+  {
+    userId: '1',
+    restaurantId: '235', // Cowgirl
+    status: 'been',
+    rating: 3.4,
+    notes: 'Fun theme, but food was underwhelming this visit.',
+    visitDate: new Date('2023-11-18'),
+    createdAt: new Date('2023-11-18'),
+    tags: ['Casual'],
+  },
+  {
+    userId: '1',
     restaurantId: '12', // Eleven Madison Park
     status: 'want_to_try',
     notes: 'Need to save up for this one. Heard amazing things about the plant-based menu.',

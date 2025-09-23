@@ -93,7 +93,7 @@ export const mockLists: List[] = [
     userId: '1', // Tor Cox
     name: 'Been',
     description: 'Restaurants I\'ve visited',
-    restaurants: ['100', '101', '102', '103'], // International restaurants from mockup
+    restaurants: ['100', '101', '102', '103', '233', '234', '235'],
     isPublic: false,
     category: 'restaurants',
     listType: 'been',
