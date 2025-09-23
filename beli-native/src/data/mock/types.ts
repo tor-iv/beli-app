@@ -13,4 +13,6 @@ export {
   type ActivityComment,
   type List,
   type UserList,
+  type ListCategory,
+  type ListScope,
 } from '../../types';

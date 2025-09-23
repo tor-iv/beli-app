@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle, ScrollView } from 'react-native';
-import { Chip } from '../base';
+import { View, StyleSheet, ViewStyle, ScrollView, Text, Pressable } from 'react-native';
 import { theme } from '../../theme';
 
 interface TabOption {
@@ -35,21 +34,20 @@ export const TabSelector: React.FC<TabSelectorProps> = ({
       : tab.label;
 
     return (
-      <Chip
-        key={tab.id}
-        label={label}
-        selected={isSelected}
-        onPress={() => onTabPress(tab.id)}
-        variant="default"
-        size="medium"
-        style={[
-          styles.tab,
-          isSelected && styles.selectedTab,
-        ]}
-        textStyle={[
-          isSelected && styles.selectedTabText,
-        ]}
-      />
+      <View key={tab.id} style={styles.tabContainer}>
+        <Pressable
+          onPress={() => onTabPress(tab.id)}
+          style={styles.tabButton}
+        >
+          <Text style={[
+            styles.tabText,
+            isSelected && styles.selectedTabText,
+          ]}>
+            {label}
+          </Text>
+        </Pressable>
+        {isSelected && <View style={styles.tabUnderline} />}
+      </View>
     );
   };
 
@@ -84,7 +82,7 @@ const styles = StyleSheet.create({
 
   fixedContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'flex-start',
     paddingHorizontal: theme.spacing.edgePadding,
   },
 
@@ -92,17 +90,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.edgePadding,
   },
 
-  tab: {
-    marginRight: theme.spacing.sm,
-    backgroundColor: 'transparent',
-    borderWidth: 0,
+  tabContainer: {
+    marginRight: theme.spacing.lg,
+    alignItems: 'center',
   },
 
-  selectedTab: {
-    backgroundColor: theme.colors.primary,
+  tabButton: {
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: 0,
+  },
+
+  tabText: {
+    fontSize: 15,
+    color: theme.colors.textTertiary,
+    fontWeight: theme.typography.weights.medium,
+    letterSpacing: 0.2,
   },
 
   selectedTabText: {
-    color: theme.colors.textInverse,
+    color: theme.colors.textPrimary,
+    fontWeight: theme.typography.weights.semibold,
+  },
+
+  tabUnderline: {
+    height: 3,
+    backgroundColor: theme.colors.textPrimary,
+    borderRadius: 1.5,
+    width: '100%',
+    marginTop: theme.spacing.xs,
   },
 });

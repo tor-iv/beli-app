@@ -40,7 +40,7 @@ export const RatingBubble: React.FC<RatingBubbleProps> = ({
       borderRadius: bubbleSize / 2,
       backgroundColor: theme.colors.white,
       borderWidth: 1.5,
-      borderColor: '#E0E0E0',
+      borderColor: '#D9D9DE',
     },
     style,
   ];

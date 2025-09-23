@@ -17,6 +17,7 @@ export const typography = {
 
   // Font weights
   weights: {
+    normal: '400' as const,   // Alias for regular
     regular: '400' as const,  // Body text
     medium: '500' as const,   // Subtle emphasis
     semibold: '600' as const, // Headers, buttons

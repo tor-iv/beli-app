@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image, StyleSheet, ViewStyle, Pressable } from 'react-native';
+import { View, StyleSheet, ViewStyle, Pressable, Text as RNText } from 'react-native';
 import { Text, Caption } from '../typography';
 import { RatingBubble, PriceRange } from '../rating';
 import { theme } from '../../theme';
@@ -11,6 +11,8 @@ interface RestaurantListItemProps {
   rank?: number;
   showDistance?: boolean;
   showStatus?: boolean;
+  isOpen?: boolean;
+  closingTime?: string | null;
   style?: ViewStyle;
   testID?: string;
 }
@@ -21,6 +23,8 @@ export const RestaurantListItem: React.FC<RestaurantListItemProps> = ({
   rank,
   showDistance = true,
   showStatus = false,
+  isOpen,
+  closingTime,
   style,
   testID,
 }) => {
@@ -29,63 +33,48 @@ export const RestaurantListItem: React.FC<RestaurantListItemProps> = ({
       {/* Rank Number */}
       {rank !== undefined && (
         <View style={styles.rankContainer}>
-          <Text variant="h4" color="textSecondary" style={styles.rank}>
-            {rank}
-          </Text>
+          <RNText style={styles.rank}>
+            {rank}.
+          </RNText>
         </View>
       )}
 
-      {/* Restaurant Image */}
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: restaurant.images[0] }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-      </View>
-
       {/* Content */}
       <View style={styles.content}>
-        <Text variant="body" numberOfLines={1} style={styles.name}>
+        <RNText style={styles.name}>
           {restaurant.name}
-        </Text>
+        </RNText>
 
         <View style={styles.metadata}>
           <PriceRange priceRange={restaurant.priceRange} />
-          <Text variant="caption" color="textSecondary" style={styles.separator}>
+          <RNText style={styles.separator}>
             |
-          </Text>
-          <Caption color="textSecondary" numberOfLines={1} style={styles.cuisine}>
+          </RNText>
+          <RNText style={styles.cuisine} numberOfLines={1}>
             {restaurant.cuisine.join(', ')}
-          </Caption>
+          </RNText>
         </View>
 
-        <Caption color="textSecondary" numberOfLines={1} style={styles.address}>
-          {restaurant.location.address}, {restaurant.location.neighborhood}
-        </Caption>
+        <RNText style={styles.address} numberOfLines={1}>
+          {restaurant.location.neighborhood}, {restaurant.location.city}, {restaurant.location.state}
+        </RNText>
 
-        {(showDistance || showStatus) && (
-          <View style={styles.statusRow}>
-            {showDistance && restaurant.distance && (
-              <Caption color="textSecondary">
-                {restaurant.distance.toFixed(1)} mi
-              </Caption>
+        <View style={styles.statusRow}>
+          <RNText style={styles.statusText}>
+            {showDistance && restaurant.distance && `${restaurant.distance.toFixed(0)} mi`}
+            {showDistance && showStatus && restaurant.distance && " • "}
+            {showStatus && (isOpen ? "Open" : "Closed")}
+            {showStatus && closingTime && (isOpen
+              ? ` • Closes ${closingTime}`
+              : ` • Opens ${closingTime}`
             )}
-            {showDistance && showStatus && (
-              <Text variant="caption" color="textSecondary" style={styles.separator}>
-                •
-              </Text>
-            )}
-            {showStatus && (
-              <Caption color="success">Open now</Caption>
-            )}
-          </View>
-        )}
+          </RNText>
+        </View>
       </View>
 
       {/* Rating */}
       <View style={styles.ratingContainer}>
-        <RatingBubble rating={restaurant.rating} size="small" />
+        <RatingBubble rating={restaurant.rating} size="medium" />
       </View>
     </View>
   );
@@ -118,36 +107,27 @@ export const RestaurantListItem: React.FC<RestaurantListItemProps> = ({
 const styles = StyleSheet.create({
   pressable: {
     backgroundColor: theme.colors.white,
-    paddingVertical: theme.spacing.md,
+    paddingVertical: theme.spacing.lg,
     paddingHorizontal: theme.spacing.edgePadding,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.borderLight,
   },
 
   container: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
 
   rankContainer: {
-    width: 32,
-    alignItems: 'center',
+    width: 28,
     marginRight: theme.spacing.md,
+    marginTop: 2,
   },
 
   rank: {
+    fontSize: 18,
     fontWeight: theme.typography.weights.bold,
-  },
-
-  imageContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: theme.spacing.borderRadius.sm,
-    overflow: 'hidden',
-    marginRight: theme.spacing.md,
-  },
-
-  image: {
-    width: '100%',
-    height: '100%',
+    color: theme.colors.textPrimary,
   },
 
   content: {
@@ -156,26 +136,35 @@ const styles = StyleSheet.create({
   },
 
   name: {
+    fontSize: 18,
     fontWeight: theme.typography.weights.semibold,
-    marginBottom: 2,
+    color: theme.colors.textPrimary,
+    marginBottom: 6,
   },
 
   metadata: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 2,
+    marginBottom: 4,
   },
 
   separator: {
+    fontSize: 14,
+    color: theme.colors.textTertiary,
     marginHorizontal: theme.spacing.xs,
   },
 
   cuisine: {
     flex: 1,
+    fontSize: 14,
+    color: theme.colors.textPrimary,
+    fontWeight: theme.typography.weights.normal,
   },
 
   address: {
-    marginBottom: 2,
+    marginBottom: 6,
+    fontSize: 14,
+    color: theme.colors.textSecondary,
   },
 
   statusRow: {
@@ -183,7 +172,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  statusSeparator: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    marginHorizontal: theme.spacing.xs,
+  },
+
+  statusText: {
+    fontSize: 13,
+    color: theme.colors.textTertiary,
+  },
+
   ratingContainer: {
     alignItems: 'center',
+    marginTop: 2,
   },
 });

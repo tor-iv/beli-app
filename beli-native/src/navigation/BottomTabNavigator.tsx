@@ -1,7 +1,8 @@
 import React from 'react';
+import { View, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme';
+import { colors, spacing } from '../theme';
 
 // Import screens (we'll create these next)
 import FeedScreen from '../screens/FeedScreen';
@@ -37,18 +38,12 @@ export default function BottomTabNavigator() {
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: {
-          backgroundColor: colors.cardWhite,
-          borderTopWidth: 0,
-          elevation: 8,
-          shadowColor: colors.shadow,
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          height: 83,
-          paddingBottom: 20,
-          paddingTop: 8,
-        },
+        tabBarStyle: styles.tabBar,
+        tabBarBackground: () => (
+          <View style={styles.tabBarBackground}>
+            <View style={styles.divider} />
+          </View>
+        ),
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '500',
@@ -71,10 +66,10 @@ export default function BottomTabNavigator() {
         component={FeedScreen}
         options={{ headerShown: false }}
       />
-      <Tab.Screen 
-        name="Lists" 
+      <Tab.Screen
+        name="Lists"
         component={ListsScreen}
-        options={{ title: 'Your Lists' }}
+        options={{ headerShown: false }}
       />
       <Tab.Screen 
         name="Search" 
@@ -93,3 +88,39 @@ export default function BottomTabNavigator() {
     </Tab.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: 'transparent',
+    borderTopWidth: 0,
+    elevation: 0,
+    shadowOpacity: 0,
+    height: spacing.tabBarHeight,
+    paddingBottom: 20,
+    paddingTop: 8,
+  },
+
+  tabBarBackground: {
+    flex: 1,
+    backgroundColor: colors.cardWhite,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+
+  divider: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.borderLight,
+  },
+});

@@ -1,4 +1,4 @@
-import { List } from '../../types';
+import { List, ListCategory, ListScope } from '../../types';
 
 export const mockLists: List[] = [
   // Featured/Curated Lists
@@ -9,6 +9,8 @@ export const mockLists: List[] = [
     description: 'The ultimate guide to the best pizza slices in the five boroughs',
     restaurants: ['2', '3', '20', '26'], // Prince Street, Joe's, L'industrie, Artichoke
     isPublic: true,
+    category: 'restaurants',
+    listType: 'playlists',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-15'),
   },
@@ -19,6 +21,8 @@ export const mockLists: List[] = [
     description: 'NYC\'s finest dining establishments with Michelin recognition',
     restaurants: ['10', '12', '15', '25'], // Le Bernardin, Eleven Madison Park, Daniel, NoMad
     isPublic: true,
+    category: 'restaurants',
+    listType: 'playlists',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-10'),
   },
@@ -29,6 +33,8 @@ export const mockLists: List[] = [
     description: 'Romantic restaurants perfect for special occasions',
     restaurants: ['1', '4', '10', '14', '15', '21'], // Balthazar, Minetta, Le Bernardin, Locanda Verde, Daniel, Cecconi's
     isPublic: true,
+    category: 'restaurants',
+    listType: 'playlists',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-12'),
   },
@@ -39,6 +45,8 @@ export const mockLists: List[] = [
     description: 'Where to eat when everything else is closed',
     restaurants: ['3', '11', '18', '26', '28'], // Joe's Pizza, Halal Guys, Gray's Papaya, Artichoke, Mamoun's
     isPublic: true,
+    category: 'restaurants',
+    listType: 'playlists',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-08'),
   },
@@ -49,6 +57,8 @@ export const mockLists: List[] = [
     description: 'Under-the-radar spots that deserve more attention',
     restaurants: ['22', '23', '24', '8'], // Al di La, Taverna Kyclades, Ivan Ramen, Xi'an Famous Foods
     isPublic: true,
+    category: 'restaurants',
+    listType: 'playlists',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-05'),
   },
@@ -59,6 +69,8 @@ export const mockLists: List[] = [
     description: 'Plant-based dining done right',
     restaurants: ['27', '12'], // Blue Hill, Eleven Madison Park
     isPublic: true,
+    category: 'restaurants',
+    listType: 'playlists',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-03'),
   },
@@ -69,6 +81,8 @@ export const mockLists: List[] = [
     description: 'Great food that won\'t break the bank (under $15)',
     restaurants: ['3', '8', '9', '11', '13', '18', '26', '28'], // Joe's, Xi'an, Joe's Shanghai, Halal Guys, Shake Shack, Gray's, Artichoke, Mamoun's
     isPublic: true,
+    category: 'restaurants',
+    listType: 'playlists',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-06'),
   },
@@ -79,8 +93,10 @@ export const mockLists: List[] = [
     userId: '1', // Tor Cox
     name: 'Been',
     description: 'Restaurants I\'ve visited',
-    restaurants: ['1', '3', '5'], // Based on user relations
+    restaurants: ['100', '101', '102', '103'], // International restaurants from mockup
     isPublic: false,
+    category: 'restaurants',
+    listType: 'been',
     createdAt: new Date('2023-01-15'),
     updatedAt: new Date('2024-01-10'),
   },
@@ -91,6 +107,8 @@ export const mockLists: List[] = [
     description: 'Restaurants on my bucket list',
     restaurants: ['12', '10', '20'], // Based on user relations
     isPublic: false,
+    category: 'restaurants',
+    listType: 'want_to_try',
     createdAt: new Date('2023-01-15'),
     updatedAt: new Date('2024-01-15'),
   },
@@ -101,6 +119,8 @@ export const mockLists: List[] = [
     description: 'My go-to restaurants for romantic dinners',
     restaurants: ['1', '10', '14', '15'],
     isPublic: true,
+    category: 'restaurants',
+    listType: 'playlists',
     createdAt: new Date('2023-06-20'),
     updatedAt: new Date('2024-01-08'),
   },
@@ -111,6 +131,8 @@ export const mockLists: List[] = [
     description: 'Amazing plant-based dining in NYC',
     restaurants: ['27', '12', '30'],
     isPublic: true,
+    category: 'restaurants',
+    listType: 'recs',
     createdAt: new Date('2022-09-10'),
     updatedAt: new Date('2024-01-14'),
   },
@@ -121,6 +143,8 @@ export const mockLists: List[] = [
     description: 'Rating every pizza place in the city',
     restaurants: ['2', '3', '20', '26'],
     isPublic: true,
+    category: 'restaurants',
+    listType: 'recs',
     createdAt: new Date('2022-07-01'),
     updatedAt: new Date('2024-01-14'),
   },
@@ -131,6 +155,8 @@ export const mockLists: List[] = [
     description: 'Authentic Italian restaurants that remind me of home',
     restaurants: ['14', '21', '22'],
     isPublic: true,
+    category: 'restaurants',
+    listType: 'recs',
     createdAt: new Date('2022-03-15'),
     updatedAt: new Date('2024-01-13'),
   },
@@ -141,6 +167,8 @@ export const mockLists: List[] = [
     description: 'Amazing food under $10',
     restaurants: ['3', '8', '11', '18', '28'],
     isPublic: true,
+    category: 'restaurants',
+    listType: 'recs',
     createdAt: new Date('2023-07-01'),
     updatedAt: new Date('2024-01-15'),
   },
@@ -151,6 +179,8 @@ export const mockLists: List[] = [
     description: 'The best steaks and BBQ in the city',
     restaurants: ['19', '4'],
     isPublic: true,
+    category: 'restaurants',
+    listType: 'recs',
     createdAt: new Date('2023-02-20'),
     updatedAt: new Date('2024-01-06'),
   },
@@ -161,6 +191,8 @@ export const mockLists: List[] = [
     description: 'Real ramen spots that remind me of Tokyo',
     restaurants: ['24', '6'],
     isPublic: true,
+    category: 'restaurants',
+    listType: 'recs',
     createdAt: new Date('2022-08-10'),
     updatedAt: new Date('2024-01-13'),
   },
@@ -171,6 +203,8 @@ export const mockLists: List[] = [
     description: 'Restaurants with exceptional wine programs',
     restaurants: ['10', '15', '25'],
     isPublic: true,
+    category: 'restaurants',
+    listType: 'recs',
     createdAt: new Date('2021-11-01'),
     updatedAt: new Date('2024-01-08'),
   },
@@ -181,6 +215,8 @@ export const mockLists: List[] = [
     description: 'Best brunch spots for bottomless mimosas',
     restaurants: ['1', '17', '30'],
     isPublic: true,
+    category: 'restaurants',
+    listType: 'recs',
     createdAt: new Date('2023-03-01'),
     updatedAt: new Date('2024-01-13'),
   },
@@ -191,6 +227,8 @@ export const mockLists: List[] = [
     description: 'Best seafood restaurants in NYC',
     restaurants: ['10', '23'],
     isPublic: true,
+    category: 'restaurants',
+    listType: 'recs',
     createdAt: new Date('2022-12-01'),
     updatedAt: new Date('2024-01-12'),
   },
@@ -201,6 +239,8 @@ export const mockLists: List[] = [
     description: '100% plant-based restaurants and dishes',
     restaurants: ['27', '12'],
     isPublic: true,
+    category: 'restaurants',
+    listType: 'recs',
     createdAt: new Date('2022-07-15'),
     updatedAt: new Date('2024-01-09'),
   },
@@ -211,39 +251,185 @@ export const mockLists: List[] = [
     description: 'Testing every burger in the five boroughs',
     restaurants: ['4', '13'],
     isPublic: true,
+    category: 'restaurants',
+    listType: 'recs',
     createdAt: new Date('2023-06-01'),
     updatedAt: new Date('2024-01-11'),
+  },
+
+  // Tor Cox - Bars category
+  {
+    id: 'user-1-bars-been',
+    userId: '1',
+    name: 'Bar Check-Ins',
+    description: 'Cocktail bars I have already visited',
+    restaurants: ['200', '201'],
+    isPublic: false,
+    category: 'bars',
+    listType: 'been',
+    createdAt: new Date('2023-02-10'),
+    updatedAt: new Date('2024-01-05'),
+  },
+  {
+    id: 'user-1-bars-want',
+    userId: '1',
+    name: 'Bars to Check Out',
+    description: 'Cities best speakeasies still on my list',
+    restaurants: ['202'],
+    isPublic: false,
+    category: 'bars',
+    listType: 'want_to_try',
+    createdAt: new Date('2023-05-12'),
+    updatedAt: new Date('2024-01-02'),
+  },
+  {
+    id: 'user-1-bars-recs',
+    userId: '1',
+    name: 'Late Night Cocktail Crawl',
+    description: 'My go-to route when friends are in town',
+    restaurants: ['200', '201', '202'],
+    isPublic: true,
+    category: 'bars',
+    listType: 'recs',
+    createdAt: new Date('2023-06-02'),
+    updatedAt: new Date('2024-01-07'),
+  },
+  {
+    id: 'user-1-bars-playlist',
+    userId: '1',
+    name: 'Moody Speakeasy Vibes',
+    description: 'Curated bar list for cozy nights out',
+    restaurants: ['200', '202'],
+    isPublic: false,
+    category: 'bars',
+    listType: 'playlists',
+    createdAt: new Date('2023-08-18'),
+    updatedAt: new Date('2023-12-28'),
+  },
+
+  // Tor Cox - Bakeries category
+  {
+    id: 'user-1-bakeries-been',
+    userId: '1',
+    name: 'Bakery Faves',
+    description: 'Sweet spots I revisit often',
+    restaurants: ['210', '211'],
+    isPublic: false,
+    category: 'bakeries',
+    listType: 'been',
+    createdAt: new Date('2022-11-04'),
+    updatedAt: new Date('2024-01-04'),
+  },
+  {
+    id: 'user-1-bakeries-want',
+    userId: '1',
+    name: 'Pastry Hit List',
+    description: 'Bakeries I need to try soon',
+    restaurants: ['212'],
+    isPublic: false,
+    category: 'bakeries',
+    listType: 'want_to_try',
+    createdAt: new Date('2023-02-21'),
+    updatedAt: new Date('2023-12-12'),
+  },
+  {
+    id: 'user-1-bakeries-playlist',
+    userId: '1',
+    name: 'Weekend Morning Run',
+    description: 'My go-to bakery crawl for visitors',
+    restaurants: ['210', '211', '212'],
+    isPublic: true,
+    category: 'bakeries',
+    listType: 'playlists',
+    createdAt: new Date('2023-03-18'),
+    updatedAt: new Date('2024-01-09'),
+  },
+
+  // Tor Cox - Coffee & Tea category
+  {
+    id: 'user-1-coffee-been',
+    userId: '1',
+    name: 'Daily Coffee Rotation',
+    description: 'Cafés fueling my weekdays',
+    restaurants: ['220', '221'],
+    isPublic: false,
+    category: 'coffee_tea',
+    listType: 'been',
+    createdAt: new Date('2022-09-12'),
+    updatedAt: new Date('2024-01-06'),
+  },
+  {
+    id: 'user-1-coffee-want',
+    userId: '1',
+    name: 'Coffee Shop Radar',
+    description: 'Spots I keep hearing about',
+    restaurants: ['222'],
+    isPublic: false,
+    category: 'coffee_tea',
+    listType: 'want_to_try',
+    createdAt: new Date('2023-04-02'),
+    updatedAt: new Date('2024-01-03'),
+  },
+  {
+    id: 'user-1-coffee-recs',
+    userId: '1',
+    name: 'Remote Work Friendly Cafés',
+    description: 'Reliable Wi-Fi, plenty of outlets, good vibes',
+    restaurants: ['220', '221', '222'],
+    isPublic: true,
+    category: 'coffee_tea',
+    listType: 'recs',
+    createdAt: new Date('2023-07-15'),
+    updatedAt: new Date('2024-01-05'),
+  },
+
+  // Tor Cox - Dessert category
+  {
+    id: 'user-1-dessert-been',
+    userId: '1',
+    name: 'Dessert Wins',
+    description: 'Sweet tooth satisfiers I love',
+    restaurants: ['230'],
+    isPublic: false,
+    category: 'dessert',
+    listType: 'been',
+    createdAt: new Date('2023-01-25'),
+    updatedAt: new Date('2023-12-19'),
+  },
+  {
+    id: 'user-1-dessert-want',
+    userId: '1',
+    name: 'Desserts to Try',
+    description: 'Frozen treats & plated desserts on my radar',
+    restaurants: ['231', '232'],
+    isPublic: false,
+    category: 'dessert',
+    listType: 'want_to_try',
+    createdAt: new Date('2023-05-22'),
+    updatedAt: new Date('2024-01-01'),
+  },
+  {
+    id: 'user-1-dessert-playlist',
+    userId: '1',
+    name: 'Late Night Dessert Crawl',
+    description: 'Perfect sugar rush itinerary',
+    restaurants: ['230', '231', '232'],
+    isPublic: true,
+    category: 'dessert',
+    listType: 'playlists',
+    createdAt: new Date('2023-06-11'),
+    updatedAt: new Date('2024-01-04'),
   },
 ];
 
 // Helper function to get lists by type for a user
-export const getUserListsByType = (userId: string, type: 'been' | 'want_to_try' | 'recs' | 'playlists') => {
-  switch (type) {
-    case 'been':
-      return mockLists.filter(list =>
-        list.userId === userId && list.name === 'Been'
-      );
-    case 'want_to_try':
-      return mockLists.filter(list =>
-        list.userId === userId && list.name === 'Want to Try'
-      );
-    case 'recs':
-      return mockLists.filter(list =>
-        list.userId === userId &&
-        list.name !== 'Been' &&
-        list.name !== 'Want to Try' &&
-        list.isPublic
-      );
-    case 'playlists':
-      return mockLists.filter(list =>
-        list.userId === userId &&
-        list.name !== 'Been' &&
-        list.name !== 'Want to Try'
-      );
-    default:
-      return [];
-  }
-};
+export const getUserListsByType = (userId: string, listType: ListScope, category: ListCategory) =>
+  mockLists.filter(
+    list =>
+      list.userId === userId &&
+      list.listType === listType &&
+      list.category === category
+  );
 
 // Featured lists that appear on the home feed
 export const featuredLists = mockLists.filter(list => list.userId === 'admin');

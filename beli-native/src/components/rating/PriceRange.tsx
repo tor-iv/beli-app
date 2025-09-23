@@ -1,10 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
-import { Text } from '../typography';
+import { View, StyleSheet, ViewStyle, Text } from 'react-native';
 import { theme } from '../../theme';
 
 interface PriceRangeProps {
-  priceRange: '$' | '$$' | '$$$' | '$$$$';
+  priceRange: '$' | '$$' | '$$$' | '$$$$' | '€€€' | string;
   style?: ViewStyle;
   testID?: string;
 }
@@ -14,19 +13,25 @@ export const PriceRange: React.FC<PriceRangeProps> = ({
   style,
   testID,
 }) => {
-  const activeDollars = priceRange.length;
-  const totalDollars = 4;
+  const activeSymbols = priceRange.length;
+  const totalSymbols = 4;
+  const symbol = priceRange.includes('€') ? '€' : '$';
 
   return (
     <View style={[styles.container, style]} testID={testID}>
-      {Array.from({ length: totalDollars }, (_, index) => (
+      {Array.from({ length: totalSymbols }, (_, index) => (
         <Text
           key={index}
-          variant="bodySmall"
-          color={index < activeDollars ? 'textPrimary' : 'textTertiary'}
-          style={styles.dollar}
+          style={[
+            styles.symbol,
+            {
+              color: index < activeSymbols
+                ? theme.colors.textPrimary
+                : theme.colors.textTertiary,
+            },
+          ]}
         >
-          $
+          {symbol}
         </Text>
       ))}
     </View>
@@ -39,7 +44,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  dollar: {
+  symbol: {
+    fontSize: 14,
     fontWeight: theme.typography.weights.semibold,
     marginRight: 1,
   },

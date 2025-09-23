@@ -1,7 +1,7 @@
 export const colors = {
   // Primary brand colors
-  primary: '#0B7B7F',        // Main teal brand color
-  primaryDark: '#005F46',    // Darker variant for CTAs
+  primary: '#0A6C70',        // Main teal brand color (slightly richer)
+  primaryDark: '#075159',    // Darker variant for CTAs
   primaryLight: '#E6F7FF',   // Light variant for backgrounds
   white: '#FFFFFF',          // Pure white
   offWhite: '#FAFAFA',       // Secondary background

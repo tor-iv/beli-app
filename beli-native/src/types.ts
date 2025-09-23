@@ -37,10 +37,18 @@ export interface Restaurant {
   location: RestaurantLocation;
   hours: Hours;
   phone: string;
-  website: string;
+  website?: string;
   images: string[];
   popularDishes: string[];
   distance?: number;
+  tags?: string[];
+  scores?: {
+    recScore: number;
+    friendScore: number;
+  };
+  isOpen?: boolean;
+  closingTime?: string | null;
+  acceptsReservations?: boolean;
 }
 
 export interface RestaurantLocation {
@@ -122,6 +130,16 @@ export interface ActivityComment {
 }
 
 // List types
+export type ListCategory =
+  | 'restaurants'
+  | 'bars'
+  | 'bakeries'
+  | 'coffee_tea'
+  | 'dessert'
+  | 'other';
+
+export type ListScope = 'been' | 'want_to_try' | 'recs' | 'playlists';
+
 export interface List {
   id: string;
   userId: string;
@@ -129,7 +147,8 @@ export interface List {
   description: string;
   restaurants: string[]; // restaurant IDs
   isPublic: boolean;
-  type?: string; // Optional type field for categorization
+  category: ListCategory;
+  listType: ListScope;
   createdAt: Date;
   updatedAt: Date;
 }
