@@ -1,12 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, RefreshControl, ScrollView, TextInput, Pressable, Image } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, FlatList, RefreshControl, ScrollView, Pressable, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors, typography, spacing } from '../theme';
 import { ActivityCard, LoadingSpinner } from '../components';
 import { MockDataService } from '../data/mockDataService';
 import type { Activity } from '../data/mock/types';
 
+type BottomTabParamList = {
+  Feed: undefined;
+  Lists: undefined;
+  Search: { autoFocus?: boolean } | undefined;
+  Leaderboard: undefined;
+  Profile: undefined;
+};
+
 export default function FeedScreen() {
+  const navigation = useNavigation<BottomTabNavigationProp<BottomTabParamList>>();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -30,6 +41,10 @@ export default function FeedScreen() {
   const onRefresh = () => {
     setRefreshing(true);
     loadFeed();
+  };
+
+  const handleSearchPress = () => {
+    navigation.navigate('Search', { autoFocus: true });
   };
 
   const renderActivity = ({ item }: { item: Activity }) => (
@@ -67,14 +82,10 @@ export default function FeedScreen() {
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
-        <View style={styles.searchBar}>
+        <Pressable style={styles.searchBar} onPress={handleSearchPress}>
           <Ionicons name="search" size={20} color={colors.textSecondary} style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search a restaurant, member, etc."
-            placeholderTextColor={colors.textSecondary}
-          />
-        </View>
+          <Text style={styles.searchPlaceholder}>Search a restaurant, member, etc.</Text>
+        </Pressable>
       </View>
 
       {/* Action Buttons */}
@@ -286,10 +297,10 @@ const styles = StyleSheet.create({
   searchIcon: {
     marginRight: spacing.sm,
   },
-  searchInput: {
+  searchPlaceholder: {
     flex: 1,
     fontSize: 16,
-    color: colors.textPrimary,
+    color: colors.textSecondary,
   },
 
   // Action Buttons Styles

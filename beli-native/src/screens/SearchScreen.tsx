@@ -1,21 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, Pressable, ScrollView } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, FlatList, Pressable, ScrollView, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { colors, typography, spacing } from '../theme';
 import { SearchBar, LoadingSpinner, EmptyState } from '../components';
 import { MockDataService } from '../data/mockDataService';
 import type { Restaurant } from '../data/mock/types';
 
 export default function SearchScreen() {
+  const navigation = useNavigation<any>();
+  const route = useRoute<any>();
+  const searchInputRef = useRef<TextInput | null>(null);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
   const [recentRestaurants, setRecentRestaurants] = useState<Restaurant[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [searchingRestaurants, setSearchingRestaurants] = useState(false);
   const [activeSegment, setActiveSegment] = useState<'Restaurants' | 'Members'>('Restaurants');
   const [location, setLocation] = useState('Current Location');
 
   const handleLocationPress = () => {};
+
+  useEffect(() => {
+    if (route.params?.autoFocus) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 100);
+
+      if (typeof navigation.setParams === 'function') {
+        navigation.setParams({ autoFocus: false });
+      }
+    }
+  }, [route.params?.autoFocus, navigation]);
 
   useEffect(() => {
     loadRestaurants();
@@ -23,11 +40,46 @@ export default function SearchScreen() {
 
   useEffect(() => {
     if (activeSegment !== 'Restaurants') {
+      setSearchingRestaurants(false);
       setFilteredRestaurants([]);
       return;
     }
 
-    filterRestaurants(searchQuery);
+    const trimmedQuery = searchQuery.trim();
+
+    if (!trimmedQuery) {
+      setFilteredRestaurants(restaurants);
+      setSearchingRestaurants(false);
+      return;
+    }
+
+    let isCancelled = false;
+    setSearchingRestaurants(true);
+
+    const timeoutId = setTimeout(() => {
+      MockDataService.searchRestaurants(trimmedQuery)
+        .then(results => {
+          if (!isCancelled) {
+            setFilteredRestaurants(results);
+          }
+        })
+        .catch(error => {
+          if (!isCancelled) {
+            console.error('Restaurant search failed:', error);
+            setFilteredRestaurants([]);
+          }
+        })
+        .finally(() => {
+          if (!isCancelled) {
+            setSearchingRestaurants(false);
+          }
+        });
+    }, 200);
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(timeoutId);
+    };
   }, [searchQuery, restaurants, activeSegment]);
 
   const loadRestaurants = async () => {
@@ -41,26 +93,6 @@ export default function SearchScreen() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const filterRestaurants = (query: string) => {
-    if (!query.trim()) {
-      setFilteredRestaurants(restaurants);
-      return;
-    }
-
-    const queryLower = query.toLowerCase();
-    const filtered = restaurants.filter(restaurant => {
-      const matchesName = restaurant.name.toLowerCase().includes(queryLower);
-      const matchesCuisine = Array.isArray(restaurant.cuisine)
-        ? restaurant.cuisine.some(c => c.toLowerCase().includes(queryLower))
-        : false;
-      const neighborhood = restaurant.location?.neighborhood ?? '';
-      const matchesNeighborhood = neighborhood.toLowerCase().includes(queryLower);
-
-      return matchesName || matchesCuisine || matchesNeighborhood;
-    });
-    setFilteredRestaurants(filtered);
   };
 
   const segments = [
@@ -172,10 +204,12 @@ export default function SearchScreen() {
     return (
       <>
         <SearchBar
+          ref={searchInputRef}
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder={searchPlaceholder}
           onClear={handleClearSearch}
+          autoFocus={Boolean(route.params?.autoFocus)}
           style={styles.searchInput}
         />
         {showLocation && (
@@ -238,6 +272,14 @@ export default function SearchScreen() {
           description="Find and follow friends by name or username"
           iconName="people-outline"
         />
+      );
+    }
+
+    if (searchQuery.trim() && searchingRestaurants) {
+      return (
+        <View style={styles.loadingContainer}>
+          <LoadingSpinner size="large" />
+        </View>
       );
     }
 

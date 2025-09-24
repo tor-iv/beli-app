@@ -57,13 +57,25 @@ export class MockDataService {
     let filteredRestaurants = mockRestaurants;
 
     // Text search
-    if (query) {
-      const lowercaseQuery = query.toLowerCase();
-      filteredRestaurants = filteredRestaurants.filter(restaurant =>
-        restaurant.name.toLowerCase().includes(lowercaseQuery) ||
-        restaurant.cuisine.some(c => c.toLowerCase().includes(lowercaseQuery)) ||
-        restaurant.location.neighborhood.toLowerCase().includes(lowercaseQuery)
-      );
+    if (query.trim()) {
+      const lowercaseQuery = query.trim().toLowerCase();
+      filteredRestaurants = filteredRestaurants.filter(restaurant => {
+        const textFields: string[] = [
+          restaurant.name,
+          restaurant.location.neighborhood,
+          restaurant.location.city,
+          restaurant.location.state,
+          restaurant.location.address,
+          restaurant.priceRange,
+          ...(restaurant.cuisine ?? []),
+          ...(restaurant.tags ?? []),
+          ...(restaurant.popularDishes ?? []),
+        ];
+
+        return textFields.some(field =>
+          typeof field === 'string' && field.toLowerCase().includes(lowercaseQuery)
+        );
+      });
     }
 
     // Cuisine filter

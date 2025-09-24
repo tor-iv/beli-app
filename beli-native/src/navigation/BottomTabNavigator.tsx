@@ -95,7 +95,7 @@ export default function BottomTabNavigator() {
                   >
                     <Ionicons
                       name="add"
-                      size={24}
+                      size={22}
                       color={colors.textInverse}
                     />
                   </View>
@@ -166,8 +166,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   searchTabButton: {
-    width: 44,
-    height: 44,
+    width: 40,
+    height: 40,
     borderRadius: spacing.borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',

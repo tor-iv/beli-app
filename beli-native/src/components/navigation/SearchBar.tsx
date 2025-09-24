@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { View, TextInput, StyleSheet, ViewStyle, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../../theme';
@@ -17,19 +17,22 @@ interface SearchBarProps {
   testID?: string;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({
-  value,
-  onChangeText,
-  placeholder = 'Search restaurants, cuisine, occasion',
-  onFocus,
-  onBlur,
-  onClear,
-  autoFocus = false,
-  editable = true,
-  showIcon = true,
-  style,
-  testID,
-}) => {
+export const SearchBar = forwardRef<TextInput, SearchBarProps>(function SearchBar(
+  {
+    value,
+    onChangeText,
+    placeholder = 'Search restaurants, cuisine, occasion',
+    onFocus,
+    onBlur,
+    onClear,
+    autoFocus = false,
+    editable = true,
+    showIcon = true,
+    style,
+    testID,
+  },
+  ref
+) {
   const SearchIcon = () => (
     <Ionicons name="search" size={18} color={theme.colors.textSecondary} />
   );
@@ -53,6 +56,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       )}
 
       <TextInput
+        ref={ref}
         style={styles.input}
         value={value}
         onChangeText={onChangeText}
@@ -71,7 +75,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       )}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
