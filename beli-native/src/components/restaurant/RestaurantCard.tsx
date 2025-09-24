@@ -23,6 +23,9 @@ export const RestaurantCard: React.FC<RestaurantCardProps> = ({
   style,
   testID,
 }) => {
+  const cuisines = Array.isArray(restaurant.cuisine) ? restaurant.cuisine : [];
+  const tags = Array.isArray(restaurant.tags) ? restaurant.tags : [];
+
   const content = (
     <>
       {/* Hero Image */}
@@ -49,7 +52,7 @@ export const RestaurantCard: React.FC<RestaurantCardProps> = ({
             •
           </Text>
           <Caption color="textSecondary" numberOfLines={1}>
-            {restaurant.cuisine.join(', ')}
+            {cuisines.join(', ')}
           </Caption>
         </View>
 
@@ -59,9 +62,9 @@ export const RestaurantCard: React.FC<RestaurantCardProps> = ({
           </Caption>
         )}
 
-        {showTags && restaurant.tags.length > 0 && (
+        {showTags && tags.length > 0 && (
           <View style={styles.tags}>
-            {restaurant.tags.slice(0, 3).map((tag, index) => (
+            {tags.slice(0, 3).map((tag) => (
               <View key={tag} style={styles.tag}>
                 <Caption variant="metadata" color="textSecondary">
                   {tag}

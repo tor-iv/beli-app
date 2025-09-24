@@ -9,11 +9,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `cd beli-native && npm run ios` - Run on iOS simulator
 - `cd beli-native && npm run android` - Run on Android simulator
 - `cd beli-native && npm run web` - Run in web browser
+- `cd beli-native && npx tsc` - Type check the TypeScript code
 
 ### Development Notes
 - Always work from the `beli-native/` directory for React Native development
 - Use `npx expo start --clear` to clear Metro cache when experiencing bundling issues
 - The app uses Expo SDK 54 with React Native 0.81.4
+- TypeScript is strictly enforced - run `npx tsc` to check for type errors
+- No linting/formatting scripts are configured - rely on TypeScript checking
 
 ## Architecture Overview
 

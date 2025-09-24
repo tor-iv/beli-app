@@ -80,16 +80,40 @@ export default function FeedScreen() {
       {/* Action Buttons */}
       <View style={styles.actionButtons}>
         <Pressable style={styles.actionButton}>
-          <Ionicons name="calendar" size={16} color={colors.white} />
+          <Ionicons
+            name="calendar"
+            size={18}
+            color={colors.textInverse}
+            style={styles.actionButtonIcon}
+          />
           <Text style={styles.actionButtonText}>Reserve now</Text>
         </Pressable>
         <Pressable style={styles.actionButton}>
-          <Ionicons name="navigate" size={16} color={colors.white} />
+          <Ionicons
+            name="navigate"
+            size={18}
+            color={colors.textInverse}
+            style={styles.actionButtonIcon}
+          />
           <Text style={styles.actionButtonText}>Recs Nearby</Text>
         </Pressable>
         <Pressable style={styles.actionButton}>
-          <Ionicons name="trending-up" size={16} color={colors.white} />
+          <Ionicons
+            name="trending-up"
+            size={18}
+            color={colors.textInverse}
+            style={styles.actionButtonIcon}
+          />
           <Text style={styles.actionButtonText}>Trending</Text>
+        </Pressable>
+        <Pressable style={styles.actionButton}>
+          <Ionicons
+            name="people"
+            size={18}
+            color={colors.textInverse}
+            style={styles.actionButtonIcon}
+          />
+          <Text style={styles.actionButtonText}>Friend recs</Text>
         </Pressable>
       </View>
 
@@ -277,16 +301,19 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   actionButton: {
-    backgroundColor: '#2C5F5F',
-    borderRadius: 25,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    backgroundColor: colors.primary,
+    borderRadius: spacing.borderRadius.xl,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    minHeight: 36,
+  },
+  actionButtonIcon: {
+    marginRight: spacing.xs,
   },
   actionButtonText: {
-    color: colors.white,
+    color: colors.textInverse,
     fontSize: 14,
     fontWeight: '500',
   },

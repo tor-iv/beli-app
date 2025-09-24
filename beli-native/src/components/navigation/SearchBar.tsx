@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TextInput, StyleSheet, ViewStyle, Pressable } from 'react-native';
-import { Text } from '../typography';
+import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../../theme';
 
 interface SearchBarProps {
@@ -31,7 +31,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   testID,
 }) => {
   const SearchIcon = () => (
-    <Text style={styles.icon}>🔍</Text>
+    <Ionicons name="search" size={18} color={theme.colors.textSecondary} />
   );
 
   const ClearIcon = () => (
@@ -40,7 +40,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       style={styles.clearButton}
       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
     >
-      <Text style={styles.clearIcon}>✕</Text>
+      <Ionicons name="close-circle" size={18} color={theme.colors.textSecondary} />
     </Pressable>
   );
 
@@ -88,11 +88,6 @@ const styles = StyleSheet.create({
     marginRight: theme.spacing.sm,
   },
 
-  icon: {
-    fontSize: 16,
-    color: theme.colors.textSecondary,
-  },
-
   input: {
     flex: 1,
     fontSize: theme.typography.sizes.base,
@@ -106,8 +101,4 @@ const styles = StyleSheet.create({
     padding: theme.spacing.xs,
   },
 
-  clearIcon: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-  },
 });

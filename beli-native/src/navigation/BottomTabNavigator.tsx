@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing } from '../theme';
@@ -18,14 +18,16 @@ export default function BottomTabNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
+          if (route.name === 'Search') {
+            return null;
+          }
+
           let iconName: keyof typeof Ionicons.glyphMap;
 
           if (route.name === 'Feed') {
             iconName = focused ? 'document' : 'document-outline';
           } else if (route.name === 'Lists') {
             iconName = focused ? 'list' : 'list-outline';
-          } else if (route.name === 'Search') {
-            iconName = focused ? 'search' : 'search-outline';
           } else if (route.name === 'Leaderboard') {
             iconName = focused ? 'trophy' : 'trophy-outline';
           } else if (route.name === 'Profile') {
@@ -44,10 +46,7 @@ export default function BottomTabNavigator() {
             <View style={styles.divider} />
           </View>
         ),
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '500',
-        },
+        tabBarLabelStyle: styles.tabLabel,
         headerStyle: {
           backgroundColor: colors.cardWhite,
           elevation: 0,
@@ -74,7 +73,37 @@ export default function BottomTabNavigator() {
       <Tab.Screen 
         name="Search" 
         component={SearchScreen}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          tabBarLabel: () => null,
+          tabBarButton: ({ onPress, accessibilityRole, accessibilityState }) => {
+            const focused = accessibilityState?.selected;
+            return (
+              <Pressable
+                accessibilityRole={accessibilityRole}
+                accessibilityState={accessibilityState}
+                onPress={onPress}
+                style={styles.searchTabButtonWrapper}
+              >
+                {({ pressed }) => (
+                  <View
+                    style={[
+                      styles.searchTabButton,
+                      focused ? styles.searchTabButtonActive : styles.searchTabButtonInactive,
+                      pressed && styles.searchTabButtonPressed,
+                    ]}
+                  >
+                    <Ionicons
+                      name="add"
+                      size={24}
+                      color={colors.textInverse}
+                    />
+                  </View>
+                )}
+              </Pressable>
+            );
+          },
+        }}
       />
       <Tab.Screen 
         name="Leaderboard" 
@@ -122,5 +151,42 @@ const styles = StyleSheet.create({
     right: 0,
     height: StyleSheet.hairlineWidth,
     backgroundColor: colors.borderLight,
+  },
+
+  tabLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  tabLabelInactive: {
+    color: colors.textSecondary,
+  },
+  searchTabButtonWrapper: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  searchTabButton: {
+    width: 44,
+    height: 44,
+    borderRadius: spacing.borderRadius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primary,
+    marginBottom: spacing.xs,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  searchTabButtonInactive: {
+    opacity: 0.75,
+  },
+  searchTabButtonActive: {
+    opacity: 1,
+  },
+  searchTabButtonPressed: {
+    transform: [{ scale: 0.96 }],
+    opacity: 0.9,
   },
 });

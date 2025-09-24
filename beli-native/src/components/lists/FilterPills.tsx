@@ -231,8 +231,8 @@ const styles = StyleSheet.create({
   },
 
   filterPill: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.xs,
     borderRadius: theme.spacing.borderRadius.full,
     borderWidth: 1,
     borderColor: theme.colors.borderMedium,
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     marginRight: theme.spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 40,
+    minHeight: 34,
   },
 
   filterPillSelected: {
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   dropdownPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.md,
   },
 
   filterText: {
