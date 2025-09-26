@@ -3,6 +3,7 @@ import { View, StyleSheet, Pressable } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing } from '../theme';
+import type { BottomTabParamList } from './types';
 
 // Import screens (we'll create these next)
 import FeedScreen from '../screens/FeedScreen';
@@ -11,7 +12,7 @@ import SearchScreen from '../screens/SearchScreen';
 import LeaderboardScreen from '../screens/LeaderboardScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 export default function BottomTabNavigator() {
   return (

@@ -39,12 +39,20 @@ export interface Restaurant {
   phone?: string;
   website?: string;
   popularDishes: string[];
-  tags: string[];
-  scores: {
+  tags?: string[];
+  scores?: {
     recScore: number;
     friendScore: number;
+    averageScore?: number;
+    recScoreSampleSize?: number;
+    friendScoreSampleSize?: number;
+    averageScoreSampleSize?: number;
   };
   distance?: number; // in miles
+  ratingCount?: number;
+  friendsWantToTryCount?: number;
+  friendAvatars?: string[];
+  popularDishImages?: string[];
 }
 
 export interface UserRestaurantRelation {

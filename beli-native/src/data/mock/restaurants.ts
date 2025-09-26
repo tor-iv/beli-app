@@ -1,6 +1,59 @@
 import { Restaurant } from '../../types';
 
 export const mockRestaurants: Restaurant[] = [
+  {
+    id: 'moody-tongue',
+    name: 'Moody Tongue Pizza',
+    cuisine: ['Pizza', 'Japanese'],
+    priceRange: '$$',
+    location: {
+      address: '345 E 6th St',
+      city: 'New York',
+      state: 'NY',
+      neighborhood: 'Ukrainian Village',
+      coordinates: { lat: 40.7285, lng: -73.9881 },
+    },
+    rating: 8.0,
+    images: [
+      'https://images.unsplash.com/photo-1525059696034-4967e8436775?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1527169402691-feff5539e52c?w=600&auto=format&fit=crop',
+    ],
+    hours: {
+      monday: '11:30 AM - 10:30 PM',
+      tuesday: '11:30 AM - 10:30 PM',
+      wednesday: '11:30 AM - 10:30 PM',
+      thursday: '11:30 AM - 11:00 PM',
+      friday: '11:30 AM - 12:00 AM',
+      saturday: '11:00 AM - 12:00 AM',
+      sunday: '11:00 AM - 10:00 PM',
+    },
+    phone: '(212) 555-0137',
+    website: 'https://moodytonguepizza.example.com',
+    popularDishes: ['Shiso Pepperoni', 'Miso Burrata Slice', 'Yuzu Calabrian Wings'],
+    tags: ['Date Night', 'Gluten Free', 'Atmosphere', 'Sharing', 'Beer'],
+    scores: {
+      recScore: 8.0,
+      friendScore: 8.5,
+      averageScore: 8.2,
+      recScoreSampleSize: 2150,
+      friendScoreSampleSize: 32,
+      averageScoreSampleSize: 1849,
+    },
+    distance: 0.4,
+    ratingCount: 1849,
+    friendsWantToTryCount: 4,
+    friendAvatars: [
+      'https://i.pravatar.cc/150?img=2',
+      'https://i.pravatar.cc/150?img=6',
+      'https://i.pravatar.cc/150?img=8',
+      'https://i.pravatar.cc/150?img=11',
+    ],
+    popularDishImages: [
+      'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1565299543923-37dd378c0eb3?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&auto=format&fit=crop',
+    ],
+  },
   // MANHATTAN - SOHO
   {
     id: '1',
@@ -32,8 +85,25 @@ export const mockRestaurants: Restaurant[] = [
     scores: {
       recScore: 8.2,
       friendScore: 8.6,
+      averageScore: 8.4,
+      recScoreSampleSize: 2100,
+      friendScoreSampleSize: 54,
+      averageScoreSampleSize: 3287,
     },
     distance: 0.8,
+    ratingCount: 3287,
+    friendsWantToTryCount: 6,
+    friendAvatars: [
+      'https://i.pravatar.cc/150?img=2',
+      'https://i.pravatar.cc/150?img=3',
+      'https://i.pravatar.cc/150?img=4',
+      'https://i.pravatar.cc/150?img=5',
+    ],
+    popularDishImages: [
+      'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1525755662778-989d0524087e?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1543353071-10c8ba85a904?w=600&auto=format&fit=crop',
+    ],
   },
   {
     id: '2',
@@ -64,8 +134,25 @@ export const mockRestaurants: Restaurant[] = [
     scores: {
       recScore: 8.8,
       friendScore: 9.0,
+      averageScore: 8.9,
+      recScoreSampleSize: 2900,
+      friendScoreSampleSize: 61,
+      averageScoreSampleSize: 4203,
     },
     distance: 0.5,
+    ratingCount: 4203,
+    friendsWantToTryCount: 12,
+    friendAvatars: [
+      'https://i.pravatar.cc/150?img=6',
+      'https://i.pravatar.cc/150?img=7',
+      'https://i.pravatar.cc/150?img=8',
+      'https://i.pravatar.cc/150?img=9',
+    ],
+    popularDishImages: [
+      'https://images.unsplash.com/photo-1548365328-9bdb8fccb4c6?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1506354666786-959d6d497f1a?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1528137871618-79d2761e3fd5?w=600&auto=format&fit=crop',
+    ],
   },
 
   // MANHATTAN - GREENWICH VILLAGE
@@ -98,8 +185,25 @@ export const mockRestaurants: Restaurant[] = [
     scores: {
       recScore: 7.5,
       friendScore: 8.1,
+      averageScore: 7.8,
+      recScoreSampleSize: 1720,
+      friendScoreSampleSize: 31,
+      averageScoreSampleSize: 2650,
     },
     distance: 0.3,
+    ratingCount: 2650,
+    friendsWantToTryCount: 9,
+    friendAvatars: [
+      'https://i.pravatar.cc/150?img=10',
+      'https://i.pravatar.cc/150?img=11',
+      'https://i.pravatar.cc/150?img=12',
+      'https://i.pravatar.cc/150?img=13',
+    ],
+    popularDishImages: [
+      'https://images.unsplash.com/photo-1546549039-60223902133e?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1542282811-943ef1a977c3?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop',
+    ],
   },
   {
     id: '4',
@@ -131,8 +235,25 @@ export const mockRestaurants: Restaurant[] = [
     scores: {
       recScore: 9.0,
       friendScore: 9.2,
+      averageScore: 9.1,
+      recScoreSampleSize: 980,
+      friendScoreSampleSize: 27,
+      averageScoreSampleSize: 1405,
     },
     distance: 0.6,
+    ratingCount: 1405,
+    friendsWantToTryCount: 4,
+    friendAvatars: [
+      'https://i.pravatar.cc/150?img=1',
+      'https://i.pravatar.cc/150?img=2',
+      'https://i.pravatar.cc/150?img=3',
+      'https://i.pravatar.cc/150?img=4',
+    ],
+    popularDishImages: [
+      'https://images.unsplash.com/photo-1559847844-5315695dadae?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1550254478-ead40cc54513?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1543772927-c50e04ac4f86?w=600&auto=format&fit=crop',
+    ],
   },
 
   // MANHATTAN - EAST VILLAGE
@@ -166,8 +287,25 @@ export const mockRestaurants: Restaurant[] = [
     scores: {
       recScore: 8.0,
       friendScore: 8.6,
+      averageScore: 8.3,
+      recScoreSampleSize: 2140,
+      friendScoreSampleSize: 34,
+      averageScoreSampleSize: 3527,
     },
     distance: 1.2,
+    ratingCount: 3527,
+    friendsWantToTryCount: 11,
+    friendAvatars: [
+      'https://i.pravatar.cc/150?img=14',
+      'https://i.pravatar.cc/150?img=7',
+      'https://i.pravatar.cc/150?img=5',
+      'https://i.pravatar.cc/150?img=8',
+    ],
+    popularDishImages: [
+      'https://images.unsplash.com/photo-1504672281653-10fd488287c5?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1524593166156-33164d6bef54?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1525755662778-989d0524087e?w=600&auto=format&fit=crop',
+    ],
   },
   {
     id: '6',
@@ -198,8 +336,25 @@ export const mockRestaurants: Restaurant[] = [
     scores: {
       recScore: 8.5,
       friendScore: 8.9,
+      averageScore: 8.7,
+      recScoreSampleSize: 1860,
+      friendScoreSampleSize: 29,
+      averageScoreSampleSize: 2743,
     },
     distance: 0.9,
+    ratingCount: 2743,
+    friendsWantToTryCount: 7,
+    friendAvatars: [
+      'https://i.pravatar.cc/150?img=9',
+      'https://i.pravatar.cc/150?img=12',
+      'https://i.pravatar.cc/150?img=15',
+      'https://i.pravatar.cc/150?img=16',
+    ],
+    popularDishImages: [
+      'https://images.unsplash.com/photo-1612874471862-a0bb0cf08c8f?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1543286386-713bdd548da4?w=600&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1548865166-48cd35b0400d?w=600&auto=format&fit=crop',
+    ],
   },
 
   // MANHATTAN - LOWER EAST SIDE
@@ -1023,6 +1178,14 @@ export const mockRestaurants: Restaurant[] = [
     website: 'https://alouette.dk',
     popularDishes: ['New Nordic Cuisine', 'Seasonal Menu', 'Wine Pairing'],
     tags: ['Fine Dining', 'Nordic', 'Michelin'],
+    ratingCount: 1849,
+    friendsWantToTryCount: 4,
+    friendAvatars: [
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      'https://images.unsplash.com/photo-1494790108755-2616b612b387?w=150',
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+    ],
     scores: { recScore: 10.0, friendScore: 10.0 },
     distance: 3845,
   },

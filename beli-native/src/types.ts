@@ -19,7 +19,7 @@ export interface UserStats {
   beenCount: number;
   wantToTryCount: number;
   currentStreak: number;
-  totalReviews: number;
+  totalReviews?: number;
 }
 
 export interface Location {
@@ -45,10 +45,18 @@ export interface Restaurant {
   scores?: {
     recScore: number;
     friendScore: number;
+    averageScore?: number;
+    recScoreSampleSize?: number;
+    friendScoreSampleSize?: number;
+    averageScoreSampleSize?: number;
   };
   isOpen?: boolean;
   closingTime?: string | null;
   acceptsReservations?: boolean;
+  ratingCount?: number;
+  friendsWantToTryCount?: number;
+  friendAvatars?: string[];
+  popularDishImages?: string[];
 }
 
 export interface RestaurantLocation {
@@ -83,6 +91,7 @@ export interface UserRestaurantRelation {
   tags?: string[];
   createdAt: Date;
   visitDate?: Date;
+  companions?: string[];
 }
 
 // Review types

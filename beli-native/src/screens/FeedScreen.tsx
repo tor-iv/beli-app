@@ -2,22 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, RefreshControl, ScrollView, Pressable, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { colors, typography, spacing } from '../theme';
 import { ActivityCard, LoadingSpinner } from '../components';
 import { MockDataService } from '../data/mockDataService';
 import type { Activity } from '../data/mock/types';
+import type { BottomTabParamList, AppStackParamList } from '../navigation/types';
 
-type BottomTabParamList = {
-  Feed: undefined;
-  Lists: undefined;
-  Search: { autoFocus?: boolean } | undefined;
-  Leaderboard: undefined;
-  Profile: undefined;
-};
+type FeedScreenNavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<BottomTabParamList, 'Feed'>,
+  StackNavigationProp<AppStackParamList>
+>;
 
 export default function FeedScreen() {
-  const navigation = useNavigation<BottomTabNavigationProp<BottomTabParamList>>();
+  const navigation = useNavigation<FeedScreenNavigationProp>();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -47,8 +47,16 @@ export default function FeedScreen() {
     navigation.navigate('Search', { autoFocus: true });
   };
 
+  const handleRestaurantPress = (restaurantId: string) => {
+    navigation.navigate('RestaurantInfo', { restaurantId });
+  };
+
   const renderActivity = ({ item }: { item: Activity }) => (
-    <ActivityCard activity={item} />
+    <ActivityCard
+      activity={item}
+      onPress={() => handleRestaurantPress(item.restaurant.id)}
+      onRestaurantPress={handleRestaurantPress}
+    />
   );
 
   const renderHeader = () => (

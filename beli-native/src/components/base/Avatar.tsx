@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image, Text, StyleSheet, ViewStyle } from 'react-native';
+import { View, Image, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { theme } from '../../theme';
 
 interface AvatarProps {
@@ -9,7 +9,7 @@ interface AvatarProps {
   showOnlineStatus?: boolean;
   isOnline?: boolean;
   rankOverlay?: number;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   testID?: string;
 }
 

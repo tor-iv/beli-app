@@ -2,6 +2,10 @@ import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { View, Text, StyleSheet, SafeAreaView, FlatList, Pressable, Dimensions, Modal, TextInput, ScrollView } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { CompositeNavigationProp } from '@react-navigation/native';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { colors, typography, spacing } from '../theme';
 import {
   RestaurantListItem,
@@ -14,6 +18,12 @@ import {
 } from '../components';
 import { MockDataService } from '../data/mockDataService';
 import type { Restaurant, ListCategory } from '../types';
+import type { BottomTabParamList, AppStackParamList } from '../navigation/types';
+
+type ListsScreenNavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<BottomTabParamList, 'Lists'>,
+  StackNavigationProp<AppStackParamList>
+>;
 
 type CityOptionItem = {
   id: string;
@@ -219,6 +229,7 @@ type ListType =
 type SortType = 'rating' | 'distance' | 'name' | 'friends';
 
 export default function ListsScreen() {
+  const navigation = useNavigation<ListsScreenNavigationProp>();
   const mapButtonOffset = Math.max(spacing.sm, Math.round(Dimensions.get('window').height * 0.01));
 
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -834,6 +845,10 @@ export default function ListsScreen() {
     console.log('Search lists');
   };
 
+  const handleRestaurantPress = (restaurantId: string) => {
+    navigation.navigate('RestaurantInfo', { restaurantId });
+  };
+
   const handleViewMap = () => {
     setViewMode(prev => (prev === 'list' ? 'map' : 'list'));
   };
@@ -1145,6 +1160,7 @@ export default function ListsScreen() {
               showStatus={true}
               isOpen={item.isOpen}
               closingTime={item.closingTime}
+              onPress={() => handleRestaurantPress(item.id)}
             />
           )}
           removeClippedSubviews={true}
@@ -1169,6 +1185,7 @@ export default function ListsScreen() {
                   }}
                   title={restaurant.name}
                   description={`${neighborhood} • ${restaurant.rating.toFixed(1)}`}
+                  onPress={() => handleRestaurantPress(restaurant.id)}
                 >
                   <View style={[styles.markerContainer, { backgroundColor: scoreColor }]}>
                     <Text style={styles.markerText}>{restaurant.rating.toFixed(1)}</Text>

@@ -1,15 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, Pressable, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, FlatList, Pressable, ScrollView, TextInput, GestureResponderEvent } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import type { CompositeNavigationProp, RouteProp } from '@react-navigation/native';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { colors, typography, spacing } from '../theme';
 import { SearchBar, LoadingSpinner, EmptyState } from '../components';
 import { MockDataService } from '../data/mockDataService';
 import type { Restaurant } from '../data/mock/types';
+import type { BottomTabParamList, AppStackParamList } from '../navigation/types';
+
+type SearchScreenNavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<BottomTabParamList, 'Search'>,
+  StackNavigationProp<AppStackParamList>
+>;
+
+type SearchScreenRouteProp = RouteProp<BottomTabParamList, 'Search'>;
 
 export default function SearchScreen() {
-  const navigation = useNavigation<any>();
-  const route = useRoute<any>();
+  const navigation = useNavigation<SearchScreenNavigationProp>();
+  const route = useRoute<SearchScreenRouteProp>();
   const searchInputRef = useRef<TextInput | null>(null);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
@@ -21,6 +32,10 @@ export default function SearchScreen() {
   const [location, setLocation] = useState('Current Location');
 
   const handleLocationPress = () => {};
+
+  const handleRestaurantPress = (restaurantId: string) => {
+    navigation.navigate('RestaurantInfo', { restaurantId });
+  };
 
   useEffect(() => {
     if (route.params?.autoFocus) {
@@ -138,8 +153,12 @@ export default function SearchScreen() {
     const rowIcon = isRecent ? 'time-outline' : 'search-outline';
     const subtitleParts = [item.location?.neighborhood, item.location?.city].filter(Boolean);
     const subtitle = subtitleParts.join(', ');
+    const handleRemovePress = (event: GestureResponderEvent) => {
+      event.stopPropagation();
+      handleRemoveRecent(item.id);
+    };
     return (
-      <View style={styles.recentRow}>
+      <Pressable style={styles.recentRow} onPress={() => handleRestaurantPress(item.id)}>
         <View style={styles.recentInfo}>
           <Ionicons name={rowIcon} size={18} color={colors.textSecondary} style={styles.recentIcon} />
           <View style={styles.recentTextContainer}>
@@ -152,11 +171,11 @@ export default function SearchScreen() {
           </View>
         </View>
         {isRecent && (
-          <Pressable onPress={() => handleRemoveRecent(item.id)} hitSlop={8}>
+          <Pressable onPress={handleRemovePress} hitSlop={8}>
             <Ionicons name="close" size={18} color={colors.textSecondary} />
           </Pressable>
         )}
-      </View>
+      </Pressable>
     );
   };
 

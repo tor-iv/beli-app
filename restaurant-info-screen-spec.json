@@ -1,0 +1,289 @@
+{
+  "screenName": "RestaurantInfoScreen",
+  "description": "Detailed restaurant information screen with map, ratings, and actions",
+  "layout": {
+    "type": "scrollable",
+    "orientation": "vertical",
+    "fullHeight": true
+  },
+  "sections": [
+    {
+      "id": "statusBar",
+      "type": "system",
+      "description": "Standard iOS/Android status bar with time, location, cellular, wifi, and battery indicators"
+    },
+    {
+      "id": "mapHeader",
+      "type": "interactive_map",
+      "height": "1/3 screen",
+      "properties": {
+        "mapType": "street",
+        "location": "restaurant coordinates",
+        "pin": {
+          "style": "gray point-of-interest",
+          "position": "restaurant location"
+        },
+        "overlays": [
+          {
+            "type": "navigation",
+            "element": "back_button",
+            "position": "top-left",
+            "style": "translucent circular background"
+          },
+          {
+            "type": "actions",
+            "position": "top-right",
+            "elements": [
+              { "icon": "notification", "style": "translucent circular" },
+              { "icon": "share", "style": "translucent circular" },
+              { "icon": "menu_dots", "style": "translucent circular" }
+            ]
+          },
+          {
+            "type": "floating_actions",
+            "position": "right-edge",
+            "elements": [
+              {
+                "icon": "plus",
+                "style": "teal background, white icon",
+                "purpose": "add to list"
+              },
+              {
+                "icon": "bookmark",
+                "style": "filled flag shape",
+                "purpose": "save restaurant"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "restaurantTitle",
+      "type": "header_overlay",
+      "position": "over map, below back button",
+      "background": "subtle white/translucent overlay",
+      "content": {
+        "name": {
+          "text": "Restaurant Name",
+          "typography": "large serif, bold, 28-32pt"
+        },
+        "rating": {
+          "score": "8.0",
+          "style": "green pill badge, white text, rounded corners, drop shadow"
+        },
+        "ratingCount": {
+          "text": "(1,849 ratings)",
+          "typography": "medium gray, 14-16pt"
+        }
+      }
+    },
+    {
+      "id": "metadata",
+      "type": "info_block",
+      "alignment": "left",
+      "content": {
+        "tags": {
+          "items": ["Date Night", "Gluten Free", "Atmosphere", "Sharing", "Beer"],
+          "style": "horizontal list, teal color, center dot separators",
+          "interactive": true
+        },
+        "priceAndCuisine": {
+          "text": "$$ | Pizza, Japanese",
+          "typography": "medium gray"
+        },
+        "location": {
+          "text": "Ukrainian Village, New York, NY",
+          "typography": "light gray (#666666), smaller font"
+        },
+        "socialProof": {
+          "type": "friend_avatars",
+          "count": 4,
+          "text": "4 friends want to try",
+          "style": "overlapping circular photos with white borders"
+        }
+      }
+    },
+    {
+      "id": "actionButtons",
+      "type": "button_row",
+      "layout": "three equal-width capsule buttons",
+      "buttons": [
+        {
+          "label": "Website",
+          "icon": "globe",
+          "action": "open_website"
+        },
+        {
+          "label": "Call",
+          "icon": "phone",
+          "action": "make_call"
+        },
+        {
+          "label": "Directions",
+          "icon": "navigation",
+          "action": "open_maps"
+        }
+      ],
+      "style": {
+        "outline": "teal (#0B7B7F)",
+        "background": "white",
+        "borderRadius": "8px",
+        "iconPosition": "left of text"
+      }
+    },
+    {
+      "id": "scoresSection",
+      "type": "metrics_display",
+      "header": {
+        "title": "Scores",
+        "badge": {
+          "text": "SC",
+          "style": "small teal pill with white text"
+        },
+        "action": {
+          "text": "See all scores",
+          "style": "teal color, right-aligned link"
+        }
+      },
+      "scores": [
+        {
+          "type": "rec_score",
+          "value": "8.0",
+          "subtitle": "How much we think you will like it",
+          "sampleSize": "2k",
+          "indicatorColor": "blue"
+        },
+        {
+          "type": "friend_score",
+          "value": "8.5",
+          "subtitle": "What your friends think",
+          "sampleSize": "2",
+          "indicatorColor": "teal"
+        },
+        {
+          "type": "average_score",
+          "value": "8.3",
+          "subtitle": "What all Beli members think",
+          "sampleSize": "4k",
+          "indicatorColor": "teal variation"
+        }
+      ],
+      "style": {
+        "layout": "three circular widgets, equal spacing",
+        "background": "teal (#0B7B7F) for circles",
+        "textColor": "large white text for scores",
+        "shadows": "subtle drop shadows",
+        "indicators": "small colored beads with sample sizes"
+      }
+    },
+    {
+      "id": "popularDishes",
+      "type": "photo_carousel",
+      "header": {
+        "title": "Popular dishes",
+        "action": {
+          "text": "See all photos",
+          "style": "teal color link"
+        }
+      },
+      "content": {
+        "type": "horizontal_scrolling_photos",
+        "items": "3+ rectangular food photos",
+        "style": {
+          "borderRadius": "8px",
+          "spacing": "consistent between items",
+          "content": "user-generated or professional food photography"
+        }
+      }
+    },
+    {
+      "id": "bottomTabBar",
+      "type": "navigation",
+      "position": "bottom_fixed",
+      "tabs": [
+        {
+          "label": "Feed",
+          "icon": "outline",
+          "state": "inactive",
+          "color": "gray"
+        },
+        {
+          "label": "Your Lists",
+          "icon": "outline",
+          "state": "inactive",
+          "color": "gray"
+        },
+        {
+          "label": "Search",
+          "icon": "plus_circle",
+          "state": "active",
+          "style": "teal circle, white icon, elevated"
+        },
+        {
+          "label": "Leaderboard",
+          "icon": "outline",
+          "state": "inactive",
+          "color": "gray"
+        },
+        {
+          "label": "Profile",
+          "icon": "outline",
+          "state": "inactive",
+          "color": "gray"
+        }
+      ],
+      "style": {
+        "separator": "subtle line at top",
+        "homeIndicator": "gesture navigation bar at bottom"
+      }
+    }
+  ],
+  "designSystem": {
+    "colors": {
+      "primary": "#0B7B7F",
+      "ratingGreen": "#2CBA78",
+      "textPrimary": "#000000",
+      "textSecondary": "#666666",
+      "textTertiary": "#999999",
+      "background": "#FFFFFF"
+    },
+    "typography": {
+      "restaurantName": "serif, bold, 28-32pt",
+      "body": "sans-serif, 14-16pt",
+      "metadata": "sans-serif, 12-14pt",
+      "scores": "sans-serif, bold, large"
+    },
+    "spacing": {
+      "sectionVertical": "20-24px",
+      "horizontalPadding": "16-20px",
+      "elementSpacing": "8-12px"
+    },
+    "borderRadius": {
+      "buttons": "8px",
+      "photos": "8px",
+      "badges": "rounded corners"
+    },
+    "shadows": "subtle drop shadows on floating elements",
+    "touchTargets": "44px+ height for accessibility"
+  },
+  "interactions": {
+    "scrollBehavior": "vertical scroll with possible map parallax",
+    "mapInteraction": "pan and zoom enabled",
+    "buttonActions": {
+      "back": "navigate to previous screen",
+      "website": "open external browser",
+      "call": "initiate phone call",
+      "directions": "open maps app",
+      "seeAllScores": "navigate to detailed scores view",
+      "seeAllPhotos": "navigate to photo gallery",
+      "addToList": "show list selection modal",
+      "bookmark": "save restaurant to bookmarks"
+    }
+  },
+  "accessibility": {
+    "textContrast": "follows proper contrast ratios",
+    "touchTargets": "minimum 44px for interactive elements",
+    "semanticLabels": "proper labeling for screen readers"
+  }
+}
