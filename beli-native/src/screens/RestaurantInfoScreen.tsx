@@ -455,7 +455,6 @@ const RestaurantInfoScreen: React.FC = () => {
               description="How much we think you will like it"
               sampleSize={getScoreSample(restaurant.scores?.recScoreSampleSize)}
               accentColor={getScoreColor(recScore)}
-              style={styles.scoreCard}
             />
             <RestaurantScoreCard
               score={friendScore}
@@ -463,17 +462,15 @@ const RestaurantInfoScreen: React.FC = () => {
               description="What your friends think"
               sampleSize={getScoreSample(restaurant.scores?.friendScoreSampleSize)}
               accentColor={getScoreColor(friendScore)}
-              style={styles.scoreCard}
             />
             <RestaurantScoreCard
               score={averageScore}
-              title="Your Score"
+              title="Average Score"
               description="Community average"
               sampleSize={getScoreSample(
                 restaurant.scores?.averageScoreSampleSize ?? restaurant.ratingCount
               )}
               accentColor={getScoreColor(averageScore)}
-              style={styles.scoreCard}
             />
           </ScrollView>
 
@@ -742,15 +739,6 @@ const styles = StyleSheet.create({
   scoresContainer: {
     paddingHorizontal: 20,
     gap: 12,
-  },
-  scoreCard: {
-    width: 160,
-    height: 100,
-    backgroundColor: colors.cardWhite,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-    borderRadius: 16,
-    padding: 16,
   },
   dishScrollContent: {
     paddingHorizontal: 20,

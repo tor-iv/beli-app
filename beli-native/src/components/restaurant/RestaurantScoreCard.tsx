@@ -1,7 +1,5 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle, Text as RNText } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
-import { Text, Caption } from '../typography';
 import { theme } from '../../theme';
 
 interface RestaurantScoreCardProps {
@@ -48,53 +46,37 @@ export const RestaurantScoreCard: React.FC<RestaurantScoreCardProps> = ({
 }) => {
   const formattedSample = formatSampleSize(sampleSize);
   const resolvedAccent = accentColor ?? getScoreColor(score);
-  const radius = 45;
-  const strokeWidth = 3;
-  const normalizedRadius = radius - strokeWidth * 2;
-  const circumference = normalizedRadius * 2 * Math.PI;
-  const strokeDasharray = `${circumference} ${circumference}`;
-  const progress = (score / 10) * circumference;
-  const strokeDashoffset = circumference - progress;
 
   return (
     <View style={[styles.container, style]} testID={testID}>
       <View style={styles.scoreColumn}>
-        <View style={styles.scoreBubble}>
-          <Svg height={radius * 2} width={radius * 2} style={styles.progressRing}>
-            <Circle
-              stroke={theme.colors.borderLight}
-              fill="transparent"
-              strokeWidth={strokeWidth}
-              r={normalizedRadius}
-              cx={radius}
-              cy={radius}
-            />
-            <Circle
-              stroke={resolvedAccent}
-              fill="transparent"
-              strokeWidth={strokeWidth}
-              strokeDasharray={strokeDasharray}
-              strokeDashoffset={strokeDashoffset}
-              strokeLinecap="round"
-              r={normalizedRadius}
-              cx={radius}
-              cy={radius}
-              transform={`rotate(-90 ${radius} ${radius})`}
-            />
-          </Svg>
-          <View style={styles.scoreTextContainer}>
-            <RNText style={[styles.scoreText, { color: resolvedAccent }]}>
+        {/* Score Circle */}
+        <View style={styles.scoreCircleContainer}>
+          <View style={[styles.scoreCircle, { backgroundColor: resolvedAccent }]}>
+            <RNText style={styles.scoreText}>
               {score.toFixed(1)}
             </RNText>
           </View>
+          {/* Sample Size Badge */}
+          {formattedSample && (
+            <View style={styles.sampleBadge}>
+              <RNText style={styles.sampleText}>
+                {formattedSample}
+              </RNText>
+            </View>
+          )}
         </View>
-        <Text style={styles.title}>
+
+        {/* Title */}
+        <RNText style={styles.title}>
           {title}
-        </Text>
+        </RNText>
+
+        {/* Description */}
         {description && (
-          <Text style={styles.description}>
+          <RNText style={styles.description}>
             {description}
-          </Text>
+          </RNText>
         )}
       </View>
     </View>
@@ -103,46 +85,62 @@ export const RestaurantScoreCard: React.FC<RestaurantScoreCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center',
+    width: 160,
+    height: 100,
+    backgroundColor: theme.colors.cardWhite,
+    borderWidth: 1,
+    borderColor: '#E5E5E7',
+    borderRadius: 16,
+    padding: 16,
   },
   scoreColumn: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    flex: 1,
   },
-  scoreBubble: {
-    width: 90,
-    height: 90,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: theme.spacing.sm,
+  scoreCircleContainer: {
+    position: 'relative',
+    marginBottom: 8,
   },
-  progressRing: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-  },
-  scoreTextContainer: {
-    position: 'absolute',
+  scoreCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 90,
-    height: 90,
   },
   scoreText: {
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: '700',
     fontSize: 24,
+    color: theme.colors.textInverse,
+  },
+  sampleBadge: {
+    position: 'absolute',
+    bottom: -4,
+    right: -4,
+    backgroundColor: '#1C1C1E',
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    minWidth: 20,
+    alignItems: 'center',
+  },
+  sampleText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: theme.colors.textInverse,
   },
   title: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
     color: theme.colors.textPrimary,
-    textAlign: 'center',
+    textAlign: 'left',
     marginBottom: 4,
   },
   description: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
+    fontSize: 13,
+    color: '#8E8E93',
+    textAlign: 'left',
+    lineHeight: 16,
   },
 });
