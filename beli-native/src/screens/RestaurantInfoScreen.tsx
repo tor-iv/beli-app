@@ -737,7 +737,8 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   scoresContainer: {
-    paddingHorizontal: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
     gap: 12,
   },
   dishScrollContent: {

@@ -49,30 +49,28 @@ export const RestaurantScoreCard: React.FC<RestaurantScoreCardProps> = ({
 
   return (
     <View style={[styles.container, style]} testID={testID}>
-      <View style={styles.scoreColumn}>
-        {/* Score Circle */}
-        <View style={styles.scoreCircleContainer}>
-          <View style={[styles.scoreCircle, { backgroundColor: resolvedAccent }]}>
-            <RNText style={styles.scoreText}>
-              {score.toFixed(1)}
+      {/* Score Circle */}
+      <View style={styles.scoreCircleContainer}>
+        <View style={styles.scoreCircle}>
+          <RNText style={[styles.scoreText, { color: resolvedAccent }]}>
+            {score.toFixed(1)}
+          </RNText>
+        </View>
+        {/* Sample Size Badge */}
+        {formattedSample && (
+          <View style={styles.sampleBadge}>
+            <RNText style={styles.sampleText}>
+              {formattedSample}
             </RNText>
           </View>
-          {/* Sample Size Badge */}
-          {formattedSample && (
-            <View style={styles.sampleBadge}>
-              <RNText style={styles.sampleText}>
-                {formattedSample}
-              </RNText>
-            </View>
-          )}
-        </View>
+        )}
+      </View>
 
-        {/* Title */}
+      {/* Title and Description */}
+      <View style={styles.textColumn}>
         <RNText style={styles.title}>
           {title}
         </RNText>
-
-        {/* Description */}
         {description && (
           <RNText style={styles.description}>
             {description}
@@ -85,26 +83,21 @@ export const RestaurantScoreCard: React.FC<RestaurantScoreCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: 160,
-    height: 100,
-    backgroundColor: theme.colors.cardWhite,
-    borderWidth: 1,
-    borderColor: '#E5E5E7',
-    borderRadius: 16,
-    padding: 16,
-  },
-  scoreColumn: {
-    alignItems: 'flex-start',
-    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    width: 240,
   },
   scoreCircleContainer: {
     position: 'relative',
-    marginBottom: 8,
   },
   scoreCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    borderWidth: 1.5,
+    borderColor: '#E5E5E7',
+    backgroundColor: theme.colors.cardWhite,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -112,35 +105,37 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.primary,
     fontWeight: '700',
     fontSize: 24,
-    color: theme.colors.textInverse,
   },
   sampleBadge: {
     position: 'absolute',
     bottom: -4,
-    right: -4,
+    right: -6,
     backgroundColor: '#1C1C1E',
     borderRadius: 10,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    minWidth: 20,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    minWidth: 24,
     alignItems: 'center',
   },
   sampleText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '600',
     color: theme.colors.textInverse,
   },
+  textColumn: {
+    flex: 1,
+    flexShrink: 1,
+  },
   title: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
     color: theme.colors.textPrimary,
-    textAlign: 'left',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   description: {
     fontSize: 13,
     color: '#8E8E93',
-    textAlign: 'left',
-    lineHeight: 16,
+    lineHeight: 18,
+    flexWrap: 'wrap',
   },
 });
