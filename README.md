@@ -4,7 +4,7 @@ A social restaurant discovery platform built with React Native and Expo that com
 
 ## Why I Built This
 
-This project started as a way to study building a front-end experience that I genuinely enjoyed using. As someone who uses restaurant discovery apps daily, I wanted to explore how I could enhance the features and interactions of an app that's part of my everyday routine—combining practical frontend development practice with thoughtful product improvements.
+This project started as a way to study building a front-end experience that I genuinely enjoyed using. As someone who uses restaurant discovery apps daily, I wanted to explore how I could enhance the features and interactions of an app that's part of my everyday routine—combining practical frontend development practice while improving the product.
 
 ## Overview
 
