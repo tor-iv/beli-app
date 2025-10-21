@@ -87,9 +87,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     width: 240,
+    overflow: 'visible',
   },
   scoreCircleContainer: {
     position: 'relative',
+    overflow: 'visible',
   },
   scoreCircle: {
     width: 56,

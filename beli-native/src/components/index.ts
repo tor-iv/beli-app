@@ -24,3 +24,6 @@ export * from './feedback';
 
 // Layout components
 export * from './layout';
+
+// Modal components
+export * from './modals';

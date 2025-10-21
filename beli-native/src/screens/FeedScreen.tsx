@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, RefreshControl, ScrollView, Pressable, Image } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, FlatList, RefreshControl, ScrollView, Pressable, Image, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { colors, typography, spacing } from '../theme';
-import { ActivityCard, LoadingSpinner } from '../components';
+import { ActivityCard, LoadingSpinner, AddRestaurantModal } from '../components';
+import type { RestaurantSubmissionData } from '../components';
 import { MockDataService } from '../data/mockDataService';
 import type { Activity } from '../data/mock/types';
+import type { Restaurant } from '../types';
 import type { BottomTabParamList, AppStackParamList } from '../navigation/types';
 
 type FeedScreenNavigationProp = CompositeNavigationProp<
@@ -21,6 +23,8 @@ export default function FeedScreen() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
 
   const loadFeed = async () => {
     try {
@@ -51,11 +55,61 @@ export default function FeedScreen() {
     navigation.navigate('RestaurantInfo', { restaurantId });
   };
 
+  const handleAddPress = (restaurant: Restaurant) => {
+    setSelectedRestaurant(restaurant);
+    setShowAddModal(true);
+  };
+
+  const handleModalClose = () => {
+    setShowAddModal(false);
+    setSelectedRestaurant(null);
+  };
+
+  const handleModalSubmit = async (data: RestaurantSubmissionData) => {
+    if (!selectedRestaurant) return;
+
+    try {
+      const currentUser = await MockDataService.getCurrentUser();
+
+      // Convert rating to numeric value
+      const ratingValue = data.rating === 'liked' ? 8 : data.rating === 'fine' ? 5 : 3;
+
+      await MockDataService.addRestaurantToUserList(
+        currentUser.id,
+        selectedRestaurant.id,
+        'been', // Status is 'been' since they're ranking it
+        {
+          rating: ratingValue,
+          notes: data.notes,
+          photos: data.photos,
+          tags: data.labels,
+        }
+      );
+
+      Alert.alert(
+        'Success!',
+        `${selectedRestaurant.name} has been added to your list.`,
+        [{ text: 'OK' }]
+      );
+
+      // Refresh the feed to show any updates
+      loadFeed();
+    } catch (error) {
+      console.error('Failed to add restaurant:', error);
+      Alert.alert(
+        'Error',
+        'Failed to add restaurant. Please try again.',
+        [{ text: 'OK' }]
+      );
+    }
+  };
+
   const renderActivity = ({ item }: { item: Activity }) => (
     <ActivityCard
       activity={item}
       onPress={() => handleRestaurantPress(item.restaurant.id)}
       onRestaurantPress={handleRestaurantPress}
+      onAddPress={() => handleAddPress(item.restaurant)}
     />
   );
 
@@ -222,6 +276,15 @@ export default function FeedScreen() {
           />
         }
       />
+
+      {selectedRestaurant && (
+        <AddRestaurantModal
+          visible={showAddModal}
+          restaurant={selectedRestaurant}
+          onClose={handleModalClose}
+          onSubmit={handleModalSubmit}
+        />
+      )}
     </SafeAreaView>
   );
 }

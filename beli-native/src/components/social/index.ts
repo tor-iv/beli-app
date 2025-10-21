@@ -2,3 +2,7 @@ export { ActivityCard } from './ActivityCard';
 export { SocialActions } from './SocialActions';
 export { UserStats } from './UserStats';
 export { FollowButton } from './FollowButton';
+export { ProfileListRow } from './ProfileListRow';
+export { ProfileStatCard } from './ProfileStatCard';
+export { AchievementBanner } from './AchievementBanner';
+export { ProfileActivityCard } from './ProfileActivityCard';

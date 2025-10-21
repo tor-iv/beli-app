@@ -15,6 +15,7 @@ interface ActivityCardProps {
   onLike?: () => void;
   onComment?: () => void;
   onBookmark?: () => void;
+  onAddPress?: () => void;
   currentUserId?: string;
   style?: ViewStyle;
   testID?: string;
@@ -28,6 +29,7 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
   onLike,
   onComment,
   onBookmark,
+  onAddPress,
   currentUserId,
   style,
   testID,
@@ -186,7 +188,7 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
           </Pressable>
         </View>
         <View style={styles.rightActions}>
-          <Pressable style={styles.actionButton}>
+          <Pressable style={styles.actionButton} onPress={onAddPress}>
             <Ionicons name="add-circle-outline" size={20} color={theme.colors.textSecondary} />
           </Pressable>
           <Pressable style={styles.actionButton} onPress={onBookmark}>

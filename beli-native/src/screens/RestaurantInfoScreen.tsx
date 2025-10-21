@@ -6,6 +6,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
 import { Screen, Text, Caption, Badge, LoadingSpinner, RestaurantScoreCard, Avatar } from '../components';
+import { AddRestaurantModal, RestaurantSubmissionData } from '../components/modals';
 import { colors, spacing, theme } from '../theme';
 import { MockDataService } from '../data/mockDataService';
 import type { Restaurant } from '../types';
@@ -124,6 +125,7 @@ const RestaurantInfoScreen: React.FC = () => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const scrollY = new Animated.Value(0);
 
@@ -178,7 +180,13 @@ const RestaurantInfoScreen: React.FC = () => {
   };
 
   const handleAddPress = () => {
-    console.log('Add to list pressed');
+    setShowAddModal(true);
+  };
+
+  const handleModalSubmit = (data: RestaurantSubmissionData) => {
+    console.log('Restaurant submission data:', data);
+    // TODO: Integrate with MockDataService to save the data
+    setShowAddModal(false);
   };
 
   const handleBookmarkPress = () => {
@@ -448,6 +456,7 @@ const RestaurantInfoScreen: React.FC = () => {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.scoresContainer}
+            style={styles.scoresScrollView}
           >
             <RestaurantScoreCard
               score={recScore}
@@ -490,6 +499,16 @@ const RestaurantInfoScreen: React.FC = () => {
           <View style={styles.bottomSpacer} />
         </View>
       </Animated.ScrollView>
+
+      {/* Add Restaurant Modal */}
+      {restaurant && (
+        <AddRestaurantModal
+          visible={showAddModal}
+          restaurant={restaurant}
+          onClose={() => setShowAddModal(false)}
+          onSubmit={handleModalSubmit}
+        />
+      )}
     </View>
   );
 };
@@ -736,9 +755,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.primary,
   },
+  scoresScrollView: {
+    overflow: 'visible',
+  },
   scoresContainer: {
     paddingLeft: 20,
     paddingRight: 20,
+    paddingVertical: 8,
     gap: 12,
   },
   dishScrollContent: {
