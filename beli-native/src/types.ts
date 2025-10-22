@@ -173,3 +173,26 @@ export interface List {
 
 // Type aliases for screen compatibility
 export type UserList = List;
+
+// Notification types
+export type NotificationType =
+  | 'rating_liked'      // Someone liked your rating
+  | 'bookmark_liked'    // Someone liked your bookmark
+  | 'comment'           // Someone commented
+  | 'follow'            // Someone followed you
+  | 'list_bookmark'     // Someone bookmarked from your list
+  | 'streak'            // Streak achievement
+  | 'recommendation';   // Someone recommended a place
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  actorUser?: User;           // The user who performed the action
+  targetRestaurant?: Restaurant; // Restaurant involved
+  targetList?: string;        // List name if applicable
+  commentText?: string;       // For comment notifications
+  streakCount?: number;       // For streak notifications
+  timestamp: Date;
+  isRead: boolean;
+  actionDescription: string;  // "liked your rating of", "commented on your bookmarking of"
+}

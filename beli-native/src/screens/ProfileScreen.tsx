@@ -139,7 +139,7 @@ export default function ProfileScreen() {
           {/* Avatar */}
           <Avatar
             source={{ uri: user.avatar }}
-            size="xxl"
+            size="profile"
           />
 
           {/* Username and Member Since */}
@@ -199,17 +199,20 @@ export default function ProfileScreen() {
             label="Been"
             count={user.stats.beenCount}
             onPress={() => {}}
+            isLast={false}
           />
           <ProfileListRow
             icon="bookmark"
             label="Want to Try"
             count={user.stats.wantToTryCount}
             onPress={() => {}}
+            isLast={false}
           />
           <ProfileListRow
             icon="heart"
             label="Recs for You"
             onPress={() => {}}
+            isLast={true}
           />
         </View>
 
@@ -321,7 +324,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   userName: {
-    fontSize: typography.sizes['2xl'],
+    fontSize: typography.sizes['3xl'],
     fontWeight: typography.weights.bold,
     color: colors.textPrimary,
   },
@@ -336,12 +339,12 @@ const styles = StyleSheet.create({
   usernameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: spacing.md,
+    marginTop: spacing.lg,
     gap: spacing.xs,
   },
   username: {
     fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.medium,
+    fontWeight: typography.weights.semibold,
     color: colors.textPrimary,
   },
   badge: {
@@ -357,7 +360,7 @@ const styles = StyleSheet.create({
   },
   memberSince: {
     fontSize: typography.sizes.base,
-    color: colors.textSecondary,
+    color: colors.textTertiary,
     marginTop: spacing.xs,
   },
   bio: {
@@ -391,20 +394,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-    marginTop: spacing.xl,
+    marginTop: spacing['2xl'],
   },
   statItem: {
     alignItems: 'center',
   },
   statValue: {
-    fontSize: typography.sizes['2xl'],
+    fontSize: typography.sizes.xl,
     fontWeight: typography.weights.bold,
     color: colors.textPrimary,
   },
   statLabel: {
     fontSize: typography.sizes.sm,
     color: colors.textTertiary,
-    marginTop: spacing.xs,
+    marginTop: 4,
   },
   listSection: {
     backgroundColor: colors.white,

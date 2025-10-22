@@ -1,10 +1,11 @@
-import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope } from '../types';
+import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification } from '../types';
 import { mockUsers, currentUser } from './mock/users';
 import { mockRestaurants } from './mock/restaurants';
 import { mockUserRestaurantRelations } from './mock/userRestaurantRelations';
 import { mockReviews, Review } from './mock/reviews';
 import { mockActivities, trendingRestaurants, recentCheckIns, Activity } from './mock/activities';
 import { mockLists, getUserListsByType, featuredLists } from './mock/lists';
+import { mockNotifications } from './mock/notifications';
 
 // Simulate network delay - reduced for better UX
 const delay = (ms: number = 150) => new Promise(resolve => setTimeout(resolve, ms));
@@ -527,6 +528,31 @@ export class MockDataService {
     }
 
     return restaurants;
+  }
+
+  // Notification-related methods
+  static async getNotifications(): Promise<Notification[]> {
+    await delay();
+    // Return notifications sorted by timestamp (newest first)
+    return [...mockNotifications].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  }
+
+  static async markNotificationAsRead(notificationId: string): Promise<void> {
+    await delay();
+    const notification = mockNotifications.find(n => n.id === notificationId);
+    if (notification) {
+      notification.isRead = true;
+    }
+  }
+
+  static async markAllNotificationsAsRead(): Promise<void> {
+    await delay();
+    mockNotifications.forEach(n => n.isRead = true);
+  }
+
+  static async getUnreadNotificationCount(): Promise<number> {
+    await delay();
+    return mockNotifications.filter(n => !n.isRead).length;
   }
 }
 

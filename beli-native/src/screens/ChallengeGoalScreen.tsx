@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -31,6 +32,7 @@ export default function ChallengeGoalScreen() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [groupedReviews, setGroupedReviews] = useState<GroupedReviews>({});
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     loadChallengeData();
@@ -110,23 +112,39 @@ export default function ChallengeGoalScreen() {
 
   const challenge = user.stats.challenge2025;
 
+  // Interpolate opacity for sticky white header
+  const stickyHeaderOpacity = scrollY.interpolate({
+    inputRange: [100, 150],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={8}>
-          <Ionicons name="chevron-back" size={32} color={colors.white} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>beli</Text>
-        <TouchableOpacity hitSlop={8}>
-          <Ionicons name="ellipsis-horizontal" size={32} color={colors.white} />
-        </TouchableOpacity>
-      </View>
+      <Animated.ScrollView
+        showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+        scrollEventThrottle={16}
+      >
+        {/* Scrollable Teal Header */}
+        <View style={styles.scrollableHeader}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={8}>
+              <Ionicons name="chevron-back" size={32} color={colors.white} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>beli</Text>
+            <TouchableOpacity hitSlop={8}>
+              <Ionicons name="ellipsis-horizontal" size={32} color={colors.white} />
+            </TouchableOpacity>
+          </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Title Section */}
-        <View style={styles.titleSection}>
-          <Text style={styles.title}>{challenge.year} Restaurant Challenge</Text>
+          {/* Title Section */}
+          <View style={styles.titleSection}>
+            <Text style={styles.title}>{challenge.year} Restaurant Challenge</Text>
+          </View>
         </View>
 
         {/* Circular Badge */}
@@ -171,7 +189,25 @@ export default function ChallengeGoalScreen() {
 
         {/* Bottom Spacing */}
         <View style={{ height: spacing.xl }} />
-      </ScrollView>
+      </Animated.ScrollView>
+
+      {/* Sticky White Header - appears on scroll */}
+      <Animated.View
+        style={[
+          styles.stickyHeader,
+          { opacity: stickyHeaderOpacity },
+        ]}
+      >
+        <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={8}>
+          <Ionicons name="chevron-back" size={32} color={colors.textPrimary} />
+        </TouchableOpacity>
+        <Text style={styles.stickyHeaderTitle} numberOfLines={1}>
+          {challenge.year} Restaurant Challe...
+        </Text>
+        <TouchableOpacity hitSlop={8}>
+          <Ionicons name="ellipsis-horizontal" size={32} color={colors.textPrimary} />
+        </TouchableOpacity>
+      </Animated.View>
     </SafeAreaView>
   );
 }
@@ -179,7 +215,10 @@ export default function ChallengeGoalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.white,
+  },
+  scrollableHeader: {
+    backgroundColor: colors.primary,
   },
   loadingContainer: {
     flex: 1,
@@ -201,7 +240,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    backgroundColor: colors.primary,
+  },
+  stickyHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    paddingTop: 50, // Account for status bar
+    backgroundColor: colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  stickyHeaderTitle: {
+    fontSize: typography.sizes.lg,
+    fontWeight: typography.weights.semibold,
+    color: colors.textPrimary,
+    flex: 1,
+    textAlign: 'center',
+    marginHorizontal: spacing.md,
   },
   headerTitle: {
     fontSize: typography.sizes['2xl'],
@@ -209,7 +270,6 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   titleSection: {
-    backgroundColor: colors.primary,
     paddingHorizontal: spacing.lg,
     paddingBottom: 110,
     alignItems: 'center',

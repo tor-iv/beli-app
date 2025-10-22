@@ -20,7 +20,7 @@ export const ProfileStatCard: React.FC<ProfileStatCardProps> = ({
     <View style={styles.container}>
       <Ionicons
         name={icon}
-        size={40}
+        size={32}
         color={iconColor || colors.primary}
         style={styles.icon}
       />
@@ -44,18 +44,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   icon: {
-    marginRight: spacing.md,
+    marginRight: spacing.sm,
   },
   textContainer: {
     flex: 1,
   },
   label: {
-    fontSize: typography.sizes.base,
+    fontSize: typography.sizes.sm,
     color: colors.textTertiary,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   value: {
-    fontSize: typography.sizes['2xl'],
+    fontSize: typography.sizes.xl,
     fontWeight: typography.weights.bold,
     color: colors.primary,
   },

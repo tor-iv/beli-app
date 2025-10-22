@@ -41,7 +41,7 @@ export const Button: React.FC<ButtonProps> = ({
   ];
 
   const labelStyle = [
-    styles.text,
+    styles.textBase,
     styles[`${variant}Text`],
     styles[`${size}Text`],
     disabled && styles.disabledText,
@@ -81,6 +81,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: theme.spacing.lg,
+    paddingVertical: 10, // Explicit vertical padding
+    overflow: 'visible', // Ensure text isn't clipped
     ...theme.shadows.button,
   },
 
@@ -91,23 +93,28 @@ const styles = StyleSheet.create({
   secondary: {
     backgroundColor: theme.colors.white,
     borderWidth: 1,
-    borderColor: theme.colors.primary,
+    borderColor: '#E5E5EA', // Light gray border to match design mockup
+    ...theme.shadows.none,
   },
   text: {
     backgroundColor: 'transparent',
+    ...theme.shadows.none,
   },
 
   // Sizes
   small: {
     height: 36,
     paddingHorizontal: theme.spacing.md,
+    paddingVertical: 8,
   },
   medium: {
     height: theme.spacing.buttonHeight,
+    paddingVertical: 10,
   },
   large: {
     height: 52,
     paddingHorizontal: theme.spacing.xl,
+    paddingVertical: 12,
   },
 
   // Disabled state
@@ -116,15 +123,19 @@ const styles = StyleSheet.create({
   },
 
   // Text styles
-  text: {
+  textBase: {
     textAlign: 'center',
-    ...theme.typography.textStyles.button,
+    fontSize: 15, // Explicit fontSize
+    fontWeight: '600', // Semibold - less bold than before, matches design mockup
+    lineHeight: 20, // Explicit pixel lineHeight
+    color: '#000000', // Fallback color
+    includeFontPadding: false, // Android: remove extra padding
   },
   primaryText: {
-    color: theme.colors.textInverse,
+    color: '#FFFFFF', // Explicit white
   },
   secondaryText: {
-    color: theme.colors.primary,
+    color: '#000000', // Explicit black
   },
   textText: {
     color: theme.colors.primary,
@@ -132,13 +143,16 @@ const styles = StyleSheet.create({
 
   // Size-specific text styles
   smallText: {
-    fontSize: theme.typography.sizes.sm,
+    fontSize: 13,
+    lineHeight: 18,
   },
   mediumText: {
-    fontSize: theme.typography.sizes.base,
+    fontSize: 15,
+    lineHeight: 20,
   },
   largeText: {
-    ...theme.typography.textStyles.buttonLarge,
+    fontSize: 17,
+    lineHeight: 22,
   },
 
   disabledText: {

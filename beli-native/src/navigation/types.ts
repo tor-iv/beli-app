@@ -12,4 +12,5 @@ export type AppStackParamList = {
     restaurantId: string;
   };
   ChallengeGoal: undefined;
+  Notifications: undefined;
 };

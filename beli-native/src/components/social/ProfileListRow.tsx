@@ -8,6 +8,7 @@ interface ProfileListRowProps {
   label: string;
   count?: number;
   onPress?: () => void;
+  isLast?: boolean;
 }
 
 export const ProfileListRow: React.FC<ProfileListRowProps> = ({
@@ -15,17 +16,27 @@ export const ProfileListRow: React.FC<ProfileListRowProps> = ({
   label,
   count,
   onPress,
+  isLast = false,
 }) => {
+  // Map filled icons to outline variants
+  const iconMap: Record<string, any> = {
+    'checkmark-circle': 'checkmark-circle-outline',
+    'bookmark': 'bookmark-outline',
+    'heart': 'heart-outline',
+  };
+
+  const outlineIcon = iconMap[icon] || icon;
+
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[styles.container, isLast && styles.lastContainer]}
       onPress={onPress}
       activeOpacity={0.7}
     >
       <View style={styles.leftContent}>
         <Ionicons
-          name={icon}
-          size={28}
+          name={outlineIcon}
+          size={24}
           color={colors.textPrimary}
           style={styles.icon}
         />
@@ -56,6 +67,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.borderLight,
   },
+  lastContainer: {
+    borderBottomWidth: 0,
+  },
   leftContent: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -76,7 +90,7 @@ const styles = StyleSheet.create({
   },
   count: {
     fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.regular,
+    fontWeight: typography.weights.bold,
     color: colors.textPrimary,
   },
 });

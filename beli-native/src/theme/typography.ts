@@ -1,7 +1,7 @@
 export const typography = {
   fontFamily: {
-    primary: 'SF Pro Display', // iOS primary font
-    system: 'System',          // Fallback system font
+    primary: 'System', // Use system font for reliability
+    system: 'System',  // Fallback system font
   },
 
   // Font sizes matching Beli's design hierarchy
@@ -15,12 +15,12 @@ export const typography = {
     '3xl': 34, // Hero numbers (rankings)
   },
 
-  // Font weights
+  // Font weights (using standard values for cross-platform compatibility)
   weights: {
     normal: '400' as const,   // Alias for regular
     regular: '400' as const,  // Body text
-    medium: '500' as const,   // Subtle emphasis
-    semibold: '600' as const, // Headers, buttons
+    medium: '500' as const,   // Subtle emphasis (may not render on all platforms)
+    semibold: '600' as const, // Headers, buttons (may not render on all platforms)
     bold: '700' as const,     // Strong emphasis
   },
 

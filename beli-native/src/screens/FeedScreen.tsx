@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, RefreshControl, ScrollView, Pressable, Image, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -25,6 +25,7 @@ export default function FeedScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
 
   const loadFeed = async () => {
     try {
@@ -38,9 +39,26 @@ export default function FeedScreen() {
     }
   };
 
+  const loadNotificationCount = async () => {
+    try {
+      const count = await MockDataService.getUnreadNotificationCount();
+      setUnreadNotificationCount(count);
+    } catch (error) {
+      console.error('Failed to load notification count:', error);
+    }
+  };
+
   useEffect(() => {
     loadFeed();
+    loadNotificationCount();
   }, []);
+
+  // Refresh notification count when screen gains focus
+  useFocusEffect(
+    React.useCallback(() => {
+      loadNotificationCount();
+    }, [])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -49,6 +67,10 @@ export default function FeedScreen() {
 
   const handleSearchPress = () => {
     navigation.navigate('Search', { autoFocus: true });
+  };
+
+  const handleNotificationsPress = () => {
+    navigation.navigate('Notifications');
   };
 
   const handleRestaurantPress = (restaurantId: string) => {
@@ -130,11 +152,13 @@ export default function FeedScreen() {
               <Text style={styles.badgeText}>1</Text>
             </View>
           </Pressable>
-          <Pressable style={styles.iconButton}>
+          <Pressable style={styles.iconButton} onPress={handleNotificationsPress}>
             <Ionicons name="notifications-outline" size={24} color={colors.textPrimary} />
-            <View style={styles.notificationBadge}>
-              <Text style={styles.badgeText}>1</Text>
-            </View>
+            {unreadNotificationCount > 0 && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.badgeText}>{unreadNotificationCount}</Text>
+              </View>
+            )}
           </Pressable>
           <Pressable style={styles.iconButton}>
             <Ionicons name="menu-outline" size={24} color={colors.textPrimary} />

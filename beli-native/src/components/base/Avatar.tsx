@@ -4,7 +4,7 @@ import { theme } from '../../theme';
 
 interface AvatarProps {
   source?: { uri: string } | number;
-  size?: 'small' | 'medium' | 'large' | 'xlarge' | 'xxl';
+  size?: 'small' | 'medium' | 'large' | 'xlarge' | 'xxl' | 'profile' | number;
   initials?: string;
   showOnlineStatus?: boolean;
   isOnline?: boolean;
@@ -19,6 +19,7 @@ const AVATAR_SIZES = {
   large: 72,
   xlarge: 80,
   xxl: 120,
+  profile: 180,
 };
 
 const ONLINE_DOT_SIZES = {
@@ -27,6 +28,7 @@ const ONLINE_DOT_SIZES = {
   large: 16,
   xlarge: 20,
   xxl: 24,
+  profile: 28,
 };
 
 export const Avatar: React.FC<AvatarProps> = ({
@@ -39,8 +41,8 @@ export const Avatar: React.FC<AvatarProps> = ({
   style,
   testID,
 }) => {
-  const avatarSize = AVATAR_SIZES[size];
-  const onlineDotSize = ONLINE_DOT_SIZES[size];
+  const avatarSize = typeof size === 'number' ? size : AVATAR_SIZES[size];
+  const onlineDotSize = typeof size === 'number' ? size * 0.3 : ONLINE_DOT_SIZES[size];
 
   const avatarStyle = [
     styles.avatar,

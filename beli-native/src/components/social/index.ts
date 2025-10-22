@@ -6,3 +6,4 @@ export { ProfileListRow } from './ProfileListRow';
 export { ProfileStatCard } from './ProfileStatCard';
 export { AchievementBanner } from './AchievementBanner';
 export { ProfileActivityCard } from './ProfileActivityCard';
+export { NotificationListItem } from './NotificationListItem';
