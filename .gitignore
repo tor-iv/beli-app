@@ -50,3 +50,14 @@ yarn-error.*
 
 # OS generated files
 Thumbs.db
+
+# Next.js (for beli-web/)
+.next/
+out/
+next-env.d.ts
+
+# Vercel
+.vercel
+
+# Build info
+*.tsbuildinfo

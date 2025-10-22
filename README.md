@@ -1,6 +1,6 @@
 # Beli App
 
-A social restaurant discovery platform built with React Native and Expo that combines personal dining tracking, social networking, and gamified restaurant exploration.
+A social restaurant discovery platform with native mobile and web applications that combines personal dining tracking, social networking, and gamified restaurant exploration.
 
 ## Why I Built This
 
@@ -17,26 +17,45 @@ Beli allows users to:
 
 ## Tech Stack
 
+### Mobile (beli-native/)
 - **Framework**: React Native with Expo SDK 54
 - **Language**: TypeScript
 - **Navigation**: React Navigation 7
 - **State Management**: Zustand
 - **UI Components**: Custom components with Expo Vector Icons
 
+### Web (beli-web/)
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **UI Library**: shadcn/ui + Tailwind CSS
+- **State Management**: Zustand + React Query
+- **Deployment**: Vercel
+
 ## Project Structure
+
+This is a monorepo containing multiple applications:
 
 ```
 beli-app/
-├── beli-native/          # Main React Native application
+├── beli-native/          # React Native mobile app (iOS/Android)
 │   ├── src/              # Source code
 │   ├── assets/           # Images, fonts, and other assets
 │   ├── App.tsx           # Main app component
-│   └── package.json      # Dependencies and scripts
+│   └── package.json      # Native dependencies
+│
+├── beli-web/             # Next.js web application
+│   ├── app/              # Next.js App Router pages
+│   ├── components/       # React components
+│   ├── lib/              # Utilities and services
+│   ├── types/            # TypeScript types
+│   └── package.json      # Web dependencies
+│
 ├── beli-images/          # Design assets and mockups
 └── docs/                 # Project documentation
     ├── beli-app-requirements.md
     ├── beli-app-design-system.md
-    └── beli-app-build-guide.md
+    ├── beli-app-build-guide.md
+    └── beli-web-implementation-plan.md
 ```
 
 ## Getting Started
@@ -53,49 +72,76 @@ beli-app/
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/tor-iv/beli-app.git
 cd beli-app
 ```
 
-2. Navigate to the React Native app:
+2a. **For Mobile App (React Native):**
 ```bash
 cd beli-native
-```
-
-3. Install dependencies:
-```bash
 npm install
-```
-
-4. Start the development server:
-```bash
 npm start
 ```
 
+2b. **For Web App (Next.js):**
+```bash
+cd beli-web
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the web app in your browser.
+
 ## Available Scripts
 
-In the `beli-native` directory:
-
+### Mobile App (`beli-native/`)
 - `npm start` - Start the Expo development server
 - `npm run android` - Start on Android simulator/device
 - `npm run ios` - Start on iOS simulator/device
-- `npm run web` - Start on web browser
+- `npm run web` - Start Expo web version
+
+### Web App (`beli-web/`)
+- `npm run dev` - Start Next.js development server (http://localhost:3000)
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
 
 ## Development
 
-The app follows a bottom tab navigation structure with:
+Both apps share the same core features and design system:
 - **Feed**: Social feed and restaurant discoveries
 - **Your Lists**: Personal restaurant collections
 - **Search**: Restaurant and user search
 - **Leaderboard**: Friend rankings and achievements
 - **Profile**: User profile and settings
 
+### Monorepo Workflow
+
+Each app has independent dependencies:
+```bash
+# Install dependencies for native app
+cd beli-native && npm install
+
+# Install dependencies for web app
+cd beli-web && npm install
+```
+
+Both apps share design tokens and data models but run independently.
+
+## Deployments
+
+- **Mobile:** Expo (iOS App Store, Google Play Store)
+- **Web:** Vercel - Auto-deploys from `main` branch
+  - Production: https://beli-web.vercel.app (after setup)
+  - Preview deployments for all PRs
+
 ## Contributing
 
-1. Create a feature branch from `master`
+1. Create a feature branch from `main`
 2. Make your changes
-3. Test thoroughly on both iOS and Android
-4. Submit a pull request
+3. Use commit prefixes: `mobile:`, `web:`, `shared:`, or `docs:`
+4. Test thoroughly (native: iOS/Android, web: Chrome/Safari/Firefox)
+5. Submit a pull request
 
 ## License
 
