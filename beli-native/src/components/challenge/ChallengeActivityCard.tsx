@@ -68,8 +68,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
   },
   header: {
     flexDirection: 'row',
@@ -99,7 +97,7 @@ const styles = StyleSheet.create({
   },
   notesContainer: {
     marginTop: spacing.md,
-    paddingLeft: 52, // Align with text above (avatar + gap)
+    marginLeft: 52, // Align with text above (avatar + gap)
   },
   notesLabel: {
     fontSize: typography.sizes.base,
@@ -115,6 +113,6 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.sm,
     color: colors.textTertiary,
     marginTop: spacing.md,
-    paddingLeft: 52,
+    marginLeft: 52,
   },
 });

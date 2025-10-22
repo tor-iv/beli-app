@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: spacing.borderRadius.xl,
     padding: spacing.xl,
-    marginHorizontal: spacing.lg,
+    marginHorizontal: spacing.md,
     marginTop: spacing.md,
     ...shadows.card,
   },

@@ -144,24 +144,26 @@ export default function ChallengeGoalScreen() {
         {/* Monthly Timeline */}
         <View style={styles.timelineContainer}>
           {Object.entries(groupedReviews).map(([monthYear, items]) => (
-            <View key={monthYear}>
+            <View key={monthYear} style={styles.monthSection}>
               <View style={styles.monthHeader}>
                 <Text style={styles.monthTitle}>{monthYear}</Text>
               </View>
-              {items.map(({ review, restaurant }) => (
-                <ChallengeActivityCard
-                  key={review.id}
-                  userAvatar={user.avatar}
-                  restaurantName={restaurant.name}
-                  cuisine={restaurant.cuisine[0]}
-                  location={`${restaurant.location.neighborhood}, ${restaurant.location.city}`}
-                  rating={review.rating}
-                  notes={review.content}
-                  date={formatDate(review.createdAt)}
-                  onPress={() => {
-                    // Navigate to restaurant detail
-                  }}
-                />
+              {items.map(({ review, restaurant }, index) => (
+                <View key={review.id}>
+                  <ChallengeActivityCard
+                    userAvatar={user.avatar}
+                    restaurantName={restaurant.name}
+                    cuisine={restaurant.cuisine[0]}
+                    location={`${restaurant.location.neighborhood}, ${restaurant.location.city}`}
+                    rating={review.rating}
+                    notes={review.content}
+                    date={formatDate(review.createdAt)}
+                    onPress={() => {
+                      // Navigate to restaurant detail
+                    }}
+                  />
+                  {index < items.length - 1 && <View style={styles.cardSeparator} />}
+                </View>
               ))}
             </View>
           ))}
@@ -227,19 +229,25 @@ const styles = StyleSheet.create({
   },
   timelineContainer: {
     marginTop: spacing.xl,
+  },
+  monthSection: {
     backgroundColor: colors.white,
+    marginBottom: spacing.md,
   },
   monthHeader: {
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    backgroundColor: colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
+    backgroundColor: colors.background,
   },
   monthTitle: {
     fontSize: typography.sizes.base,
     fontWeight: typography.weights.bold,
     color: colors.textPrimary,
     letterSpacing: 0.5,
+  },
+  cardSeparator: {
+    height: 1,
+    backgroundColor: colors.borderLight,
+    marginHorizontal: spacing.lg,
   },
 });

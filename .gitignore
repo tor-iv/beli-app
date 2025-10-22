@@ -3,6 +3,9 @@
 # dependencies
 node_modules/
 
+#example images
+beli-images/*
+
 # Expo
 .expo/
 dist/
