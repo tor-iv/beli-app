@@ -27,3 +27,6 @@ export * from './layout';
 
 // Modal components
 export * from './modals';
+
+// Challenge components
+export * from './challenge';

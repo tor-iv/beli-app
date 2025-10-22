@@ -11,4 +11,5 @@ export type AppStackParamList = {
   RestaurantInfo: {
     restaurantId: string;
   };
+  ChallengeGoal: undefined;
 };

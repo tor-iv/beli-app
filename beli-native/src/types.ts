@@ -20,6 +20,15 @@ export interface UserStats {
   wantToTryCount: number;
   currentStreak: number;
   totalReviews?: number;
+  challenge2025?: ChallengeGoal;
+}
+
+export interface ChallengeGoal {
+  year: number;
+  goalCount: number;
+  currentCount: number;
+  startDate: Date;
+  endDate: Date;
 }
 
 export interface Location {

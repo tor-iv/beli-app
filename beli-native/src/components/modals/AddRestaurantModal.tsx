@@ -144,7 +144,7 @@ export const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({
                     ]}
                   >
                     {rating === option.key && (
-                      <Ionicons name="checkmark" size={32} color="white" />
+                      <Ionicons name="checkmark" size={28} color="white" />
                     )}
                   </View>
                   <Text style={styles.ratingLabel}>{option.label}</Text>
@@ -157,54 +157,54 @@ export const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({
           <View style={styles.optionsList}>
             {/* Who did you go with */}
             <Pressable style={styles.optionRow}>
-              <Ionicons name="people-outline" size={24} color={colors.textPrimary} />
+              <Ionicons name="people-outline" size={22} color={colors.textPrimary} />
               <Text style={styles.optionLabel}>Who did you go with?</Text>
-              <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
             </Pressable>
 
             {/* Add labels */}
             <Pressable style={styles.optionRow}>
-              <Ionicons name="pricetag-outline" size={24} color={colors.textPrimary} />
+              <Ionicons name="pricetag-outline" size={22} color={colors.textPrimary} />
               <View style={styles.optionLabelContainer}>
                 <Text style={styles.optionLabel}>Add labels (good for, etc.)</Text>
                 <View style={styles.scBadge}>
                   <Text style={styles.scBadgeText}>SC</Text>
                 </View>
               </View>
-              <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
             </Pressable>
 
             {/* Add notes */}
             <Pressable style={styles.optionRow}>
-              <Ionicons name="create-outline" size={24} color={colors.textPrimary} />
+              <Ionicons name="create-outline" size={22} color={colors.textPrimary} />
               <Text style={styles.optionLabel}>Add notes</Text>
-              <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
             </Pressable>
 
             {/* Add favorite dishes */}
             <Pressable style={styles.optionRow}>
-              <Ionicons name="restaurant-outline" size={24} color={colors.textPrimary} />
+              <Ionicons name="restaurant-outline" size={22} color={colors.textPrimary} />
               <Text style={styles.optionLabel}>Add favorite dishes</Text>
-              <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
             </Pressable>
 
             {/* Add photos */}
             <Pressable style={styles.optionRow}>
-              <Ionicons name="camera-outline" size={24} color={colors.textPrimary} />
+              <Ionicons name="camera-outline" size={22} color={colors.textPrimary} />
               <Text style={styles.optionLabel}>Add photos</Text>
-              <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
             </Pressable>
 
             {/* Add visit date */}
             <Pressable style={styles.optionRow}>
-              <Ionicons name="calendar-outline" size={24} color={colors.textPrimary} />
+              <Ionicons name="calendar-outline" size={22} color={colors.textPrimary} />
               <Text style={styles.optionLabel}>Add visit date</Text>
-              <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
             </Pressable>
 
             {/* Stealth mode */}
             <View style={styles.optionRow}>
-              <Ionicons name="lock-closed-outline" size={24} color={colors.textPrimary} />
+              <Ionicons name="lock-closed-outline" size={22} color={colors.textPrimary} />
               <View style={styles.stealthContainer}>
                 <View style={styles.stealthLabelContainer}>
                   <Text style={styles.optionLabel}>Stealth mode</Text>
@@ -299,8 +299,8 @@ export const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    paddingTop: 60,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    paddingTop: 50,
     paddingHorizontal: 16,
   },
   container: {
@@ -310,24 +310,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: colors.white,
     borderRadius: 16,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   headerContent: {
     flex: 1,
     marginRight: 12,
   },
   restaurantName: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '700',
     color: colors.textPrimary,
     marginBottom: 4,
   },
   restaurantMeta: {
-    fontSize: 15,
+    fontSize: 13,
     color: colors.textSecondary,
   },
   closeButton: {
@@ -338,21 +338,21 @@ const styles = StyleSheet.create({
   },
   section: {
     backgroundColor: colors.white,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     borderRadius: 16,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   sectionLabel: {
-    fontSize: 16,
+    fontSize: 14,
     color: colors.textPrimary,
-    marginBottom: 12,
+    marginBottom: 10,
   },
   listTypeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
     borderWidth: 1.5,
     borderColor: colors.borderLight,
     borderRadius: 12,
@@ -360,31 +360,31 @@ const styles = StyleSheet.create({
   },
   listTypeText: {
     flex: 1,
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: '600',
     color: colors.textPrimary,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '600',
     color: colors.textPrimary,
-    marginBottom: 20,
+    marginBottom: 16,
     textAlign: 'center',
   },
   ratingButtons: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    gap: 12,
+    gap: 8,
   },
   ratingButtonContainer: {
     flex: 1,
     alignItems: 'center',
-    gap: 12,
+    gap: 8,
   },
   ratingCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
     borderColor: colors.textPrimary,
   },
   ratingLabel: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.textPrimary,
     textAlign: 'center',
     fontWeight: '500',
@@ -401,20 +401,20 @@ const styles = StyleSheet.create({
   optionsList: {
     backgroundColor: colors.white,
     borderRadius: 16,
-    paddingHorizontal: 20,
-    marginBottom: 8,
+    paddingHorizontal: 16,
+    marginBottom: 6,
   },
   optionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.borderLight,
     gap: 12,
   },
   optionLabel: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     color: colors.textPrimary,
   },
   optionLabelContainer: {
@@ -449,8 +449,8 @@ const styles = StyleSheet.create({
   },
   bottomButtonContainer: {
     paddingHorizontal: 16,
-    paddingBottom: 32,
-    paddingTop: 16,
+    paddingBottom: 20,
+    paddingTop: 12,
   },
   submitButton: {
     backgroundColor: colors.primary,
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   submitButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: colors.white,
   },

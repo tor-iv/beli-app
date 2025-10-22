@@ -15,6 +15,13 @@ export const mockUsers: User[] = [
       wantToTryCount: 89,
       currentStreak: 3,
       totalReviews: 156,
+      challenge2025: {
+        year: 2025,
+        goalCount: 250,
+        currentCount: 352,
+        startDate: new Date('2025-01-01'),
+        endDate: new Date('2025-12-31'),
+      },
     },
     location: {
       city: 'New York',

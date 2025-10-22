@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { colors, typography, spacing } from '../theme';
 import {
   Avatar,
@@ -11,18 +13,23 @@ import {
   Button,
   TabSelector,
   ProfileActivityCard,
+  MenuDrawer,
 } from '../components';
 import { MockDataService } from '../data/mockDataService';
 import type { User, Review, Restaurant } from '../data/mock/types';
+import type { AppStackParamList } from '../navigation/types';
 
 type TabId = 'activity' | 'taste';
+type ProfileScreenNavigationProp = StackNavigationProp<AppStackParamList>;
 
 export default function ProfileScreen() {
+  const navigation = useNavigation<ProfileScreenNavigationProp>();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabId>('activity');
   const [recentReviews, setRecentReviews] = useState<Review[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -76,13 +83,53 @@ export default function ProfileScreen() {
     { id: 'taste', label: 'Taste Profile', icon: 'stats-chart' as const },
   ];
 
+  const menuOptions = [
+    {
+      id: 'invites',
+      label: 'You have 3 invites left',
+      icon: 'mail-outline' as const,
+      onPress: () => console.log('Invites'),
+    },
+    {
+      id: 'school',
+      label: 'Add Your School',
+      icon: 'school-outline' as const,
+      onPress: () => console.log('School'),
+    },
+    {
+      id: 'settings',
+      label: 'Settings',
+      icon: 'settings-outline' as const,
+      onPress: () => console.log('Settings'),
+    },
+    {
+      id: 'challenge',
+      label: 'Your 2025 Goal',
+      icon: 'trophy-outline' as const,
+      subtitle: user?.stats.challenge2025 ? `${user.stats.challenge2025.currentCount} of ${user.stats.challenge2025.goalCount} restaurants` : undefined,
+      onPress: () => navigation.navigate('ChallengeGoal'),
+    },
+    {
+      id: 'faq',
+      label: 'FAQ',
+      icon: 'help-circle-outline' as const,
+      onPress: () => console.log('FAQ'),
+    },
+    {
+      id: 'logout',
+      label: 'Log Out',
+      icon: 'log-out-outline' as const,
+      onPress: () => console.log('Log out'),
+    },
+  ];
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header with Name and Menu */}
         <View style={styles.header}>
           <Text style={styles.userName}>{user.displayName}</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => setMenuVisible(true)}>
             <Ionicons name="menu" size={32} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
@@ -217,7 +264,7 @@ export default function ProfileScreen() {
                   rating={review.rating}
                   visitCount={1}
                   image={review.photos?.[0] || restaurant.images?.[0]}
-                  notes={review.notes}
+                  notes={review.content}
                   onPress={() => {}}
                 />
               );
@@ -234,6 +281,13 @@ export default function ProfileScreen() {
         {/* Bottom Spacing */}
         <View style={{ height: spacing.xl }} />
       </ScrollView>
+
+      {/* Menu Drawer */}
+      <MenuDrawer
+        visible={menuVisible}
+        onClose={() => setMenuVisible(false)}
+        options={menuOptions}
+      />
     </SafeAreaView>
   );
 }
