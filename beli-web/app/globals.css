@@ -1,26 +1,79 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: 250 250 250;
+  --foreground: 0 0 0;
+  --card: 255 255 255;
+  --card-foreground: 0 0 0;
+  --primary: 10 108 112;
+  --primary-foreground: 255 255 255;
+  --muted: 142 142 147;
+  --muted-foreground: 199 199 204;
+  --border: 229 229 234;
+  --radius: 0.75rem;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Custom rating bubble */
+.rating-bubble {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  font-weight: 700;
+  width: 44px;
+  height: 44px;
+  font-size: 15px;
+}
+
+/* Rating color variants */
+.rating-excellent {
+  background-color: #22C55E;
+  color: white;
+}
+
+.rating-good {
+  background-color: #84CC16;
+  color: white;
+}
+
+.rating-average {
+  background-color: #F59E0B;
+  color: white;
+}
+
+.rating-poor {
+  background-color: #EF4444;
+  color: white;
+}
+
+/* Content-first card style */
+.beli-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.2s;
+}
+
+.beli-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Page transitions */
+.page-transition {
+  transition: opacity 0.2s;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: all 0.2s;
+}
+
+.card-hover:hover {
+  transform: scale(1.02);
 }
