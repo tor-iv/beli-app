@@ -6,6 +6,10 @@ import { Header } from "@/components/layout/header";
 export const metadata: Metadata = {
   title: "Beli - Discover Great Restaurants",
   description: "Your social restaurant discovery platform",
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/icon.png',
+  },
 };
 
 export default function RootLayout({

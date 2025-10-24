@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { useSearchRestaurants } from '@/lib/hooks/use-restaurants';
 import { RestaurantCard } from '@/components/restaurant/restaurant-card';
-import { Search as SearchIcon } from 'lucide-react';
+import { IoSearch } from 'react-icons/io5';
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');
@@ -15,7 +15,7 @@ export default function SearchPage() {
       <h1 className="text-2xl font-bold mb-6">Search Restaurants</h1>
 
       <div className="relative mb-6">
-        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
+        <IoSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
         <Input
           type="search"
           placeholder="Search by name, cuisine, neighborhood..."

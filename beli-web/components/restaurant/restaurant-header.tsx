@@ -1,5 +1,5 @@
 import { Restaurant } from '@/types';
-import { MapPin, DollarSign } from 'lucide-react';
+import { IoLocationSharp, IoCashOutline } from 'react-icons/io5';
 
 interface RestaurantHeaderProps {
   restaurant: Restaurant;
@@ -12,11 +12,11 @@ export function RestaurantHeader({ restaurant }: RestaurantHeaderProps) {
       <div className="flex flex-wrap items-center gap-4 text-muted">
         <span>{restaurant.cuisine.join(', ')}</span>
         <span className="flex items-center gap-1">
-          <DollarSign className="w-4 h-4" />
+          <IoCashOutline className="w-4 h-4" />
           {restaurant.priceRange}
         </span>
         <span className="flex items-center gap-1">
-          <MapPin className="w-4 h-4" />
+          <IoLocationSharp className="w-4 h-4" />
           {restaurant.location.neighborhood}
         </span>
         {restaurant.distance && (

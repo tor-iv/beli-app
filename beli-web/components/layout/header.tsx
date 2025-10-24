@@ -3,14 +3,24 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Home, List, Search, Trophy, User } from 'lucide-react';
+import {
+  IoDocument,
+  IoDocumentOutline,
+  IoList,
+  IoListOutline,
+  IoAdd,
+  IoTrophy,
+  IoTrophyOutline,
+  IoPersonCircle,
+  IoPersonCircleOutline
+} from 'react-icons/io5';
 
 const navigation = [
-  { name: 'Feed', href: '/feed', icon: Home },
-  { name: 'Lists', href: '/lists', icon: List },
-  { name: 'Search', href: '/search', icon: Search },
-  { name: 'Leaderboard', href: '/leaderboard', icon: Trophy },
-  { name: 'Profile', href: '/profile/current', icon: User },
+  { name: 'Feed', href: '/feed', icon: IoDocument, outlineIcon: IoDocumentOutline },
+  { name: 'Lists', href: '/lists', icon: IoList, outlineIcon: IoListOutline },
+  { name: 'Search', href: '/search', icon: IoAdd, outlineIcon: IoAdd, isSpecial: true },
+  { name: 'Leaderboard', href: '/leaderboard', icon: IoTrophy, outlineIcon: IoTrophyOutline },
+  { name: 'Profile', href: '/profile/current', icon: IoPersonCircle, outlineIcon: IoPersonCircleOutline },
 ];
 
 export function Header() {
@@ -24,14 +34,17 @@ export function Header() {
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <Link href="/feed" className="flex items-center space-x-2">
+              <div className="w-8 h-8 relative">
+                <img src="/icon.png" alt="Beli" className="w-full h-full object-contain" />
+              </div>
               <span className="text-2xl font-bold text-primary">Beli</span>
             </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6">
               {navigation.map((item) => {
-                const Icon = item.icon;
                 const isActive = pathname?.startsWith(item.href);
+                const Icon = isActive ? item.icon : item.outlineIcon;
 
                 return (
                   <Link
@@ -42,7 +55,7 @@ export function Header() {
                       isActive ? 'text-primary' : 'text-muted'
                     )}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-5 h-5" />
                     {item.name}
                   </Link>
                 );
@@ -53,23 +66,42 @@ export function Header() {
       </header>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-50">
-        <div className="flex justify-around py-2">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-50 shadow-[0_-2px_8px_rgba(0,0,0,0.1)]">
+        <div className="flex justify-around items-center py-2 px-2">
           {navigation.map((item) => {
-            const Icon = item.icon;
             const isActive = pathname?.startsWith(item.href);
+            const Icon = isActive ? item.icon : item.outlineIcon;
+
+            // Special circular button for search
+            if (item.isSpecial) {
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="flex flex-col items-center justify-center -mt-2"
+                >
+                  <div className={cn(
+                    'w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-md',
+                    'active:scale-95 transition-transform',
+                    isActive ? 'opacity-100' : 'opacity-75'
+                  )}>
+                    <Icon className="w-[22px] h-[22px] text-white" />
+                  </div>
+                </Link>
+              );
+            }
 
             return (
               <Link
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center gap-1 p-2',
+                  'flex flex-col items-center gap-1 p-2 min-w-[60px]',
                   isActive ? 'text-primary' : 'text-muted'
                 )}
               >
-                <Icon className="w-5 h-5" />
-                <span className="text-xs">{item.name}</span>
+                <Icon className="w-6 h-6" />
+                <span className="text-[11px] font-medium">{item.name}</span>
               </Link>
             );
           })}

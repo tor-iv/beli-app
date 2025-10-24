@@ -2,7 +2,7 @@ import { Restaurant } from '@/types';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { RatingBubble } from '@/components/rating/rating-bubble';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
-import { MapPin } from 'lucide-react';
+import { IoLocationSharp } from 'react-icons/io5';
 import Link from 'next/link';
 
 interface RestaurantCardProps {
@@ -27,7 +27,7 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
 
         <CardContent>
           <div className="flex items-center gap-1 text-sm text-muted mb-3">
-            <MapPin className="w-4 h-4" />
+            <IoLocationSharp className="w-4 h-4" />
             <span>{restaurant.location.neighborhood}</span>
             {restaurant.distance && (
               <span className="ml-2">{restaurant.distance.toFixed(1)} mi</span>
