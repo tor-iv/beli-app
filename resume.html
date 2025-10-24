@@ -371,6 +371,12 @@
                 margin: 0.35in 0.45in;
             }
 
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
             body {
                 background: white;
                 padding: 0;
@@ -379,31 +385,41 @@
                 line-height: 1.25;
             }
 
-            /* Compact header */
+            /* Compact header - inline layout */
             .header {
-                padding: 8px 12px;
-                margin-bottom: 6px;
+                padding: 6px 10px;
+                margin-bottom: 5px;
                 box-shadow: none;
                 border: 1px solid var(--border-light);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
             }
 
             .header h1 {
-                font-size: 20px;
-                margin-bottom: 3px;
+                font-size: 16px;
+                margin-bottom: 0;
+                margin-right: 12px;
             }
 
             .header .contact {
-                font-size: 8.5px;
-                margin-bottom: 4px;
+                font-size: 8px;
+                margin-bottom: 0;
+                flex: 1;
+                text-align: left;
             }
 
             .header .links {
-                gap: 6px;
+                gap: 4px;
+                width: 100%;
+                margin-top: 3px;
+                justify-content: flex-start;
             }
 
             .header .links a {
-                font-size: 8px;
-                padding: 2px 6px;
+                font-size: 7.5px;
+                padding: 2px 5px;
             }
 
             /* Compact section headers */
@@ -544,13 +560,13 @@
                 line-height: 1.3;
             }
 
-            /* Hide hobbies section for print to save space */
+            /* Compact hobbies section for print */
             .hobbies-list {
-                display: none;
-            }
-
-            .section-header:last-of-type {
-                display: none;
+                padding: 5px 10px;
+                font-size: 7.5px;
+                line-height: 1.3;
+                box-shadow: none;
+                border: 1px solid var(--border-light);
             }
 
             /* Remove hover effects */
@@ -589,7 +605,7 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>VICTOR COX IV</h1>
+        <h1>Victor Cox IV</h1>
         <div class="contact">
             vcox484@gmail.com • (651) 955-9920 • New York, NY
         </div>
