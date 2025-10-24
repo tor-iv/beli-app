@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Victor Cox IV - Professional Journey</title>
+    <style>
+        /* Import SF Pro Display font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Beli color system */
+            --primary: #0A6C70;
+            --primary-dark: #075159;
+            --primary-light: #E6F7FF;
+            --white: #FFFFFF;
+            --off-white: #FAFAFA;
+
+            /* Rating colors */
+            --rating-excellent: #22C55E;
+            --rating-good: #84CC16;
+            --rating-average: #F59E0B;
+            --rating-poor: #EF4444;
+
+            /* Text colors */
+            --text-primary: #000000;
+            --text-secondary: #8E8E93;
+            --text-tertiary: #C7C7CC;
+
+            /* UI */
+            --background: #FAFAFA;
+            --card-bg: #FFFFFF;
+            --border-light: #E5E5EA;
+            --shadow: rgba(0,0,0,0.08);
+
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 12px;
+            --spacing-lg: 16px;
+            --spacing-xl: 24px;
+            --spacing-2xl: 32px;
+
+            /* Typography */
+            --font-xs: 11px;
+            --font-sm: 13px;
+            --font-base: 15px;
+            --font-lg: 17px;
+            --font-xl: 20px;
+            --font-2xl: 24px;
+            --font-3xl: 34px;
+
+            /* Border radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 999px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+            font-size: var(--font-base);
+            line-height: 1.4;
+            color: var(--text-primary);
+            background: var(--background);
+            padding: var(--spacing-xl);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header - Profile Style */
+        .header {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-2xl);
+            margin-bottom: var(--spacing-xl);
+            box-shadow: 0 2px 8px var(--shadow);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: var(--font-3xl);
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+
+        .header .contact {
+            font-size: var(--font-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .header .links {
+            display: flex;
+            gap: var(--spacing-lg);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .header .links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: var(--font-sm);
+            font-weight: 600;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--radius-full);
+            background: var(--primary-light);
+            transition: all 0.2s;
+        }
+
+        .header .links a:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        /* Section Headers */
+        .section-header {
+            font-size: var(--font-xl);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: var(--spacing-2xl) 0 var(--spacing-lg) 0;
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        /* Experience Cards */
+        .experience-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: 0 2px 8px var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .experience-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+        }
+
+        .experience-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+            gap: var(--spacing-lg);
+        }
+
+        .experience-info {
+            flex: 1;
+        }
+
+        .company-name {
+            font-size: var(--font-lg);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .job-title {
+            font-size: var(--font-base);
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .job-meta {
+            font-size: var(--font-sm);
+            color: var(--text-secondary);
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        /* Rating Bubble */
+        .rating-bubble {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-base);
+            font-weight: 700;
+            color: var(--white);
+            flex-shrink: 0;
+        }
+
+        .rating-excellent {
+            background: var(--rating-excellent);
+        }
+
+        .rating-good {
+            background: var(--rating-good);
+        }
+
+        .rating-average {
+            background: var(--rating-average);
+        }
+
+        /* Achievements list */
+        .achievements {
+            list-style: none;
+            margin-top: var(--spacing-md);
+        }
+
+        .achievements li {
+            padding-left: var(--spacing-lg);
+            margin-bottom: var(--spacing-sm);
+            position: relative;
+            font-size: var(--font-base);
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .achievements li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Skills Grid */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .skill-item {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            box-shadow: 0 2px 8px var(--shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .skill-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .skill-rating {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-base);
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .skill-name {
+            font-size: var(--font-sm);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Education Card */
+        .education-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .education-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .school-name {
+            font-size: var(--font-lg);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .degree {
+            font-size: var(--font-base);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .gpa-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--radius-full);
+            font-size: var(--font-sm);
+            font-weight: 600;
+        }
+
+        /* Projects */
+        .project-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: 0 2px 8px var(--shadow);
+            transition: all 0.2s;
+        }
+
+        .project-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .project-name {
+            font-size: var(--font-lg);
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .match-badge {
+            background: var(--rating-excellent);
+            color: var(--white);
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--radius-full);
+            font-size: var(--font-sm);
+            font-weight: 700;
+        }
+
+        .project-description {
+            font-size: var(--font-base);
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        /* Hobbies */
+        .hobbies-list {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: 0 2px 8px var(--shadow);
+            font-size: var(--font-base);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Print styles */
+        @media print {
+            @page {
+                size: letter;
+                margin: 0.35in 0.45in;
+            }
+
+            body {
+                background: white;
+                padding: 0;
+                max-width: 100%;
+                font-size: 9px;
+                line-height: 1.25;
+            }
+
+            /* Compact header */
+            .header {
+                padding: 8px 12px;
+                margin-bottom: 6px;
+                box-shadow: none;
+                border: 1px solid var(--border-light);
+            }
+
+            .header h1 {
+                font-size: 20px;
+                margin-bottom: 3px;
+            }
+
+            .header .contact {
+                font-size: 8.5px;
+                margin-bottom: 4px;
+            }
+
+            .header .links {
+                gap: 6px;
+            }
+
+            .header .links a {
+                font-size: 8px;
+                padding: 2px 6px;
+            }
+
+            /* Compact section headers */
+            .section-header {
+                font-size: 13px;
+                margin: 8px 0 4px 0;
+                padding-bottom: 2px;
+                border-bottom: 1.5px solid var(--primary);
+            }
+
+            /* Compact experience cards */
+            .experience-card {
+                padding: 6px 10px;
+                margin-bottom: 5px;
+                box-shadow: none;
+                border: 1px solid var(--border-light);
+                page-break-inside: avoid;
+            }
+
+            .experience-header {
+                margin-bottom: 4px;
+                gap: 8px;
+            }
+
+            .company-name {
+                font-size: 11px;
+                margin-bottom: 1px;
+            }
+
+            .job-title {
+                font-size: 9.5px;
+                margin-bottom: 1px;
+            }
+
+            .job-meta {
+                font-size: 8px;
+                gap: 6px;
+            }
+
+            .rating-bubble {
+                width: 28px;
+                height: 28px;
+                font-size: 10px;
+            }
+
+            /* Compact achievements */
+            .achievements {
+                margin-top: 4px;
+            }
+
+            .achievements li {
+                font-size: 8.5px;
+                line-height: 1.3;
+                margin-bottom: 2px;
+                padding-left: 10px;
+            }
+
+            .achievements li:last-child {
+                margin-bottom: 0;
+            }
+
+            /* Compact education */
+            .education-card {
+                padding: 6px 10px;
+                margin-bottom: 5px;
+                box-shadow: none;
+                border: 1px solid var(--border-light);
+            }
+
+            .education-header {
+                margin-bottom: 0;
+            }
+
+            .school-name {
+                font-size: 11px;
+                margin-bottom: 1px;
+            }
+
+            .degree {
+                font-size: 8.5px;
+                margin-bottom: 1px;
+            }
+
+            .gpa-badge {
+                font-size: 8px;
+                padding: 2px 6px;
+            }
+
+            /* Skills grid - more compact */
+            .skills-grid {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 4px;
+                margin-bottom: 6px;
+            }
+
+            .skill-item {
+                padding: 5px 4px;
+                box-shadow: none;
+                border: 1px solid var(--border-light);
+            }
+
+            .skill-rating {
+                width: 24px;
+                height: 24px;
+                font-size: 9px;
+                margin-bottom: 3px;
+            }
+
+            .skill-name {
+                font-size: 7.5px;
+                line-height: 1.2;
+            }
+
+            /* Compact projects */
+            .project-card {
+                padding: 6px 10px;
+                margin-bottom: 5px;
+                box-shadow: none;
+                border: 1px solid var(--border-light);
+                page-break-inside: avoid;
+            }
+
+            .project-header {
+                margin-bottom: 3px;
+            }
+
+            .project-name {
+                font-size: 10px;
+            }
+
+            .match-badge {
+                font-size: 8px;
+                padding: 1px 5px;
+            }
+
+            .project-description {
+                font-size: 8.5px;
+                line-height: 1.3;
+            }
+
+            /* Hide hobbies section for print to save space */
+            .hobbies-list {
+                display: none;
+            }
+
+            .section-header:last-of-type {
+                display: none;
+            }
+
+            /* Remove hover effects */
+            .experience-card:hover,
+            .skill-item:hover,
+            .project-card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: var(--spacing-md);
+            }
+
+            .header h1 {
+                font-size: var(--font-2xl);
+            }
+
+            .experience-header {
+                flex-direction: column;
+            }
+
+            .rating-bubble {
+                align-self: flex-start;
+            }
+
+            .skills-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>VICTOR COX IV</h1>
+        <div class="contact">
+            vcox484@gmail.com • (651) 955-9920 • New York, NY
+        </div>
+        <div class="links">
+            <a href="https://www.linkedin.com/in/tor-iv/">LinkedIn</a>
+            <a href="https://github.com/tor-iv">GitHub</a>
+            <a href="https://tor-iv.com">Portfolio</a>
+            <a href="#">beli: tor_iv</a>
+        </div>
+    </div>
+
+    <!-- Experience Section -->
+    <h2 class="section-header">Your Professional Journey</h2>
+
+    <div class="experience-card">
+        <div class="experience-header">
+            <div class="experience-info">
+                <div class="company-name">Bloomberg LP</div>
+                <div class="job-title">Software Engineer</div>
+                <div class="job-meta">
+                    <span>New York, NY</span>
+                    <span>July 2023 - Present</span>
+                </div>
+            </div>
+            <div class="rating-bubble rating-excellent">9.2</div>
+        </div>
+        <ul class="achievements">
+            <li>Architected and led migration of critical data pipeline infrastructure from Apache Airflow 1 to 2, to fully managed infrastructure that reduced maintenance, allowed horizontal scalability</li>
+            <li>Designed streaming data architecture using Kafka, replacing batch processing systems, resulting in faster processing, enhanced fault tolerance, and enabling horizontal scaling to 10x load</li>
+            <li>Engineered MCP server integration with GitHub Copilot, building React document management interface that fed organizational knowledge into AI coding agents for context-aware code generation</li>
+            <li>Led multi-team migration from legacy cloud storage to modern solution, coordinating technical plans and implementation across teams</li>
+        </ul>
+    </div>
+
+    <div class="experience-card">
+        <div class="experience-header">
+            <div class="experience-info">
+                <div class="company-name">Capital One</div>
+                <div class="job-title">TIP Fullstack Intern</div>
+                <div class="job-meta">
+                    <span>McLean, VA</span>
+                    <span>Summer 2022</span>
+                </div>
+            </div>
+            <div class="rating-bubble rating-good">8.5</div>
+        </div>
+        <ul class="achievements">
+            <li>Engineered a full-stack database recommendation system using ReactJS, AWS Lambda, S3, and Python, implementing RESTful APIs and serverless architecture that reduced team queries by 60%</li>
+            <li>Built and deployed a Slack chatbot integration using Node.js and the Slack API for query processing</li>
+        </ul>
+    </div>
+
+    <div class="experience-card">
+        <div class="experience-header">
+            <div class="experience-info">
+                <div class="company-name">HCI Lab, University of Notre Dame</div>
+                <div class="job-title">Undergraduate Researcher</div>
+                <div class="job-meta">
+                    <span>Notre Dame, IN</span>
+                    <span>Fall 2021 - Spring 2023</span>
+                </div>
+            </div>
+            <div class="rating-bubble rating-good">8.0</div>
+        </div>
+        <ul class="achievements">
+            <li>Developed system (Flask, PostgreSQL, Java) to collect gig worker behavioral data, analyzed Uber algorithm bias using pandas, and designed a UX-research-based prototype to help gig workers with task planning</li>
+            <li>Co-authored paper "A Bottom-Up End-User Intelligent Assistant Approach to Empower Gig Workers against AI Inequality" published at CHIWORK '22</li>
+        </ul>
+    </div>
+
+    <!-- Education -->
+    <h2 class="section-header">Education</h2>
+
+    <div class="education-card">
+        <div class="education-header">
+            <div>
+                <div class="school-name">University of Notre Dame</div>
+                <div class="degree">Bachelor of Science in Computer Science</div>
+                <div class="degree">Minor: Studio Arts (Ceramics)</div>
+                <div class="job-meta">
+                    <span>Notre Dame, IN</span>
+                    <span>Spring 2023</span>
+                </div>
+            </div>
+            <div class="gpa-badge">GPA 3.8</div>
+        </div>
+    </div>
+
+    <!-- Skills -->
+    <h2 class="section-header">Technical Skills</h2>
+
+    <div class="skills-grid">
+        <div class="skill-item">
+            <div class="skill-rating rating-excellent">9.5</div>
+            <div class="skill-name">Python</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-excellent">9.0</div>
+            <div class="skill-name">JavaScript</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-excellent">8.5</div>
+            <div class="skill-name">React</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-good">8.5</div>
+            <div class="skill-name">C/C++</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-good">8.0</div>
+            <div class="skill-name">Java</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-excellent">9.0</div>
+            <div class="skill-name">Airflow</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-excellent">9.0</div>
+            <div class="skill-name">Kafka</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-good">8.0</div>
+            <div class="skill-name">PostgreSQL</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-good">7.5</div>
+            <div class="skill-name">MongoDB</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-excellent">9.0</div>
+            <div class="skill-name">AWS</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-good">8.0</div>
+            <div class="skill-name">Docker</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-excellent">9.5</div>
+            <div class="skill-name">Linux</div>
+        </div>
+    </div>
+
+    <!-- Projects -->
+    <h2 class="section-header">Featured Projects</h2>
+
+    <div class="project-card">
+        <div class="project-header">
+            <div class="project-name">tor-chinese</div>
+            <div class="match-badge">95% Match</div>
+        </div>
+        <div class="project-description">
+            Vercel-deployed Next.js application featuring daily Hanzi character learning with spaced repetition methodology
+        </div>
+    </div>
+
+    <div class="project-card">
+        <div class="project-header">
+            <div class="project-name">Keeper's Heart AR Platform</div>
+            <div class="match-badge">98% Match</div>
+        </div>
+        <div class="project-description">
+            Built full-stack AR marketing app for scanning competitor whiskey bottles and automated PayPal rebates. Integrated Google Cloud Vision API for real-time detection across 15+ brands. Implemented 6-layer fraud prevention (cryptographic hashing, rate limiting, receipt validation). Stack: Next.js, TypeScript, Supabase, PayPal API
+        </div>
+    </div>
+
+    <div class="project-card">
+        <div class="project-header">
+            <div class="project-name">tors-studio</div>
+            <div class="match-badge">92% Match</div>
+        </div>
+        <div class="project-description">
+            (In Progress) Firebase-deployed React marketplace with Stripe payment integration for pottery auctions and creative idea collection
+        </div>
+    </div>
+
+    <!-- Hobbies -->
+    <h2 class="section-header">Beyond Code</h2>
+
+    <div class="hobbies-list">
+        Ceramics and pottery • Baking/Cooking • Fantasy/Sci-fi • Chinese (Language) • Yo-yo • Travel • Eating • Rec Sports • Urban Planning • Climbing • Lifting
+    </div>
+</body>
+</html>
