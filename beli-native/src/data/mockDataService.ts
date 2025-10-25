@@ -6,6 +6,7 @@ import { mockReviews, Review } from './mock/reviews';
 import { mockActivities, trendingRestaurants, recentCheckIns, Activity } from './mock/activities';
 import { mockLists, getUserListsByType, featuredLists } from './mock/lists';
 import { mockNotifications } from './mock/notifications';
+import { challenge2025, mockChallengeActivities, getActivitiesByMonth, getDaysRemaining, getProgressPercentage, Challenge2025, ChallengeActivity } from './mock/challenges';
 
 // Simulate network delay - reduced for better UX
 const delay = (ms: number = 150) => new Promise(resolve => setTimeout(resolve, ms));
@@ -554,6 +555,56 @@ export class MockDataService {
     await delay();
     return mockNotifications.filter(n => !n.isRead).length;
   }
+
+  // Challenge 2025 methods
+  static async getChallenge2025(): Promise<Challenge2025> {
+    await delay();
+    return {
+      ...challenge2025,
+      currentCount: mockChallengeActivities.length,
+    };
+  }
+
+  static async getChallengeActivities(month?: string): Promise<Array<ChallengeActivity & { restaurant: Restaurant }>> {
+    await delay();
+    let activities = mockChallengeActivities;
+
+    if (month) {
+      activities = activities.filter(activity => {
+        const activityMonth = new Date(activity.timestamp).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase();
+        return activityMonth === month;
+      });
+    }
+
+    // Enrich activities with restaurant data
+    return activities.map(activity => ({
+      ...activity,
+      restaurant: mockRestaurants.find(r => r.id === activity.restaurantId)!,
+    })).filter(a => a.restaurant); // Filter out any with missing restaurant data
+  }
+
+  static async getChallengeStats(): Promise<{
+    currentCount: number;
+    goalCount: number;
+    daysRemaining: number;
+    progressPercentage: number;
+  }> {
+    await delay();
+    return {
+      currentCount: mockChallengeActivities.length,
+      goalCount: challenge2025.goalCount,
+      daysRemaining: getDaysRemaining(),
+      progressPercentage: getProgressPercentage(),
+    };
+  }
+
+  static async updateChallengeGoal(goalCount: number): Promise<void> {
+    await delay();
+    challenge2025.goalCount = goalCount;
+  }
 }
 
 export default MockDataService;
+
+// Export types
+export type { Challenge2025, ChallengeActivity };

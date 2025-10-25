@@ -10,6 +10,8 @@ export interface User {
   dietaryRestrictions: string[];
   dislikedCuisines: string[];
   memberSince: Date;
+  isTastemaker?: boolean;
+  tastemakerProfile?: TastemakerProfile;
 }
 
 export interface UserStats {
@@ -62,6 +64,7 @@ export interface Restaurant {
   isOpen?: boolean;
   closingTime?: string | null;
   acceptsReservations?: boolean;
+  recommendedBy?: string[]; // user IDs who recommended this restaurant
   ratingCount?: number;
   friendsWantToTryCount?: number;
   friendAvatars?: string[];
@@ -195,4 +198,62 @@ export interface Notification {
   timestamp: Date;
   isRead: boolean;
   actionDescription: string;  // "liked your rating of", "commented on your bookmarking of"
+}
+
+// Tastemaker types
+export type TastemakerBadgeType =
+  | 'pizza_expert'
+  | 'michelin_hunter'
+  | 'budget_guru'
+  | 'vegan_queen'
+  | 'fine_dining_specialist'
+  | 'street_food_explorer'
+  | 'brunch_master'
+  | 'dessert_connoisseur'
+  | 'ramen_specialist'
+  | 'wine_expert'
+  | 'verified';
+
+export interface TastemakerBadge {
+  type: TastemakerBadgeType;
+  label: string;
+  color: string; // hex color for badge
+  icon?: string; // emoji or icon name
+}
+
+export interface TastemakerProfile {
+  specialty: string; // Main focus area (e.g., "NYC Pizza Expert")
+  tagline: string; // Short memorable tagline
+  badges: TastemakerBadge[];
+  featuredListsCount: number;
+  totalPosts: number;
+  engagementRate: number; // percentage
+  verifiedSince?: Date;
+  socialLinks?: {
+    instagram?: string;
+    twitter?: string;
+    website?: string;
+  };
+}
+
+export interface TastemakerPost {
+  id: string;
+  userId: string; // Author (must be a tastemaker)
+  user?: User; // Populated user object
+  title: string;
+  subtitle?: string;
+  coverImage: string;
+  content: string; // Rich text/markdown content
+  restaurantIds: string[]; // Featured restaurants in the post
+  restaurants?: Restaurant[]; // Populated restaurant objects
+  listIds?: string[]; // Referenced lists
+  tags: string[]; // Content tags (e.g., "pizza", "budget-friendly", "date-night")
+  publishedAt: Date;
+  updatedAt: Date;
+  interactions: {
+    likes: string[]; // user IDs
+    bookmarks: string[]; // user IDs
+    views: number;
+  };
+  isFeatured: boolean; // Featured on homepage
 }

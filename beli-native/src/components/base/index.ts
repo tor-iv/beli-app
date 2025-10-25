@@ -5,3 +5,4 @@ export { Badge } from './Badge';
 export { Chip } from './Chip';
 export { IconButton } from './IconButton';
 export { default as CheckboxRow } from './CheckboxRow';
+export { default as AccordionItem } from './AccordionItem';

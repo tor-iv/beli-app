@@ -34,23 +34,11 @@ export function ReservationsScreen({ navigation }: ReservationsScreenProps) {
   return <PlaceholderScreen title="Your Reservations" />;
 }
 
-// Goal Screen
-type GoalScreenProps = NativeStackScreenProps<AppStackParamList, 'GoalScreen'>;
-export function GoalScreen({ navigation }: GoalScreenProps) {
-  React.useLayoutEffect(() => {
-    navigation.setOptions({ title: 'Your 2025 Goal' });
-  }, [navigation]);
-  return <PlaceholderScreen title="Your 2025 Goal" />;
-}
+// Goal Screen - Implemented as ChallengeGoalScreen
+export { default as GoalScreen } from './ChallengeGoalScreen';
 
-// FAQ Screen
-type FAQScreenProps = NativeStackScreenProps<AppStackParamList, 'FAQScreen'>;
-export function FAQScreen({ navigation }: FAQScreenProps) {
-  React.useLayoutEffect(() => {
-    navigation.setOptions({ title: 'FAQ' });
-  }, [navigation]);
-  return <PlaceholderScreen title="Frequently Asked Questions" />;
-}
+// FAQ Screen - Implemented in separate file
+export { default as FAQScreen } from './FAQScreen';
 
 // Dietary Restrictions Screen - Implemented in separate file
 export { default as DietaryRestrictionsScreen } from './DietaryRestrictionsScreen';

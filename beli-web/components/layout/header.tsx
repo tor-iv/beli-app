@@ -8,6 +8,8 @@ import {
   IoDocumentOutline,
   IoList,
   IoListOutline,
+  IoStar,
+  IoStarOutline,
   IoAdd,
   IoTrophy,
   IoTrophyOutline,
@@ -18,6 +20,7 @@ import {
 const navigation = [
   { name: 'Feed', href: '/feed', icon: IoDocument, outlineIcon: IoDocumentOutline },
   { name: 'Lists', href: '/lists', icon: IoList, outlineIcon: IoListOutline },
+  { name: 'Tastemakers', href: '/tastemakers', icon: IoStar, outlineIcon: IoStarOutline },
   { name: 'Search', href: '/search', icon: IoAdd, outlineIcon: IoAdd, isSpecial: true },
   { name: 'Leaderboard', href: '/leaderboard', icon: IoTrophy, outlineIcon: IoTrophyOutline },
   { name: 'Profile', href: '/profile/current', icon: IoPersonCircle, outlineIcon: IoPersonCircleOutline },

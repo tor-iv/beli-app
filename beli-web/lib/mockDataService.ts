@@ -1,4 +1,4 @@
-import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification } from '@/types';
+import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification, TastemakerPost } from '@/types';
 import { mockUsers, currentUser } from '@/data/mock/users';
 import { mockRestaurants } from '@/data/mock/restaurants';
 import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
@@ -7,6 +7,8 @@ import { mockActivities, trendingRestaurants, recentCheckIns, Activity } from '@
 import { mockLists, getUserListsByType, featuredLists } from '@/data/mock/lists';
 import { mockNotifications } from '@/data/mock/notifications';
 import { mockRecentSearches, RecentSearch } from '@/data/mock/recentSearches';
+import { mockTastemakers } from '@/data/mock/tastemakers';
+import { mockTastemakerPosts, getFeaturedPosts, getPostsByUserId } from '@/data/mock/tastemakerPosts';
 
 // Simulate network delay - reduced for better UX
 const delay = (ms: number = 150) => new Promise(resolve => setTimeout(resolve, ms));
@@ -341,26 +343,6 @@ export class MockDataService {
       .slice(0, limit);
   }
 
-  // Search recent searches (mock implementation)
-  static async getRecentSearches(userId: string): Promise<string[]> {
-    await delay();
-
-    // Mock recent searches - in a real app this would be stored per user
-    return [
-      'Pizza',
-      'Ramen',
-      'Italian',
-      'Date night',
-      'Brunch',
-    ];
-  }
-
-  static async addRecentSearch(userId: string, query: string): Promise<void> {
-    await delay();
-    // In a real app, this would save the search query for the user
-    console.log(`Added search "${query}" for user ${userId}`);
-  }
-
   // Utility methods
   static async getRandomRestaurants(count: number = 5): Promise<Restaurant[]> {
     await delay();
@@ -393,24 +375,6 @@ export class MockDataService {
     }
 
     return this.getRestaurantsWithStatus(candidateIds, { sortBy: 'rating' });
-  }
-
-  static async getFriendRecommendations(userId: string): Promise<Restaurant[]> {
-    const visitedIds = new Set(
-      mockUserRestaurantRelations
-        .filter(relation => relation.userId === userId)
-        .map(relation => relation.restaurantId)
-    );
-
-    const friendListRestaurantIds = mockLists
-      .filter(list => list.listType === 'recs' && list.userId !== userId)
-      .flatMap(list => list.restaurants);
-
-    const uniqueIds = Array.from(new Set(friendListRestaurantIds)).filter(id => !visitedIds.has(id));
-
-    const idsToFetch = (uniqueIds.length > 0 ? uniqueIds : trendingRestaurants.map(r => r.id)).slice(0, 12);
-
-    return this.getRestaurantsWithStatus(idsToFetch, { sortBy: 'rating' });
   }
 
   // Restaurant status and filtering utilities
@@ -586,6 +550,164 @@ export class MockDataService {
     const index = mockRecentSearches.findIndex(s => s.id === searchId);
     if (index !== -1) {
       mockRecentSearches.splice(index, 1);
+    }
+  }
+
+  // Restaurant discovery methods for profile page
+  static async getReservableRestaurants(limit: number = 10): Promise<Restaurant[]> {
+    await delay();
+    return mockRestaurants
+      .filter(r => r.acceptsReservations === true)
+      .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+      .slice(0, limit);
+  }
+
+  static async getNearbyRecommendations(userId: string, maxDistance: number = 2.0, limit: number = 10): Promise<Restaurant[]> {
+    await delay();
+    // Get restaurants that are nearby (within maxDistance miles) and have good ratings
+    return mockRestaurants
+      .filter(r => r.distance && r.distance <= maxDistance && r.rating >= 7.5)
+      .sort((a, b) => {
+        // Sort by rating descending, then by distance ascending
+        const ratingDiff = (b.rating || 0) - (a.rating || 0);
+        if (Math.abs(ratingDiff) > 0.1) return ratingDiff;
+        return (a.distance || 999) - (b.distance || 999);
+      })
+      .slice(0, limit);
+  }
+
+  static async getFriendRecommendations(userId: string, limit: number = 10): Promise<Restaurant[]> {
+    await delay();
+    // Get current user's following list
+    const currentUser = await this.getCurrentUser();
+    // In a real app, we'd fetch the user's following list
+    // For now, we'll use user IDs that appear in recommendedBy arrays
+
+    // Get restaurants recommended by friends
+    return mockRestaurants
+      .filter(r => r.recommendedBy && r.recommendedBy.length > 0)
+      .sort((a, b) => {
+        // Sort by number of friend recommendations, then by rating
+        const recCountDiff = (b.recommendedBy?.length || 0) - (a.recommendedBy?.length || 0);
+        if (recCountDiff !== 0) return recCountDiff;
+        return (b.rating || 0) - (a.rating || 0);
+      })
+      .slice(0, limit);
+  }
+
+  // Tastemaker methods
+  static async getTastemakers(limit?: number): Promise<User[]> {
+    await delay();
+    const tastemakers = mockTastemakers.sort((a, b) =>
+      (b.stats.followers || 0) - (a.stats.followers || 0)
+    );
+    return limit ? tastemakers.slice(0, limit) : tastemakers;
+  }
+
+  static async getTastemakerByUsername(username: string): Promise<User | null> {
+    await delay();
+    return mockTastemakers.find(tm => tm.username === username) || null;
+  }
+
+  static async getTastemakerPosts(limit?: number): Promise<TastemakerPost[]> {
+    await delay();
+    // Populate user data for each post
+    const postsWithUsers = mockTastemakerPosts.map(post => ({
+      ...post,
+      user: mockTastemakers.find(tm => tm.id === post.userId),
+    }));
+
+    const sorted = postsWithUsers.sort((a, b) =>
+      b.publishedAt.getTime() - a.publishedAt.getTime()
+    );
+    return limit ? sorted.slice(0, limit) : sorted;
+  }
+
+  static async getFeaturedTastemakerPosts(limit?: number): Promise<TastemakerPost[]> {
+    await delay();
+    const featured = getFeaturedPosts().map(post => ({
+      ...post,
+      user: mockTastemakers.find(tm => tm.id === post.userId),
+    }));
+
+    const sorted = featured.sort((a, b) =>
+      b.interactions.views - a.interactions.views
+    );
+    return limit ? sorted.slice(0, limit) : sorted;
+  }
+
+  static async getTastemakerPostById(postId: string): Promise<TastemakerPost | null> {
+    await delay();
+    const post = mockTastemakerPosts.find(p => p.id === postId);
+    if (!post) return null;
+
+    // Populate user and restaurant data
+    const user = mockTastemakers.find(tm => tm.id === post.userId);
+    const restaurants = mockRestaurants.filter(r => post.restaurantIds.includes(r.id));
+
+    return {
+      ...post,
+      user,
+      restaurants,
+    };
+  }
+
+  static async getTastemakerPostsByUser(userId: string, limit?: number): Promise<TastemakerPost[]> {
+    await delay();
+    const userPosts = getPostsByUserId(userId).map(post => ({
+      ...post,
+      user: mockTastemakers.find(tm => tm.id === userId),
+    }));
+
+    const sorted = userPosts.sort((a, b) =>
+      b.publishedAt.getTime() - a.publishedAt.getTime()
+    );
+    return limit ? sorted.slice(0, limit) : sorted;
+  }
+
+  static async likeTastemakerPost(postId: string, userId: string): Promise<void> {
+    await delay();
+    const post = mockTastemakerPosts.find(p => p.id === postId);
+    if (post && !post.interactions.likes.includes(userId)) {
+      post.interactions.likes.push(userId);
+    }
+  }
+
+  static async unlikeTastemakerPost(postId: string, userId: string): Promise<void> {
+    await delay();
+    const post = mockTastemakerPosts.find(p => p.id === postId);
+    if (post) {
+      const index = post.interactions.likes.indexOf(userId);
+      if (index > -1) {
+        post.interactions.likes.splice(index, 1);
+      }
+    }
+  }
+
+  static async bookmarkTastemakerPost(postId: string, userId: string): Promise<void> {
+    await delay();
+    const post = mockTastemakerPosts.find(p => p.id === postId);
+    if (post && !post.interactions.bookmarks.includes(userId)) {
+      post.interactions.bookmarks.push(userId);
+    }
+  }
+
+  static async unbookmarkTastemakerPost(postId: string, userId: string): Promise<void> {
+    await delay();
+    const post = mockTastemakerPosts.find(p => p.id === postId);
+    if (post) {
+      const index = post.interactions.bookmarks.indexOf(userId);
+      if (index > -1) {
+        post.interactions.bookmarks.splice(index, 1);
+      }
+    }
+  }
+
+  static async incrementPostViews(postId: string): Promise<void> {
+    await delay();
+    const post = mockTastemakerPosts.find(p => p.id === postId);
+    if (post) {
+      post.interactions.views += 1;
     }
   }
 }

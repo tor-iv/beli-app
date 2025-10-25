@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 :root {
   --background: 250 250 250;
@@ -78,4 +79,26 @@ body {
 
 .card-hover:hover {
   transform: scale(1.02);
+}
+
+/* Custom Leaflet popup styling */
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+  font-family: inherit !important;
+}
+
+.leaflet-popup-tip {
+  background: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.custom-marker {
+  background: transparent !important;
+  border: none !important;
 }

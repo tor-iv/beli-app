@@ -1,15 +1,12 @@
 import { MockDataService } from '@/lib/mockDataService';
 import { ActivityCard } from '@/components/social/activity-card';
-import { ThreeColumnLayout } from '@/components/layout/three-column';
 import { TrendingWidget } from '@/components/feed/trending-widget';
-import { LeaderboardWidget } from '@/components/feed/leaderboard-widget';
-import { QuickStats } from '@/components/feed/quick-stats';
+import { RestaurantToggleWidget } from '@/components/profile/restaurant-toggle-widget';
+import { ThreeColumnLayout } from '@/components/layout/three-column';
 
 export default async function FeedPage() {
   // Server-side data fetching
   const feed = await MockDataService.getActivityFeed();
-  const currentUser = await MockDataService.getCurrentUser();
-  const leaderboard = await MockDataService.getLeaderboard();
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -23,18 +20,13 @@ export default async function FeedPage() {
         </div>
       </div>
 
-      {/* Desktop: Three column layout */}
+      {/* Desktop: Two column layout with sticky sidebar */}
       <div className="hidden lg:block">
         <ThreeColumnLayout
           left={
             <div className="space-y-4">
-              <QuickStats
-                beenCount={currentUser.stats.beenCount}
-                wantToTryCount={currentUser.stats.wantToTryCount}
-                currentStreak={currentUser.stats.currentStreak}
-                rank={currentUser.stats.rank}
-              />
               <TrendingWidget />
+              <RestaurantToggleWidget defaultView="reserve" />
             </div>
           }
           center={
@@ -47,18 +39,8 @@ export default async function FeedPage() {
               </div>
             </div>
           }
-          right={
-            <div className="space-y-4">
-              <LeaderboardWidget users={leaderboard.slice(0, 3).map(u => ({
-                id: u.id,
-                username: u.username,
-                displayName: u.displayName,
-                avatar: u.avatar,
-                beenCount: u.stats.beenCount,
-                rank: u.stats.rank
-              }))} />
-            </div>
-          }
+          stickySidebars={true}
+          className="gap-12"
         />
       </div>
     </div>

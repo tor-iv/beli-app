@@ -10,6 +10,7 @@ interface RestaurantListItemCompactProps {
   isSelected?: boolean;
   onClick?: () => void;
   rank?: number;
+  'data-restaurant-id'?: string;
 }
 
 export function RestaurantListItemCompact({
@@ -17,10 +18,12 @@ export function RestaurantListItemCompact({
   isSelected = false,
   onClick,
   rank,
+  'data-restaurant-id': dataRestaurantId,
 }: RestaurantListItemCompactProps) {
   return (
     <button
       onClick={onClick}
+      data-restaurant-id={dataRestaurantId}
       className={cn(
         'w-full text-left p-4 rounded-lg transition-all',
         'hover:bg-gray-50 cursor-pointer',

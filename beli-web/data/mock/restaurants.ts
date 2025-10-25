@@ -40,6 +40,8 @@ export const mockRestaurants: Restaurant[] = [
       averageScoreSampleSize: 1849,
     },
     distance: 0.4,
+    acceptsReservations: true,
+    recommendedBy: ['user-2', 'user-3'],
     ratingCount: 1849,
     friendsWantToTryCount: 4,
     friendAvatars: [
@@ -91,6 +93,8 @@ export const mockRestaurants: Restaurant[] = [
       averageScoreSampleSize: 3287,
     },
     distance: 0.8,
+    acceptsReservations: true,
+    recommendedBy: ['user-2', 'user-4', 'user-5'],
     ratingCount: 3287,
     friendsWantToTryCount: 6,
     friendAvatars: [
@@ -241,6 +245,8 @@ export const mockRestaurants: Restaurant[] = [
       averageScoreSampleSize: 1405,
     },
     distance: 0.6,
+    acceptsReservations: true,
+    recommendedBy: ['user-3', 'user-5'],
     ratingCount: 1405,
     friendsWantToTryCount: 4,
     friendAvatars: [
@@ -342,6 +348,7 @@ export const mockRestaurants: Restaurant[] = [
       averageScoreSampleSize: 2743,
     },
     distance: 0.9,
+    recommendedBy: ['user-2', 'user-3', 'user-4'],
     ratingCount: 2743,
     friendsWantToTryCount: 7,
     friendAvatars: [
@@ -390,6 +397,7 @@ export const mockRestaurants: Restaurant[] = [
       friendScore: 8.8,
     },
     distance: 1.1,
+    recommendedBy: ['user-5'],
   },
 
   // MANHATTAN - CHINATOWN
@@ -491,6 +499,8 @@ export const mockRestaurants: Restaurant[] = [
       friendScore: 8.8,
     },
     distance: 2.1,
+    acceptsReservations: true,
+    recommendedBy: ['user-4', 'user-6'],
   },
   {
     id: '11',
@@ -558,6 +568,8 @@ export const mockRestaurants: Restaurant[] = [
       friendScore: 8.7,
     },
     distance: 1.5,
+    acceptsReservations: true,
+    recommendedBy: ['user-2', 'user-3'],
   },
   {
     id: '13',
@@ -660,6 +672,7 @@ export const mockRestaurants: Restaurant[] = [
       friendScore: 9.5,
     },
     distance: 3.2,
+    acceptsReservations: true,
   },
   {
     id: '16',
