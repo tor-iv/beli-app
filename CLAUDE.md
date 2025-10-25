@@ -144,6 +144,17 @@ colors.primary          // #0B7B7F (teal)
 3. Add new service method to MockDataService
 4. Import and use the service method in components
 
+**Web-specific data patterns:**
+- Use React Query hooks from `lib/hooks/` (e.g., `useRestaurants`, `useUser`, `useFeed`)
+- React Query handles caching, loading states, and error handling automatically
+- Hooks wrap MockDataService methods for consistent API
+- Example:
+```typescript
+import { useRestaurants } from '@/lib/hooks/use-restaurants';
+
+const { data: restaurants, isLoading, error } = useRestaurants();
+```
+
 ### Navigation Structure
 
 Bottom tab navigation with 5 main screens:

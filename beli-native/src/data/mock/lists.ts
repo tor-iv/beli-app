@@ -113,6 +113,18 @@ export const mockLists: List[] = [
     updatedAt: new Date('2024-01-15'),
   },
   {
+    id: 'user-1-recs',
+    userId: '1', // Tor Cox
+    name: 'My Recommendations',
+    description: 'Places I recommend to friends',
+    restaurants: ['1', '2', '3', '4', '10', '14', '15', '21', '27'],
+    isPublic: true,
+    category: 'restaurants',
+    listType: 'recs',
+    createdAt: new Date('2023-03-10'),
+    updatedAt: new Date('2024-01-16'),
+  },
+  {
     id: 'user-1-date-night',
     userId: '1', // Tor Cox
     name: 'Perfect Date Spots',

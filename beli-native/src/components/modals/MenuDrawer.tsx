@@ -36,13 +36,19 @@ export default function MenuDrawer({ visible, onClose, options }: MenuDrawerProp
     >
       <Pressable style={styles.backdrop} onPress={onClose}>
         <Pressable style={styles.drawer} onPress={(e) => e.stopPropagation()}>
+          {/* Close Button - Positioned absolutely */}
+          <TouchableOpacity
+            onPress={onClose}
+            style={styles.closeButton}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="close" size={24} color={colors.textSecondary} />
+          </TouchableOpacity>
+
           <SafeAreaView style={styles.safeArea}>
             {/* Header */}
             <View style={styles.header}>
               <Text style={styles.title}>Menu</Text>
-              <TouchableOpacity onPress={onClose} hitSlop={8}>
-                <Ionicons name="close" size={32} color={colors.textPrimary} />
-              </TouchableOpacity>
             </View>
 
             {/* Menu Options */}
@@ -109,10 +115,11 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.lg,
     borderBottomWidth: 1,
     borderBottomColor: colors.borderLight,
   },
@@ -120,6 +127,19 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes['2xl'],
     fontWeight: typography.weights.bold,
     color: colors.textPrimary,
+    textAlign: 'left',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 60,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.borderLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
   },
   content: {
     flex: 1,
@@ -127,7 +147,7 @@ const styles = StyleSheet.create({
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: spacing.lg,
     paddingVertical: spacing.lg,
   },
   optionBorder: {

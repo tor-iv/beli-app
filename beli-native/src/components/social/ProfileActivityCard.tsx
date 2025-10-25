@@ -59,8 +59,8 @@ export const ProfileActivityCard: React.FC<ProfileActivityCardProps> = ({
           )}
         </View>
         {rating !== undefined && (
-          <View style={[styles.ratingBadge, { backgroundColor: getRatingColor(rating) }]}>
-            <Text style={styles.ratingText}>{rating.toFixed(1)}</Text>
+          <View style={styles.ratingBadge}>
+            <Text style={[styles.ratingText, { color: getRatingColor(rating) }]}>{rating.toFixed(1)}</Text>
           </View>
         )}
       </View>
@@ -117,13 +117,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: spacing.sm,
-    borderWidth: 3,
-    borderColor: colors.white,
+    backgroundColor: colors.white,
+    borderWidth: 1.5,
+    borderColor: '#D9D9DE',
   },
   ratingText: {
     fontSize: typography.sizes.xl,
     fontWeight: typography.weights.bold,
-    color: colors.white,
   },
   image: {
     width: '100%',

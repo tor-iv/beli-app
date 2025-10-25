@@ -8,6 +8,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { colors, typography, spacing } from '../theme';
 import { ActivityCard, LoadingSpinner, AddRestaurantModal } from '../components';
 import type { RestaurantSubmissionData } from '../components';
+import HamburgerMenu from '../components/modals/HamburgerMenu';
 import { MockDataService } from '../data/mockDataService';
 import type { Activity } from '../data/mock/types';
 import type { Restaurant } from '../types';
@@ -26,6 +27,7 @@ export default function FeedScreen() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+  const [showMenu, setShowMenu] = useState(false);
 
   const loadFeed = async () => {
     try {
@@ -160,7 +162,7 @@ export default function FeedScreen() {
               </View>
             )}
           </Pressable>
-          <Pressable style={styles.iconButton}>
+          <Pressable style={styles.iconButton} onPress={() => setShowMenu(true)}>
             <Ionicons name="menu-outline" size={24} color={colors.textPrimary} />
           </Pressable>
         </View>
@@ -185,7 +187,10 @@ export default function FeedScreen() {
           />
           <Text style={styles.actionButtonText}>Reserve now</Text>
         </Pressable>
-        <Pressable style={styles.actionButton}>
+        <Pressable
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('Lists', { initialTab: 'recs' })}
+        >
           <Ionicons
             name="navigate"
             size={18}
@@ -194,7 +199,10 @@ export default function FeedScreen() {
           />
           <Text style={styles.actionButtonText}>Recs Nearby</Text>
         </Pressable>
-        <Pressable style={styles.actionButton}>
+        <Pressable
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('Lists', { initialTab: 'trending' })}
+        >
           <Ionicons
             name="trending-up"
             size={18}
@@ -203,7 +211,10 @@ export default function FeedScreen() {
           />
           <Text style={styles.actionButtonText}>Trending</Text>
         </Pressable>
-        <Pressable style={styles.actionButton}>
+        <Pressable
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('Lists', { initialTab: 'recs_from_friends' })}
+        >
           <Ionicons
             name="people"
             size={18}
@@ -309,6 +320,12 @@ export default function FeedScreen() {
           onSubmit={handleModalSubmit}
         />
       )}
+
+      <HamburgerMenu
+        visible={showMenu}
+        onClose={() => setShowMenu(false)}
+        navigation={navigation}
+      />
     </SafeAreaView>
   );
 }

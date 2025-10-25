@@ -13,7 +13,7 @@ import {
   Button,
   TabSelector,
   ProfileActivityCard,
-  MenuDrawer,
+  HamburgerMenu,
 } from '../components';
 import { MockDataService } from '../data/mockDataService';
 import type { User, Review, Restaurant } from '../data/mock/types';
@@ -81,46 +81,6 @@ export default function ProfileScreen() {
   const tabs = [
     { id: 'activity', label: 'Recent Activity', icon: 'newspaper' as const },
     { id: 'taste', label: 'Taste Profile', icon: 'stats-chart' as const },
-  ];
-
-  const menuOptions = [
-    {
-      id: 'invites',
-      label: 'You have 3 invites left',
-      icon: 'mail-outline' as const,
-      onPress: () => console.log('Invites'),
-    },
-    {
-      id: 'school',
-      label: 'Add Your School',
-      icon: 'school-outline' as const,
-      onPress: () => console.log('School'),
-    },
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: 'settings-outline' as const,
-      onPress: () => console.log('Settings'),
-    },
-    {
-      id: 'challenge',
-      label: 'Your 2025 Goal',
-      icon: 'trophy-outline' as const,
-      subtitle: user?.stats.challenge2025 ? `${user.stats.challenge2025.currentCount} of ${user.stats.challenge2025.goalCount} restaurants` : undefined,
-      onPress: () => navigation.navigate('ChallengeGoal'),
-    },
-    {
-      id: 'faq',
-      label: 'FAQ',
-      icon: 'help-circle-outline' as const,
-      onPress: () => console.log('FAQ'),
-    },
-    {
-      id: 'logout',
-      label: 'Log Out',
-      icon: 'log-out-outline' as const,
-      onPress: () => console.log('Log out'),
-    },
   ];
 
   return (
@@ -285,11 +245,11 @@ export default function ProfileScreen() {
         <View style={{ height: spacing.xl }} />
       </ScrollView>
 
-      {/* Menu Drawer */}
-      <MenuDrawer
+      {/* Menu */}
+      <HamburgerMenu
         visible={menuVisible}
         onClose={() => setMenuVisible(false)}
-        options={menuOptions}
+        navigation={navigation}
       />
     </SafeAreaView>
   );

@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, Pressable, Dimensions, Modal, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, Dimensions, Modal, TextInput, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import MapView, { Marker, Region } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -24,6 +25,8 @@ type ListsScreenNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabParamList, 'Lists'>,
   StackNavigationProp<AppStackParamList>
 >;
+
+type ListsScreenRouteProp = RouteProp<BottomTabParamList, 'Lists'>;
 
 type CityOptionItem = {
   id: string;
@@ -230,12 +233,16 @@ type SortType = 'rating' | 'distance' | 'name' | 'friends';
 
 export default function ListsScreen() {
   const navigation = useNavigation<ListsScreenNavigationProp>();
+  const route = useRoute<ListsScreenRouteProp>();
   const mapButtonOffset = Math.max(spacing.sm, Math.round(Dimensions.get('window').height * 0.01));
+
+  // Safely get initialTab from route params with fallback
+  const initialTab = route.params?.initialTab || 'been';
 
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-  const [selectedTab, setSelectedTab] = useState<ListType>('been');
+  const [selectedTab, setSelectedTab] = useState<ListType>(initialTab);
   const [selectedCategory, setSelectedCategory] = useState<ListCategory>('restaurants');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
@@ -266,7 +273,7 @@ export default function ListsScreen() {
   const [goodForSearch, setGoodForSearch] = useState('');
 
   // Cache for loaded data by tab
-  const [cachedData, setCachedData] = useState<Record<ListType, Record<string, Restaurant[]>>>({} as Record<ListType, Record<string, Restaurant[]>>);
+  const [cachedData, setCachedData] = useState<Record<ListType, Record<string, Restaurant[]>>>({});
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [listCounts, setListCounts] = useState<Record<string, number>>({});
 
@@ -660,13 +667,13 @@ export default function ListsScreen() {
       if (restaurantIds.length === 0) {
         setRestaurants([]);
         if (hasNoFilters) {
-          setCachedData(prev => {
-            const safePrev = prev ? { ...prev } : {};
-            const existing = safePrev[tab] ? { ...safePrev[tab] } : {};
-            existing[cacheKey] = [];
-            safePrev[tab] = existing;
-            return safePrev;
-          });
+          setCachedData(prev => ({
+            ...prev,
+            [tab]: {
+              ...(prev[tab] || {}),
+              [cacheKey]: []
+            }
+          }));
         }
         return;
       }
@@ -688,13 +695,13 @@ export default function ListsScreen() {
 
       // Cache the data if no filters are applied
       if (hasNoFilters) {
-        setCachedData(prev => {
-          const safePrev = prev ? { ...prev } : {};
-          const existing = safePrev[tab] ? { ...safePrev[tab] } : {};
-          existing[cacheKey] = restaurantsData;
-          safePrev[tab] = existing;
-          return safePrev;
-        });
+        setCachedData(prev => ({
+          ...prev,
+          [tab]: {
+            ...(prev[tab] || {}),
+            [cacheKey]: restaurantsData
+          }
+        }));
       }
 
       setRestaurants(restaurantsData);

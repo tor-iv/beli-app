@@ -6,6 +6,7 @@ import { mockReviews, Review } from '@/data/mock/reviews';
 import { mockActivities, trendingRestaurants, recentCheckIns, Activity } from '@/data/mock/activities';
 import { mockLists, getUserListsByType, featuredLists } from '@/data/mock/lists';
 import { mockNotifications } from '@/data/mock/notifications';
+import { mockRecentSearches, RecentSearch } from '@/data/mock/recentSearches';
 
 // Simulate network delay - reduced for better UX
 const delay = (ms: number = 150) => new Promise(resolve => setTimeout(resolve, ms));
@@ -555,6 +556,37 @@ export class MockDataService {
   static async getUnreadNotificationCount(): Promise<number> {
     await delay();
     return mockNotifications.filter(n => !n.isRead).length;
+  }
+
+  // Recent search methods
+  static async getRecentSearches(): Promise<RecentSearch[]> {
+    await delay();
+    return mockRecentSearches;
+  }
+
+  static async addRecentSearch(restaurantId: string): Promise<void> {
+    await delay();
+    const restaurant = mockRestaurants.find(r => r.id === restaurantId);
+    if (restaurant) {
+      const newSearch: RecentSearch = {
+        id: `recent-${Date.now()}`,
+        restaurantId: restaurant.id,
+        restaurantName: restaurant.name,
+        location: `${restaurant.location.neighborhood}, ${restaurant.location.city}`,
+        timestamp: new Date(),
+      };
+      mockRecentSearches.unshift(newSearch);
+      // Keep only the 10 most recent
+      mockRecentSearches.splice(10);
+    }
+  }
+
+  static async clearRecentSearch(searchId: string): Promise<void> {
+    await delay();
+    const index = mockRecentSearches.findIndex(s => s.id === searchId);
+    if (index !== -1) {
+      mockRecentSearches.splice(index, 1);
+    }
   }
 }
 

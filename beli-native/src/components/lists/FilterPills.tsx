@@ -148,23 +148,61 @@ export const FilterPills: React.FC<FilterPillsProps> = ({
   };
 
   const renderItems = () => {
+    // Defensive null checks
+    const safeFilters = filters || [];
+    const safeDropdownFilters = dropdownFilters || [];
+    const safeSelectedFilters = selectedFilters || [];
+
     if (orderedItems?.length) {
-      return orderedItems.map((item) => {
+      // When orderedItems is provided, sort so selected items appear first
+      const sortedItems = [...orderedItems].sort((a, b) => {
+        const aIsSelected = a.type === 'dropdown'
+          ? (safeDropdownFilters.find(df => df.id === a.id)?.isActive || !!safeDropdownFilters.find(df => df.id === a.id)?.selectedOption)
+          : safeSelectedFilters.includes(a.id);
+
+        const bIsSelected = b.type === 'dropdown'
+          ? (safeDropdownFilters.find(df => df.id === b.id)?.isActive || !!safeDropdownFilters.find(df => df.id === b.id)?.selectedOption)
+          : safeSelectedFilters.includes(b.id);
+
+        // Selected items come first
+        if (aIsSelected && !bIsSelected) return -1;
+        if (!aIsSelected && bIsSelected) return 1;
+        return 0; // Maintain original order within selected/unselected groups
+      });
+
+      return sortedItems.map((item) => {
         if (item.type === 'dropdown') {
-          const dropdown = dropdownFilters.find(df => df.id === item.id);
+          const dropdown = safeDropdownFilters.find(df => df.id === item.id);
           if (!dropdown) return null;
           return renderDropdownFilter(dropdown);
         }
 
-        const filter = filters.find(f => f.id === item.id);
+        const filter = safeFilters.find(f => f.id === item.id);
         if (!filter) return null;
         return renderFilter(filter);
       }).filter(Boolean);
     }
 
+    // When no orderedItems, separate dropdowns and filters, then sort each group
+    const sortedDropdowns = [...safeDropdownFilters].sort((a, b) => {
+      const aIsActive = a.isActive || !!a.selectedOption;
+      const bIsActive = b.isActive || !!b.selectedOption;
+      if (aIsActive && !bIsActive) return -1;
+      if (!aIsActive && bIsActive) return 1;
+      return 0;
+    });
+
+    const sortedFilters = [...safeFilters].sort((a, b) => {
+      const aIsSelected = safeSelectedFilters.includes(a.id);
+      const bIsSelected = safeSelectedFilters.includes(b.id);
+      if (aIsSelected && !bIsSelected) return -1;
+      if (!aIsSelected && bIsSelected) return 1;
+      return 0;
+    });
+
     return [
-      ...dropdownFilters.map(renderDropdownFilter),
-      ...filters.map(renderFilter),
+      ...sortedDropdowns.map(renderDropdownFilter),
+      ...sortedFilters.map(renderFilter),
     ];
   };
 

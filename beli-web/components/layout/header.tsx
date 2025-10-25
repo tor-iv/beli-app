@@ -34,10 +34,9 @@ export function Header() {
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <Link href="/feed" className="flex items-center space-x-2">
-              <div className="w-8 h-8 relative">
-                <img src="/icon.png" alt="Beli" className="w-full h-full object-contain" />
+              <div className="h-12 relative">
+                <img src="/beli-logo.webp" alt="Beli" className="h-full object-contain" />
               </div>
-              <span className="text-2xl font-bold text-primary">Beli</span>
             </Link>
 
             {/* Desktop Navigation */}

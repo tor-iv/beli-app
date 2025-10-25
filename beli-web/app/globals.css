@@ -29,27 +29,29 @@ body {
   width: 44px;
   height: 44px;
   font-size: 15px;
+  background-color: white;
+  border: 3px solid;
 }
 
-/* Rating color variants */
+/* Rating color variants - bordered style */
 .rating-excellent {
-  background-color: #22C55E;
-  color: white;
+  border-color: #22C55E;
+  color: #22C55E;
 }
 
 .rating-good {
-  background-color: #84CC16;
-  color: white;
+  border-color: #84CC16;
+  color: #84CC16;
 }
 
 .rating-average {
-  background-color: #F59E0B;
-  color: white;
+  border-color: #F59E0B;
+  color: #F59E0B;
 }
 
 .rating-poor {
-  background-color: #EF4444;
-  color: white;
+  border-color: #EF4444;
+  color: #EF4444;
 }
 
 /* Content-first card style */
