@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, Dimensions, Modal, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, Dimensions, Modal, TextInput, ScrollView, Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MapView, { Marker, Region } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
@@ -273,12 +273,21 @@ export default function ListsScreen() {
   const [goodForSearch, setGoodForSearch] = useState('');
 
   // Cache for loaded data by tab
-  const [cachedData, setCachedData] = useState<Record<ListType, Record<string, Restaurant[]>>>({});
+  const [cachedData, setCachedData] = useState<Partial<Record<ListType, Record<string, Restaurant[]>>>>({});
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [listCounts, setListCounts] = useState<Record<string, number>>({});
 
+  // Search functionality
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isMapSearchModalVisible, setIsMapSearchModalVisible] = useState(false);
+  const [isMoreOptionsVisible, setIsMoreOptionsVisible] = useState(false);
+
   // Debounce timer ref
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Map ref for programmatic control
+  const mapRef = useRef<MapView>(null);
 
   const tabs = [
     { id: 'been', label: 'Been' },
@@ -331,8 +340,19 @@ export default function ListsScreen() {
     .map(id => PRICE_LOOKUP[id])
     .filter(Boolean) as string[];
 
+  const filteredRestaurants = useMemo(() => {
+    if (!searchQuery.trim()) return restaurants;
+    const query = searchQuery.toLowerCase();
+    return restaurants.filter(restaurant =>
+      restaurant.name.toLowerCase().includes(query) ||
+      restaurant.cuisine.some(c => c.toLowerCase().includes(query)) ||
+      restaurant.location.neighborhood?.toLowerCase().includes(query)
+    );
+  }, [restaurants, searchQuery]);
+
   const mapMarkers = useMemo(() => {
-    return restaurants
+    const restaurantsToMap = isSearchActive ? filteredRestaurants : restaurants;
+    return restaurantsToMap
       .map(restaurant => {
         const key = restaurant.name.toLowerCase();
         const override = COORDINATE_OVERRIDES[key];
@@ -342,7 +362,7 @@ export default function ListsScreen() {
         return { restaurant, coordinates, neighborhood };
       })
       .filter((entry): entry is { restaurant: Restaurant; coordinates: { lat: number; lng: number }; neighborhood: string } => entry !== null);
-  }, [restaurants]);
+  }, [restaurants, filteredRestaurants, isSearchActive]);
 
   const cityFilterDisplay = selectedCityLabels.length > 0
     ? summarizeSelectionLabels(selectedCityLabels, 'City')
@@ -849,7 +869,30 @@ export default function ListsScreen() {
   };
 
   const handleSearchPress = () => {
-    console.log('Search lists');
+    if (viewMode === 'map') {
+      // In map view, show modal with options
+      setIsMapSearchModalVisible(true);
+    } else {
+      // In list view, toggle search bar
+      setIsSearchActive(true);
+      setSearchQuery('');
+    }
+  };
+
+  const handleCloseSearch = () => {
+    setIsSearchActive(false);
+    setSearchQuery('');
+  };
+
+  const handleSearchThisList = () => {
+    setIsMapSearchModalVisible(false);
+    setIsSearchActive(true);
+    setSearchQuery('');
+  };
+
+  const handleSearchAllPlaces = () => {
+    setIsMapSearchModalVisible(false);
+    navigation.navigate('Search');
   };
 
   const handleRestaurantPress = (restaurantId: string) => {
@@ -861,19 +904,39 @@ export default function ListsScreen() {
   };
 
   const handleMapFilterPress = () => {
-    console.log('Map filters');
+    // Open the existing comprehensive filters modal
+    setPendingTagSelection(selectedTags);
+    setPendingGoodForSelection(selectedGoodFors);
+    setPendingPriceSelection(selectedPriceTiers);
+    setPendingScoreFilter(selectedScoreFilter);
+    setPendingFriendFilter(selectedFriendFilter);
+    setPendingFilterToggles(selectedFilters);
+    setTagSearch('');
+    setGoodForSearch('');
+    setExpandedSection(null);
+    setIsAllFiltersOpen(true);
   };
 
   const handleMapLocatePress = () => {
-    console.log('Locate user');
+    // Recenter map to Manhattan
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(NYC_REGION, 500);
+    }
   };
 
-  const handleShare = () => {
-    console.log('Share list');
+  const handleShare = async () => {
+    try {
+      const listName = tabs.find(tab => tab.id === selectedTab)?.label || 'My';
+      await Share.share({
+        message: `Check out my ${listName} list on Beli!`,
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
   };
 
   const handleMore = () => {
-    console.log('More options');
+    setIsMoreOptionsVisible(true);
   };
 
   const handleDropdownPress = (dropdownId: string) => {
@@ -1139,7 +1202,7 @@ export default function ListsScreen() {
         ]}
       />
 
-      {viewMode === 'list' && (
+      {viewMode === 'list' && !isSearchActive && (
         <View style={styles.sortSection}>
           <SortToggle
             sortBy="Score"
@@ -1152,11 +1215,30 @@ export default function ListsScreen() {
         </View>
       )}
 
+      {viewMode === 'list' && isSearchActive && (
+        <View style={styles.searchBarContainer}>
+          <View style={styles.searchBarWrapper}>
+            <Ionicons name="search" size={18} color={colors.textSecondary} style={styles.searchBarIcon} />
+            <TextInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Search your list"
+              placeholderTextColor={colors.textSecondary}
+              style={styles.searchBarInput}
+              autoFocus
+            />
+          </View>
+          <Pressable onPress={handleCloseSearch}>
+            <Text style={styles.closeSearchText}>Close</Text>
+          </Pressable>
+        </View>
+      )}
+
       {viewMode === 'list' ? (
         <FlatList
           style={styles.content}
           contentContainerStyle={styles.listContentContainer}
-          data={restaurants}
+          data={isSearchActive ? filteredRestaurants : restaurants}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           renderItem={({ item, index }) => (
@@ -1178,6 +1260,7 @@ export default function ListsScreen() {
       ) : (
         <View style={[styles.content, styles.mapContainer]}>
           <MapView
+            ref={mapRef}
             style={styles.map}
             initialRegion={NYC_REGION}
           >
@@ -1712,6 +1795,96 @@ export default function ListsScreen() {
               </Pressable>
               <Pressable style={styles.applyButton} onPress={applyCuisineSelection}>
                 <Text style={styles.applyButtonText}>Apply</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Map Search Modal */}
+      <Modal
+        visible={isMapSearchModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsMapSearchModalVisible(false)}
+      >
+        <Pressable
+          style={styles.mapSearchOverlay}
+          onPress={() => setIsMapSearchModalVisible(false)}
+        >
+          <View style={styles.mapSearchModal}>
+            <Pressable style={styles.mapSearchOption} onPress={handleSearchThisList}>
+              <Text style={styles.mapSearchOptionText}>Search this list</Text>
+            </Pressable>
+            <View style={styles.mapSearchDivider} />
+            <Pressable style={styles.mapSearchOption} onPress={handleSearchAllPlaces}>
+              <Text style={styles.mapSearchOptionText}>Search all places</Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
+
+      {/* More Options Modal */}
+      <Modal
+        visible={isMoreOptionsVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setIsMoreOptionsVisible(false)}
+      >
+        <View style={styles.sheetOverlay}>
+          <Pressable style={styles.sheetBackdrop} onPress={() => setIsMoreOptionsVisible(false)} />
+          <View style={styles.sheetContent}>
+            <View style={styles.sheetHandle} />
+            <View style={styles.sheetHeader}>
+              <Text style={styles.sheetTitle}>List Options</Text>
+              <Pressable onPress={() => setIsMoreOptionsVisible(false)} style={styles.sheetCloseButton}>
+                <Ionicons name="close" size={20} color={colors.textPrimary} />
+              </Pressable>
+            </View>
+
+            <View style={styles.moreOptionsContainer}>
+              <Pressable
+                style={styles.moreOption}
+                onPress={() => {
+                  setIsMoreOptionsVisible(false);
+                  console.log('Edit List');
+                }}
+              >
+                <Ionicons name="create-outline" size={22} color={colors.textPrimary} />
+                <Text style={styles.moreOptionText}>Edit List</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.moreOption}
+                onPress={() => {
+                  setIsMoreOptionsVisible(false);
+                  console.log('Export List');
+                }}
+              >
+                <Ionicons name="download-outline" size={22} color={colors.textPrimary} />
+                <Text style={styles.moreOptionText}>Export List</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.moreOption}
+                onPress={() => {
+                  setIsMoreOptionsVisible(false);
+                  console.log('List Settings');
+                }}
+              >
+                <Ionicons name="settings-outline" size={22} color={colors.textPrimary} />
+                <Text style={styles.moreOptionText}>List Settings</Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.moreOption, styles.moreOptionDestructive]}
+                onPress={() => {
+                  setIsMoreOptionsVisible(false);
+                  console.log('Delete List');
+                }}
+              >
+                <Ionicons name="trash-outline" size={22} color={colors.error} />
+                <Text style={[styles.moreOptionText, styles.moreOptionTextDestructive]}>Delete List</Text>
               </Pressable>
             </View>
           </View>
@@ -2313,5 +2486,105 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 15,
     fontWeight: typography.weights.semibold,
+  },
+
+  // Search bar styles
+  searchBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    paddingHorizontal: spacing.edgePadding,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+    gap: spacing.md,
+  },
+
+  searchBarWrapper: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    borderRadius: spacing.borderRadius.lg,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+
+  searchBarIcon: {
+    marginRight: spacing.sm,
+  },
+
+  searchBarInput: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.textPrimary,
+  },
+
+  closeSearchText: {
+    fontSize: 16,
+    color: colors.primary,
+    fontWeight: typography.weights.semibold,
+  },
+
+  // Map search modal styles
+  mapSearchOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+
+  mapSearchModal: {
+    backgroundColor: colors.white,
+    borderRadius: spacing.borderRadius.xl,
+    width: '80%',
+    maxWidth: 320,
+    overflow: 'hidden',
+  },
+
+  mapSearchOption: {
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xl,
+    alignItems: 'center',
+  },
+
+  mapSearchOptionText: {
+    fontSize: 17,
+    color: colors.primary,
+    fontWeight: typography.weights.medium,
+  },
+
+  mapSearchDivider: {
+    height: 1,
+    backgroundColor: colors.borderLight,
+  },
+
+  // More options modal styles
+  moreOptionsContainer: {
+    paddingTop: spacing.md,
+  },
+
+  moreOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+
+  moreOptionDestructive: {
+    borderBottomWidth: 0,
+  },
+
+  moreOptionText: {
+    fontSize: 17,
+    color: colors.textPrimary,
+    marginLeft: spacing.md,
+    fontWeight: typography.weights.medium,
+  },
+
+  moreOptionTextDestructive: {
+    color: colors.error,
   },
 });

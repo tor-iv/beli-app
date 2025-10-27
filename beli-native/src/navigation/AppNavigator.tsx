@@ -5,6 +5,9 @@ import BottomTabNavigator from './BottomTabNavigator';
 import RestaurantInfoScreen from '../screens/RestaurantInfoScreen';
 import ChallengeGoalScreen from '../screens/ChallengeGoalScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
+import ReservationSharingScreen from '../screens/ReservationSharingScreen';
+import GroupDinnerScreen from '../screens/GroupDinnerScreen';
+import FeaturedListsScreen from '../screens/FeaturedListsScreen';
 
 // Settings Screens
 import SettingsHubScreen from '../screens/SettingsHubScreen';
@@ -59,6 +62,21 @@ const AppNavigator: React.FC = () => {
       <Stack.Screen
         name="Notifications"
         component={NotificationsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ReservationSharing"
+        component={ReservationSharingScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="GroupDinner"
+        component={GroupDinnerScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="FeaturedLists"
+        component={FeaturedListsScreen}
         options={{ headerShown: false }}
       />
 

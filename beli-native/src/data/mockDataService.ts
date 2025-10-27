@@ -1,4 +1,4 @@
-import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification } from '../types';
+import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification, Reservation, ReservationPriorityLevel } from '../types';
 import { mockUsers, currentUser } from './mock/users';
 import { mockRestaurants } from './mock/restaurants';
 import { mockUserRestaurantRelations } from './mock/userRestaurantRelations';
@@ -7,6 +7,7 @@ import { mockActivities, trendingRestaurants, recentCheckIns, Activity } from '.
 import { mockLists, getUserListsByType, featuredLists } from './mock/lists';
 import { mockNotifications } from './mock/notifications';
 import { challenge2025, mockChallengeActivities, getActivitiesByMonth, getDaysRemaining, getProgressPercentage, Challenge2025, ChallengeActivity } from './mock/challenges';
+import { mockReservations, getUserPriorityLevel, getAvailableReservations, getClaimedReservationsByUser, getSharedReservationsByUser, getReservationReminders } from './mock/reservations';
 
 // Simulate network delay - reduced for better UX
 const delay = (ms: number = 150) => new Promise(resolve => setTimeout(resolve, ms));
@@ -281,6 +282,31 @@ export class MockDataService {
   static async getListById(listId: string): Promise<List | null> {
     await delay();
     return mockLists.find(list => list.id === listId) || null;
+  }
+
+  static async getUserListProgress(userId: string, listId: string): Promise<{ visited: number; total: number }> {
+    await delay();
+
+    const list = mockLists.find(l => l.id === listId);
+    if (!list) {
+      return { visited: 0, total: 0 };
+    }
+
+    // Get user's been list to check which restaurants they've visited
+    const userRelations = await this.getUserRestaurantRelations(userId);
+    const visitedRestaurantIds = userRelations
+      .filter(rel => rel.status === 'been')
+      .map(rel => rel.restaurantId);
+
+    // Count how many restaurants in the list the user has been to
+    const visited = list.restaurants.filter(restaurantId =>
+      visitedRestaurantIds.includes(restaurantId)
+    ).length;
+
+    return {
+      visited,
+      total: list.restaurants.length,
+    };
   }
 
   static async createList(list: Omit<List, 'id' | 'createdAt' | 'updatedAt'>): Promise<List> {
@@ -601,6 +627,228 @@ export class MockDataService {
   static async updateChallengeGoal(goalCount: number): Promise<void> {
     await delay();
     challenge2025.goalCount = goalCount;
+  }
+
+  // Reservation methods
+  static async getUserReservations(userId: string, filter?: 'available' | 'claimed' | 'shared'): Promise<Reservation[]> {
+    await delay();
+
+    let reservations = mockReservations;
+
+    if (filter === 'available') {
+      return getAvailableReservations();
+    } else if (filter === 'claimed') {
+      return getClaimedReservationsByUser(userId);
+    } else if (filter === 'shared') {
+      return getSharedReservationsByUser(userId);
+    }
+
+    // Return all user's reservations (owned, claimed, or shared)
+    return reservations.filter(r =>
+      r.userId === userId ||
+      r.claimedBy === userId ||
+      r.sharedWith?.includes(userId)
+    );
+  }
+
+  static async getAvailableReservations(): Promise<Reservation[]> {
+    await delay();
+    return getAvailableReservations();
+  }
+
+  static async getClaimedReservations(userId: string): Promise<Reservation[]> {
+    await delay();
+    return getClaimedReservationsByUser(userId);
+  }
+
+  static async getSharedReservations(userId: string): Promise<Reservation[]> {
+    await delay();
+    return getSharedReservationsByUser(userId);
+  }
+
+  static async claimReservation(reservationId: string, userId: string): Promise<boolean> {
+    await delay();
+
+    const reservation = mockReservations.find(r => r.id === reservationId);
+    if (!reservation || reservation.status !== 'available') {
+      return false;
+    }
+
+    reservation.status = 'claimed';
+    reservation.claimedBy = userId;
+    return true;
+  }
+
+  static async shareReservation(reservationId: string, recipientUserIds: string[]): Promise<boolean> {
+    await delay();
+
+    const reservation = mockReservations.find(r => r.id === reservationId);
+    if (!reservation) {
+      return false;
+    }
+
+    reservation.status = 'shared';
+    reservation.sharedWith = recipientUserIds;
+    return true;
+  }
+
+  static async cancelReservationShare(reservationId: string): Promise<boolean> {
+    await delay();
+
+    const reservation = mockReservations.find(r => r.id === reservationId);
+    if (!reservation) {
+      return false;
+    }
+
+    reservation.status = 'cancelled';
+    return true;
+  }
+
+  static async getUserReservationPriority(userId: string): Promise<ReservationPriorityLevel> {
+    await delay();
+    return getUserPriorityLevel(userId);
+  }
+
+  static async getReservationReminders(userId: string): Promise<Reservation[]> {
+    await delay();
+    return getReservationReminders(userId);
+  }
+
+  static async getReservationById(reservationId: string): Promise<Reservation | null> {
+    await delay();
+    return mockReservations.find(r => r.id === reservationId) || null;
+  }
+
+  // Group Dinner methods
+  static async getUserFriends(userId: string): Promise<User[]> {
+    await delay();
+    // Return users who the current user is following (simplified)
+    // In a real app, this would be a proper friends/following relationship
+    return mockUsers.filter(u => u.id !== userId).slice(0, 10);
+  }
+
+  static async getRecentDiningCompanions(userId: string): Promise<User[]> {
+    await delay();
+    // For now, return a subset of friends
+    // In a real app, this would track who you've actually dined with
+    return mockUsers.filter(u => u.id !== userId).slice(0, 5);
+  }
+
+  static async getRestaurantAvailability(restaurantId: string, date: Date): Promise<{ available: boolean; timeSlot?: string }> {
+    await delay();
+    // Mock availability - in reality this would check reservation system
+    const randomAvailable = Math.random() > 0.3; // 70% chance of availability
+    const timeSlots = ['6:00 PM', '6:30 PM', '7:00 PM', '7:30 PM', '8:00 PM', '8:30 PM'];
+    const randomSlot = timeSlots[Math.floor(Math.random() * timeSlots.length)];
+
+    return {
+      available: randomAvailable,
+      timeSlot: randomAvailable ? randomSlot : undefined
+    };
+  }
+
+  static async getGroupDinnerSuggestions(
+    userId: string,
+    participantIds?: string[]
+  ): Promise<import('../types').GroupDinnerMatch[]> {
+    await delay();
+
+    const isGroup = participantIds && participantIds.length > 0;
+    const allUserIds = isGroup ? [userId, ...participantIds] : [userId];
+
+    // Get want-to-try restaurants for all participants
+    const wantToTryRelations = mockUserRestaurantRelations.filter(
+      rel => allUserIds.includes(rel.userId) && rel.status === 'want_to_try'
+    );
+
+    // Get restaurants that have been visited recently (to filter out)
+    const recentlyVisited = mockUserRestaurantRelations.filter(
+      rel => allUserIds.includes(rel.userId) &&
+      rel.status === 'been' &&
+      rel.visitDate &&
+      (new Date().getTime() - new Date(rel.visitDate).getTime()) < 30 * 24 * 60 * 60 * 1000 // 30 days
+    ).map(rel => rel.restaurantId);
+
+    // Get all users for dietary restrictions
+    const users = await Promise.all(allUserIds.map(id => this.getUserById(id)));
+    const allDietaryRestrictions = users
+      .filter((u): u is User => u !== null)
+      .flatMap(u => u.dietaryRestrictions || []);
+
+    // Count how many people have each restaurant on their want-to-try list
+    const restaurantCounts = new Map<string, { count: number; userIds: string[] }>();
+
+    wantToTryRelations.forEach(rel => {
+      const existing = restaurantCounts.get(rel.restaurantId) || { count: 0, userIds: [] };
+      restaurantCounts.set(rel.restaurantId, {
+        count: existing.count + 1,
+        userIds: [...existing.userIds, rel.userId]
+      });
+    });
+
+    // Build scored matches
+    const matches: import('../types').GroupDinnerMatch[] = [];
+
+    for (const [restaurantId, data] of restaurantCounts.entries()) {
+      // Skip recently visited
+      if (recentlyVisited.includes(restaurantId)) continue;
+
+      const restaurant = mockRestaurants.find(r => r.id === restaurantId);
+      if (!restaurant) continue;
+
+      // Calculate score
+      let score = 0;
+      const matchReasons: string[] = [];
+
+      // Want-to-try overlap (70% weight)
+      const overlapRatio = data.count / allUserIds.length;
+      const wantToTryScore = overlapRatio * 70;
+      score += wantToTryScore;
+
+      if (data.count === allUserIds.length) {
+        matchReasons.push('Everyone wants to try this!');
+      } else if (data.count > 1) {
+        matchReasons.push(`On ${data.count} want-to-try lists`);
+      } else {
+        matchReasons.push('On your want-to-try list');
+      }
+
+      // Dietary compatibility (20% weight)
+      // For simplicity, assume all restaurants can accommodate dietary restrictions in mock
+      const dietaryScore = 20;
+      score += dietaryScore;
+      if (allDietaryRestrictions.length > 0) {
+        matchReasons.push('Accommodates dietary restrictions');
+      }
+
+      // Location convenience (10% weight)
+      // In real app, would calculate distance from participants
+      const locationScore = restaurant.distance ? Math.max(0, 10 - restaurant.distance) : 10;
+      score += locationScore;
+      if (restaurant.distance && restaurant.distance < 2) {
+        matchReasons.push('Nearby location');
+      }
+
+      // Get availability
+      const availability = await this.getRestaurantAvailability(restaurantId, new Date());
+
+      matches.push({
+        restaurant,
+        score: Math.round(score),
+        onListsCount: data.count,
+        participants: data.userIds,
+        matchReasons,
+        availability: availability.available ? {
+          date: new Date().toLocaleDateString(),
+          timeSlot: availability.timeSlot || 'Various times'
+        } : undefined
+      });
+    }
+
+    // Sort by score (highest first)
+    matches.sort((a, b) => b.score - a.score);
+
+    return matches;
   }
 }
 

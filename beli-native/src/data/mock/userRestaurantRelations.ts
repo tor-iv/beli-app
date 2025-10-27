@@ -88,6 +88,62 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
     createdAt: new Date('2024-01-08'),
     tags: ['Instagram Famous', 'Pizza'],
   },
+  {
+    userId: '1',
+    restaurantId: 'thai-villa', // Thai Villa
+    status: 'want_to_try',
+    notes: 'Heard great things about their pad thai and green curry.',
+    createdAt: new Date('2024-02-15'),
+    tags: ['Thai', 'Date Night'],
+  },
+  {
+    userId: '1',
+    restaurantId: 'bombay-spice', // Bombay Spice
+    status: 'want_to_try',
+    notes: 'Craving some good Indian food. Butter chicken looks amazing.',
+    createdAt: new Date('2024-02-14'),
+    tags: ['Indian', 'Vegetarian Options'],
+  },
+  {
+    userId: '1',
+    restaurantId: 'ramen-house', // Ramen House
+    status: 'want_to_try',
+    notes: 'Perfect for a quick comfort food meal. Love a good tonkotsu.',
+    createdAt: new Date('2024-02-13'),
+    tags: ['Ramen', 'Comfort Food'],
+  },
+  {
+    userId: '1',
+    restaurantId: 'la-pecora-bianca', // La Pecora Bianca
+    status: 'want_to_try',
+    notes: 'That rigatoni vodka has been all over Instagram. Need to try!',
+    createdAt: new Date('2024-02-12'),
+    tags: ['Italian', 'Pasta'],
+  },
+  {
+    userId: '1',
+    restaurantId: 'seoul-kitchen', // Seoul Kitchen
+    status: 'want_to_try',
+    notes: 'Group dinner spot - Korean BBQ sounds perfect.',
+    createdAt: new Date('2024-02-11'),
+    tags: ['Korean', 'Group Friendly'],
+  },
+  {
+    userId: '1',
+    restaurantId: 'dim-sum-palace', // Dim Sum Palace
+    status: 'want_to_try',
+    notes: 'Sunday brunch dim sum mission with friends.',
+    createdAt: new Date('2024-02-10'),
+    tags: ['Chinese', 'Brunch'],
+  },
+  {
+    userId: '1',
+    restaurantId: 'tapas-barcelona', // Tapas Barcelona
+    status: 'want_to_try',
+    notes: 'Perfect for sharing plates and sangria with friends.',
+    createdAt: new Date('2024-02-09'),
+    tags: ['Spanish', 'Sharing'],
+  },
 
   // Sarah Kim (user 2) relations
   {
@@ -129,6 +185,38 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
     notes: 'Plant-based fine dining sounds incredible.',
     createdAt: new Date('2024-01-14'),
     tags: ['Plant-Based', 'Fine Dining'],
+  },
+  {
+    userId: '2',
+    restaurantId: 'thai-villa', // Thai Villa
+    status: 'want_to_try',
+    notes: 'Thai food always has great vegetarian options!',
+    createdAt: new Date('2024-02-16'),
+    tags: ['Thai', 'Vegetarian Options'],
+  },
+  {
+    userId: '2',
+    restaurantId: 'bombay-spice', // Bombay Spice
+    status: 'want_to_try',
+    notes: 'Love Indian food - so many veggie dishes to choose from.',
+    createdAt: new Date('2024-02-15'),
+    tags: ['Indian', 'Vegan Options'],
+  },
+  {
+    userId: '2',
+    restaurantId: 'vegan-garden', // Vegan Garden
+    status: 'want_to_try',
+    notes: 'All vegan menu - finally! Need to try the beyond burger.',
+    createdAt: new Date('2024-02-14'),
+    tags: ['Vegan', 'Healthy'],
+  },
+  {
+    userId: '2',
+    restaurantId: 'dim-sum-palace', // Dim Sum Palace
+    status: 'want_to_try',
+    notes: 'Dim sum brunch with the girls sounds perfect.',
+    createdAt: new Date('2024-02-13'),
+    tags: ['Chinese', 'Brunch'],
   },
 
   // Mike Chen (user 3) relations

@@ -21,7 +21,7 @@ interface AddRestaurantModalProps {
 }
 
 export interface RestaurantSubmissionData {
-  rating: 'liked' | 'fine' | 'disliked';
+  rating: 'liked' | 'fine' | 'disliked' | null;
   listType: 'restaurants' | 'bars' | 'bakeries' | 'coffee_tea' | 'dessert' | 'other';
   companions: string[];
   labels: string[];
@@ -59,7 +59,7 @@ export const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({
   onClose,
   onSubmit,
 }) => {
-  const [rating, setRating] = useState<'liked' | 'fine' | 'disliked'>('liked');
+  const [rating, setRating] = useState<'liked' | 'fine' | 'disliked' | null>(null);
   const [listType, setListType] = useState<'restaurants' | 'bars' | 'bakeries' | 'coffee_tea' | 'dessert' | 'other'>('restaurants');
   const [showListTypePicker, setShowListTypePicker] = useState(false);
   const [companions, setCompanions] = useState<string[]>([]);
@@ -153,77 +153,79 @@ export const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({
             </View>
           </View>
 
-          {/* Additional Options */}
-          <View style={styles.optionsList}>
-            {/* Who did you go with */}
-            <Pressable style={styles.optionRow}>
-              <Ionicons name="people-outline" size={22} color={colors.textPrimary} />
-              <Text style={styles.optionLabel}>Who did you go with?</Text>
-              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
-            </Pressable>
+          {/* Additional Options - Only show after rating is selected */}
+          {rating !== null && (
+            <View style={styles.optionsList}>
+              {/* Who did you go with */}
+              <Pressable style={styles.optionRow}>
+                <Ionicons name="people-outline" size={22} color={colors.textPrimary} />
+                <Text style={styles.optionLabel}>Who did you go with?</Text>
+                <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+              </Pressable>
 
-            {/* Add labels */}
-            <Pressable style={styles.optionRow}>
-              <Ionicons name="pricetag-outline" size={22} color={colors.textPrimary} />
-              <View style={styles.optionLabelContainer}>
-                <Text style={styles.optionLabel}>Add labels (good for, etc.)</Text>
-                <View style={styles.scBadge}>
-                  <Text style={styles.scBadgeText}>SC</Text>
-                </View>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
-            </Pressable>
-
-            {/* Add notes */}
-            <Pressable style={styles.optionRow}>
-              <Ionicons name="create-outline" size={22} color={colors.textPrimary} />
-              <Text style={styles.optionLabel}>Add notes</Text>
-              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
-            </Pressable>
-
-            {/* Add favorite dishes */}
-            <Pressable style={styles.optionRow}>
-              <Ionicons name="restaurant-outline" size={22} color={colors.textPrimary} />
-              <Text style={styles.optionLabel}>Add favorite dishes</Text>
-              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
-            </Pressable>
-
-            {/* Add photos */}
-            <Pressable style={styles.optionRow}>
-              <Ionicons name="camera-outline" size={22} color={colors.textPrimary} />
-              <Text style={styles.optionLabel}>Add photos</Text>
-              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
-            </Pressable>
-
-            {/* Add visit date */}
-            <Pressable style={styles.optionRow}>
-              <Ionicons name="calendar-outline" size={22} color={colors.textPrimary} />
-              <Text style={styles.optionLabel}>Add visit date</Text>
-              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
-            </Pressable>
-
-            {/* Stealth mode */}
-            <View style={styles.optionRow}>
-              <Ionicons name="lock-closed-outline" size={22} color={colors.textPrimary} />
-              <View style={styles.stealthContainer}>
-                <View style={styles.stealthLabelContainer}>
-                  <Text style={styles.optionLabel}>Stealth mode</Text>
+              {/* Add labels */}
+              <Pressable style={styles.optionRow}>
+                <Ionicons name="pricetag-outline" size={22} color={colors.textPrimary} />
+                <View style={styles.optionLabelContainer}>
+                  <Text style={styles.optionLabel}>Add labels (good for, etc.)</Text>
                   <View style={styles.scBadge}>
                     <Text style={styles.scBadgeText}>SC</Text>
                   </View>
                 </View>
-                <Text style={styles.stealthDescription}>
-                  Hide this activity from newsfeed
-                </Text>
+                <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+              </Pressable>
+
+              {/* Add notes */}
+              <Pressable style={styles.optionRow}>
+                <Ionicons name="create-outline" size={22} color={colors.textPrimary} />
+                <Text style={styles.optionLabel}>Add notes</Text>
+                <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+              </Pressable>
+
+              {/* Add favorite dishes */}
+              <Pressable style={styles.optionRow}>
+                <Ionicons name="restaurant-outline" size={22} color={colors.textPrimary} />
+                <Text style={styles.optionLabel}>Add favorite dishes</Text>
+                <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+              </Pressable>
+
+              {/* Add photos */}
+              <Pressable style={styles.optionRow}>
+                <Ionicons name="camera-outline" size={22} color={colors.textPrimary} />
+                <Text style={styles.optionLabel}>Add photos</Text>
+                <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+              </Pressable>
+
+              {/* Add visit date */}
+              <Pressable style={styles.optionRow}>
+                <Ionicons name="calendar-outline" size={22} color={colors.textPrimary} />
+                <Text style={styles.optionLabel}>Add visit date</Text>
+                <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+              </Pressable>
+
+              {/* Stealth mode */}
+              <View style={styles.optionRow}>
+                <Ionicons name="lock-closed-outline" size={22} color={colors.textPrimary} />
+                <View style={styles.stealthContainer}>
+                  <View style={styles.stealthLabelContainer}>
+                    <Text style={styles.optionLabel}>Stealth mode</Text>
+                    <View style={styles.scBadge}>
+                      <Text style={styles.scBadgeText}>SC</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.stealthDescription}>
+                    Hide this activity from newsfeed
+                  </Text>
+                </View>
+                <Switch
+                  value={stealthMode}
+                  onValueChange={setStealthMode}
+                  trackColor={{ false: colors.borderLight, true: colors.primary }}
+                  thumbColor={colors.white}
+                />
               </View>
-              <Switch
-                value={stealthMode}
-                onValueChange={setStealthMode}
-                trackColor={{ false: colors.borderLight, true: colors.primary }}
-                thumbColor={colors.white}
-              />
             </View>
-          </View>
+          )}
 
           {/* Bottom Button */}
           <View style={styles.bottomButtonContainer}>

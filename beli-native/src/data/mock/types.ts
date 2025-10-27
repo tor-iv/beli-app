@@ -15,4 +15,6 @@ export {
   type UserList,
   type ListCategory,
   type ListScope,
+  type GroupDinnerSession,
+  type GroupDinnerMatch,
 } from '../../types';

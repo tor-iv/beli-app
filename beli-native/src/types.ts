@@ -169,6 +169,7 @@ export interface List {
   listType: ListScope;
   createdAt: Date;
   updatedAt: Date;
+  thumbnailImage?: string; // Optional thumbnail for featured lists
 }
 
 // Type aliases for screen compatibility
@@ -195,4 +196,53 @@ export interface Notification {
   timestamp: Date;
   isRead: boolean;
   actionDescription: string;  // "liked your rating of", "commented on your bookmarking of"
+}
+
+// Reservation types
+export type ReservationStatus = 'available' | 'claimed' | 'shared' | 'cancelled';
+export type PriorityLevel = 'SC' | 'Gold' | 'Silver' | 'Bronze';
+
+export interface Reservation {
+  id: string;
+  restaurantId: string;
+  restaurant: Restaurant;
+  userId: string; // Original reservation owner
+  user: User;
+  dateTime: Date;
+  partySize: number;
+  status: ReservationStatus;
+  claimedBy?: string; // User ID who claimed it
+  sharedWith?: string[]; // User IDs reservation is shared with
+  createdAt: Date;
+  notes?: string;
+}
+
+export interface ReservationPriorityLevel {
+  userId: string;
+  level: PriorityLevel;
+  invitesSent: number;
+  reservationsShared: number;
+  nextLevelProgress: number; // 0-100 percentage to next level
+  nextLevel?: PriorityLevel;
+}
+
+// Group Dinner types
+export interface GroupDinnerSession {
+  id: string;
+  userId: string;
+  participants: string[]; // user IDs (can be empty for solo)
+  selectedRestaurant?: string;
+  createdAt: Date;
+}
+
+export interface GroupDinnerMatch {
+  restaurant: Restaurant;
+  score: number;
+  onListsCount: number; // how many want-to-try lists
+  participants: string[]; // who has it on their list
+  matchReasons: string[];
+  availability?: {
+    date: string;
+    timeSlot: string;
+  };
 }

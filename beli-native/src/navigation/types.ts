@@ -13,6 +13,9 @@ export type AppStackParamList = {
   };
   ChallengeGoal: undefined;
   Notifications: undefined;
+  ReservationSharing: undefined;
+  GroupDinner: undefined;
+  FeaturedLists: undefined;
 
   // Settings Screens
   SettingsHub: undefined;

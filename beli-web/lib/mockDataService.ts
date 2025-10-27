@@ -1,4 +1,4 @@
-import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification, TastemakerPost } from '@/types';
+import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification, TastemakerPost, Reservation, ReservationPriorityLevel } from '@/types';
 import { mockUsers, currentUser } from '@/data/mock/users';
 import { mockRestaurants } from '@/data/mock/restaurants';
 import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
@@ -9,6 +9,7 @@ import { mockNotifications } from '@/data/mock/notifications';
 import { mockRecentSearches, RecentSearch } from '@/data/mock/recentSearches';
 import { mockTastemakers } from '@/data/mock/tastemakers';
 import { mockTastemakerPosts, getFeaturedPosts, getPostsByUserId } from '@/data/mock/tastemakerPosts';
+import { mockReservations, getUserPriorityLevel, getAvailableReservations, getClaimedReservationsByUser, getSharedReservationsByUser, getReservationReminders } from '@/data/mock/reservations';
 
 // Simulate network delay - reduced for better UX
 const delay = (ms: number = 150) => new Promise(resolve => setTimeout(resolve, ms));
@@ -709,6 +710,96 @@ export class MockDataService {
     if (post) {
       post.interactions.views += 1;
     }
+  }
+
+  // Reservation methods
+  static async getUserReservations(userId: string, filter?: 'available' | 'claimed' | 'shared'): Promise<Reservation[]> {
+    await delay();
+
+    let reservations = mockReservations;
+
+    if (filter === 'available') {
+      return getAvailableReservations();
+    } else if (filter === 'claimed') {
+      return getClaimedReservationsByUser(userId);
+    } else if (filter === 'shared') {
+      return getSharedReservationsByUser(userId);
+    }
+
+    // Return all user's reservations (owned, claimed, or shared)
+    return reservations.filter(r =>
+      r.userId === userId ||
+      r.claimedBy === userId ||
+      r.sharedWith?.includes(userId)
+    );
+  }
+
+  static async getAvailableReservations(): Promise<Reservation[]> {
+    await delay();
+    return getAvailableReservations();
+  }
+
+  static async getClaimedReservations(userId: string): Promise<Reservation[]> {
+    await delay();
+    return getClaimedReservationsByUser(userId);
+  }
+
+  static async getSharedReservations(userId: string): Promise<Reservation[]> {
+    await delay();
+    return getSharedReservationsByUser(userId);
+  }
+
+  static async claimReservation(reservationId: string, userId: string): Promise<boolean> {
+    await delay();
+
+    const reservation = mockReservations.find(r => r.id === reservationId);
+    if (!reservation || reservation.status !== 'available') {
+      return false;
+    }
+
+    reservation.status = 'claimed';
+    reservation.claimedBy = userId;
+    return true;
+  }
+
+  static async shareReservation(reservationId: string, recipientUserIds: string[]): Promise<boolean> {
+    await delay();
+
+    const reservation = mockReservations.find(r => r.id === reservationId);
+    if (!reservation) {
+      return false;
+    }
+
+    reservation.status = 'shared';
+    reservation.sharedWith = recipientUserIds;
+    return true;
+  }
+
+  static async cancelReservationShare(reservationId: string): Promise<boolean> {
+    await delay();
+
+    const reservation = mockReservations.find(r => r.id === reservationId);
+    if (!reservation) {
+      return false;
+    }
+
+    reservation.status = 'cancelled';
+    return true;
+  }
+
+  static async getUserReservationPriority(userId: string): Promise<ReservationPriorityLevel> {
+    await delay();
+    return getUserPriorityLevel(userId);
+  }
+
+  static async getReservationReminders(userId: string): Promise<Reservation[]> {
+    await delay();
+    return getReservationReminders(userId);
+  }
+
+  static async getReservationById(reservationId: string): Promise<Reservation | null> {
+    await delay();
+    return mockReservations.find(r => r.id === reservationId) || null;
   }
 }
 

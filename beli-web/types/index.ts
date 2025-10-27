@@ -257,3 +257,31 @@ export interface TastemakerPost {
   };
   isFeatured: boolean; // Featured on homepage
 }
+
+// Reservation types
+export type ReservationStatus = 'available' | 'claimed' | 'shared' | 'cancelled';
+export type PriorityLevel = 'SC' | 'Gold' | 'Silver' | 'Bronze';
+
+export interface Reservation {
+  id: string;
+  restaurantId: string;
+  restaurant: Restaurant;
+  userId: string; // Original reservation owner
+  user: User;
+  dateTime: Date;
+  partySize: number;
+  status: ReservationStatus;
+  claimedBy?: string; // User ID who claimed it
+  sharedWith?: string[]; // User IDs reservation is shared with
+  createdAt: Date;
+  notes?: string;
+}
+
+export interface ReservationPriorityLevel {
+  userId: string;
+  level: PriorityLevel;
+  invitesSent: number;
+  reservationsShared: number;
+  nextLevelProgress: number; // 0-100 percentage to next level
+  nextLevel?: PriorityLevel;
+}

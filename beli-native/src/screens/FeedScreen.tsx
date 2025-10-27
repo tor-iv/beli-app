@@ -9,6 +9,7 @@ import { colors, typography, spacing } from '../theme';
 import { ActivityCard, LoadingSpinner, AddRestaurantModal } from '../components';
 import type { RestaurantSubmissionData } from '../components';
 import HamburgerMenu from '../components/modals/HamburgerMenu';
+import { FeedFiltersModal, type FeedFilters } from '../components/modals/FeedFiltersModal';
 import { MockDataService } from '../data/mockDataService';
 import type { Activity } from '../data/mock/types';
 import type { Restaurant } from '../types';
@@ -22,17 +23,57 @@ type FeedScreenNavigationProp = CompositeNavigationProp<
 export default function FeedScreen() {
   const navigation = useNavigation<FeedScreenNavigationProp>();
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
   const [showMenu, setShowMenu] = useState(false);
+  const [showFiltersModal, setShowFiltersModal] = useState(false);
+  const [feedFilters, setFeedFilters] = useState<FeedFilters>({
+    rankingsOnly: false,
+    topRatedOnly: false,
+    restaurantsOnly: false,
+  });
+
+  const applyFilters = (activitiesData: Activity[]) => {
+    let filtered = [...activitiesData];
+
+    if (feedFilters.rankingsOnly) {
+      // Show only activities with ratings (reviews/visits with ratings)
+      filtered = filtered.filter(activity =>
+        activity.rating && activity.rating > 0
+      );
+    }
+
+    if (feedFilters.topRatedOnly) {
+      // Show only top-rated activities (9.0+)
+      filtered = filtered.filter(activity =>
+        activity.rating && activity.rating >= 9
+      );
+    }
+
+    if (feedFilters.restaurantsOnly) {
+      // Show only restaurants (exclude bars, bakeries, etc.)
+      // Assuming restaurants don't have specific tags marking them as bars/bakeries
+      // This is a simple filter - could be enhanced with restaurant category data
+      filtered = filtered.filter(activity =>
+        !activity.restaurant.tags?.some(tag =>
+          ['bar', 'bakery', 'cafe', 'coffee', 'dessert'].includes(tag.toLowerCase())
+        )
+      );
+    }
+
+    return filtered;
+  };
 
   const loadFeed = async () => {
     try {
       const feedData = await MockDataService.getActivityFeed();
       setActivities(feedData);
+      const filtered = applyFilters(feedData);
+      setFilteredActivities(filtered);
     } catch (error) {
       console.error('Failed to load feed:', error);
     } finally {
@@ -55,12 +96,22 @@ export default function FeedScreen() {
     loadNotificationCount();
   }, []);
 
+  // Reapply filters when filter settings change
+  useEffect(() => {
+    const filtered = applyFilters(activities);
+    setFilteredActivities(filtered);
+  }, [feedFilters]);
+
   // Refresh notification count when screen gains focus
   useFocusEffect(
     React.useCallback(() => {
       loadNotificationCount();
     }, [])
   );
+
+  const handleApplyFilters = (filters: FeedFilters) => {
+    setFeedFilters(filters);
+  };
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -73,6 +124,10 @@ export default function FeedScreen() {
 
   const handleNotificationsPress = () => {
     navigation.navigate('Notifications');
+  };
+
+  const handleGroupDinnerPress = () => {
+    navigation.navigate('GroupDinner');
   };
 
   const handleRestaurantPress = (restaurantId: string) => {
@@ -148,11 +203,14 @@ export default function FeedScreen() {
           </View>
         </View>
         <View style={styles.headerIcons}>
-          <Pressable style={styles.iconButton}>
+          <Pressable style={styles.iconButton} onPress={() => navigation.navigate('ReservationSharing')}>
             <Ionicons name="calendar-outline" size={24} color={colors.textPrimary} />
             <View style={styles.notificationBadge}>
               <Text style={styles.badgeText}>1</Text>
             </View>
+          </Pressable>
+          <Pressable style={styles.iconButton} onPress={handleGroupDinnerPress}>
+            <Ionicons name="restaurant-outline" size={24} color={colors.textPrimary} />
           </Pressable>
           <Pressable style={styles.iconButton} onPress={handleNotificationsPress}>
             <Ionicons name="notifications-outline" size={24} color={colors.textPrimary} />
@@ -178,7 +236,7 @@ export default function FeedScreen() {
 
       {/* Action Buttons */}
       <View style={styles.actionButtons}>
-        <Pressable style={styles.actionButton}>
+        <Pressable style={styles.actionButton} onPress={() => navigation.navigate('ReservationSharing')}>
           <Ionicons
             name="calendar"
             size={18}
@@ -243,7 +301,9 @@ export default function FeedScreen() {
       <View style={styles.featuredSection}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>FEATURED LISTS</Text>
-          <Text style={styles.seeAllText}>See all</Text>
+          <Pressable onPress={() => navigation.navigate('FeaturedLists')}>
+            <Text style={styles.seeAllText}>See all</Text>
+          </Pressable>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.featuredScroll}>
           <View style={styles.featuredCard}>
@@ -272,7 +332,7 @@ export default function FeedScreen() {
       {/* Feed Header */}
       <View style={styles.feedHeader}>
         <Text style={styles.feedTitle}>YOUR FEED</Text>
-        <Pressable style={styles.filtersButton}>
+        <Pressable style={styles.filtersButton} onPress={() => setShowFiltersModal(true)}>
           <View style={styles.scBadgeSmall}>
             <Text style={styles.scTextSmall}>SC</Text>
           </View>
@@ -297,7 +357,7 @@ export default function FeedScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
-        data={activities}
+        data={filteredActivities}
         renderItem={renderActivity}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
@@ -320,6 +380,13 @@ export default function FeedScreen() {
           onSubmit={handleModalSubmit}
         />
       )}
+
+      <FeedFiltersModal
+        visible={showFiltersModal}
+        filters={feedFilters}
+        onClose={() => setShowFiltersModal(false)}
+        onApply={handleApplyFilters}
+      />
 
       <HamburgerMenu
         visible={showMenu}
