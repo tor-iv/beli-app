@@ -19,7 +19,7 @@ export function InlineRestaurantCard({ restaurant, rank }: InlineRestaurantCardP
           {/* Image Section */}
           <div className="relative w-full md:w-2/5 h-64 md:h-auto">
             <Image
-              src={restaurant.imageUrl}
+              src={restaurant.images?.[0] || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&auto=format&fit=crop'}
               alt={restaurant.name}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -42,21 +42,21 @@ export function InlineRestaurantCard({ restaurant, rank }: InlineRestaurantCardP
                 </h3>
                 <div className="flex items-center gap-2 text-sm text-muted mb-3">
                   <IoLocationSharp size={16} />
-                  <span>{restaurant.neighborhood}</span>
+                  <span>{restaurant.location.neighborhood}</span>
                   <span>•</span>
                   <IoRestaurant size={16} />
-                  <span>{restaurant.cuisine}</span>
+                  <span>{restaurant.cuisine.join(', ')}</span>
                 </div>
               </div>
               <div className="flex-shrink-0">
-                <RatingBubble score={restaurant.averageScore} size="lg" />
+                <RatingBubble rating={restaurant.scores?.averageScore || restaurant.rating} size="lg" />
               </div>
             </div>
 
-            {/* Description */}
-            {restaurant.description && (
+            {/* Description - Using tags as a fallback since description doesn't exist */}
+            {restaurant.tags && restaurant.tags.length > 0 && (
               <p className="text-gray-700 leading-relaxed mb-4 line-clamp-3">
-                {restaurant.description}
+                {restaurant.tags.join(' • ')}
               </p>
             )}
 
@@ -65,14 +65,9 @@ export function InlineRestaurantCard({ restaurant, rank }: InlineRestaurantCardP
               <span className="px-3 py-1.5 bg-gray-100 rounded-full text-sm font-medium text-gray-700">
                 {restaurant.priceRange}
               </span>
-              {restaurant.dietaryOptions && restaurant.dietaryOptions.length > 0 && (
-                <span className="px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm font-medium">
-                  {restaurant.dietaryOptions[0]}
-                </span>
-              )}
-              {restaurant.reservationRequired && (
+              {restaurant.acceptsReservations && (
                 <span className="px-3 py-1.5 bg-amber-50 text-amber-700 rounded-full text-sm font-medium">
-                  Reservation Required
+                  Reservations Available
                 </span>
               )}
             </div>
@@ -82,12 +77,12 @@ export function InlineRestaurantCard({ restaurant, rank }: InlineRestaurantCardP
               <div className="border-t pt-4 mt-4">
                 <p className="text-sm font-semibold text-gray-900 mb-2">Must-Try Dishes:</p>
                 <div className="flex flex-wrap gap-2">
-                  {restaurant.popularDishes.slice(0, 3).map((dish) => (
+                  {restaurant.popularDishes.slice(0, 3).map((dish, idx) => (
                     <span
-                      key={dish.id}
+                      key={idx}
                       className="text-sm text-gray-600 bg-gray-50 px-2 py-1 rounded"
                     >
-                      {dish.name}
+                      {dish}
                     </span>
                   ))}
                 </div>

@@ -12,7 +12,7 @@ export function PhotoGalleryGrid({ restaurants }: PhotoGalleryGridProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Get first 6 restaurants with images
-  const restaurantsWithImages = restaurants.filter(r => r.imageUrl).slice(0, 6);
+  const restaurantsWithImages = restaurants.filter(r => r.images?.[0]).slice(0, 6);
 
   if (restaurantsWithImages.length === 0) return null;
 
@@ -24,10 +24,10 @@ export function PhotoGalleryGrid({ restaurants }: PhotoGalleryGridProps) {
             <div
               key={restaurant.id}
               className="relative aspect-square group cursor-pointer overflow-hidden rounded-xl"
-              onClick={() => setSelectedImage(restaurant.imageUrl)}
+              onClick={() => setSelectedImage(restaurant.images[0])}
             >
               <Image
-                src={restaurant.imageUrl}
+                src={restaurant.images[0]}
                 alt={restaurant.name}
                 fill
                 className="object-cover group-hover:scale-110 transition-transform duration-300"
@@ -39,7 +39,7 @@ export function PhotoGalleryGrid({ restaurants }: PhotoGalleryGridProps) {
                     {index + 1}. {restaurant.name}
                   </p>
                   <p className="text-white/90 text-xs mt-1 drop-shadow-md">
-                    {restaurant.neighborhood}
+                    {restaurant.location.neighborhood}
                   </p>
                 </div>
               </div>
