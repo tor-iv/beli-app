@@ -3,16 +3,30 @@ import { ActivityCard } from '@/components/social/activity-card';
 import { TrendingWidget } from '@/components/feed/trending-widget';
 import { RestaurantToggleWidget } from '@/components/profile/restaurant-toggle-widget';
 import { ThreeColumnLayout } from '@/components/layout/three-column';
+import { TastemakerPicksWidget } from '@/components/feed/tastemaker-picks-widget';
+import { getFeaturedPosts } from '@/data/mock/tastemakerPosts';
 
 export default async function FeedPage() {
   // Server-side data fetching
   const feed = await MockDataService.getActivityFeed();
+  const featuredPosts = getFeaturedPosts();
 
   return (
     <div className="container mx-auto px-4 py-6">
       {/* Mobile: Single column */}
       <div className="lg:hidden max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Your Feed</h1>
+
+        {/* Tastemaker Picks Widget - Mobile Only */}
+        {featuredPosts.length > 0 && (
+          <div className="mb-6">
+            <TastemakerPicksWidget
+              featuredPost={featuredPosts[0]}
+              recentPosts={featuredPosts.slice(1, 3)}
+            />
+          </div>
+        )}
+
         <div className="space-y-4">
           {feed.map((item) => (
             <ActivityCard key={item.id} activity={item} />

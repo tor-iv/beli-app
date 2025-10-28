@@ -75,38 +75,38 @@ export function RestaurantToggleWidget({ userId = 'current-user', defaultView = 
         </div>
 
         <Tabs value={activeView} onValueChange={(v) => setActiveView(v as ViewType)}>
-          <TabsList className="w-full mb-6 grid grid-cols-4 h-14 sm:h-11 gap-1">
+          <TabsList className="w-full mb-6 grid grid-cols-4 h-12 gap-2">
             <TabsTrigger
               value="reserve"
-              className="text-xs px-2 gap-2 flex-col sm:flex-row h-full py-2"
+              className="px-2 h-full flex items-center justify-center"
               title="Reserve Now"
+              aria-label="Reserve Now"
             >
-              <Calendar className="w-5 h-5 sm:w-4 sm:h-4" />
-              <span className="text-[10px] sm:text-xs leading-tight">Reserve</span>
+              <Calendar className="w-5 h-5" />
             </TabsTrigger>
             <TabsTrigger
               value="nearby"
-              className="text-xs px-2 gap-2 flex-col sm:flex-row h-full py-2"
+              className="px-2 h-full flex items-center justify-center"
               title="Nearby & Friends"
+              aria-label="Nearby & Friends"
             >
-              <MapPin className="w-5 h-5 sm:w-4 sm:h-4" />
-              <span className="text-[10px] sm:text-xs leading-tight">Nearby</span>
+              <MapPin className="w-5 h-5" />
             </TabsTrigger>
             <TabsTrigger
               value="trending"
-              className="text-xs px-2 gap-2 flex-col sm:flex-row h-full py-2"
+              className="px-2 h-full flex items-center justify-center"
               title="Trending"
+              aria-label="Trending"
             >
-              <TrendingUp className="w-5 h-5 sm:w-4 sm:h-4" />
-              <span className="text-[10px] sm:text-xs leading-tight">Trending</span>
+              <TrendingUp className="w-5 h-5" />
             </TabsTrigger>
             <TabsTrigger
               value="friends"
-              className="text-xs px-2 gap-2 flex-col sm:flex-row h-full py-2"
+              className="px-2 h-full flex items-center justify-center"
               title="Friend Picks"
+              aria-label="Friend Picks"
             >
-              <Users className="w-5 h-5 sm:w-4 sm:h-4" />
-              <span className="text-[10px] sm:text-xs leading-tight">Friends</span>
+              <Users className="w-5 h-5" />
             </TabsTrigger>
           </TabsList>
 

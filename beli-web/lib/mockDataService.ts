@@ -1,4 +1,4 @@
-import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification, TastemakerPost, Reservation, ReservationPriorityLevel } from '@/types';
+import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification, TastemakerPost, Reservation, ReservationPriorityLevel, MenuItem, OrderSuggestion, HungerLevel, MealTime } from '@/types';
 import { mockUsers, currentUser } from '@/data/mock/users';
 import { mockRestaurants } from '@/data/mock/restaurants';
 import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
@@ -10,6 +10,7 @@ import { mockRecentSearches, RecentSearch } from '@/data/mock/recentSearches';
 import { mockTastemakers } from '@/data/mock/tastemakers';
 import { mockTastemakerPosts, getFeaturedPosts, getPostsByUserId } from '@/data/mock/tastemakerPosts';
 import { mockReservations, getUserPriorityLevel, getAvailableReservations, getClaimedReservationsByUser, getSharedReservationsByUser, getReservationReminders } from '@/data/mock/reservations';
+import { allMenuItems, restaurantMenus } from '@/data/mock/menuItems';
 
 // Simulate network delay - reduced for better UX
 const delay = (ms: number = 150) => new Promise(resolve => setTimeout(resolve, ms));
@@ -800,6 +801,242 @@ export class MockDataService {
   static async getReservationById(reservationId: string): Promise<Reservation | null> {
     await delay();
     return mockReservations.find(r => r.id === reservationId) || null;
+  }
+
+  // Menu and Ordering methods
+  static async getRestaurantMenu(restaurantId: string): Promise<MenuItem[]> {
+    await delay();
+
+    const menuItemIds = restaurantMenus[restaurantId] || [];
+    const menu = allMenuItems.filter(item => menuItemIds.includes(item.id));
+
+    // Sort by category, then by popularity
+    return menu.sort((a, b) => {
+      const categoryOrder: Record<string, number> = {
+        appetizer: 1,
+        entree: 2,
+        side: 3,
+        dessert: 4,
+        drink: 5,
+      };
+
+      const categoryDiff = (categoryOrder[a.category] || 0) - (categoryOrder[b.category] || 0);
+      if (categoryDiff !== 0) return categoryDiff;
+
+      return b.popularity - a.popularity;
+    });
+  }
+
+  static async generateOrderSuggestion(
+    restaurantId: string,
+    partySize: number,
+    hungerLevel: HungerLevel,
+    mealTime: MealTime = 'any-time',
+    dietaryRestrictions?: string[]
+  ): Promise<OrderSuggestion> {
+    await delay(300); // Slightly longer delay to simulate AI processing
+
+    const menu = await this.getRestaurantMenu(restaurantId);
+
+    if (menu.length === 0) {
+      throw new Error('No menu available for this restaurant');
+    }
+
+    // Calculate "hunger points" based on party size and hunger level
+    const hungerMultiplier = {
+      'light': 0.8,
+      'moderate': 1.2,
+      'very-hungry': 1.8,
+    }[hungerLevel];
+
+    const basePointsPerPerson = 10;
+    const totalHungerPoints = partySize * basePointsPerPerson * hungerMultiplier;
+
+    // Define portion point values
+    const portionPoints: Record<string, number> = {
+      small: 5,
+      medium: 10,
+      large: 15,
+      shareable: 12,
+    };
+
+    // Filter menu based on meal time and dietary restrictions
+    let availableMenu = menu;
+
+    // Filter by meal time
+    if (mealTime !== 'any-time') {
+      availableMenu = availableMenu.filter(item => {
+        if (!item.mealTime || item.mealTime.length === 0) {
+          return true; // Include items without mealTime metadata
+        }
+        return item.mealTime.includes(mealTime) || item.mealTime.includes('any-time');
+      });
+    }
+
+    // Filter by dietary restrictions
+    if (dietaryRestrictions && dietaryRestrictions.length > 0) {
+      availableMenu = availableMenu.filter(item => {
+        if (dietaryRestrictions.includes('vegetarian') && !item.isVegetarian) {
+          return false;
+        }
+        if (dietaryRestrictions.includes('gluten-free') && !item.isGlutenFree) {
+          return false;
+        }
+        return true;
+      });
+    }
+
+    // Separate items by category
+    const appetizers = availableMenu.filter(i => i.category === 'appetizer');
+    const entrees = availableMenu.filter(i => i.category === 'entree');
+    const sides = availableMenu.filter(i => i.category === 'side');
+    const desserts = availableMenu.filter(i => i.category === 'dessert');
+    const drinks = availableMenu.filter(i => i.category === 'drink');
+
+    // Build the order
+    const selectedItems: Array<MenuItem & { quantity: number }> = [];
+    let currentPoints = 0;
+    const reasoning: string[] = [];
+
+    // Helper function to add items
+    const addItem = (item: MenuItem, quantity: number = 1) => {
+      selectedItems.push({ ...item, quantity });
+      currentPoints += portionPoints[item.portionSize] * quantity;
+    };
+
+    // Strategy based on party size and hunger level
+    if (partySize === 1) {
+      // Solo dining
+      if (hungerLevel === 'light') {
+        // 1 appetizer or 1 entree
+        if (Math.random() > 0.5 && appetizers.length > 0) {
+          addItem(appetizers[0]);
+          reasoning.push('Perfect light bite for one');
+        } else if (entrees.length > 0) {
+          addItem(entrees[0]);
+          reasoning.push('A satisfying solo meal');
+        }
+      } else if (hungerLevel === 'moderate') {
+        // 1 entree + maybe appetizer
+        if (entrees.length > 0) addItem(entrees[0]);
+        if (appetizers.length > 0 && currentPoints < totalHungerPoints * 0.8) {
+          addItem(appetizers[0]);
+        }
+        reasoning.push('Great portions for one person');
+      } else {
+        // very-hungry: entree + appetizer + dessert
+        if (appetizers.length > 0) addItem(appetizers[0]);
+        if (entrees.length > 0) addItem(entrees[0]);
+        if (desserts.length > 0) addItem(desserts[0]);
+        reasoning.push('Feast for one');
+      }
+    } else {
+      // Group dining
+      // Always add some appetizers for sharing
+      const numAppetizers = Math.min(
+        Math.ceil(partySize / 2),
+        appetizers.length,
+        hungerLevel === 'light' ? 1 : hungerLevel === 'moderate' ? 2 : 3
+      );
+
+      for (let i = 0; i < numAppetizers && i < appetizers.length; i++) {
+        addItem(appetizers[i]);
+      }
+
+      if (numAppetizers > 0) {
+        reasoning.push('Shareable starters for the table');
+      }
+
+      // Add entrees based on party size
+      const entreesNeeded = hungerLevel === 'light'
+        ? Math.ceil(partySize * 0.5)
+        : hungerLevel === 'very-hungry'
+        ? partySize + Math.floor(partySize / 3)
+        : partySize;
+
+      // Get top-rated entrees
+      const sortedEntrees = [...entrees].sort((a, b) => b.popularity - a.popularity);
+
+      for (let i = 0; i < entreesNeeded && currentPoints < totalHungerPoints; i++) {
+        const entreeIndex = i % sortedEntrees.length;
+        if (sortedEntrees[entreeIndex]) {
+          const existingItem = selectedItems.find(
+            si => si.id === sortedEntrees[entreeIndex].id
+          );
+
+          if (existingItem) {
+            existingItem.quantity++;
+          } else {
+            addItem(sortedEntrees[entreeIndex]);
+          }
+        }
+      }
+
+      reasoning.push('Includes crowd favorites');
+
+      // Add sides if very hungry or moderate with room
+      if ((hungerLevel === 'very-hungry' || hungerLevel === 'moderate') && sides.length > 0) {
+        const numSides = Math.min(2, sides.length);
+        for (let i = 0; i < numSides; i++) {
+          addItem(sides[i]);
+        }
+        if (numSides > 0) {
+          reasoning.push('Complementary sides to share');
+        }
+      }
+
+      // Add dessert if very hungry
+      if (hungerLevel === 'very-hungry' && desserts.length > 0) {
+        const numDesserts = Math.min(Math.ceil(partySize / 2), desserts.length);
+        for (let i = 0; i < numDesserts; i++) {
+          addItem(desserts[i]);
+        }
+        reasoning.push('Sweet ending to your meal');
+      }
+
+      // Add drinks
+      if (drinks.length > 0 && partySize >= 2) {
+        const numDrinks = Math.min(2, drinks.length);
+        for (let i = 0; i < numDrinks; i++) {
+          addItem(drinks[i], partySize);
+        }
+      }
+    }
+
+    // Calculate total price
+    const totalPrice = selectedItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+
+    // Generate sharability description
+    const estimatedSharability = partySize === 1
+      ? 'Perfect portions for one'
+      : partySize <= 2
+      ? `Great for ${partySize} people`
+      : partySize <= 4
+      ? `Ideal for your group of ${partySize}`
+      : `Feast for ${partySize} people`;
+
+    // Add pricing reasoning
+    const pricePerPerson = totalPrice / partySize;
+    if (pricePerPerson < 30) {
+      reasoning.push('Budget-friendly option');
+    } else if (pricePerPerson > 60) {
+      reasoning.push('Premium dining experience');
+    }
+
+    return {
+      id: `suggestion-${Date.now()}`,
+      restaurantId,
+      partySize,
+      hungerLevel,
+      mealTime,
+      items: selectedItems,
+      totalPrice,
+      reasoning,
+      estimatedSharability,
+    };
   }
 }
 

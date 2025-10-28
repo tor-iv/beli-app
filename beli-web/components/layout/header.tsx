@@ -70,7 +70,7 @@ export function Header() {
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-50 shadow-[0_-2px_8px_rgba(0,0,0,0.1)]">
         <div className="flex justify-around items-center py-2 px-2">
-          {navigation.map((item) => {
+          {navigation.filter(item => item.name !== 'Tastemakers').map((item) => {
             const isActive = pathname?.startsWith(item.href);
             const Icon = isActive ? item.icon : item.outlineIcon;
 

@@ -16,65 +16,89 @@ export function TastemakerCard({ tastemaker }: TastemakerCardProps) {
 
   return (
     <Link href={`/tastemakers/${tastemaker.username}`}>
-      <Card className="beli-card hover:shadow-lg transition-shadow cursor-pointer">
-        <CardContent className="p-6">
-          {/* Header with avatar and badges */}
-          <div className="flex items-start gap-4 mb-4">
-            <div className="relative">
-              <Image
-                src={tastemaker.avatar}
-                alt={tastemaker.displayName}
-                width={64}
-                height={64}
-                className="rounded-full"
-              />
+      <Card className="beli-card hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group">
+        <CardContent className="p-0">
+          {/* Header section with gradient background */}
+          <div
+            className="relative p-6 pb-16"
+            style={{
+              background: `linear-gradient(135deg, ${profile.badges[0]?.color || '#0B7B7F'}15 0%, ${profile.badges[0]?.color || '#0B7B7F'}08 100%)`
+            }}
+          >
+            {/* Verified badge corner */}
+            <div className="absolute top-3 right-3">
               <IoCheckmarkCircle
-                className="absolute -bottom-1 -right-1 text-primary bg-white rounded-full"
-                size={20}
+                className="text-primary drop-shadow-md"
+                size={24}
               />
             </div>
 
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-lg mb-1 truncate">
+            {/* Engagement rate indicator */}
+            <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-bold text-primary shadow-sm">
+              {profile.engagementRate.toFixed(1)}% engagement
+            </div>
+
+            {/* Avatar - Much larger */}
+            <div className="flex justify-center">
+              <div className="relative">
+                <Image
+                  src={tastemaker.avatar}
+                  alt={tastemaker.displayName}
+                  width={100}
+                  height={100}
+                  className="rounded-full border-4 border-white shadow-lg group-hover:scale-105 transition-transform"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Content section */}
+          <div className="px-6 pb-6 -mt-8">
+            {/* Name and username */}
+            <div className="text-center mb-3">
+              <h3 className="font-bold text-xl mb-1 group-hover:text-primary transition-colors">
                 {tastemaker.displayName}
               </h3>
-              <p className="text-sm text-muted mb-2">@{tastemaker.username}</p>
-
-              {/* Badges */}
-              <div className="flex flex-wrap gap-1.5">
-                {profile.badges.slice(0, 3).map((badge) => (
-                  <span
-                    key={badge.type}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-                    style={{
-                      backgroundColor: `${badge.color}15`,
-                      color: badge.color,
-                    }}
-                  >
-                    {badge.icon && <span>{badge.icon}</span>}
-                    {badge.label}
-                  </span>
-                ))}
-              </div>
+              <p className="text-sm text-muted">@{tastemaker.username}</p>
             </div>
-          </div>
 
-          {/* Specialty and tagline */}
-          <div className="mb-4">
-            <p className="font-medium text-sm mb-1">{profile.specialty}</p>
-            <p className="text-sm text-muted line-clamp-2">{profile.tagline}</p>
-          </div>
+            {/* Specialty - Highlighted */}
+            <div className="text-center mb-4">
+              <p className="font-semibold text-sm text-primary mb-1">{profile.specialty}</p>
+              <p className="text-sm text-muted line-clamp-2 leading-relaxed">{profile.tagline}</p>
+            </div>
 
-          {/* Stats */}
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex gap-4">
-              <div>
-                <span className="font-semibold">{tastemaker.stats.followers.toLocaleString()}</span>
-                <span className="text-muted ml-1">followers</span>
+            {/* Badges - More prominent */}
+            <div className="flex flex-wrap justify-center gap-2 mb-4">
+              {profile.badges.map((badge) => (
+                <span
+                  key={badge.type}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shadow-sm"
+                  style={{
+                    backgroundColor: `${badge.color}20`,
+                    color: badge.color,
+                    border: `1.5px solid ${badge.color}40`
+                  }}
+                >
+                  {badge.icon && <span className="text-sm">{badge.icon}</span>}
+                  {badge.label}
+                </span>
+              ))}
+            </div>
+
+            {/* Stats - Visual grid */}
+            <div className="grid grid-cols-3 gap-3 pt-4 border-t">
+              <div className="text-center">
+                <p className="font-bold text-lg text-primary">{tastemaker.stats.followers.toLocaleString()}</p>
+                <p className="text-xs text-muted">Followers</p>
               </div>
-              <div>
-                <span className="font-semibold">{profile.totalPosts}</span>
-                <span className="text-muted ml-1">posts</span>
+              <div className="text-center border-x">
+                <p className="font-bold text-lg text-primary">{profile.totalPosts}</p>
+                <p className="text-xs text-muted">Articles</p>
+              </div>
+              <div className="text-center">
+                <p className="font-bold text-lg text-primary">{profile.featuredListsCount}</p>
+                <p className="text-xs text-muted">Lists</p>
               </div>
             </div>
           </div>

@@ -69,6 +69,7 @@ export interface Restaurant {
   friendsWantToTryCount?: number;
   friendAvatars?: string[];
   popularDishImages?: string[];
+  menu?: string[]; // array of menu item IDs
 }
 
 export interface RestaurantLocation {
@@ -284,4 +285,38 @@ export interface ReservationPriorityLevel {
   reservationsShared: number;
   nextLevelProgress: number; // 0-100 percentage to next level
   nextLevel?: PriorityLevel;
+}
+
+// Menu and Ordering types
+export type MenuItemCategory = 'appetizer' | 'entree' | 'side' | 'dessert' | 'drink';
+export type PortionSize = 'small' | 'medium' | 'large' | 'shareable';
+export type HungerLevel = 'light' | 'moderate' | 'very-hungry';
+export type MealTime = 'breakfast' | 'lunch' | 'dinner' | 'any-time';
+
+export interface MenuItem {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: MenuItemCategory;
+  imageUrl: string;
+  portionSize: PortionSize;
+  tags: string[];
+  popularity: number; // 0-100 score
+  isVegetarian?: boolean;
+  isGlutenFree?: boolean;
+  spiceLevel?: 1 | 2 | 3 | 4 | 5;
+  mealTime?: MealTime[]; // Which meals this item is suitable for
+}
+
+export interface OrderSuggestion {
+  id: string;
+  restaurantId: string;
+  partySize: number;
+  hungerLevel: HungerLevel;
+  mealTime: MealTime;
+  items: Array<MenuItem & { quantity: number }>;
+  totalPrice: number;
+  reasoning: string[];
+  estimatedSharability: string; // e.g., "Perfect for 4 people"
 }

@@ -7,6 +7,7 @@ import { RatingBubble } from '@/components/rating/rating-bubble';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SidebarLayout } from '@/components/layout/sidebar';
+import { WhatToOrderButton } from '@/components/restaurant/what-to-order-button';
 
 export default async function RestaurantPage({ params }: { params: { id: string } }) {
   const restaurant = await MockDataService.getRestaurantById(params.id);
@@ -20,6 +21,9 @@ export default async function RestaurantPage({ params }: { params: { id: string 
       {/* Mobile: Single column */}
       <div className="md:hidden max-w-4xl mx-auto">
         <RestaurantHeader restaurant={restaurant} />
+        <div className="mb-4">
+          <WhatToOrderButton restaurant={restaurant} />
+        </div>
 
         <div className="space-y-6 mt-6">
           <RestaurantMetadata restaurant={restaurant} />
@@ -55,6 +59,9 @@ export default async function RestaurantPage({ params }: { params: { id: string 
       {/* Desktop: Sidebar layout */}
       <div className="hidden md:block max-w-7xl mx-auto">
         <RestaurantHeader restaurant={restaurant} />
+        <div className="mb-4">
+          <WhatToOrderButton restaurant={restaurant} />
+        </div>
 
         <div className="mt-6">
           <SidebarLayout

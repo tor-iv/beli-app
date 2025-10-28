@@ -3,9 +3,9 @@ import { User } from '@/types';
 export const mockUsers: User[] = [
   {
     id: '1',
-    username: 'torcox',
+    username: 'tor_iv',
     displayName: 'Tor Cox',
-    avatar: 'https://i.pravatar.cc/150?img=1',
+    avatar: '/profile-tor.jpg',
     bio: 'Food enthusiast exploring NYC 🍕 | Always hunting for the perfect slice',
     stats: {
       followers: 234,

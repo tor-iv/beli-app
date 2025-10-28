@@ -55,6 +55,7 @@ export const mockRestaurants: Restaurant[] = [
       'https://images.unsplash.com/photo-1565299543923-37dd378c0eb3?w=600&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&auto=format&fit=crop',
     ],
+    menu: ['mt-1', 'mt-2', 'mt-3', 'mt-4', 'mt-5', 'mt-6', 'mt-7', 'mt-8', 'mt-9', 'mt-10'],
   },
   // MANHATTAN - SOHO
   {
@@ -108,6 +109,7 @@ export const mockRestaurants: Restaurant[] = [
       'https://images.unsplash.com/photo-1525755662778-989d0524087e?w=600&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1543353071-10c8ba85a904?w=600&auto=format&fit=crop',
     ],
+    menu: ['bal-1', 'bal-2', 'bal-3', 'bal-4', 'bal-5', 'bal-6', 'bal-7', 'bal-8', 'bal-9', 'bal-10', 'bal-11', 'bal-12'],
   },
   {
     id: '2',
