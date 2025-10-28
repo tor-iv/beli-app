@@ -56,30 +56,64 @@ export function RestaurantToggleWidget({ userId = 'current-user', defaultView = 
     loadRestaurants();
   }, [activeView, userId]);
 
+  const getViewTitle = () => {
+    switch (activeView) {
+      case 'reserve': return 'Reserve Now';
+      case 'nearby': return 'Nearby & Friends';
+      case 'trending': return 'Trending';
+      case 'friends': return 'Friend Picks';
+      default: return 'Restaurants';
+    }
+  };
+
   return (
     <Card className="beli-card">
-      <CardContent className="p-6">
+      <CardContent className="p-5 sm:p-6">
+        {/* Header with dynamic title */}
+        <div className="mb-6">
+          <h3 className="font-semibold text-base sm:text-lg">{getViewTitle()}</h3>
+        </div>
+
         <Tabs value={activeView} onValueChange={(v) => setActiveView(v as ViewType)}>
-          <TabsList className="w-full mb-6 grid grid-cols-4">
-            <TabsTrigger value="reserve" className="text-xs sm:text-sm px-2 sm:px-3 gap-1">
-              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Reserve</span>
+          <TabsList className="w-full mb-6 grid grid-cols-4 h-14 sm:h-11 gap-1">
+            <TabsTrigger
+              value="reserve"
+              className="text-xs px-2 gap-2 flex-col sm:flex-row h-full py-2"
+              title="Reserve Now"
+            >
+              <Calendar className="w-5 h-5 sm:w-4 sm:h-4" />
+              <span className="text-[10px] sm:text-xs leading-tight">Reserve</span>
             </TabsTrigger>
-            <TabsTrigger value="nearby" className="text-xs sm:text-sm px-2 sm:px-3 gap-1">
-              <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Nearby</span>
+            <TabsTrigger
+              value="nearby"
+              className="text-xs px-2 gap-2 flex-col sm:flex-row h-full py-2"
+              title="Nearby & Friends"
+            >
+              <MapPin className="w-5 h-5 sm:w-4 sm:h-4" />
+              <span className="text-[10px] sm:text-xs leading-tight">Nearby</span>
             </TabsTrigger>
-            <TabsTrigger value="trending" className="text-xs sm:text-sm px-2 sm:px-3 gap-1">
-              <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Trending</span>
+            <TabsTrigger
+              value="trending"
+              className="text-xs px-2 gap-2 flex-col sm:flex-row h-full py-2"
+              title="Trending"
+            >
+              <TrendingUp className="w-5 h-5 sm:w-4 sm:h-4" />
+              <span className="text-[10px] sm:text-xs leading-tight">Trending</span>
             </TabsTrigger>
-            <TabsTrigger value="friends" className="text-xs sm:text-sm px-2 sm:px-3 gap-1">
-              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Friends</span>
+            <TabsTrigger
+              value="friends"
+              className="text-xs px-2 gap-2 flex-col sm:flex-row h-full py-2"
+              title="Friend Picks"
+            >
+              <Users className="w-5 h-5 sm:w-4 sm:h-4" />
+              <span className="text-[10px] sm:text-xs leading-tight">Friends</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value={activeView}>
+          {/* Visual separator */}
+          <div className="border-t border-gray-100 mb-6" />
+
+          <TabsContent value={activeView} className="mt-0">
             {loading ? (
               <div className="space-y-2">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -99,17 +133,18 @@ export function RestaurantToggleWidget({ userId = 'current-user', defaultView = 
               </div>
             ) : (
               <div className="text-center py-12 text-muted">
-                <p>No restaurants found for this category</p>
+                <p className="text-sm">No restaurants found for this category</p>
               </div>
             )}
 
             {restaurants.length > 0 && (
-              <div className="mt-6 text-center">
+              <div className="mt-8 pt-6 border-t border-gray-100 text-center">
                 <Link
                   href={`/lists?view=${activeView}`}
-                  className="text-primary hover:underline text-sm font-medium"
+                  className="text-primary hover:underline text-sm font-medium inline-flex items-center gap-1"
                 >
-                  View all →
+                  View all
+                  <span aria-hidden="true">→</span>
                 </Link>
               </div>
             )}
