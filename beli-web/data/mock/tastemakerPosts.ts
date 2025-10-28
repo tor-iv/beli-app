@@ -390,6 +390,324 @@ Wine should enhance your meal, not complicate it. If you're stressed about the p
     },
     isFeatured: false,
   },
+  {
+    id: 'post-9',
+    userId: 'tm-1', // Alex Pizza King
+    title: 'The Ultimate NYC Pizza Neighborhood Power Ranking',
+    subtitle: 'From Williamsburg to the Upper West Side - which neighborhoods have the best slices?',
+    coverImage: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=1200&h=600&fit=crop',
+    content: `After three years of eating pizza across all five boroughs, I've ranked NYC neighborhoods by their pizza quality. Some results might surprise you.
+
+**The Methodology:**
+
+I visited every notable pizzeria in each neighborhood, tried at least 3 slices from each, and rated them on crust, sauce, cheese, and overall execution.
+
+**Top 5 Neighborhoods for Pizza:**
+
+**1. Williamsburg, Brooklyn**
+
+This one's not a surprise. With L'industrie, Best Pizza, and Paulie Gee's all within walking distance, Williamsburg is pizza heaven. The competition here keeps everyone sharp.
+
+**2. Lower East Side, Manhattan**
+
+Scarr's Pizza alone would put this neighborhood on the list, but you've also got Prince Street Pizza's legendary Spicy Spring nearby. The variety here is unmatched.
+
+**3. Bushwick, Brooklyn**
+
+The underrated champion. Roberta's gets all the press, but there are at least 5 other spots here doing incredible things. Plus, the prices are still reasonable.
+
+**4. Greenwich Village, Manhattan**
+
+Joe's Pizza is the classic, but don't sleep on John's of Bleecker Street. This neighborhood wrote the book on New York pizza.
+
+**5. Park Slope, Brooklyn**
+
+Di Fara is worth the trip alone, though the neighborhood has gotten more competitive recently. Still the king of Brooklyn pizza.
+
+**The Dark Horses:**
+
+**Astoria, Queens** - Massively underrated. Some of the best Sicilian slices in the city.
+
+**Arthur Avenue, Bronx** - Old school Italian neighborhood that's been doing this since before it was cool.
+
+**Overrated Neighborhoods:**
+
+Look, I love the Upper West Side, but the pizza scene there is just... fine. Nothing special. Same with Midtown East - too many mediocre tourist traps.
+
+**Pro Tips:**
+- Weekend afternoons = freshest pies
+- Cash is still king at most places
+- Don't be afraid to venture to outer boroughs
+- Follow the locals, not the Instagram hotspots
+
+The best pizza in NYC isn't always in Manhattan. Sometimes you need to take the L train.`,
+    restaurantIds: ['2', '3', '20', '26'],
+    listIds: ['featured-1'],
+    tags: ['pizza', 'neighborhood-guide', 'brooklyn', 'manhattan'],
+    publishedAt: new Date('2024-01-25'),
+    updatedAt: new Date('2024-01-25'),
+    interactions: {
+      likes: ['1', '3', '5', '7', '9', '11', '13'],
+      bookmarks: ['1', '5', '9'],
+      views: 4832,
+    },
+    isFeatured: false,
+  },
+  {
+    id: 'post-10',
+    userId: 'tm-2', // Emma Fine Dining
+    title: 'NYC\'s New Restaurant Openings Worth the Hype',
+    subtitle: 'I ate at every buzzy new spot this month. Here are the ones that actually deliver.',
+    coverImage: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&h=600&fit=crop',
+    content: `Every month brings a wave of new restaurant openings in NYC. Most don't live up to the hype. But these five? They're the real deal.
+
+**The Methodology:**
+
+I dined at 12 new openings this month, all within their first 6 weeks. I'm focusing on places that are generating buzz and actually worth your money.
+
+**The Winners:**
+
+**Tatiana by Kwame Onwuachi (Lincoln Center)**
+
+This is what NYC dining needed. Onwuachi brings Afro-Caribbean flavors to a fine dining setting without losing the soul. The suya-spiced lamb is worth the reservation battle alone.
+
+What impressed me: The service is warm and knowledgeable without being stuffy. The wine pairings are creative. The space feels special without being intimidating.
+
+**Le Dive (Lower East Side)**
+
+A natural wine bar that actually has good food? Revolutionary. The mussels are perfect, the burger is craveable, and the wine list will teach you things.
+
+What impressed me: It's cool without trying too hard. You can wear jeans or dress up. The staff genuinely wants you to enjoy yourself.
+
+**The Fly (SoHo)**
+
+NYC needed another great Greek restaurant, and The Fly delivers. The whole fish preparation is theatrical and delicious. The spreads are exceptional.
+
+What impressed me: Traditional techniques with modern execution. Nothing feels gimmicky. Just really good Greek food in a beautiful space.
+
+**Four Horsemen (Williamsburg)**
+
+James Murphy (yes, from LCD Soundsystem) helped create one of the best wine bars in Brooklyn. The menu changes constantly based on what's good.
+
+What impressed me: The "no wrong choices" menu design. Everything pairs well with natural wine. The vibe is relaxed but the execution is serious.
+
+**Cote (Flatiron)**
+
+Korean BBQ meets fine dining. You're grilling premium cuts at your table while servers guide you through the process. It's an experience.
+
+What impressed me: They've elevated Korean BBQ without losing the fun of it. The butcher's feast is a masterclass in beef.
+
+**The Ones That Disappointed:**
+
+I won't name names, but there were three celebrity chef openings this month that felt phoned in. High prices, mediocre food, trading on name recognition.
+
+**How to Actually Get Reservations:**
+
+- Set alerts on Resy for 30 days out
+- Try for Tuesday/Wednesday nights
+- Bar seats often have walk-in availability
+- Follow restaurants on Instagram for last-minute openings
+- Be nice to hosts - they remember
+
+**The Bottom Line:**
+
+New doesn't always mean better. But when a restaurant truly delivers something special, it's worth fighting for that reservation.`,
+    restaurantIds: ['12', '15', '21'],
+    listIds: ['featured-3'],
+    tags: ['new-openings', 'fine-dining', 'reservations', 'trending'],
+    publishedAt: new Date('2024-01-28'),
+    updatedAt: new Date('2024-01-28'),
+    interactions: {
+      likes: ['2', '4', '6', '8', '10', '12'],
+      bookmarks: ['2', '4', '10'],
+      views: 5234,
+    },
+    isFeatured: true,
+  },
+  {
+    id: 'post-11',
+    userId: 'tm-3', // David Street Food
+    title: 'The NYC Food Cart Power Rankings',
+    subtitle: 'Street food that rivals sit-down restaurants, all under $15',
+    coverImage: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=1200&h=600&fit=crop',
+    content: `Food carts are the soul of NYC dining. Here's my definitive ranking of the best ones, neighborhood by neighborhood.
+
+**The Rules:**
+
+- Must be an actual cart or truck (not a restaurant with a window)
+- Maximum $15 per meal
+- Consistent quality over at least 6 months
+- I tried everything at least 5 times
+
+**Top 10 Food Carts in NYC:**
+
+**#1: King of Falafel & Shawarma (Astoria)**
+
+This cart has a cult following for a reason. The falafel is crispy outside, fluffy inside. The hot sauce is the perfect level of spicy. And at $6, it's a steal.
+
+Secret menu item: Ask for extra pickles and turnips.
+
+**#2: Desi Food Cart (Jackson Heights)**
+
+Best chicken tikka masala from a cart, period. The naan is made fresh. For $10, you're getting restaurant-quality Indian food.
+
+Pro tip: Get there before noon for the freshest naan.
+
+**#3: Birria-Landia (Jackson Heights)**
+
+The birria tacos that broke Instagram. But unlike most hyped spots, these actually live up to it. The consommé is rich and deep. The cheese pull is real.
+
+Wait time: 20-30 minutes on weekends. Worth it.
+
+**#4: The Halal Guys (53rd & 6th)**
+
+Yeah, it's famous. Yeah, there are multiple locations now. But the original cart is still the best. The white sauce is legendary.
+
+**#5: Tacos El Bronco (Sunset Park)**
+
+These al pastor tacos are better than most restaurants. The pork is perfectly seasoned. The pineapple adds the right sweetness.
+
+Hidden gem: The quesadillas are massive and $8.
+
+**#6: NY Dosas (Washington Square Park)**
+
+The Pondicherry dosa changed my life. Crispy, flavorful, filling. And completely vegetarian-friendly.
+
+Best time: Lunch on weekdays, less crowded.
+
+**#7: Wafels & Dinges (Multiple Locations)**
+
+Belgian waffles done right. The speculoos spread is dangerous. Not your average street cart dessert.
+
+Pro move: The Dinges wafel with Nutella and whipped cream.
+
+**#8: Korilla BBQ (Multiple Locations)**
+
+Korean BBQ meets Mexican street food. The kimchi quesadilla shouldn't work but absolutely does.
+
+**#9: Big Gay Ice Cream Truck (Various)**
+
+Creative soft-serve that's worth hunting down. The Salty Pimp lives up to its name.
+
+**#10: Calexico Cart (Red Hook/Barclays)**
+
+California-style Mexican that's surprisingly authentic. The crack sauce is addictive.
+
+**How to Find the Best Carts:**
+
+- Follow @nycfoodtrucks on Instagram
+- Look for long lines of locals (not tourists)
+- Cash only is usually a good sign
+- Carts with a specialty > carts with huge menus
+- Check health inspection grades
+
+**The Bottom Line:**
+
+Some of the best food in NYC comes from carts. Don't let the lack of seats fool you - these chefs are serious about their craft.`,
+    restaurantIds: ['11', '28', '8'],
+    listIds: ['featured-7', 'user-7-cheap-eats'],
+    tags: ['street-food', 'budget-friendly', 'food-trucks', 'hidden-gems'],
+    publishedAt: new Date('2024-01-30'),
+    updatedAt: new Date('2024-01-30'),
+    interactions: {
+      likes: ['1', '3', '7', '9', '13', '14', '15', '18'],
+      bookmarks: ['1', '7', '13', '15'],
+      views: 6134,
+    },
+    isFeatured: false,
+  },
+  {
+    id: 'post-12',
+    userId: 'tm-7', // Maya Desserts
+    title: 'NYC Bakeries That Are Worth Waking Up Early For',
+    subtitle: 'From croissants to babka, these pastries justify the morning alarm',
+    coverImage: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&h=600&fit=crop',
+    content: `As a pastry chef, I'm incredibly picky about baked goods. These bakeries are doing something special enough to get me out of bed before 8am.
+
+**The Early Bird List:**
+
+**Breads Bakery (Multiple Locations)**
+
+The chocolate babka is famous for a reason, but don't sleep on the croissants. They're doing traditional French technique with Israeli influences.
+
+Get there by: 8am for the full selection
+Must order: Chocolate babka (obviously), almond croissant, rugelach
+Price point: $6-12 per item
+
+**Maman (Multiple Locations)**
+
+French-style café that takes their pastries seriously. The chocolate chip cookies are legendary, but the morning pastries are where they shine.
+
+Get there by: 9am (they have better stock than most)
+Must order: Lavender lemon cookie, everything croissant, banana bread
+Price point: $4-8 per item
+
+**She Wolf Bakery (Brooklyn)**
+
+This is serious sourdough. They're fermenting for 48+ hours and you can taste the difference. The morning pastries rotate based on what's seasonal.
+
+Get there by: 7:30am (they sell out fast)
+Must order: Whatever laminated pastry they have that day, country loaf
+Price point: $5-10 per item
+
+**Supermoon Bakehouse (Lower East Side)**
+
+The Crêux is worth the hype. It's a croissant-muffin hybrid that shouldn't work but absolutely does. Flavors rotate weekly.
+
+Get there by: 10am (or order ahead)
+Must order: Whatever flavor Crêux sounds interesting, everything bagel
+Price point: $7-12 per item
+
+**Balthazar Bakery (SoHo)**
+
+The retail bakery attached to the restaurant. Same quality bread and pastries that supply the restaurant.
+
+Get there by: 8:30am
+Must order: Pain aux raisins, baguette, any of the tarts
+Price point: $4-9 per item
+
+**Daily Provisions (Multiple Locations)**
+
+From the team behind Union Square Cafe. Everything is made in-house, including the donuts.
+
+Get there by: 9am
+Must order: Almond croissant, blackberry brioche donut, BEC on their biscuit
+Price point: $5-10 per item
+
+**What Makes a Great Bakery:**
+
+**Freshness**: If they're not baking throughout the day, they're not serious.
+
+**Technique**: You can tell when someone actually knows what they're doing. The layers should shatter. The crumb should be even.
+
+**Ingredients**: Real butter, good chocolate, fresh fruit. No shortcuts.
+
+**Variety**: Doing one thing well is fine, but range shows skill.
+
+**Why You Should Wake Up Early:**
+
+Morning pastries are a completely different experience fresh from the oven. That croissant at 3pm? It's fine. But at 8am when it's still warm? It's transcendent.
+
+**Pro Tips:**
+- Call ahead for special orders
+- Weekend mornings are chaos - weekdays are better
+- Most bakeries have loyalty programs
+- Don't be afraid to ask what just came out of the oven
+- Freeze extra bread/pastries properly - they'll keep for weeks
+
+The best pastries in NYC are worth setting an alarm for. Your future self will thank you.`,
+    restaurantIds: ['25', '26', '27'],
+    listIds: ['user-1-dessert-playlist'],
+    tags: ['bakery', 'breakfast', 'pastries', 'coffee'],
+    publishedAt: new Date('2024-02-02'),
+    updatedAt: new Date('2024-02-02'),
+    interactions: {
+      likes: ['1', '2', '6', '10', '13', '17', '20'],
+      bookmarks: ['1', '10', '13'],
+      views: 3876,
+    },
+    isFeatured: false,
+  },
 ];
 
 // Helper to get featured posts

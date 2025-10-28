@@ -136,7 +136,7 @@ export function TastemakerPostCard({ post, variant = 'default' }: TastemakerPost
           {/* Engagement stats - More compact */}
           <div className="flex items-center justify-between text-sm border-t pt-4">
             <div className="flex items-center gap-4 text-muted">
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5" suppressHydrationWarning>
                 <IoEye size={16} className="text-primary" />
                 <span className="font-medium">{post.interactions.views.toLocaleString()}</span>
               </span>

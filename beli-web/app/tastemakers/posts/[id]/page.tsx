@@ -2,15 +2,17 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MockDataService } from '@/lib/mockDataService';
-import { RestaurantListItemCompact } from '@/components/restaurant/restaurant-list-item-compact';
-import { IoHeart, IoHeartOutline, IoBookmark, IoBookmarkOutline, IoEye, IoShareSocial } from 'react-icons/io5';
+import { PhotoGalleryGrid } from '@/components/tastemakers/photo-gallery-grid';
+import { InlineRestaurantCard } from '@/components/tastemakers/inline-restaurant-card';
+import { TableOfContents } from '@/components/tastemakers/table-of-contents';
+import { IoHeart, IoHeartOutline, IoBookmark, IoBookmarkOutline, IoEye, IoShareSocial, IoTrendingUp } from 'react-icons/io5';
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function TastemakerPostPage({ params }: PageProps) {
-  const { id } = params;
+  const { id } = await params;
 
   // Fetch post data
   const post = await MockDataService.getTastemakerPostById(id);
@@ -23,15 +25,37 @@ export default async function TastemakerPostPage({ params }: PageProps) {
 
   const { user } = post;
 
+  // Check if article is trending (views > 3000)
+  const isTrending = post.interactions.views > 3000;
+
   return (
     <div className="container mx-auto px-4 py-6">
       <article className="max-w-5xl mx-auto">
-        {/* Breadcrumb */}
-        <div className="mb-6">
-          <Link href="/tastemakers" className="text-primary hover:underline text-sm font-medium">
-            ← Back to Tastemakers
+        {/* Infatuation-style Breadcrumb */}
+        <div className="mb-6 flex items-center gap-2 text-sm">
+          <Link href="/tastemakers" className="text-muted hover:text-primary font-semibold transition-colors">
+            NEW YORK
           </Link>
+          <span className="text-muted">/</span>
+          <Link href="/tastemakers" className="text-muted hover:text-primary font-semibold transition-colors">
+            GUIDES
+          </Link>
+          <span className="text-muted">/</span>
+          <span className="text-gray-900 font-semibold uppercase text-xs line-clamp-1">
+            {post.title}
+          </span>
         </div>
+
+        {/* Trending Badge */}
+        {isTrending && (
+          <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-lg border border-primary/20">
+            <IoTrendingUp className="text-primary" size={18} />
+            <span className="text-sm font-bold text-primary">THIS GUIDE IS TRENDING NOW</span>
+            <span className="text-xs text-primary/70 ml-2">
+              {post.interactions.views.toLocaleString()} views
+            </span>
+          </div>
+        )}
 
         {/* Cover Image - Full width hero */}
         <div className="relative w-full h-[500px] md:h-[600px] mb-8 rounded-2xl overflow-hidden shadow-2xl">
@@ -59,9 +83,12 @@ export default async function TastemakerPostPage({ params }: PageProps) {
               ))}
             </div>
 
-            {/* Title */}
+            {/* Title with yellow highlight effect (Infatuation-style) */}
             <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight drop-shadow-lg max-w-4xl">
-              {post.title}
+              <span className="relative inline-block">
+                {post.title}
+                <span className="absolute bottom-2 left-0 right-0 h-3 bg-yellow-300/40 -z-10"></span>
+              </span>
             </h1>
 
             {/* Subtitle */}
@@ -126,6 +153,11 @@ export default async function TastemakerPostPage({ params }: PageProps) {
           </div>
         </div>
 
+        {/* Photo Gallery Grid (Infatuation-style) */}
+        {post.restaurants && post.restaurants.length > 0 && (
+          <PhotoGalleryGrid restaurants={post.restaurants} />
+        )}
+
         {/* Action Buttons - More prominent */}
         <div className="flex items-center gap-3 mb-10">
           <button className="flex items-center gap-2 px-6 py-3 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors font-medium shadow-sm">
@@ -142,19 +174,25 @@ export default async function TastemakerPostPage({ params }: PageProps) {
           </button>
         </div>
 
-        {/* Content - Better typography */}
-        <div className="prose prose-lg max-w-none mb-12">
-          {/* Render content with line breaks preserved */}
-          {post.content.split('\n').map((paragraph, index) => {
-            // Handle headers (lines starting with **)
-            if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
-              const text = paragraph.replace(/\*\*/g, '');
-              return (
-                <h2 key={index} className="text-3xl font-bold mt-10 mb-5 text-gray-900">
-                  {text}
-                </h2>
-              );
-            }
+        {/* Content with Sidebar Layout */}
+        <div className="lg:grid lg:grid-cols-12 lg:gap-8 mb-12">
+          {/* Main Content */}
+          <div className="lg:col-span-8 prose prose-lg max-w-none">
+            {/* Render content with line breaks preserved */}
+            {post.content.split('\n').map((paragraph, index) => {
+              // Handle headers (lines starting with **)
+              if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
+                const text = paragraph.replace(/\*\*/g, '');
+                return (
+                  <h2
+                    key={index}
+                    id={`heading-${index}`}
+                    className="text-3xl font-bold mt-10 mb-5 text-gray-900 scroll-mt-24"
+                  >
+                    {text}
+                  </h2>
+                );
+              }
 
             // Handle empty lines
             if (paragraph.trim() === '') {
@@ -174,23 +212,30 @@ export default async function TastemakerPostPage({ params }: PageProps) {
               </p>
             );
           })}
+          </div>
+
+          {/* Table of Contents Sidebar */}
+          <aside className="lg:col-span-4">
+            <TableOfContents content={post.content} />
+          </aside>
         </div>
 
-        {/* Featured Restaurants - Enhanced */}
+        {/* Featured Restaurants - Inline Cards */}
         {post.restaurants && post.restaurants.length > 0 && (
-          <div className="mb-12 bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl p-8">
-            <div className="flex items-center justify-between mb-6">
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-3xl font-bold mb-2">Featured Restaurants</h2>
-                <p className="text-muted">Places mentioned in this article</p>
+                <h2 className="text-3xl font-bold mb-2">Featured in This Guide</h2>
+                <p className="text-muted">The {post.restaurants.length} restaurants you need to know</p>
               </div>
-              <span className="bg-primary text-white px-4 py-2 rounded-full font-bold text-sm">
-                {post.restaurants.length} spots
-              </span>
             </div>
-            <div className="space-y-4">
-              {post.restaurants.map((restaurant) => (
-                <RestaurantListItemCompact key={restaurant.id} restaurant={restaurant} />
+            <div>
+              {post.restaurants.map((restaurant, index) => (
+                <InlineRestaurantCard
+                  key={restaurant.id}
+                  restaurant={restaurant}
+                  rank={index + 1}
+                />
               ))}
             </div>
           </div>

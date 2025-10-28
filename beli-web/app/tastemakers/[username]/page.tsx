@@ -7,11 +7,11 @@ import { RestaurantListItemCompact } from '@/components/restaurant/restaurant-li
 import { IoCheckmarkCircle, IoLogoInstagram, IoLogoTwitter, IoGlobe } from 'react-icons/io5';
 
 interface PageProps {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }
 
 export default async function TastemakerProfilePage({ params }: PageProps) {
-  const { username } = params;
+  const { username } = await params;
 
   // Fetch tastemaker data
   const tastemaker = await MockDataService.getTastemakerByUsername(username);

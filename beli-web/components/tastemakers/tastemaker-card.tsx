@@ -34,7 +34,7 @@ export function TastemakerCard({ tastemaker }: TastemakerCardProps) {
             </div>
 
             {/* Engagement rate indicator */}
-            <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-bold text-primary shadow-sm">
+            <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-bold text-primary shadow-sm" suppressHydrationWarning>
               {profile.engagementRate.toFixed(1)}% engagement
             </div>
 
@@ -88,7 +88,7 @@ export function TastemakerCard({ tastemaker }: TastemakerCardProps) {
 
             {/* Stats - Visual grid */}
             <div className="grid grid-cols-3 gap-3 pt-4 border-t">
-              <div className="text-center">
+              <div className="text-center" suppressHydrationWarning>
                 <p className="font-bold text-lg text-primary">{tastemaker.stats.followers.toLocaleString()}</p>
                 <p className="text-xs text-muted">Followers</p>
               </div>

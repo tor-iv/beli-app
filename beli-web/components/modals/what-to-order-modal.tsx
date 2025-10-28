@@ -17,18 +17,15 @@ interface WhatToOrderModalProps {
 
 type Step = 'setup' | 'suggestions';
 
-const MEAL_TIMES: Array<{
-  value: MealTime;
-  icon: string;
-  label: string;
-  description: string;
-  color: string;
-}> = [
-  { value: 'breakfast', icon: '☀️', label: 'Breakfast', description: 'Morning eats', color: '#FFB340' },
-  { value: 'lunch', icon: '🌤️', label: 'Lunch', description: 'Midday meal', color: '#4A90E2' },
-  { value: 'dinner', icon: '🌙', label: 'Dinner', description: 'Evening dining', color: '#7C3AED' },
-  { value: 'any-time', icon: '🍽️', label: 'Any Time', description: 'No preference', color: '#0B7B7F' },
-];
+// Helper function to auto-detect meal time based on current hour
+const getMealTimeFromHour = (): MealTime => {
+  const hour = new Date().getHours();
+
+  if (hour >= 5 && hour < 11) return 'breakfast';
+  if (hour >= 11 && hour < 16) return 'lunch';
+  if (hour >= 16 && hour < 22) return 'dinner';
+  return 'any-time';
+};
 
 const HUNGER_LEVELS: Array<{
   value: HungerLevel;
@@ -45,7 +42,6 @@ const HUNGER_LEVELS: Array<{
 export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrderModalProps) {
   const [step, setStep] = useState<Step>('setup');
   const [partySize, setPartySize] = useState(2);
-  const [mealTime, setMealTime] = useState<MealTime>('any-time');
   const [hungerLevel, setHungerLevel] = useState<HungerLevel>('moderate');
   const [suggestion, setSuggestion] = useState<OrderSuggestion | null>(null);
   const [loading, setLoading] = useState(false);
@@ -53,7 +49,6 @@ export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrder
   const handleClose = () => {
     setStep('setup');
     setPartySize(2);
-    setMealTime('any-time');
     setHungerLevel('moderate');
     setSuggestion(null);
     onOpenChange(false);
@@ -62,11 +57,12 @@ export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrder
   const handleGenerateSuggestions = async () => {
     setLoading(true);
     try {
+      const detectedMealTime = getMealTimeFromHour();
       const result = await MockDataService.generateOrderSuggestion(
         restaurant.id,
         partySize,
         hungerLevel,
-        mealTime
+        detectedMealTime
       );
       setSuggestion(result);
       setStep('suggestions');
@@ -79,11 +75,12 @@ export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrder
 
   const handleShuffle = async () => {
     try {
+      const detectedMealTime = getMealTimeFromHour();
       const result = await MockDataService.generateOrderSuggestion(
         restaurant.id,
         partySize,
         hungerLevel,
-        mealTime
+        detectedMealTime
       );
       setSuggestion(result);
     } catch (error) {
@@ -145,34 +142,6 @@ export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrder
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
-              </div>
-            </div>
-
-            {/* Meal Time */}
-            <div>
-              <h3 className="font-semibold mb-4">What meal is this?</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {MEAL_TIMES.map(meal => (
-                  <Card
-                    key={meal.value}
-                    className={`cursor-pointer transition-all ${
-                      mealTime === meal.value
-                        ? 'border-2 shadow-md'
-                        : 'hover:shadow-sm'
-                    }`}
-                    style={{
-                      borderColor: mealTime === meal.value ? meal.color : undefined,
-                      backgroundColor: mealTime === meal.value ? `${meal.color}15` : undefined,
-                    }}
-                    onClick={() => setMealTime(meal.value)}
-                  >
-                    <CardContent className="p-4 text-center">
-                      <div className="text-3xl mb-1">{meal.icon}</div>
-                      <div className="font-semibold text-sm">{meal.label}</div>
-                      <div className="text-xs text-muted-foreground">{meal.description}</div>
-                    </CardContent>
-                  </Card>
-                ))}
               </div>
             </div>
 
