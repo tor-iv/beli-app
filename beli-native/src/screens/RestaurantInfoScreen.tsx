@@ -6,7 +6,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
 import { Screen, Text, Caption, Badge, LoadingSpinner, RestaurantScoreCard, Avatar } from '../components';
-import { AddRestaurantModal, RestaurantSubmissionData } from '../components/modals';
+import { AddRestaurantModal, RestaurantSubmissionData, WhatToOrderModal } from '../components/modals';
 import { colors, spacing, theme } from '../theme';
 import { MockDataService } from '../data/mockDataService';
 import type { Restaurant } from '../types';
@@ -16,10 +16,11 @@ type RestaurantInfoRouteProp = RouteProp<AppStackParamList, 'RestaurantInfo'>;
 type RestaurantInfoNavigationProp = StackNavigationProp<AppStackParamList, 'RestaurantInfo'>;
 
 const ACTION_BUTTONS: Array<{
-  key: 'website' | 'call' | 'directions';
+  key: 'website' | 'call' | 'directions' | 'order';
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
 }> = [
+  { key: 'order', icon: 'restaurant-outline', label: 'What to Order' },
   { key: 'website', icon: 'globe-outline', label: 'Website' },
   { key: 'call', icon: 'call-outline', label: 'Call' },
   { key: 'directions', icon: 'navigate-outline', label: 'Directions' },
@@ -126,6 +127,7 @@ const RestaurantInfoScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showOrderModal, setShowOrderModal] = useState(false);
 
   const scrollY = new Animated.Value(0);
 
@@ -194,8 +196,11 @@ const RestaurantInfoScreen: React.FC = () => {
     console.log('Bookmark pressed:', !isSaved);
   };
 
-  const handlePrimaryAction = (action: 'website' | 'call' | 'directions') => {
+  const handlePrimaryAction = (action: 'website' | 'call' | 'directions' | 'order') => {
     switch (action) {
+      case 'order':
+        setShowOrderModal(true);
+        break;
       case 'website':
         if (restaurant?.website) {
           console.log('Open website:', restaurant.website);
@@ -409,7 +414,8 @@ const RestaurantInfoScreen: React.FC = () => {
               const isDisabled =
                 (key === 'website' && !restaurant.website) ||
                 (key === 'call' && !restaurant.phone) ||
-                (key === 'directions' && !restaurant.location);
+                (key === 'directions' && !restaurant.location) ||
+                (key === 'order' && !restaurant.menu);
 
               return (
                 <Pressable
@@ -507,6 +513,15 @@ const RestaurantInfoScreen: React.FC = () => {
           restaurant={restaurant}
           onClose={() => setShowAddModal(false)}
           onSubmit={handleModalSubmit}
+        />
+      )}
+
+      {/* What to Order Modal */}
+      {restaurant && (
+        <WhatToOrderModal
+          visible={showOrderModal}
+          restaurant={restaurant}
+          onClose={() => setShowOrderModal(false)}
         />
       )}
     </View>
@@ -694,11 +709,12 @@ const styles = StyleSheet.create({
   },
   quickActionsRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     marginTop: 20,
     gap: 12,
   },
   quickActionButton: {
-    flex: 1,
+    minWidth: '47%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

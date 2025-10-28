@@ -79,25 +79,23 @@ export default function GroupDinnerScreen() {
   };
 
   const handleSwipeRight = (match: GroupDinnerMatch) => {
-    console.log('[PARENT] handleSwipeRight called', {
-      restaurant: match.restaurant.name,
-      currentSavedCount: savedRestaurants.length,
-    });
+    console.log('[GroupDinnerScreen] handleSwipeRight called:', match.restaurant.name);
+    console.log('[GroupDinnerScreen] Current savedRestaurants.length:', savedRestaurants.length);
+    console.log('[GroupDinnerScreen] Already saved?', savedRestaurants.find(r => r.restaurant.id === match.restaurant.id) ? 'YES' : 'NO');
 
     // Add to saved list if not already saved and under limit
     if (savedRestaurants.length < 3 && !savedRestaurants.find(r => r.restaurant.id === match.restaurant.id)) {
       const newSaved = [...savedRestaurants, match];
+      console.log('[GroupDinnerScreen] Adding restaurant. New count:', newSaved.length);
       setSavedRestaurants(newSaved);
-
-      console.log('[PARENT] Saved restaurant, new count:', newSaved.length);
 
       // If we now have 3, show selection screen
       if (newSaved.length === 3) {
-        console.log('[PARENT] ✅ Showing SelectionScreen!');
+        console.log('[GroupDinnerScreen] Reached 3 saved, showing selection screen');
         setShowSelectionScreen(true);
       }
     } else {
-      console.log('[PARENT] ❌ Cannot save - at limit or duplicate');
+      console.log('[GroupDinnerScreen] NOT adding - either at limit or already saved');
     }
   };
 

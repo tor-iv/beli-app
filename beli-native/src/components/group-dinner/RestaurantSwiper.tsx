@@ -36,19 +36,41 @@ export default function RestaurantSwiper({
   const [currentIndex, setCurrentIndex] = useState(0);
   const position = useRef(new Animated.ValueXY()).current;
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
-  const [localSavedCount, setLocalSavedCount] = useState(savedRestaurants.length);
-  const localSavedCountRef = useRef(localSavedCount);
 
-  // Sync local saved count with parent prop and update ref
+  // Track savedRestaurants in a ref so panResponder can access fresh value
+  const savedRestaurantsRef = useRef(savedRestaurants);
+
+  // Track callbacks in refs so panResponder can access fresh values
+  const onSwipeRightRef = useRef(onSwipeRight);
+  const onSwipeLeftRef = useRef(onSwipeLeft);
+
+  // Track current index in a ref to prevent race conditions with rapid swipes
+  const currentIndexRef = useRef(0);
+
+  // Track if a swipe is currently in progress
+  const isSwipingRef = useRef(false);
+
+  // Sync refs with prop changes
   useEffect(() => {
-    setLocalSavedCount(savedRestaurants.length);
-    localSavedCountRef.current = savedRestaurants.length;
-  }, [savedRestaurants.length]);
+    savedRestaurantsRef.current = savedRestaurants;
+    onSwipeRightRef.current = onSwipeRight;
+    onSwipeLeftRef.current = onSwipeLeft;
+  }, [savedRestaurants, onSwipeRight, onSwipeLeft]);
+
+  // Sync currentIndexRef with currentIndex state
+  useEffect(() => {
+    currentIndexRef.current = currentIndex;
+  }, [currentIndex]);
 
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderMove: (_, gesture) => {
+        // Block gesture if swipe in progress
+        if (isSwipingRef.current) {
+          return;
+        }
+
         position.setValue({ x: gesture.dx, y: 0 });
 
         // Set swipe direction for visual feedback
@@ -61,28 +83,18 @@ export default function RestaurantSwiper({
         }
       },
       onPanResponderRelease: (_, gesture) => {
+        // Block if swipe already in progress
+        if (isSwipingRef.current) {
+          return;
+        }
+
         if (gesture.dx > SWIPE_THRESHOLD) {
-          // Check if we can still save more restaurants
-          const currentMatch = matches[currentIndex % matches.length];
-          const isDuplicate = savedRestaurants.find(r => r.restaurant.id === currentMatch.restaurant.id);
-          const canSave = !isDuplicate && localSavedCountRef.current < 3;
-
-          console.log('[SWIPE CHECK]', {
-            restaurant: currentMatch.restaurant.name,
-            isDuplicate,
-            localCount: localSavedCountRef.current,
-            savedRestaurantsLength: savedRestaurants.length,
-            canSave,
-          });
-
-          if (canSave) {
-            // Allow swipe - will save and potentially trigger SelectionScreen
-            forceSwipe('right');
-          } else {
-            // At limit or duplicate - just reset position
-            console.log('[BLOCKED] Cannot save more restaurants');
+          // Block if already at limit (use ref to get fresh value)
+          if (savedRestaurantsRef.current.length >= 3) {
             resetPosition();
+            return;
           }
+          forceSwipe('right');
         } else if (gesture.dx < -SWIPE_THRESHOLD) {
           // Swipe left - pass
           forceSwipe('left');
@@ -95,50 +107,49 @@ export default function RestaurantSwiper({
   ).current;
 
   const forceSwipe = (direction: 'left' | 'right') => {
+    // Set swipe in progress flag to block concurrent swipes
+    isSwipingRef.current = true;
+
     const x = direction === 'right' ? SCREEN_WIDTH + 100 : -SCREEN_WIDTH - 100;
+    // Use ref to get current index and increment it immediately
+    const indexToProcess = currentIndexRef.current;
+
+    // Increment the ref immediately to prevent race conditions
+    currentIndexRef.current = indexToProcess + 1;
+
+    console.log('[RestaurantSwiper] Starting swipe. Processing index:', indexToProcess, 'Next index will be:', currentIndexRef.current);
+
     Animated.timing(position, {
       toValue: { x, y: 0 },
       duration: 250,
       useNativeDriver: false,
-    }).start(() => onSwipeComplete(direction));
+    }).start(() => onSwipeComplete(direction, indexToProcess));
   };
 
-  const onSwipeComplete = (direction: 'left' | 'right') => {
-    const match = matches[currentIndex % matches.length];
+  const onSwipeComplete = (direction: 'left' | 'right', indexToProcess: number) => {
+    const match = matches[indexToProcess];
+    console.log('[RestaurantSwiper] onSwipeComplete - processing index:', indexToProcess, 'Restaurant:', match?.restaurant.name);
 
-    // Update local count immediately for right swipes
+    // Let parent handle all validation and state updates
+    // Use refs to get fresh callback references
     if (direction === 'right') {
-      const isDuplicate = savedRestaurants.find(r => r.restaurant.id === match.restaurant.id);
-      const willSave = !isDuplicate && savedRestaurants.length < 3;
-
-      console.log('[SWIPE COMPLETE]', {
-        restaurant: match.restaurant.name,
-        isDuplicate,
-        savedRestaurantsLength: savedRestaurants.length,
-        willSave,
-      });
-
-      if (willSave) {
-        setLocalSavedCount(prev => {
-          const newCount = prev + 1;
-          localSavedCountRef.current = newCount;
-          console.log('[LOCAL COUNT UPDATED]', newCount);
-          return newCount;
-        });
-        onSwipeRight(match);
-      }
+      console.log('[RestaurantSwiper] Swipe right complete:', match.restaurant.name, 'Current saved count:', savedRestaurantsRef.current.length);
+      onSwipeRightRef.current(match);
     } else {
-      onSwipeLeft(match);
+      onSwipeLeftRef.current(match);
     }
 
     // Reset position and direction
     position.setValue({ x: 0, y: 0 });
     setSwipeDirection(null);
 
-    // Increment to next card after a brief delay to show counter update
-    setTimeout(() => {
-      setCurrentIndex(prev => prev + 1);
-    }, 50);
+    // Update state to match ref (for UI rendering)
+    const newIndex = indexToProcess + 1;
+    console.log('[RestaurantSwiper] Setting state currentIndex to:', newIndex);
+    setCurrentIndex(newIndex);
+
+    // Clear swipe in progress flag
+    isSwipingRef.current = false;
   };
 
   const resetPosition = () => {
@@ -150,22 +161,31 @@ export default function RestaurantSwiper({
   };
 
   const handlePass = () => {
+    // Block if swipe already in progress
+    if (isSwipingRef.current) {
+      return;
+    }
     forceSwipe('left');
   };
 
   const handleLock = () => {
-    // Check if we can still save more restaurants
-    const currentMatch = matches[currentIndex % matches.length];
-    const isDuplicate = savedRestaurants.find(r => r.restaurant.id === currentMatch.restaurant.id);
-    const canSave = !isDuplicate && localSavedCountRef.current < 3;
-
-    if (canSave) {
-      forceSwipe('right');
+    // Block if swipe already in progress
+    if (isSwipingRef.current) {
+      return;
     }
-    // Otherwise do nothing - at limit or duplicate
+    // Block if already at limit (use ref to get fresh value)
+    if (savedRestaurantsRef.current.length >= 3) {
+      return;
+    }
+    forceSwipe('right');
   };
 
   const handleShuffle = () => {
+    // Block if swipe in progress
+    if (isSwipingRef.current) {
+      return;
+    }
+
     // Animate a quick fade
     Animated.sequence([
       Animated.timing(position, {
@@ -179,13 +199,17 @@ export default function RestaurantSwiper({
         useNativeDriver: false,
       }),
     ]).start(() => {
+      // Reset both state and ref to beginning
+      currentIndexRef.current = 0;
+      setCurrentIndex(0);
       onShuffle();
     });
   };
 
-  // Loop through restaurants instead of showing empty state
-  const currentMatch = matches[currentIndex % matches.length];
-  const nextMatch = matches[(currentIndex + 1) % matches.length];
+  // Check if we've swiped through all cards
+  const hasMoreCards = currentIndex < matches.length;
+  const currentMatch = hasMoreCards ? matches[currentIndex] : null;
+  const nextMatch = currentIndex + 1 < matches.length ? matches[currentIndex + 1] : null;
 
   const rotateCard = position.x.interpolate({
     inputRange: [-SCREEN_WIDTH, 0, SCREEN_WIDTH],
@@ -206,56 +230,69 @@ export default function RestaurantSwiper({
 
   return (
     <View style={styles.container}>
-      {/* Cards Stack */}
-      <View style={styles.cardStack}>
-        {/* Next card (background) */}
-        {nextMatch && (
-          <View style={[styles.cardWrapper, styles.nextCard]}>
-            <GroupDinnerCard
-              key={nextMatch.restaurant.id}
-              match={nextMatch}
-              savedCount={localSavedCount}
-            />
-          </View>
-        )}
-
-        {/* Current card */}
-        <Animated.View
-          style={[styles.cardWrapper, animatedCardStyle]}
-          {...panResponder.panHandlers}
-        >
-          <GroupDinnerCard
-            key={currentMatch.restaurant.id}
-            match={currentMatch}
-            onViewDetails={() => onCardPress(currentMatch)}
-            savedCount={localSavedCount}
-          />
-
-          {/* Swipe direction labels */}
-          {swipeDirection === 'left' && (
-            <Animated.View
-              style={[
-                styles.swipeLabel,
-                styles.swipeLabelLeft,
-                { opacity: swipeLabelOpacity },
-              ]}
-            >
-              <Text style={styles.swipeLabelText}>PASS</Text>
-            </Animated.View>
+      {!hasMoreCards ? (
+        /* Empty state - no more cards */
+        <View style={styles.emptyContainer}>
+          <Ionicons name="checkmark-circle-outline" size={64} color={colors.primary} />
+          <Text style={styles.emptyTitle}>No more restaurants!</Text>
+          <Text style={styles.emptyText}>
+            You've swiped through all available matches. Click shuffle below to see restaurants again.
+          </Text>
+        </View>
+      ) : (
+        /* Cards Stack */
+        <View style={styles.cardStack}>
+          {/* Next card (background) */}
+          {nextMatch && (
+            <View style={[styles.cardWrapper, styles.nextCard]}>
+              <GroupDinnerCard
+                key={nextMatch.restaurant.id}
+                match={nextMatch}
+                savedCount={savedRestaurants.length}
+              />
+            </View>
           )}
-          {swipeDirection === 'right' && (
+
+          {/* Current card */}
+          {currentMatch && (
             <Animated.View
-              style={[
-                styles.swipeLabel,
-                styles.swipeLabelRight,
-                { opacity: swipeLabelOpacity },
-              ]}
+              style={[styles.cardWrapper, animatedCardStyle]}
+              {...panResponder.panHandlers}
             >
-              <Text style={styles.swipeLabelText}>SAVE</Text>
-            </Animated.View>
+              <GroupDinnerCard
+                key={currentMatch.restaurant.id}
+                match={currentMatch}
+                onViewDetails={() => onCardPress(currentMatch)}
+                savedCount={savedRestaurants.length}
+              />
+
+            {/* Swipe direction labels */}
+            {swipeDirection === 'left' && (
+              <Animated.View
+                style={[
+                  styles.swipeLabel,
+                  styles.swipeLabelLeft,
+                  { opacity: swipeLabelOpacity },
+                ]}
+              >
+                <Text style={styles.swipeLabelText}>PASS</Text>
+              </Animated.View>
+            )}
+            {swipeDirection === 'right' && (
+              <Animated.View
+                style={[
+                  styles.swipeLabel,
+                  styles.swipeLabelRight,
+                  { opacity: swipeLabelOpacity },
+                ]}
+              >
+                <Text style={styles.swipeLabelText}>SAVE</Text>
+              </Animated.View>
+            )}
+          </Animated.View>
           )}
-        </Animated.View>
-      </View>
+        </View>
+      )}
 
       {/* Action Buttons */}
       <View style={styles.actionBar}>
