@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLists } from '@/lib/hooks/use-lists';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -24,7 +24,7 @@ type ListType = 'been' | 'want_to_try' | 'recs';
 type ViewType = 'reserve' | 'nearby' | 'trending' | 'friends' | null;
 type RightPanelView = 'detail' | 'map';
 
-export default function ListsPage() {
+function ListsContent() {
   const searchParams = useSearchParams();
   const viewParam = searchParams.get('view') as ViewType;
 
@@ -306,5 +306,24 @@ export default function ListsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ListsPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">Your Lists</h1>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Skeleton key={i} className="h-48 w-full" />
+          ))}
+        </div>
+      </div>
+    }>
+      <ListsContent />
+    </Suspense>
   );
 }
