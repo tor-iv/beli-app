@@ -23,7 +23,7 @@ body {
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 
-/* Custom rating bubble */
+/* Custom rating bubble - matches native design */
 .rating-bubble {
   display: flex;
   align-items: center;
@@ -32,29 +32,25 @@ body {
   font-weight: 700;
   width: 44px;
   height: 44px;
-  font-size: 15px;
+  font-size: 14px;
   background-color: white;
-  border: 3px solid;
+  border: 1.5px solid #D9D9DE;
 }
 
-/* Rating color variants - bordered style */
+/* Rating color variants - text color only (border is always #D9D9DE) */
 .rating-excellent {
-  border-color: #22C55E;
   color: #22C55E;
 }
 
 .rating-good {
-  border-color: #84CC16;
   color: #84CC16;
 }
 
 .rating-average {
-  border-color: #F59E0B;
   color: #F59E0B;
 }
 
 .rating-poor {
-  border-color: #EF4444;
   color: #EF4444;
 }
 
