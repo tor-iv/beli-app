@@ -60,7 +60,7 @@ export default function FeedPage() {
       }
       // Top rated only filter
       if (filters.topRatedOnly && item.type === "review") {
-        const rating = item.details?.rating
+        const rating = item.rating
         if (!rating || rating < 9.0) {
           return false
         }

@@ -71,7 +71,7 @@ export function GroupDinnerCard({
         </h3>
 
         {/* Meta Row */}
-        <div className="flex items-center text-[15px] text-secondary mb-2">
+        <div className="flex items-center text-[15px] text-muted mb-2">
           <span>{restaurant.cuisine.join(", ")}</span>
           <span className="mx-1">•</span>
           <span>{restaurant.priceRange}</span>
@@ -91,7 +91,7 @@ export function GroupDinnerCard({
             </span>
           </div>
           {restaurant.ratingCount && (
-            <span className="text-[13px] text-secondary">
+            <span className="text-[13px] text-muted">
               ({restaurant.ratingCount} reviews)
             </span>
           )}

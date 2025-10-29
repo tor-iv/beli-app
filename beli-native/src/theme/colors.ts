@@ -20,6 +20,7 @@ export const colors = {
 
   // Background colors
   background: '#FAFAFA',     // Main app background
+  backgroundSecondary: '#F0F0F0', // Secondary background (slightly darker)
   cardBackground: '#FFFFFF', // Card backgrounds
   cardWhite: '#FFFFFF',      // Card white (alias for consistency)
   modalBackground: '#FFFFFF',

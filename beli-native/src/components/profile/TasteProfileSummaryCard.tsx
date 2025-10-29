@@ -147,6 +147,5 @@ const styles = StyleSheet.create({
     fontWeight: typography.weights.light,
     color: colors.white,
     textAlign: 'center',
-    fontFamily: 'serif',
   },
 });

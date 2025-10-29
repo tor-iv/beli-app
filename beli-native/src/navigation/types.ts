@@ -23,12 +23,15 @@ export type AppStackParamList = {
   Notifications: undefined;
   ReservationSharing: undefined;
   GroupDinner: undefined;
-  FeaturedLists: undefined;
+  Tastemakers: undefined;
   FeaturedListDetail: {
     listId: string;
   };
   UserProfile: {
     userId: string;
+  };
+  TastemakerPost: {
+    postId: string;
   };
 
   // Settings Screens

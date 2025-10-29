@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { MockDataService } from '@/lib/mockDataService';
-import { User, Review, Restaurant } from '@/types';
-import { notFound } from 'next/navigation';
+import { User, Review, Restaurant, CuisineBreakdown, CityBreakdown, CountryBreakdown } from '@/types';
+import { notFound, useRouter } from 'next/navigation';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,14 +11,30 @@ import { ProfileListRow } from '@/components/profile/profile-list-row';
 import { ProfileStatCard } from '@/components/profile/profile-stat-card';
 import { AchievementBanner } from '@/components/profile/achievement-banner';
 import { ProfileActivityCard } from '@/components/profile/profile-activity-card';
+import { TasteProfileSummaryCard } from '@/components/profile/taste-profile-summary-card';
+import { TasteProfileCategoryTabs, TasteProfileCategory } from '@/components/profile/taste-profile-category-tabs';
+import { TasteProfileList, SortOption } from '@/components/profile/taste-profile-list';
+import { DiningMap } from '@/components/profile/dining-map';
+import { useTasteProfile } from '@/lib/hooks/use-taste-profile';
 import { Instagram, Newspaper, BarChart3 } from 'lucide-react';
 
 export default function ProfilePage({ params }: { params: { username: string } }) {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'activity' | 'taste'>('activity');
   const [recentReviews, setRecentReviews] = useState<Review[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+
+  // Taste profile state
+  const [tasteCategory, setTasteCategory] = useState<TasteProfileCategory>('cuisines');
+  const [sortBy, setSortBy] = useState<SortOption>('count');
+
+  // Load taste profile data
+  const { data: tasteProfile, isLoading: tasteProfileLoading } = useTasteProfile(
+    user?.id || '',
+    30
+  );
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -63,6 +79,48 @@ export default function ProfilePage({ params }: { params: { username: string } }
 
   const formatMemberSince = (date: Date) => {
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  };
+
+  // Get current category data for taste profile
+  const getCurrentCategoryData = () => {
+    if (!tasteProfile) return [];
+
+    let data: Array<CuisineBreakdown | CityBreakdown | CountryBreakdown> = [];
+
+    switch (tasteCategory) {
+      case 'cuisines':
+        data = tasteProfile.cuisineBreakdown;
+        break;
+      case 'cities':
+        data = tasteProfile.cityBreakdown;
+        break;
+      case 'countries':
+        data = tasteProfile.countryBreakdown;
+        break;
+    }
+
+    // Sort data
+    return [...data].sort((a, b) => {
+      if (sortBy === 'count') {
+        return b.count - a.count;
+      } else {
+        return b.avgScore - a.avgScore;
+      }
+    });
+  };
+
+  const handleSortToggle = () => {
+    setSortBy(prev => prev === 'count' ? 'avgScore' : 'count');
+  };
+
+  const handleItemPress = (item: CuisineBreakdown | CityBreakdown | CountryBreakdown) => {
+    // In a real app, this would navigate to a filtered restaurant list
+    console.log('Item pressed:', item);
+  };
+
+  const handleShare = () => {
+    // In a real app, this would trigger share functionality
+    console.log('Share taste profile');
   };
 
   return (
@@ -141,20 +199,20 @@ export default function ProfilePage({ params }: { params: { username: string } }
             icon="check"
             label="Been"
             count={user.stats.beenCount}
-            onPress={() => {}}
+            onPress={() => router.push('/lists?tab=been')}
             isLast={false}
           />
           <ProfileListRow
             icon="bookmark"
             label="Want to Try"
             count={user.stats.wantToTryCount}
-            onPress={() => {}}
+            onPress={() => router.push('/lists?tab=want_to_try')}
             isLast={false}
           />
           <ProfileListRow
             icon="heart"
             label="Recs for You"
-            onPress={() => {}}
+            onPress={() => router.push('/lists?tab=recs')}
             isLast={true}
           />
         </div>
@@ -227,9 +285,60 @@ export default function ProfilePage({ params }: { params: { username: string } }
             </TabsContent>
 
             <TabsContent value="taste" className="mt-0">
-              <div className="bg-white py-12 text-center">
-                <p className="text-base text-gray-500">Taste Profile coming soon...</p>
-              </div>
+              {tasteProfileLoading ? (
+                <div className="bg-white py-12 text-center">
+                  <p className="text-base text-gray-500">Loading taste profile...</p>
+                </div>
+              ) : tasteProfile ? (
+                <div className="py-6 space-y-6">
+                  {/* Summary Card */}
+                  <div className="px-6">
+                    <TasteProfileSummaryCard
+                      stats={tasteProfile.last30Days}
+                      onShare={handleShare}
+                    />
+                  </div>
+
+                  {/* Dining Map */}
+                  <div className="px-6">
+                    <DiningMap
+                      locations={tasteProfile.diningLocations}
+                      totalCities={tasteProfile.totalCities}
+                      totalRestaurants={tasteProfile.totalRestaurants}
+                      onShare={handleShare}
+                    />
+                  </div>
+
+                  {/* Category Tabs */}
+                  <div className="px-6">
+                    <TasteProfileCategoryTabs
+                      activeCategory={tasteCategory}
+                      onCategoryChange={setTasteCategory}
+                    />
+                  </div>
+
+                  {/* Category List */}
+                  <div className="px-6">
+                    <TasteProfileList
+                      data={getCurrentCategoryData()}
+                      totalCount={
+                        tasteCategory === 'cuisines'
+                          ? tasteProfile.totalCuisines
+                          : tasteCategory === 'cities'
+                          ? tasteProfile.totalCities
+                          : tasteProfile.totalCountries
+                      }
+                      sortBy={sortBy}
+                      onSortPress={handleSortToggle}
+                      onItemPress={handleItemPress}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-white py-12 text-center">
+                  <p className="text-base text-gray-500">No taste profile data available</p>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>

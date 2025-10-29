@@ -171,6 +171,7 @@ export interface List {
   isPublic: boolean;
   category: ListCategory;
   listType: ListScope;
+  thumbnailImage?: string; // optional thumbnail for featured lists
   createdAt: Date;
   updatedAt: Date;
 }
@@ -340,4 +341,55 @@ export interface GroupDinnerMatch {
     date: string;
     timeSlot: string;
   };
+}
+
+// Taste Profile types
+export interface CuisineBreakdown {
+  cuisine: string;
+  count: number;
+  avgScore: number;
+  restaurantIds: string[];
+}
+
+export interface CityBreakdown {
+  city: string;
+  state?: string;
+  count: number;
+  avgScore: number;
+  restaurantIds: string[];
+}
+
+export interface CountryBreakdown {
+  country: string;
+  count: number;
+  avgScore: number;
+  restaurantIds: string[];
+}
+
+export interface DiningLocation {
+  city: string;
+  country: string;
+  state?: string;
+  lat: number;
+  lng: number;
+  restaurantIds: string[];
+}
+
+export interface Last30DaysStats {
+  restaurantsCount: number;
+  cuisinesCount: number;
+  activityPercentile: number; // e.g., 96 means "Top 4%"
+  primaryLocation: string; // e.g., "New York"
+}
+
+export interface TasteProfileStats {
+  last30Days: Last30DaysStats;
+  cuisineBreakdown: CuisineBreakdown[];
+  cityBreakdown: CityBreakdown[];
+  countryBreakdown: CountryBreakdown[];
+  diningLocations: DiningLocation[];
+  totalRestaurants: number;
+  totalCities: number;
+  totalCountries: number;
+  totalCuisines: number;
 }

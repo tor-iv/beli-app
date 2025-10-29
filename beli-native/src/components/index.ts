@@ -33,3 +33,6 @@ export * from './challenge';
 
 // Profile components
 export * from './profile';
+
+// Tastemaker components
+export * from './tastemakers';

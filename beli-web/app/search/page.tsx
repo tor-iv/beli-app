@@ -2,14 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { EmptyState } from '@/components/ui/empty-state';
+import { MatchPercentageBadge } from '@/components/ui/match-percentage-badge';
 import { useSearchRestaurants } from '@/lib/hooks/use-restaurants';
-import { useSearchUsers } from '@/lib/hooks/use-users';
+import { useSearchUsers, useUserMatchPercentage } from '@/lib/hooks/use-users';
+import { useUser } from '@/lib/hooks/use-user';
 import { RestaurantCard } from '@/components/restaurant/restaurant-card';
 import { RestaurantListItemCompact } from '@/components/restaurant/restaurant-list-item-compact';
 import { RestaurantDetailPreview } from '@/components/restaurant/restaurant-detail-preview';
 import { UserCard } from '@/components/social/user-card';
 import { UserPreview } from '@/components/social/user-preview';
-import { IoSearch, IoLocationSharp, IoClose, IoTime } from 'react-icons/io5';
+import { Search, MapPin, X, Clock, Store, Users, Calendar, Heart, TrendingUp } from 'lucide-react';
 import { MockDataService } from '@/lib/mockDataService';
 import { RecentSearch } from '@/data/mock/recentSearches';
 import { cn } from '@/lib/utils';
@@ -19,10 +23,67 @@ import type { Restaurant, User } from '@/types';
 type SearchTab = 'restaurants' | 'members';
 
 const filterChips = [
-  { id: 'reserve', label: 'Reserve now', icon: '📅' },
-  { id: 'recs', label: 'Recs', icon: '❤️' },
-  { id: 'trending', label: 'Trending', icon: '📈' },
+  { id: 'reserve', label: 'Reserve now', icon: Calendar },
+  { id: 'recs', label: 'Recs', icon: Heart },
+  { id: 'trending', label: 'Trending', icon: TrendingUp },
 ];
+
+// Wrapper component to fetch and display user card with match percentage
+function UserCardWithMatch({ user, currentUserId }: { user: User; currentUserId: string }) {
+  const { data: matchPercentage } = useUserMatchPercentage(currentUserId, user.id);
+
+  return <UserCard user={user} matchPercentage={matchPercentage} />;
+}
+
+// Desktop user list item with match percentage
+function UserListItem({
+  user,
+  currentUserId,
+  isSelected,
+  onClick
+}: {
+  user: User;
+  currentUserId: string;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
+  const { data: matchPercentage } = useUserMatchPercentage(currentUserId, user.id);
+
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        'w-full text-left p-4 transition-all border-b border-gray-100',
+        'hover:bg-gray-50 cursor-pointer',
+        isSelected && 'bg-primary/5'
+      )}
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
+          {user.avatar && (
+            <img
+              src={user.avatar}
+              alt={user.displayName}
+              className="w-full h-full object-cover"
+            />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold truncate">{user.displayName}</h3>
+            {matchPercentage !== undefined && (
+              <MatchPercentageBadge percentage={matchPercentage} variant="compact" />
+            )}
+          </div>
+          <p className="text-sm text-muted truncate">@{user.username}</p>
+        </div>
+        <div className="text-sm text-muted flex-shrink-0">
+          {user.stats.beenCount} been
+        </div>
+      </div>
+    </button>
+  );
+}
 
 export default function SearchPage() {
   const [activeTab, setActiveTab] = useState<SearchTab>('restaurants');
@@ -33,6 +94,7 @@ export default function SearchPage() {
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
+  const { data: currentUser } = useUser('1'); // Current user ID
   const { data: restaurantResults, isLoading: restaurantsLoading } = useSearchRestaurants(query);
   const { data: userResults, isLoading: usersLoading } = useSearchUsers(query);
 
@@ -93,7 +155,7 @@ export default function SearchPage() {
             )}
           >
             <div className="flex items-center gap-2">
-              <span className="text-xl">🏪</span>
+              <Store className="w-5 h-5" />
               <span>Restaurants</span>
             </div>
             {activeTab === 'restaurants' && (
@@ -111,7 +173,7 @@ export default function SearchPage() {
             )}
           >
             <div className="flex items-center gap-2">
-              <span className="text-xl">👥</span>
+              <Users className="w-5 h-5" />
               <span>Members</span>
             </div>
             {activeTab === 'members' && (
@@ -122,7 +184,7 @@ export default function SearchPage() {
 
         {/* Search Input */}
         <div className="relative mb-4">
-          <IoSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
           <Input
             type="search"
             placeholder={
@@ -139,7 +201,7 @@ export default function SearchPage() {
         {/* Location Input (only for restaurants) */}
         {activeTab === 'restaurants' && (
           <div className="relative mb-4">
-            <IoLocationSharp className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
             <Input
               type="text"
               placeholder="Location"
@@ -152,7 +214,7 @@ export default function SearchPage() {
                 onClick={() => setLocation('Current Location')}
                 className="absolute right-3 top-1/2 -translate-y-1/2"
               >
-                <IoClose className="w-5 h-5 text-muted hover:text-foreground" />
+                <X className="w-5 h-5 text-muted hover:text-foreground" />
               </button>
             )}
           </div>
@@ -161,41 +223,48 @@ export default function SearchPage() {
         {/* Filter Chips (only for restaurants) */}
         {activeTab === 'restaurants' && (
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-            {filterChips.map((chip) => (
-              <button
-                key={chip.id}
-                onClick={() => toggleFilter(chip.id)}
-                className={cn(
-                  'flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors',
-                  selectedFilters.includes(chip.id)
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                )}
-              >
-                <span>{chip.icon}</span>
-                <span>{chip.label}</span>
-              </button>
-            ))}
+            {filterChips.map((chip) => {
+              const IconComponent = chip.icon;
+              return (
+                <button
+                  key={chip.id}
+                  onClick={() => toggleFilter(chip.id)}
+                  className={cn(
+                    'flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors',
+                    selectedFilters.includes(chip.id)
+                      ? 'bg-primary text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  )}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  <span>{chip.label}</span>
+                </button>
+              );
+            })}
           </div>
         )}
 
         {/* Results / Recent Searches */}
-        {isLoading && <div className="text-center py-8 text-muted">Searching...</div>}
+        {isLoading && (
+          <div className="py-12">
+            <LoadingSpinner size="lg" text="Searching..." />
+          </div>
+        )}
 
         {!query && activeTab === 'restaurants' && recentSearches.length > 0 && (
           <div className="mb-6 max-w-4xl">
             <h2 className="text-lg font-semibold mb-4">Recents</h2>
-            <div className="space-y-3">
+            <div className="divide-y divide-gray-100">
               {recentSearches.map((search) => (
                 <div
                   key={search.id}
-                  className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
+                  className="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors"
                 >
                   <Link
                     href={`/restaurant/${search.restaurantId}`}
                     className="flex items-start gap-3 flex-1"
                   >
-                    <IoTime className="w-5 h-5 text-muted mt-0.5" />
+                    <Clock className="w-5 h-5 text-muted mt-0.5 flex-shrink-0" />
                     <div>
                       <h3 className="font-medium">{search.restaurantName}</h3>
                       <p className="text-sm text-muted">{search.location}</p>
@@ -203,9 +272,9 @@ export default function SearchPage() {
                   </Link>
                   <button
                     onClick={() => handleClearRecent(search.id)}
-                    className="p-1 hover:bg-gray-200 rounded transition-colors"
+                    className="p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
                   >
-                    <IoClose className="w-5 h-5 text-muted" />
+                    <X className="w-5 h-5 text-muted" />
                   </button>
                 </div>
               ))}
@@ -221,13 +290,15 @@ export default function SearchPage() {
                 ? restaurantResults?.map((restaurant) => (
                     <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                   ))
-                : userResults?.map((user) => <UserCard key={user.id} user={user} />)}
+                : userResults?.map((user) => (
+                    <UserCardWithMatch key={user.id} user={user} currentUserId={currentUser?.id || '1'} />
+                  ))}
             </div>
 
             {/* Desktop: Master/Detail layout */}
             <div className="hidden md:grid md:grid-cols-[2fr_3fr] gap-6">
               {/* Master: List of results */}
-              <div className="space-y-2 overflow-auto max-h-[calc(100vh-300px)]">
+              <div className="border border-gray-200 rounded-lg overflow-hidden bg-white max-h-[calc(100vh-300px)] overflow-y-auto">
                 {activeTab === 'restaurants'
                   ? restaurantResults?.map((restaurant) => (
                       <RestaurantListItemCompact
@@ -238,36 +309,13 @@ export default function SearchPage() {
                       />
                     ))
                   : userResults?.map((user) => (
-                      <button
+                      <UserListItem
                         key={user.id}
+                        user={user}
+                        currentUserId={currentUser?.id || '1'}
+                        isSelected={selectedUser?.id === user.id}
                         onClick={() => setSelectedUser(user)}
-                        className={cn(
-                          'w-full text-left p-4 rounded-lg transition-all border',
-                          'hover:bg-gray-50 cursor-pointer',
-                          selectedUser?.id === user.id
-                            ? 'bg-primary/5 border-primary shadow-sm'
-                            : 'border-transparent'
-                        )}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
-                            {user.avatar && (
-                              <img
-                                src={user.avatar}
-                                alt={user.displayName}
-                                className="w-full h-full object-cover"
-                              />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold truncate">{user.displayName}</h3>
-                            <p className="text-sm text-muted truncate">@{user.username}</p>
-                          </div>
-                          <div className="text-sm text-muted">
-                            {user.stats.beenCount} been
-                          </div>
-                        </div>
-                      </button>
+                      />
                     ))}
               </div>
 
@@ -292,21 +340,27 @@ export default function SearchPage() {
         )}
 
         {query && results?.length === 0 && !isLoading && (
-          <div className="text-center py-12 text-muted">
-            No {activeTab} found for &quot;{query}&quot;
-          </div>
+          <EmptyState
+            icon={activeTab === 'restaurants' ? <Store className="w-16 h-16 text-muted" /> : <Users className="w-16 h-16 text-muted" />}
+            title={`No ${activeTab} found`}
+            description={`No results for "${query}"`}
+          />
         )}
 
         {!query && activeTab === 'members' && (
-          <div className="text-center py-12 text-muted">
-            Start typing to search for members
-          </div>
+          <EmptyState
+            icon={<Search className="w-16 h-16 text-muted" />}
+            title="Search for members"
+            description="Start typing to search for members by name or username"
+          />
         )}
 
         {!query && activeTab === 'restaurants' && recentSearches.length === 0 && (
-          <div className="text-center py-12 text-muted">
-            Start typing to search for restaurants
-          </div>
+          <EmptyState
+            icon={<Search className="w-16 h-16 text-muted" />}
+            title="Search for restaurants"
+            description="Start typing to search for restaurants, cuisines, or occasions"
+          />
         )}
       </div>
     </div>

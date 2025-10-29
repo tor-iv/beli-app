@@ -62,7 +62,7 @@ function RestaurantOptionCard({
         </h3>
 
         {/* Meta Row */}
-        <div className="flex items-center text-sm text-secondary mb-2">
+        <div className="flex items-center text-sm text-muted mb-2">
           <span>{restaurant.cuisine.join(", ")}</span>
           <span className="mx-1">•</span>
           <span>{restaurant.priceRange}</span>
@@ -82,7 +82,7 @@ function RestaurantOptionCard({
             </span>
           </div>
           {restaurant.ratingCount && (
-            <span className="text-xs text-secondary">
+            <span className="text-xs text-muted">
               ({restaurant.ratingCount} reviews)
             </span>
           )}
@@ -143,7 +143,7 @@ export function SelectionScreen({
       <div className="bg-white px-4 py-6 border-b sticky top-0 z-10">
         <CheckCircle className="h-12 w-12 text-primary mx-auto mb-3" />
         <h1 className="text-2xl font-bold text-center">Choose Your Spot!</h1>
-        <p className="text-base text-secondary text-center mt-2">
+        <p className="text-base text-muted text-center mt-2">
           You've saved {savedRestaurants.length} great options
         </p>
       </div>

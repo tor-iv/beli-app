@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Restaurant, Coffee, Cake, IceCream, MoreHorizontal, Users, Tag, Edit, Camera, Calendar, Lock, ChevronRight, Check, ChevronDown } from "lucide-react"
+import { Utensils, Coffee, Cake, IceCream, MoreHorizontal, Users, Tag, Edit, Camera, Calendar, Lock, ChevronRight, Check, ChevronDown } from "lucide-react"
 import {
   BottomSheet,
   BottomSheetContent,
@@ -40,7 +40,7 @@ const RATING_OPTIONS = [
 ]
 
 const LIST_TYPE_OPTIONS = [
-  { key: "restaurants" as const, label: "Restaurants", icon: Restaurant },
+  { key: "restaurants" as const, label: "Restaurants", icon: Utensils },
   { key: "bars" as const, label: "Bars", icon: Coffee },
   { key: "bakeries" as const, label: "Bakeries", icon: Cake },
   { key: "coffee_tea" as const, label: "Coffee & Tea", icon: Coffee },
@@ -75,7 +75,7 @@ export function AddRestaurantModal({
   }
 
   const selectedListType = LIST_TYPE_OPTIONS.find((opt) => opt.key === listType)
-  const SelectedIcon = selectedListType?.icon || Restaurant
+  const SelectedIcon = selectedListType?.icon || Utensils
 
   return (
     <>
@@ -168,7 +168,7 @@ export function AddRestaurantModal({
                 </button>
 
                 <button className="flex items-center w-full py-3 border-b border-gray-200 gap-3">
-                  <Restaurant className="h-5 w-5 text-foreground flex-shrink-0" />
+                  <Utensils className="h-5 w-5 text-foreground flex-shrink-0" />
                   <span className="flex-1 text-left text-base text-foreground">
                     Add favorite dishes
                   </span>

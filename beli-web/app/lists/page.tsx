@@ -27,8 +27,9 @@ type RightPanelView = 'detail' | 'map';
 function ListsContent() {
   const searchParams = useSearchParams();
   const viewParam = searchParams.get('view') as ViewType;
+  const tabParam = searchParams.get('tab') as ListType | null;
 
-  const [activeTab, setActiveTab] = useState<ListType>('been');
+  const [activeTab, setActiveTab] = useState<ListType>(tabParam || 'been');
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [viewRestaurants, setViewRestaurants] = useState<Restaurant[] | null>(null);
   const [loadingView, setLoadingView] = useState(false);
@@ -36,6 +37,13 @@ function ListsContent() {
   const [visibleRestaurants, setVisibleRestaurants] = useState<Restaurant[]>([]);
   const { data: lists, isLoading: listsLoading } = useLists();
   const { data: allRestaurants } = useRestaurants();
+
+  // Sync activeTab with URL parameter
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
 
   // Load restaurants based on view parameter
   useEffect(() => {

@@ -8,7 +8,7 @@ import { RestaurantSwiper } from "@/components/group-dinner/restaurant-swiper"
 import { SelectionScreen } from "@/components/group-dinner/selection-screen"
 import { ConfirmationModal } from "@/components/group-dinner/confirmation-modal"
 import { ParticipantSelector } from "@/components/group-dinner/participant-selector"
-import { Avatar } from "@/components/ui/avatar"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import type { User, GroupDinnerMatch } from "@/types"
 
 export default function GroupDinnerPage() {
@@ -133,7 +133,16 @@ export default function GroupDinnerPage() {
       <div className="hidden md:block bg-white px-6 py-4 border-b flex-shrink-0">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold">Group Dinner</h1>
-          <p className="text-secondary mt-1">Find the perfect restaurant for your group</p>
+          <p className="text-muted mt-1">
+            Find the perfect restaurant for your group • Use{" "}
+            <kbd className="px-1.5 py-0.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded">
+              ←
+            </kbd>{" "}
+            <kbd className="px-1.5 py-0.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded">
+              →
+            </kbd>{" "}
+            to swipe
+          </p>
         </div>
       </div>
 
@@ -151,18 +160,16 @@ export default function GroupDinnerPage() {
                 <p className="text-sm font-semibold text-primary">
                   Dining with {selectedParticipants.length} {selectedParticipants.length === 1 ? "person" : "people"}
                 </p>
-                <p className="text-xs text-secondary">
+                <p className="text-xs text-muted">
                   {selectedParticipants.map(p => p.displayName).join(", ")}
                 </p>
               </div>
               <div className="flex -space-x-2">
                 {selectedParticipants.slice(0, 3).map((user) => (
-                  <Avatar
-                    key={user.id}
-                    src={user.avatar}
-                    alt={user.displayName}
-                    className="h-8 w-8 border-2 border-white"
-                  />
+                  <Avatar key={user.id} className="h-8 w-8 border-2 border-white">
+                    <AvatarImage src={user.avatar} alt={user.displayName} />
+                    <AvatarFallback>{user.displayName[0]}</AvatarFallback>
+                  </Avatar>
                 ))}
                 {selectedParticipants.length > 3 && (
                   <div className="h-8 w-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center">
@@ -189,7 +196,7 @@ export default function GroupDinnerPage() {
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-secondary">Finding perfect matches...</p>
+              <p className="text-muted">Finding perfect matches...</p>
             </div>
           </div>
         ) : showSelectionScreen ? (

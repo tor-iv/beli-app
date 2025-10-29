@@ -10,6 +10,8 @@ export interface User {
   dietaryRestrictions: string[];
   dislikedCuisines: string[];
   memberSince: Date;
+  isTastemaker?: boolean;
+  tastemakerProfile?: TastemakerProfile;
 }
 
 export interface UserStats {
@@ -331,4 +333,62 @@ export interface TasteProfileStats {
   totalCities: number;
   totalCountries: number;
   totalCuisines: number;
+}
+
+// Tastemaker types
+export type TastemakerBadgeType =
+  | 'verified'
+  | 'pizza_expert'
+  | 'michelin_hunter'
+  | 'budget_guru'
+  | 'vegan_queen'
+  | 'fine_dining_specialist'
+  | 'street_food_explorer'
+  | 'brunch_master'
+  | 'dessert_connoisseur'
+  | 'ramen_specialist'
+  | 'wine_expert';
+
+export interface TastemakerBadge {
+  type: TastemakerBadgeType;
+  label: string;
+  color: string;
+  icon?: string;
+}
+
+export interface TastemakerProfile {
+  specialty: string;
+  tagline: string;
+  badges: TastemakerBadge[];
+  featuredListsCount: number;
+  totalPosts: number;
+  engagementRate: number;
+  verifiedSince?: Date;
+  socialLinks?: {
+    instagram?: string;
+    twitter?: string;
+    website?: string;
+  };
+}
+
+export interface TastemakerPost {
+  id: string;
+  userId: string;
+  user?: User;
+  title: string;
+  subtitle?: string;
+  coverImage: string;
+  content: string;
+  restaurantIds: string[];
+  restaurants?: Restaurant[];
+  listIds?: string[];
+  tags: string[];
+  publishedAt: Date;
+  updatedAt: Date;
+  interactions: {
+    likes: string[];
+    bookmarks: string[];
+    views: number;
+  };
+  isFeatured: boolean;
 }

@@ -17,7 +17,7 @@ import { MockDataService } from '../data/mockDataService';
 import type { User, Review, Restaurant } from '../types';
 import type { AppStackParamList } from '../navigation/types';
 
-type TabId = 'activity' | 'taste';
+type TabId = 'activity' | 'taste' | 'curated';
 type UserProfileScreenRouteProp = RouteProp<AppStackParamList, 'UserProfile'>;
 type UserProfileScreenNavigationProp = StackNavigationProp<AppStackParamList>;
 
@@ -105,10 +105,17 @@ export default function UserProfileScreen() {
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   };
 
-  const tabs = [
-    { id: 'activity', label: 'Recent Activity', icon: 'newspaper' as const },
-    { id: 'taste', label: 'Taste Profile', icon: 'stats-chart' as const },
-  ];
+  // Conditionally add 'Curated Lists' tab for tastemakers
+  const tabs = user.isTastemaker
+    ? [
+        { id: 'activity', label: 'Recent Activity', icon: 'newspaper' as const },
+        { id: 'taste', label: 'Taste Profile', icon: 'stats-chart' as const },
+        { id: 'curated', label: 'Curated Lists', icon: 'list' as const },
+      ]
+    : [
+        { id: 'activity', label: 'Recent Activity', icon: 'newspaper' as const },
+        { id: 'taste', label: 'Taste Profile', icon: 'stats-chart' as const },
+      ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -240,6 +247,14 @@ export default function UserProfileScreen() {
           {activeTab === 'taste' && (
             <View style={styles.emptyState}>
               <Text style={styles.emptyText}>Taste profile coming soon</Text>
+            </View>
+          )}
+
+          {activeTab === 'curated' && user.isTastemaker && (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>
+                Curated lists by {user.displayName} coming soon
+              </Text>
             </View>
           )}
         </View>

@@ -184,25 +184,26 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
+            background: #FFFFFF;
+            border: 1.5px solid #D9D9DE;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: var(--font-base);
             font-weight: 700;
-            color: var(--white);
             flex-shrink: 0;
         }
 
         .rating-excellent {
-            background: var(--rating-excellent);
+            color: #22C55E;
         }
 
         .rating-good {
-            background: var(--rating-good);
+            color: #84CC16;
         }
 
         .rating-average {
-            background: var(--rating-average);
+            color: #F59E0B;
         }
 
         /* Achievements list */
@@ -257,12 +258,13 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
+            background: #FFFFFF;
+            border: 1.5px solid #D9D9DE;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: var(--font-base);
             font-weight: 700;
-            color: var(--white);
             margin-bottom: var(--spacing-sm);
         }
 
@@ -339,12 +341,12 @@
         }
 
         .match-badge {
-            background: var(--rating-excellent);
-            color: var(--white);
-            padding: var(--spacing-xs) var(--spacing-md);
-            border-radius: var(--radius-full);
+            background: rgba(0, 166, 118, 0.1);
+            color: #00A676;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
             font-size: var(--font-sm);
-            font-weight: 700;
+            font-weight: 600;
         }
 
         .project-description {
@@ -362,6 +364,23 @@
             font-size: var(--font-base);
             color: var(--text-primary);
             line-height: 1.6;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+            box-shadow: 0 2px 8px var(--shadow);
+            border-left: 3px solid var(--primary);
+        }
+
+        .disclaimer p {
+            font-size: var(--font-sm);
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin: 0;
         }
 
         /* Print styles */
@@ -463,6 +482,8 @@
                 width: 28px;
                 height: 28px;
                 font-size: 10px;
+                background: #FFFFFF !important;
+                border: 1.5px solid #D9D9DE !important;
             }
 
             /* Compact achievements */
@@ -526,6 +547,8 @@
                 height: 24px;
                 font-size: 9px;
                 margin-bottom: 3px;
+                background: #FFFFFF !important;
+                border: 1.5px solid #D9D9DE !important;
             }
 
             .skill-name {
@@ -552,7 +575,9 @@
 
             .match-badge {
                 font-size: 8px;
-                padding: 1px 5px;
+                padding: 1px 4px;
+                background: rgba(0, 166, 118, 0.15) !important;
+                color: #00A676 !important;
             }
 
             .project-description {
@@ -567,6 +592,20 @@
                 line-height: 1.3;
                 box-shadow: none;
                 border: 1px solid var(--border-light);
+            }
+
+            /* Compact disclaimer for print */
+            .disclaimer {
+                padding: 4px 8px;
+                margin-top: 5px;
+                box-shadow: none;
+                border: 1px solid var(--border-light);
+                border-left: 2px solid var(--primary);
+            }
+
+            .disclaimer p {
+                font-size: 7px;
+                line-height: 1.3;
             }
 
             /* Remove hover effects */
@@ -613,6 +652,7 @@
             <a href="https://www.linkedin.com/in/tor-iv/">LinkedIn</a>
             <a href="https://github.com/tor-iv">GitHub</a>
             <a href="https://tor-iv.com">Portfolio</a>
+            <a href="https://github.com/tor-iv/beli-app">Take Home</a>
             <a href="#">beli: tor_iv</a>
         </div>
     </div>
@@ -753,7 +793,7 @@
 
     <div class="project-card">
         <div class="project-header">
-            <div class="project-name">tor-chinese</div>
+            <div class="project-name">Hanzi a day</div>
             <div class="match-badge">95% Match</div>
         </div>
         <div class="project-description">
@@ -785,7 +825,12 @@
     <h2 class="section-header">Beyond Code</h2>
 
     <div class="hobbies-list">
-        Ceramics and pottery • Baking/Cooking • Fantasy/Sci-fi • Chinese (Language) • Yo-yo • Travel • Eating • Rec Sports • Urban Planning • Climbing • Lifting
+        Ceramics and pottery • Baking/Cooking • Fantasy/Sci-fi • Chinese (Language) (Very Bad at it) • Yo-yo • Travel • Eating • Rec Sports • Urban Planning • Climbing • Lifting
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+        <p>* Ratings are playful self-assessments inspired by restaurant reviews, not actual performance metrics. They reflect enthusiasm and comfort level rather than objective skill measurements.</p>
     </div>
 </body>
 </html>

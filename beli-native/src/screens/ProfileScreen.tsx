@@ -231,20 +231,29 @@ export default function ProfileScreen() {
             icon="checkmark-circle"
             label="Been"
             count={user.stats.beenCount}
-            onPress={() => {}}
+            onPress={() => navigation.navigate('Tabs', {
+              screen: 'Lists',
+              params: { initialTab: 'been' }
+            })}
             isLast={false}
           />
           <ProfileListRow
             icon="bookmark"
             label="Want to Try"
             count={user.stats.wantToTryCount}
-            onPress={() => {}}
+            onPress={() => navigation.navigate('Tabs', {
+              screen: 'Lists',
+              params: { initialTab: 'want' }
+            })}
             isLast={false}
           />
           <ProfileListRow
             icon="heart"
             label="Recs for You"
-            onPress={() => {}}
+            onPress={() => navigation.navigate('Tabs', {
+              screen: 'Lists',
+              params: { initialTab: 'recs_for_you' }
+            })}
             isLast={true}
           />
         </View>

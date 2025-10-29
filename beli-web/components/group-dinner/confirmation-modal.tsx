@@ -17,7 +17,7 @@ import {
   BottomSheetContent,
 } from "@/components/ui/bottom-sheet"
 import { Button } from "@/components/ui/button"
-import { Avatar } from "@/components/ui/avatar"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import type { GroupDinnerMatch, User } from "@/types"
 
@@ -176,11 +176,10 @@ export function ConfirmationModal({
                     key={user.id}
                     className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1"
                   >
-                    <Avatar
-                      src={user.avatar}
-                      alt={user.displayName}
-                      className="h-6 w-6"
-                    />
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={user.avatar} alt={user.displayName} />
+                      <AvatarFallback>{user.displayName[0]}</AvatarFallback>
+                    </Avatar>
                     <span className="text-sm">{user.displayName}</span>
                   </div>
                 ))}

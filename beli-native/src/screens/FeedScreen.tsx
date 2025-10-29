@@ -309,12 +309,12 @@ export default function FeedScreen() {
         </Pressable>
       )}
 
-      {/* Featured Lists */}
+      {/* Tastemakers */}
       {featuredLists.length > 0 && (
         <View style={styles.featuredSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>FEATURED LISTS</Text>
-            <Pressable onPress={() => navigation.navigate('FeaturedLists')}>
+            <Text style={styles.sectionTitle}>TASTEMAKERS</Text>
+            <Pressable onPress={() => navigation.navigate('Tastemakers')}>
               <Text style={styles.seeAllText}>See all</Text>
             </Pressable>
           </View>

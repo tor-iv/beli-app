@@ -7,9 +7,10 @@ import ChallengeGoalScreen from '../screens/ChallengeGoalScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import ReservationSharingScreen from '../screens/ReservationSharingScreen';
 import GroupDinnerScreen from '../screens/GroupDinnerScreen';
-import FeaturedListsScreen from '../screens/FeaturedListsScreen';
+import TastemakersScreen from '../screens/TastemakersScreen';
 import FeaturedListDetailScreen from '../screens/FeaturedListDetailScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
+import TastemakerPostScreen from '../screens/TastemakerPostScreen';
 
 // Settings Screens
 import SettingsHubScreen from '../screens/SettingsHubScreen';
@@ -77,8 +78,8 @@ const AppNavigator: React.FC = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="FeaturedLists"
-        component={FeaturedListsScreen}
+        name="Tastemakers"
+        component={TastemakersScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -89,6 +90,11 @@ const AppNavigator: React.FC = () => {
       <Stack.Screen
         name="UserProfile"
         component={UserProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TastemakerPost"
+        component={TastemakerPostScreen}
         options={{ headerShown: false }}
       />
 

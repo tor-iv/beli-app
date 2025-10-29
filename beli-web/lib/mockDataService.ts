@@ -42,6 +42,60 @@ export class MockDataService {
     return user?.stats || null;
   }
 
+  static async getUserMatchPercentage(userId: string, targetUserId: string): Promise<number> {
+    await delay();
+
+    // Get both users' restaurant relations
+    const userRelations = mockUserRestaurantRelations.filter(
+      rel => rel.userId === userId && (rel.status === 'been' || rel.status === 'want_to_try')
+    );
+    const targetRelations = mockUserRestaurantRelations.filter(
+      rel => rel.userId === targetUserId && (rel.status === 'been' || rel.status === 'want_to_try')
+    );
+
+    if (userRelations.length === 0 || targetRelations.length === 0) {
+      // Return a baseline match percentage (30-50%) if either user has no data
+      return Math.floor(Math.random() * 21) + 30; // Random between 30-50
+    }
+
+    // Calculate overlap in restaurants
+    const userRestaurantIds = new Set(userRelations.map(rel => rel.restaurantId));
+    const targetRestaurantIds = new Set(targetRelations.map(rel => rel.restaurantId));
+
+    const intersection = [...userRestaurantIds].filter(id => targetRestaurantIds.has(id));
+    const union = new Set([...userRestaurantIds, ...targetRestaurantIds]);
+
+    // Jaccard similarity coefficient
+    const jaccardSimilarity = intersection.length / union.size;
+
+    // Get both users' cuisine preferences
+    const userCuisines = new Set<string>();
+    const targetCuisines = new Set<string>();
+
+    userRelations.forEach(rel => {
+      const restaurant = mockRestaurants.find(r => r.id === rel.restaurantId);
+      restaurant?.cuisine.forEach(c => userCuisines.add(c));
+    });
+
+    targetRelations.forEach(rel => {
+      const restaurant = mockRestaurants.find(r => r.id === rel.restaurantId);
+      restaurant?.cuisine.forEach(c => targetCuisines.add(c));
+    });
+
+    const cuisineIntersection = [...userCuisines].filter(c => targetCuisines.has(c));
+    const cuisineUnion = new Set([...userCuisines, ...targetCuisines]);
+    const cuisineSimilarity = cuisineIntersection.length / cuisineUnion.size;
+
+    // Combined score: 70% restaurant overlap + 30% cuisine similarity
+    const matchScore = (jaccardSimilarity * 0.7 + cuisineSimilarity * 0.3) * 100;
+
+    // Add some variance and ensure it's between 30-99
+    const variance = Math.floor(Math.random() * 11) - 5; // -5 to +5
+    const finalScore = Math.max(30, Math.min(99, Math.floor(matchScore + variance)));
+
+    return finalScore;
+  }
+
   // Restaurant-related methods
   static async getAllRestaurants(): Promise<Restaurant[]> {
     await delay();
@@ -1169,6 +1223,138 @@ export class MockDataService {
     matches.sort((a, b) => b.score - a.score);
 
     return matches;
+  }
+
+  // Taste Profile methods
+  static async getUserTasteProfile(userId: string, days: number = 30): Promise<import('@/types').TasteProfileStats> {
+    await delay();
+
+    // Get all user's "been" restaurants
+    const userRelations = mockUserRestaurantRelations.filter(
+      rel => rel.userId === userId && rel.status === 'been'
+    );
+
+    const restaurantIds = userRelations.map(rel => rel.restaurantId);
+    const restaurants = mockRestaurants.filter(r => restaurantIds.includes(r.id));
+
+    // Calculate last N days stats
+    const daysAgo = new Date();
+    daysAgo.setDate(daysAgo.getDate() - days);
+
+    const recentRelations = userRelations.filter(
+      rel => rel.visitDate && new Date(rel.visitDate) >= daysAgo
+    );
+
+    const recentRestaurantIds = recentRelations.map(rel => rel.restaurantId);
+    const recentRestaurants = mockRestaurants.filter(r => recentRestaurantIds.includes(r.id));
+
+    const recentCuisines = new Set(recentRestaurants.flatMap(r => r.cuisine));
+
+    const user = await this.getUserById(userId);
+    const primaryLocation = user?.location.city || 'Unknown';
+
+    // Calculate cuisine breakdown
+    const cuisineMap = new Map<string, { count: number; totalScore: number; restaurantIds: string[] }>();
+
+    restaurants.forEach(restaurant => {
+      restaurant.cuisine.forEach(cuisine => {
+        const existing = cuisineMap.get(cuisine) || { count: 0, totalScore: 0, restaurantIds: [] };
+        cuisineMap.set(cuisine, {
+          count: existing.count + 1,
+          totalScore: existing.totalScore + restaurant.rating,
+          restaurantIds: [...existing.restaurantIds, restaurant.id],
+        });
+      });
+    });
+
+    const cuisineBreakdown: import('@/types').CuisineBreakdown[] = Array.from(cuisineMap.entries()).map(([cuisine, data]) => ({
+      cuisine,
+      count: data.count,
+      avgScore: parseFloat((data.totalScore / data.count).toFixed(1)),
+      restaurantIds: data.restaurantIds,
+    }));
+
+    // Calculate city breakdown
+    const cityMap = new Map<string, { count: number; totalScore: number; restaurantIds: string[]; state?: string }>();
+
+    restaurants.forEach(restaurant => {
+      const cityKey = `${restaurant.location.city}, ${restaurant.location.state}`;
+      const existing = cityMap.get(cityKey) || { count: 0, totalScore: 0, restaurantIds: [], state: restaurant.location.state };
+      cityMap.set(cityKey, {
+        count: existing.count + 1,
+        totalScore: existing.totalScore + restaurant.rating,
+        restaurantIds: [...existing.restaurantIds, restaurant.id],
+        state: restaurant.location.state,
+      });
+    });
+
+    const cityBreakdown: import('@/types').CityBreakdown[] = Array.from(cityMap.entries()).map(([city, data]) => ({
+      city: city.split(',')[0].trim(),
+      state: data.state,
+      count: data.count,
+      avgScore: parseFloat((data.totalScore / data.count).toFixed(1)),
+      restaurantIds: data.restaurantIds,
+    }));
+
+    // Calculate country breakdown (mock - assuming mostly US)
+    const countryMap = new Map<string, { count: number; totalScore: number; restaurantIds: string[] }>();
+
+    restaurants.forEach(restaurant => {
+      const country = 'United States'; // Mock: assume all restaurants are in US
+      const existing = countryMap.get(country) || { count: 0, totalScore: 0, restaurantIds: [] };
+      countryMap.set(country, {
+        count: existing.count + 1,
+        totalScore: existing.totalScore + restaurant.rating,
+        restaurantIds: [...existing.restaurantIds, restaurant.id],
+      });
+    });
+
+    const countryBreakdown: import('@/types').CountryBreakdown[] = Array.from(countryMap.entries()).map(([country, data]) => ({
+      country,
+      count: data.count,
+      avgScore: parseFloat((data.totalScore / data.count).toFixed(1)),
+      restaurantIds: data.restaurantIds,
+    }));
+
+    // Generate dining locations with coordinates
+    const cityLocationMap = new Map<string, import('@/types').DiningLocation>();
+
+    restaurants.forEach(restaurant => {
+      const cityKey = restaurant.location.city;
+      const existing = cityLocationMap.get(cityKey);
+
+      if (!existing) {
+        cityLocationMap.set(cityKey, {
+          city: restaurant.location.city,
+          country: 'United States',
+          state: restaurant.location.state,
+          lat: restaurant.location.coordinates.lat,
+          lng: restaurant.location.coordinates.lng,
+          restaurantIds: [restaurant.id],
+        });
+      } else {
+        existing.restaurantIds.push(restaurant.id);
+      }
+    });
+
+    const diningLocations: import('@/types').DiningLocation[] = Array.from(cityLocationMap.values());
+
+    return {
+      last30Days: {
+        restaurantsCount: recentRestaurants.length,
+        cuisinesCount: recentCuisines.size,
+        activityPercentile: 96, // Mock: "Top 4%"
+        primaryLocation,
+      },
+      cuisineBreakdown,
+      cityBreakdown,
+      countryBreakdown,
+      diningLocations,
+      totalRestaurants: restaurants.length,
+      totalCities: cityMap.size,
+      totalCountries: countryMap.size,
+      totalCuisines: cuisineMap.size,
+    };
   }
 }
 

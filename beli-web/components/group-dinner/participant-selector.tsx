@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/bottom-sheet"
 import { Button } from "@/components/ui/button"
 import { SearchBar } from "@/components/navigation/search-bar"
-import { Avatar } from "@/components/ui/avatar"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { MockDataService } from "@/lib/mockDataService"
 import type { User } from "@/types"
 
@@ -32,11 +32,10 @@ function UserItem({ user, selected, onToggle }: UserItemProps) {
       onClick={onToggle}
       className="flex items-center gap-3 w-full p-3 hover:bg-gray-50 transition-colors"
     >
-      <Avatar
-        src={user.avatar}
-        alt={user.displayName}
-        className="h-11 w-11"
-      />
+      <Avatar className="h-11 w-11">
+        <AvatarImage src={user.avatar} alt={user.displayName} />
+        <AvatarFallback>{user.displayName[0]}</AvatarFallback>
+      </Avatar>
       <div className="flex-1 text-left">
         <p className="font-semibold leading-tight">{user.displayName}</p>
         <p className="text-sm text-secondary leading-tight">@{user.username}</p>
@@ -156,11 +155,10 @@ export function ParticipantSelector({
                   key={user.id}
                   className="flex items-center gap-2 bg-primary/10 rounded-full px-3 py-1.5 whitespace-nowrap"
                 >
-                  <Avatar
-                    src={user.avatar}
-                    alt={user.displayName}
-                    className="h-6 w-6"
-                  />
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage src={user.avatar} alt={user.displayName} />
+                    <AvatarFallback>{user.displayName[0]}</AvatarFallback>
+                  </Avatar>
                   <span className="text-sm font-medium">{user.displayName}</span>
                   <button
                     onClick={() => handleRemove(user.id)}

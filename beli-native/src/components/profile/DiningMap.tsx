@@ -18,6 +18,10 @@ export const DiningMap: React.FC<DiningMapProps> = ({
   totalRestaurants,
   onShare,
 }) => {
+  // Format plural text
+  const cityText = totalCities === 1 ? 'city' : 'cities';
+  const restaurantText = totalRestaurants === 1 ? 'restaurant' : 'restaurants';
+
   // Calculate initial region to show all markers
   const getInitialRegion = () => {
     if (locations.length === 0) {
@@ -58,7 +62,7 @@ export const DiningMap: React.FC<DiningMapProps> = ({
         <View>
           <Text style={styles.title}>Your Dining Map</Text>
           <Text style={styles.subtitle}>
-            {totalCities} cities • {totalRestaurants} restaurants
+            {totalCities} {cityText} • {totalRestaurants} {restaurantText}
           </Text>
         </View>
         {onShare && (
@@ -82,18 +86,21 @@ export const DiningMap: React.FC<DiningMapProps> = ({
           showsUserLocation={false}
           showsMyLocationButton={false}
         >
-          {locations.map((location, index) => (
-            <Marker
-              key={`${location.city}-${index}`}
-              coordinate={{
-                latitude: location.lat,
-                longitude: location.lng,
-              }}
-              title={location.city}
-              description={`${location.restaurantIds.length} restaurants`}
-              pinColor={colors.primary}
-            />
-          ))}
+          {locations.map((location, index) => {
+            const markerRestaurantText = location.restaurantIds.length === 1 ? 'restaurant' : 'restaurants';
+            return (
+              <Marker
+                key={`${location.city}-${index}`}
+                coordinate={{
+                  latitude: location.lat,
+                  longitude: location.lng,
+                }}
+                title={location.city}
+                description={`${location.restaurantIds.length} ${markerRestaurantText}`}
+                pinColor={colors.primary}
+              />
+            );
+          })}
         </MapView>
       </View>
     </View>

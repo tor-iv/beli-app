@@ -1222,12 +1222,12 @@ export default function ListsScreen() {
 
       {/* Category Dropdown */}
       <View style={styles.categorySection}>
-        <CategoryDropdown
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={(categoryId) => setSelectedCategory(categoryId as ListCategory)}
-        />
-      </View>
+            <CategoryDropdown
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onCategoryChange={(categoryId) => setSelectedCategory(categoryId as ListCategory)}
+            />
+          </View>
 
       {/* Tab Navigation */}
       <View style={styles.tabSection}>
@@ -2634,5 +2634,19 @@ const styles = StyleSheet.create({
 
   moreOptionTextDestructive: {
     color: colors.error,
+  },
+
+  // Tastemaker posts styles
+  postCardList: {
+    padding: spacing.md,
+  },
+
+  postCardRow: {
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
+
+  postCardContainer: {
+    width: '48%',
   },
 });

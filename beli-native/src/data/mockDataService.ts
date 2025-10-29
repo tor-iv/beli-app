@@ -1,4 +1,4 @@
-import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification, Reservation, ReservationPriorityLevel, MenuItem, OrderSuggestion, HungerLevel, MealTime, TasteProfileStats, CuisineBreakdown, CityBreakdown, CountryBreakdown, DiningLocation } from '../types';
+import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification, Reservation, ReservationPriorityLevel, MenuItem, OrderSuggestion, HungerLevel, MealTime, TasteProfileStats, CuisineBreakdown, CityBreakdown, CountryBreakdown, DiningLocation, TastemakerPost } from '../types';
 import { mockUsers, currentUser } from './mock/users';
 import { mockRestaurants } from './mock/restaurants';
 import { mockUserRestaurantRelations } from './mock/userRestaurantRelations';
@@ -9,6 +9,8 @@ import { mockNotifications } from './mock/notifications';
 import { challenge2025, mockChallengeActivities, getActivitiesByMonth, getDaysRemaining, getProgressPercentage, Challenge2025, ChallengeActivity } from './mock/challenges';
 import { mockReservations, getUserPriorityLevel, getAvailableReservations, getClaimedReservationsByUser, getSharedReservationsByUser, getReservationReminders } from './mock/reservations';
 import { allMenuItems, restaurantMenus } from './mock/menuItems';
+import { mockTastemakers } from './mock/tastemakers';
+import { mockTastemakerPosts } from './mock/tastemakerPosts';
 
 // Simulate network delay - reduced for better UX
 const delay = (ms: number = 150) => new Promise(resolve => setTimeout(resolve, ms));
@@ -1268,6 +1270,109 @@ export class MockDataService {
       totalCountries: countryMap.size,
       totalCuisines: cuisineMap.size,
     };
+  }
+
+  // Tastemaker-related methods
+  static async getTastemakers(limit?: number): Promise<User[]> {
+    await delay();
+    const tastemakers = mockTastemakers;
+    return limit ? tastemakers.slice(0, limit) : tastemakers;
+  }
+
+  static async getTastemakerByUsername(username: string): Promise<User | null> {
+    await delay();
+    return mockTastemakers.find(tm => tm.username === username) || null;
+  }
+
+  static async getTastemakerPosts(limit?: number): Promise<TastemakerPost[]> {
+    await delay();
+    // Sort by publishedAt descending (most recent first)
+    const sortedPosts = [...mockTastemakerPosts].sort(
+      (a, b) => b.publishedAt.getTime() - a.publishedAt.getTime()
+    );
+
+    // Populate user data
+    const postsWithUsers = sortedPosts.map(post => ({
+      ...post,
+      user: mockTastemakers.find(tm => tm.id === post.userId),
+    }));
+
+    return limit ? postsWithUsers.slice(0, limit) : postsWithUsers;
+  }
+
+  static async getFeaturedTastemakerPosts(limit?: number): Promise<TastemakerPost[]> {
+    await delay();
+    const featuredPosts = mockTastemakerPosts
+      .filter(post => post.isFeatured)
+      .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+
+    // Populate user data
+    const postsWithUsers = featuredPosts.map(post => ({
+      ...post,
+      user: mockTastemakers.find(tm => tm.id === post.userId),
+    }));
+
+    return limit ? postsWithUsers.slice(0, limit) : postsWithUsers;
+  }
+
+  static async getTastemakerPostById(postId: string): Promise<TastemakerPost | null> {
+    await delay();
+    const post = mockTastemakerPosts.find(p => p.id === postId);
+    if (!post) return null;
+
+    // Populate user and restaurant data
+    return {
+      ...post,
+      user: mockTastemakers.find(tm => tm.id === post.userId),
+      restaurants: mockRestaurants.filter(r => post.restaurantIds.includes(r.id)),
+    };
+  }
+
+  static async getTastemakerPostsByUser(userId: string, limit?: number): Promise<TastemakerPost[]> {
+    await delay();
+    const userPosts = mockTastemakerPosts
+      .filter(post => post.userId === userId)
+      .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+
+    // Populate user data
+    const postsWithUsers = userPosts.map(post => ({
+      ...post,
+      user: mockTastemakers.find(tm => tm.id === post.userId),
+    }));
+
+    return limit ? postsWithUsers.slice(0, limit) : postsWithUsers;
+  }
+
+  static async likeTastemakerPost(postId: string, userId: string): Promise<void> {
+    await delay();
+    const post = mockTastemakerPosts.find(p => p.id === postId);
+    if (post && !post.interactions.likes.includes(userId)) {
+      post.interactions.likes.push(userId);
+    }
+  }
+
+  static async unlikeTastemakerPost(postId: string, userId: string): Promise<void> {
+    await delay();
+    const post = mockTastemakerPosts.find(p => p.id === postId);
+    if (post) {
+      post.interactions.likes = post.interactions.likes.filter(id => id !== userId);
+    }
+  }
+
+  static async bookmarkTastemakerPost(postId: string, userId: string): Promise<void> {
+    await delay();
+    const post = mockTastemakerPosts.find(p => p.id === postId);
+    if (post && !post.interactions.bookmarks.includes(userId)) {
+      post.interactions.bookmarks.push(userId);
+    }
+  }
+
+  static async unbookmarkTastemakerPost(postId: string, userId: string): Promise<void> {
+    await delay();
+    const post = mockTastemakerPosts.find(p => p.id === postId);
+    if (post) {
+      post.interactions.bookmarks = post.interactions.bookmarks.filter(id => id !== userId);
+    }
   }
 }
 

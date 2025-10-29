@@ -19,7 +19,9 @@ import { MockDataService } from '../data/mockDataService';
 import type { List } from '../types';
 import type { AppStackParamList } from '../navigation/types';
 
-type NavigationProp = StackNavigationProp<AppStackParamList, 'FeaturedLists'>;
+// Note: This screen is deprecated and replaced by TastemakersScreen
+// Keep for reference only
+type NavigationProp = StackNavigationProp<AppStackParamList>;
 
 interface ListWithProgress extends List {
   progressText: string;

@@ -23,3 +23,12 @@ export function useSearchUsers(query: string) {
     enabled: query.length > 0,
   });
 }
+
+export function useUserMatchPercentage(currentUserId: string, targetUserId: string) {
+  return useQuery({
+    queryKey: ['user-match', currentUserId, targetUserId],
+    queryFn: () => MockDataService.getUserMatchPercentage(currentUserId, targetUserId),
+    enabled: !!currentUserId && !!targetUserId,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+}

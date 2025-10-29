@@ -37,8 +37,9 @@ export function RestaurantSwiper({
     isMounted.current = true
     return () => {
       isMounted.current = false
+      controls.stop() // Cancel any ongoing animations
     }
-  }, [])
+  }, [controls])
 
   // Calculate threshold based on window width
   const getThreshold = () => {
@@ -138,7 +139,7 @@ export function RestaurantSwiper({
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
         <CheckCircle2 className="h-16 w-16 text-primary mb-4" />
         <h3 className="text-xl font-bold mb-2">No more restaurants!</h3>
-        <p className="text-base text-secondary mb-6 max-w-sm">
+        <p className="text-base text-muted mb-6 max-w-sm">
           You've swiped through all available matches. Click shuffle below to see restaurants again.
         </p>
         <button
