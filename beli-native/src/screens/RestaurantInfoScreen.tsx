@@ -7,9 +7,10 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 
 import { Screen, Text, Caption, Badge, LoadingSpinner, RestaurantScoreCard, Avatar } from '../components';
 import { AddRestaurantModal, RestaurantSubmissionData, WhatToOrderModal } from '../components/modals';
+import { RankingResultModal } from '../components/modals/RankingResultModal';
 import { colors, spacing, theme } from '../theme';
 import { MockDataService } from '../data/mockDataService';
-import type { Restaurant } from '../types';
+import type { Restaurant, RankingResult, User } from '../types';
 import type { AppStackParamList } from '../navigation/types';
 
 type RestaurantInfoRouteProp = RouteProp<AppStackParamList, 'RestaurantInfo'>;
@@ -128,25 +129,34 @@ const RestaurantInfoScreen: React.FC = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [submissionData, setSubmissionData] = useState<RestaurantSubmissionData | null>(null);
+  const [rankingResult, setRankingResult] = useState<RankingResult | null>(null);
 
   const scrollY = new Animated.Value(0);
 
   useEffect(() => {
     let isMounted = true;
 
-    const loadRestaurant = async () => {
+    const loadData = async () => {
       if (!restaurantId) {
         setLoading(false);
         return;
       }
 
       try {
-        const result = await MockDataService.getRestaurantById(restaurantId);
+        const [restaurantResult, userResult] = await Promise.all([
+          MockDataService.getRestaurantById(restaurantId),
+          MockDataService.getCurrentUser(),
+        ]);
+
         if (isMounted) {
-          setRestaurant(result ?? null);
+          setRestaurant(restaurantResult ?? null);
+          setCurrentUser(userResult);
         }
       } catch (error) {
-        console.error('Failed to load restaurant details', error);
+        console.error('Failed to load data', error);
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -154,7 +164,7 @@ const RestaurantInfoScreen: React.FC = () => {
       }
     };
 
-    loadRestaurant();
+    loadData();
 
     return () => {
       isMounted = false;
@@ -189,6 +199,49 @@ const RestaurantInfoScreen: React.FC = () => {
     console.log('Restaurant submission data:', data);
     // TODO: Integrate with MockDataService to save the data
     setShowAddModal(false);
+  };
+
+  const handleRankingComplete = async (result: RankingResult, data: RestaurantSubmissionData) => {
+    if (!currentUser || !restaurant) return;
+
+    try {
+      // Save the ranked restaurant to the user's list
+      await MockDataService.insertRankedRestaurant(
+        currentUser.id,
+        restaurant.id,
+        result.category,
+        result.finalPosition,
+        result.rating,
+        {
+          notes: data.notes,
+          photos: data.photos,
+          tags: data.labels,
+          companions: data.companions,
+        }
+      );
+
+      // Store the result and data for the result modal
+      setRankingResult(result);
+      setSubmissionData(data);
+
+      // Close add modal and show result modal
+      setShowAddModal(false);
+      setShowResultModal(true);
+    } catch (error) {
+      console.error('Error saving ranked restaurant:', error);
+    }
+  };
+
+  const handleResultDone = () => {
+    // Close the result modal
+    setShowResultModal(false);
+
+    // Reset state
+    setSubmissionData(null);
+    setRankingResult(null);
+
+    // Navigate back or refresh
+    navigation.goBack();
   };
 
   const handleBookmarkPress = () => {
@@ -507,12 +560,28 @@ const RestaurantInfoScreen: React.FC = () => {
       </Animated.ScrollView>
 
       {/* Add Restaurant Modal */}
-      {restaurant && (
+      {restaurant && currentUser && (
         <AddRestaurantModal
           visible={showAddModal}
           restaurant={restaurant}
+          userId={currentUser.id}
           onClose={() => setShowAddModal(false)}
           onSubmit={handleModalSubmit}
+          onRankingComplete={handleRankingComplete}
+        />
+      )}
+
+      {/* Ranking Result Modal */}
+      {restaurant && currentUser && rankingResult && (
+        <RankingResultModal
+          visible={showResultModal}
+          restaurant={restaurant}
+          user={currentUser}
+          result={rankingResult}
+          notes={submissionData?.notes}
+          photos={submissionData?.photos}
+          onClose={() => setShowResultModal(false)}
+          onDone={handleResultDone}
         />
       )}
 

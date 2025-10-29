@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import Markdown from 'react-native-markdown-display';
 import { colors, typography, spacing, shadows } from '../theme';
 import { LoadingSpinner, RestaurantCard } from '../components';
 import { MockDataService } from '../data/mockDataService';
@@ -125,6 +126,53 @@ export default function TastemakerPostScreen() {
 
   const readTime = calculateReadTime(post.content);
 
+  // Markdown styles matching app design
+  const markdownStyles = {
+    body: {
+      color: colors.textPrimary,
+      fontSize: typography.sizes.base,
+      lineHeight: 24,
+    },
+    heading1: {
+      fontSize: typography.sizes.xl,
+      fontWeight: '700' as const,
+      color: colors.textPrimary,
+      marginTop: spacing.lg,
+      marginBottom: spacing.md,
+    },
+    heading2: {
+      fontSize: typography.sizes.lg,
+      fontWeight: '700' as const,
+      color: colors.textPrimary,
+      marginTop: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    paragraph: {
+      marginBottom: spacing.md,
+      color: colors.textPrimary,
+      fontSize: typography.sizes.base,
+      lineHeight: 24,
+    },
+    strong: {
+      fontWeight: '700' as const,
+      color: colors.textPrimary,
+    },
+    em: {
+      fontStyle: 'italic' as const,
+    },
+    list_item: {
+      marginBottom: spacing.xs,
+      color: colors.textPrimary,
+      fontSize: typography.sizes.base,
+    },
+    bullet_list: {
+      marginBottom: spacing.md,
+    },
+    ordered_list: {
+      marginBottom: spacing.md,
+    },
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -132,6 +180,10 @@ export default function TastemakerPostScreen() {
         <View style={styles.heroContainer}>
           <Image source={{ uri: post.coverImage }} style={styles.heroImage} />
           <View style={styles.heroOverlay} />
+          {/* Back Button */}
+          <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="close" size={24} color="#FFFFFF" />
+          </Pressable>
           <View style={styles.heroContent}>
             <Text style={styles.title}>{post.title}</Text>
             {post.subtitle && <Text style={styles.subtitle}>{post.subtitle}</Text>}
@@ -176,7 +228,7 @@ export default function TastemakerPostScreen() {
 
         {/* Content */}
         <View style={styles.content}>
-          <Text style={styles.contentText}>{post.content}</Text>
+          <Markdown style={markdownStyles}>{post.content}</Markdown>
         </View>
 
         {/* Tags */}
@@ -195,6 +247,7 @@ export default function TastemakerPostScreen() {
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
+              style={styles.restaurantsScrollView}
               contentContainerStyle={styles.restaurantsList}
             >
               {post.restaurants.map((restaurant) => (
@@ -268,6 +321,18 @@ const styles = StyleSheet.create({
   heroOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
+  },
+  backButton: {
+    position: 'absolute',
+    top: spacing.lg,
+    left: spacing.lg,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
   },
   heroContent: {
     position: 'absolute',
@@ -362,6 +427,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
     borderTopWidth: 1,
     borderTopColor: colors.borderLight,
+    backgroundColor: colors.background,
   },
   sectionTitle: {
     fontSize: typography.sizes.lg,
@@ -369,6 +435,9 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.md,
+  },
+  restaurantsScrollView: {
+    flexGrow: 0,
   },
   restaurantsList: {
     paddingHorizontal: spacing.lg,

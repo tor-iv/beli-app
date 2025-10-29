@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, typography, shadows } from '../../theme';
 import type { DiningLocation } from '../../types';
+import { positionDotsOnMap } from '../../utils/mapProjection';
 
 interface DiningMapProps {
   locations: DiningLocation[];
@@ -22,41 +22,11 @@ export const DiningMap: React.FC<DiningMapProps> = ({
   const cityText = totalCities === 1 ? 'city' : 'cities';
   const restaurantText = totalRestaurants === 1 ? 'restaurant' : 'restaurants';
 
-  // Calculate initial region to show all markers
-  const getInitialRegion = () => {
-    if (locations.length === 0) {
-      return {
-        latitude: 40.7128,
-        longitude: -74.0060,
-        latitudeDelta: 50,
-        longitudeDelta: 50,
-      };
-    }
-
-    // Calculate bounds
-    const lats = locations.map(loc => loc.lat);
-    const lngs = locations.map(loc => loc.lng);
-
-    const minLat = Math.min(...lats);
-    const maxLat = Math.max(...lats);
-    const minLng = Math.min(...lngs);
-    const maxLng = Math.max(...lngs);
-
-    const centerLat = (minLat + maxLat) / 2;
-    const centerLng = (minLng + maxLng) / 2;
-    const latDelta = (maxLat - minLat) * 1.5 || 50; // Add padding
-    const lngDelta = (maxLng - minLng) * 1.5 || 50;
-
-    return {
-      latitude: centerLat,
-      longitude: centerLng,
-      latitudeDelta: latDelta,
-      longitudeDelta: lngDelta,
-    };
-  };
+  // Position dots on map using projection
+  const positionedLocations = positionDotsOnMap(locations);
 
   return (
-    <View style={[styles.container, shadows.medium]}>
+    <View style={[styles.container, shadows.card]}>
       {/* Header */}
       <View style={styles.header}>
         <View>
@@ -72,36 +42,28 @@ export const DiningMap: React.FC<DiningMapProps> = ({
         )}
       </View>
 
-      {/* Map */}
+      {/* Map with Dots */}
       <View style={styles.mapContainer}>
-        <MapView
-          style={styles.map}
-          initialRegion={getInitialRegion()}
-          provider={PROVIDER_GOOGLE}
-          mapType="standard"
-          scrollEnabled={true}
-          zoomEnabled={true}
-          pitchEnabled={false}
-          rotateEnabled={false}
-          showsUserLocation={false}
-          showsMyLocationButton={false}
-        >
-          {locations.map((location, index) => {
-            const markerRestaurantText = location.restaurantIds.length === 1 ? 'restaurant' : 'restaurants';
-            return (
-              <Marker
-                key={`${location.city}-${index}`}
-                coordinate={{
-                  latitude: location.lat,
-                  longitude: location.lng,
-                }}
-                title={location.city}
-                description={`${location.restaurantIds.length} ${markerRestaurantText}`}
-                pinColor={colors.primary}
-              />
-            );
-          })}
-        </MapView>
+        {/* World Map Background */}
+        <Image
+          source={require('../../../assets/images/World_Map_Grayscale.png')}
+          style={styles.mapImage}
+          resizeMode="contain"
+        />
+
+        {/* City Dots Overlay */}
+        {positionedLocations.map((location, index) => (
+          <View
+            key={`${location.city}-${index}`}
+            style={[
+              styles.dot,
+              {
+                left: `${location.x}%`,
+                top: `${location.y}%`,
+              },
+            ]}
+          />
+        ))}
       </View>
     </View>
   );
@@ -138,10 +100,28 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: spacing.borderRadius.md,
     overflow: 'hidden',
-    backgroundColor: '#E5E5E5',
+    backgroundColor: colors.white,
+    position: 'relative',
   },
-  map: {
+  mapImage: {
     width: '100%',
     height: '100%',
+  },
+  dot: {
+    position: 'absolute',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.primary,
+    borderWidth: 2,
+    borderColor: colors.white,
+    // Adjust for dot center positioning
+    marginLeft: -5,
+    marginTop: -5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3,
   },
 });

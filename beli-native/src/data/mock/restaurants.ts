@@ -155,6 +155,7 @@ export const mockRestaurants: Restaurant[] = [
       'https://images.unsplash.com/photo-1506354666786-959d6d497f1a?w=600&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1528137871618-79d2761e3fd5?w=600&auto=format&fit=crop',
     ],
+    menu: ['psp-1', 'psp-2', 'psp-3', 'psp-4', 'psp-5', 'psp-6', 'psp-7', 'psp-8'],
   },
 
   // MANHATTAN - GREENWICH VILLAGE
@@ -206,6 +207,7 @@ export const mockRestaurants: Restaurant[] = [
       'https://images.unsplash.com/photo-1542282811-943ef1a977c3?w=600&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop',
     ],
+    menu: ['jp-1', 'jp-2', 'jp-3', 'jp-4', 'jp-5', 'jp-6', 'jp-7', 'jp-8'],
   },
   {
     id: '4',
@@ -256,6 +258,7 @@ export const mockRestaurants: Restaurant[] = [
       'https://images.unsplash.com/photo-1550254478-ead40cc54513?w=600&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1543772927-c50e04ac4f86?w=600&auto=format&fit=crop',
     ],
+    menu: ['min-1', 'min-2', 'min-3', 'min-4', 'min-5', 'min-6', 'min-7', 'min-8', 'min-9', 'min-10', 'min-11', 'min-12'],
   },
 
   // MANHATTAN - EAST VILLAGE
@@ -308,6 +311,7 @@ export const mockRestaurants: Restaurant[] = [
       'https://images.unsplash.com/photo-1524593166156-33164d6bef54?w=600&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1525755662778-989d0524087e?w=600&auto=format&fit=crop',
     ],
+    menu: ['katz-1', 'katz-2', 'katz-3', 'katz-4', 'katz-5', 'katz-6', 'katz-7', 'katz-8', 'katz-9', 'katz-10'],
   },
   {
     id: '6',
@@ -357,6 +361,7 @@ export const mockRestaurants: Restaurant[] = [
       'https://images.unsplash.com/photo-1543286386-713bdd548da4?w=600&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1548865166-48cd35b0400d?w=600&auto=format&fit=crop',
     ],
+    menu: ['momofo-1', 'momofo-2', 'momofo-3', 'momofo-4', 'momofo-5', 'momofo-6', 'momofo-7', 'momofo-8', 'momofo-9', 'momofo-10'],
   },
 
   // MANHATTAN - LOWER EAST SIDE
@@ -392,6 +397,7 @@ export const mockRestaurants: Restaurant[] = [
       friendScore: 8.8,
     },
     distance: 1.1,
+    menu: ['rd-1', 'rd-2', 'rd-3', 'rd-4', 'rd-5', 'rd-6', 'rd-7', 'rd-8', 'rd-9', 'rd-10'],
   },
 
   // MANHATTAN - CHINATOWN
@@ -1678,6 +1684,7 @@ export const mockRestaurants: Restaurant[] = [
     tags: ['Date Night', 'Italian', 'Wine Program'],
     scores: { recScore: 9.2, friendScore: 9.0 },
     distance: 0.6,
+    menu: ['lart-1', 'lart-2', 'lart-3', 'lart-4', 'lart-5', 'lart-6', 'lart-7', 'lart-8', 'lart-9', 'lart-10', 'lart-11', 'lart-12'],
   },
   {
     id: '234',
@@ -1708,6 +1715,7 @@ export const mockRestaurants: Restaurant[] = [
     tags: ['Comfort Food', 'Neighborhood Spot', 'Cocktails'],
     scores: { recScore: 6.0, friendScore: 6.5 },
     distance: 0.5,
+    menu: ['ant-1', 'ant-2', 'ant-3', 'ant-4', 'ant-5', 'ant-6', 'ant-7', 'ant-8', 'ant-9', 'ant-10'],
   },
   {
     id: '235',
@@ -1738,6 +1746,7 @@ export const mockRestaurants: Restaurant[] = [
     tags: ['Brunch', 'Casual', 'Group Friendly'],
     scores: { recScore: 3.2, friendScore: 3.6 },
     distance: 0.6,
+    menu: ['cg-1', 'cg-2', 'cg-3', 'cg-4', 'cg-5', 'cg-6', 'cg-7', 'cg-8'],
   },
   {
     id: 'thai-villa',

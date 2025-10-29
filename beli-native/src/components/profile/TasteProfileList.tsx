@@ -43,7 +43,7 @@ export const TasteProfileList: React.FC<TasteProfileListProps> = ({
         </View>
 
         <View style={styles.listItemRight}>
-          <RatingBubble rating={item.avgScore} size="small" />
+          <RatingBubble rating={item.avgScore} size="medium" />
           <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
         </View>
       </TouchableOpacity>

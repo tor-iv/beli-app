@@ -14,6 +14,7 @@ interface ActivityCardProps {
   onRestaurantPress?: (restaurantId: string) => void;
   onLike?: () => void;
   onComment?: () => void;
+  onShare?: () => void;
   onBookmark?: () => void;
   onAddPress?: () => void;
   currentUserId?: string;
@@ -28,6 +29,7 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
   onRestaurantPress,
   onLike,
   onComment,
+  onShare,
   onBookmark,
   onAddPress,
   currentUserId,
@@ -183,7 +185,7 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
           <Pressable style={styles.actionButton} onPress={onComment}>
             <Ionicons name="chatbubble-outline" size={20} color={theme.colors.textSecondary} />
           </Pressable>
-          <Pressable style={styles.actionButton}>
+          <Pressable style={styles.actionButton} onPress={onShare}>
             <Ionicons name="paper-plane-outline" size={20} color={theme.colors.textSecondary} />
           </Pressable>
         </View>

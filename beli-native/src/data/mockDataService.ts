@@ -1374,6 +1374,107 @@ export class MockDataService {
       post.interactions.bookmarks = post.interactions.bookmarks.filter(id => id !== userId);
     }
   }
+
+  // Ranking methods
+  static async getRankedRestaurants(userId: string, category: ListCategory): Promise<Restaurant[]> {
+    await delay();
+
+    // Get all restaurants in the 'been' list for this user
+    const relations = mockUserRestaurantRelations.filter(
+      relation => relation.userId === userId && relation.status === 'been'
+    );
+
+    // Filter by category (for now, all restaurants go into 'restaurants' category)
+    // In a real app, you might filter by restaurant type based on category
+
+    // Get full restaurant objects with their rank indices
+    const restaurantsWithRanks = relations
+      .map(relation => {
+        const restaurant = mockRestaurants.find(r => r.id === relation.restaurantId);
+        return restaurant ? { restaurant, rankIndex: relation.rankIndex ?? 999999 } : null;
+      })
+      .filter((item): item is { restaurant: Restaurant; rankIndex: number } => item !== null);
+
+    // Sort by rank index (lower index = higher rank)
+    restaurantsWithRanks.sort((a, b) => a.rankIndex - b.rankIndex);
+
+    return restaurantsWithRanks.map(item => item.restaurant);
+  }
+
+  static async insertRankedRestaurant(
+    userId: string,
+    restaurantId: string,
+    category: ListCategory,
+    position: number,
+    rating: number,
+    data?: {
+      notes?: string;
+      photos?: string[];
+      tags?: string[];
+      companions?: string[];
+    }
+  ): Promise<UserRestaurantRelation> {
+    await delay();
+
+    // Update rank indices for existing restaurants at or after this position
+    await this.updateRankIndices(userId, category, position);
+
+    // Create the new relation with rank index
+    const newRelation: UserRestaurantRelation = {
+      userId,
+      restaurantId,
+      status: 'been',
+      rating,
+      rankIndex: position,
+      notes: data?.notes,
+      photos: data?.photos,
+      tags: data?.tags,
+      companions: data?.companions,
+      createdAt: new Date(),
+      visitDate: new Date(),
+    };
+
+    // Add to the list
+    mockUserRestaurantRelations.push(newRelation);
+
+    return newRelation;
+  }
+
+  static async updateRankIndices(
+    userId: string,
+    category: ListCategory,
+    fromIndex: number
+  ): Promise<void> {
+    await delay();
+
+    // Find all relations for this user in the 'been' status
+    const relations = mockUserRestaurantRelations.filter(
+      relation => relation.userId === userId && relation.status === 'been'
+    );
+
+    // Increment rank index for all items at or after the insertion point
+    relations.forEach(relation => {
+      if (relation.rankIndex !== undefined && relation.rankIndex >= fromIndex) {
+        relation.rankIndex += 1;
+      }
+    });
+  }
+
+  static async updateRestaurantRating(
+    userId: string,
+    restaurantId: string,
+    rating: number
+  ): Promise<void> {
+    await delay();
+
+    const relation = mockUserRestaurantRelations.find(
+      r => r.userId === userId && r.restaurantId === restaurantId
+    );
+
+    if (relation) {
+      relation.rating = rating;
+    }
+  }
 }
 
 export default MockDataService;

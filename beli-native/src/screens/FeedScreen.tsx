@@ -7,12 +7,15 @@ import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { colors, typography, spacing } from '../theme';
 import { ActivityCard, LoadingSpinner, AddRestaurantModal, FeaturedListCard } from '../components';
+import { RankingResultModal } from '../components/modals/RankingResultModal';
 import type { RestaurantSubmissionData } from '../components';
 import HamburgerMenu from '../components/modals/HamburgerMenu';
 import { FeedFiltersModal, type FeedFilters } from '../components/modals/FeedFiltersModal';
+import { ShareModal } from '../components/modals/ShareModal';
+import { CommentsModal } from '../components/modals/CommentsModal';
 import { MockDataService } from '../data/mockDataService';
 import type { Activity } from '../data/mock/types';
-import type { Restaurant, List } from '../types';
+import type { Restaurant, List, User, RankingResult } from '../types';
 import type { BottomTabParamList, AppStackParamList } from '../navigation/types';
 
 type FeedScreenNavigationProp = CompositeNavigationProp<
@@ -37,6 +40,13 @@ export default function FeedScreen() {
     topRatedOnly: false,
     restaurantsOnly: false,
   });
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showCommentsModal, setShowCommentsModal] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [rankingResult, setRankingResult] = useState<RankingResult | null>(null);
+  const [submissionData, setSubmissionData] = useState<RestaurantSubmissionData | null>(null);
 
   const applyFilters = (activitiesData: Activity[]) => {
     let filtered = [...activitiesData];
@@ -102,10 +112,20 @@ export default function FeedScreen() {
     }
   };
 
+  const loadCurrentUser = async () => {
+    try {
+      const user = await MockDataService.getCurrentUser();
+      setCurrentUser(user);
+    } catch (error) {
+      console.error('Failed to load current user:', error);
+    }
+  };
+
   useEffect(() => {
     loadFeed();
     loadFeaturedLists();
     loadNotificationCount();
+    loadCurrentUser();
   }, []);
 
   // Reapply filters when filter settings change
@@ -195,12 +215,153 @@ export default function FeedScreen() {
     }
   };
 
+  const handleRankingComplete = async (result: RankingResult, data: RestaurantSubmissionData) => {
+    if (!currentUser || !selectedRestaurant) return;
+
+    try {
+      // Save the ranked restaurant to the user's list
+      await MockDataService.insertRankedRestaurant(
+        currentUser.id,
+        selectedRestaurant.id,
+        result.category,
+        result.finalPosition,
+        result.rating,
+        {
+          notes: data.notes,
+          photos: data.photos,
+          tags: data.labels,
+          companions: data.companions,
+        }
+      );
+
+      // Store the result and data for the result modal
+      setRankingResult(result);
+      setSubmissionData(data);
+
+      // Close add modal and show result modal
+      setShowAddModal(false);
+      setShowResultModal(true);
+
+      // Refresh the feed to show any updates
+      loadFeed();
+    } catch (error) {
+      console.error('Error saving ranked restaurant:', error);
+      Alert.alert(
+        'Error',
+        'Failed to save ranking. Please try again.',
+        [{ text: 'OK' }]
+      );
+    }
+  };
+
+  const handleResultDone = () => {
+    setShowResultModal(false);
+    setRankingResult(null);
+    setSubmissionData(null);
+    setSelectedRestaurant(null);
+  };
+
+  const handleLike = (activityId: string) => {
+    if (!currentUser) return;
+
+    setActivities((prevActivities) =>
+      prevActivities.map((activity) => {
+        if (activity.id === activityId) {
+          const likes = activity.interactions?.likes || [];
+          const isLiked = likes.includes(currentUser.id);
+
+          return {
+            ...activity,
+            interactions: {
+              ...activity.interactions,
+              likes: isLiked
+                ? likes.filter((id) => id !== currentUser.id)
+                : [...likes, currentUser.id],
+              comments: activity.interactions?.comments || [],
+              bookmarks: activity.interactions?.bookmarks || [],
+            },
+          };
+        }
+        return activity;
+      })
+    );
+  };
+
+  const handleComment = (activity: Activity) => {
+    setSelectedActivity(activity);
+    setShowCommentsModal(true);
+  };
+
+  const handleShare = (activity: Activity) => {
+    setSelectedActivity(activity);
+    setShowShareModal(true);
+  };
+
+  const handleBookmark = (activityId: string) => {
+    if (!currentUser) return;
+
+    setActivities((prevActivities) =>
+      prevActivities.map((activity) => {
+        if (activity.id === activityId) {
+          const bookmarks = activity.interactions?.bookmarks || [];
+          const isBookmarked = bookmarks.includes(currentUser.id);
+
+          return {
+            ...activity,
+            interactions: {
+              ...activity.interactions,
+              bookmarks: isBookmarked
+                ? bookmarks.filter((id) => id !== currentUser.id)
+                : [...bookmarks, currentUser.id],
+              likes: activity.interactions?.likes || [],
+              comments: activity.interactions?.comments || [],
+            },
+          };
+        }
+        return activity;
+      })
+    );
+  };
+
+  const handleAddComment = (content: string) => {
+    if (!selectedActivity || !currentUser) return;
+
+    setActivities((prevActivities) =>
+      prevActivities.map((activity) => {
+        if (activity.id === selectedActivity.id) {
+          const newComment = {
+            id: `comment-${Date.now()}`,
+            userId: currentUser.id,
+            content,
+            timestamp: new Date(),
+          };
+
+          return {
+            ...activity,
+            interactions: {
+              ...activity.interactions,
+              comments: [...(activity.interactions?.comments || []), newComment],
+              likes: activity.interactions?.likes || [],
+              bookmarks: activity.interactions?.bookmarks || [],
+            },
+          };
+        }
+        return activity;
+      })
+    );
+  };
+
   const renderActivity = ({ item }: { item: Activity }) => (
     <ActivityCard
       activity={item}
       onPress={() => handleRestaurantPress(item.restaurant.id)}
       onRestaurantPress={handleRestaurantPress}
       onAddPress={() => handleAddPress(item.restaurant)}
+      onLike={() => handleLike(item.id)}
+      onComment={() => handleComment(item)}
+      onShare={() => handleShare(item)}
+      onBookmark={() => handleBookmark(item.id)}
+      currentUserId={currentUser?.id}
     />
   );
 
@@ -377,12 +538,28 @@ export default function FeedScreen() {
         }
       />
 
-      {selectedRestaurant && (
+      {selectedRestaurant && currentUser && (
         <AddRestaurantModal
           visible={showAddModal}
           restaurant={selectedRestaurant}
+          userId={currentUser.id}
           onClose={handleModalClose}
           onSubmit={handleModalSubmit}
+          onRankingComplete={handleRankingComplete}
+        />
+      )}
+
+      {/* Ranking Result Modal */}
+      {selectedRestaurant && currentUser && rankingResult && (
+        <RankingResultModal
+          visible={showResultModal}
+          restaurant={selectedRestaurant}
+          user={currentUser}
+          result={rankingResult}
+          notes={submissionData?.notes}
+          photos={submissionData?.photos}
+          onClose={() => setShowResultModal(false)}
+          onDone={handleResultDone}
         />
       )}
 
@@ -398,6 +575,31 @@ export default function FeedScreen() {
         onClose={() => setShowMenu(false)}
         navigation={navigation}
       />
+
+      {selectedActivity && (
+        <>
+          <ShareModal
+            visible={showShareModal}
+            restaurant={selectedActivity.restaurant}
+            user={selectedActivity.user}
+            onClose={() => {
+              setShowShareModal(false);
+              setSelectedActivity(null);
+            }}
+          />
+
+          <CommentsModal
+            visible={showCommentsModal}
+            activity={selectedActivity}
+            currentUser={currentUser || undefined}
+            onClose={() => {
+              setShowCommentsModal(false);
+              setSelectedActivity(null);
+            }}
+            onAddComment={handleAddComment}
+          />
+        </>
+      )}
     </SafeAreaView>
   );
 }

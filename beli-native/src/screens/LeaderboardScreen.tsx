@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { colors, spacing } from '../theme';
 import { Avatar } from '../components';
 import { MockDataService } from '../data/mockDataService';
 import type { User } from '../data/mock/types';
+import type { AppStackNavigationProp } from '../navigation/types';
 
 type TabType = 'Been' | 'Influence' | 'Notes' | 'Photos';
 
@@ -14,6 +16,7 @@ interface LeaderboardUser extends User {
 }
 
 export default function LeaderboardScreen() {
+  const navigation = useNavigation<AppStackNavigationProp>();
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [allUsers, setAllUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -136,7 +139,11 @@ export default function LeaderboardScreen() {
 
   const renderUserItem = ({ item }: { item: LeaderboardUser }) => {
     return (
-      <View style={styles.userItem}>
+      <TouchableOpacity
+        style={styles.userItem}
+        onPress={() => navigation.navigate('UserProfile', { userId: item.id })}
+        activeOpacity={0.7}
+      >
         <Text style={styles.rank}>{item.rank}</Text>
 
         <Avatar
@@ -150,7 +157,7 @@ export default function LeaderboardScreen() {
         </View>
 
         <Text style={styles.score}>{item.score}</Text>
-      </View>
+      </TouchableOpacity>
     );
   };
 
