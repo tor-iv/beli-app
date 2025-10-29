@@ -96,10 +96,126 @@ function ListsContent() {
   // Filter lists by type
   const filteredLists = lists?.filter(list => list.listType === activeTab) || [];
 
-  // Get ALL restaurants for the current lists or from view, then sort by rating descending
+  // Get ALL restaurants for the current lists or from view
   const restaurantIds = new Set(filteredLists.flatMap(list => list.restaurants));
-  const restaurantsData = (viewRestaurants || allRestaurants?.filter(r => restaurantIds.has(r.id)) || [])
-    .sort((a, b) => b.rating - a.rating); // Sort by rating descending (10.0, 9.9, ...)
+  const baseRestaurants = viewRestaurants || allRestaurants?.filter(r => restaurantIds.has(r.id)) || [];
+
+  // Apply filters and sorting (memoized for performance)
+  const restaurantsData = useMemo(() => {
+    let filtered = [...baseRestaurants];
+
+    // Apply category filter
+    if (filters.category !== 'all') {
+      filtered = filtered.filter(r => {
+        const category = r.category?.toLowerCase() || 'restaurants';
+        return category === filters.category;
+      });
+    }
+
+    // Apply city filter
+    if (filters.cities.length > 0) {
+      filtered = filtered.filter(r => {
+        const city = r.location?.city || '';
+        return filters.cities.includes(city);
+      });
+    }
+
+    // Apply cuisine filter
+    if (filters.cuisines.length > 0) {
+      filtered = filtered.filter(r => {
+        // cuisine is string[], so check if any of the restaurant's cuisines match
+        return r.cuisine.some(c => filters.cuisines.includes(c));
+      });
+    }
+
+    // Apply price filter
+    if (filters.prices.length > 0) {
+      filtered = filtered.filter(r => {
+        return filters.prices.includes(r.priceRange as any);
+      });
+    }
+
+    // Apply tags filter
+    if (filters.tags.length > 0) {
+      filtered = filtered.filter(r => {
+        const restaurantTags = r.tags || [];
+        return filters.tags.some(tag => restaurantTags.includes(tag));
+      });
+    }
+
+    // Apply good for filter
+    if (filters.goodFor.length > 0) {
+      filtered = filtered.filter(r => {
+        const restaurantGoodFor = r.goodFor || [];
+        return filters.goodFor.some(option => restaurantGoodFor.includes(option));
+      });
+    }
+
+    // Apply minimum score filter
+    if (filters.minScore !== null) {
+      filtered = filtered.filter(r => r.rating >= filters.minScore!);
+    }
+
+    // Apply minimum friends filter
+    if (filters.minFriends !== null) {
+      filtered = filtered.filter(r => {
+        const friendCount = r.friendsWantToTryCount || 0;
+        return friendCount >= filters.minFriends!;
+      });
+    }
+
+    // Apply open now filter
+    if (filters.openNow) {
+      const now = new Date();
+      const currentHour = now.getHours();
+      filtered = filtered.filter(r => {
+        // Simple logic: assume open if 7am-11pm (can be enhanced with real hours)
+        return currentHour >= 7 && currentHour < 23;
+      });
+    }
+
+    // Apply accepts reservations filter
+    if (filters.acceptsReservations) {
+      filtered = filtered.filter(r => r.acceptsReservations === true);
+    }
+
+    // Apply search query
+    if (filters.searchQuery.trim()) {
+      const query = filters.searchQuery.toLowerCase();
+      filtered = filtered.filter(r => {
+        const name = r.name.toLowerCase();
+        const cuisines = r.cuisine.map(c => c.toLowerCase()).join(' ');
+        const neighborhood = r.location?.neighborhood?.toLowerCase() || '';
+        return name.includes(query) || cuisines.includes(query) || neighborhood.includes(query);
+      });
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let comparison = 0;
+
+      switch (filters.sortBy) {
+        case 'rating':
+          comparison = b.rating - a.rating;
+          break;
+        case 'distance':
+          // Use distance from mock data or calculate based on coordinates
+          const distA = a.distance || 0;
+          const distB = b.distance || 0;
+          comparison = distA - distB;
+          break;
+        case 'friends':
+          const friendsA = a.friendsWantToTryCount || 0;
+          const friendsB = b.friendsWantToTryCount || 0;
+          comparison = friendsB - friendsA;
+          break;
+      }
+
+      return filters.sortDirection === 'asc' ? -comparison : comparison;
+    });
+
+    return filtered;
+  }, [baseRestaurants, filters]);
 
   // Auto-select first restaurant on desktop when data changes
   useEffect(() => {
@@ -169,23 +285,72 @@ function ListsContent() {
     }
   };
 
+  const handleShare = async () => {
+    const listName = activeTab.replace('_', ' ');
+    const shareData = {
+      title: `My ${listName} on Beli`,
+      text: `Check out my ${listName} list on Beli!`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Link copied to clipboard!');
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">{getViewTitle(viewParam)}</h1>
-        {/* Show view toggle on desktop only */}
-        <div className="hidden md:block">
-          <ViewToggle view={rightPanelView} onViewChange={setRightPanelView} />
+      {/* Header */}
+      <div className="mb-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">{getViewTitle(viewParam)}</h1>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShare}
+              className="gap-2"
+            >
+              <IoShareSocial className="h-4 w-4" />
+              <span className="hidden sm:inline">Share</span>
+            </Button>
+            {/* Show view toggle on desktop only */}
+            <div className="hidden md:block">
+              <ViewToggle view={rightPanelView} onViewChange={setRightPanelView} />
+            </div>
+          </div>
+        </div>
+
+        {/* Category, Search, and Sort Row */}
+        <div className="flex flex-wrap items-center gap-3">
+          <CategoryDropdown />
+          <div className="flex-1 min-w-[200px]">
+            <ListSearch />
+          </div>
+          <SortSelector />
         </div>
       </div>
 
       {!viewParam && (
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ListType)}>
-          <TabsList className="w-full mb-6 grid grid-cols-3">
+          <TabsList className="w-full mb-4 grid grid-cols-3">
             <TabsTrigger value="been">Been</TabsTrigger>
             <TabsTrigger value="want_to_try">Want to Try</TabsTrigger>
             <TabsTrigger value="recs">Recommendations</TabsTrigger>
           </TabsList>
+
+          {/* Filter Bar */}
+          <div className="mb-6">
+            <FilterBar />
+          </div>
 
           <TabsContent value={activeTab}>
             {listsLoading ? (

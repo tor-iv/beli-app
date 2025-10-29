@@ -7,18 +7,14 @@ import { MockDataService } from "@/lib/mockDataService"
 import { ActivityCard } from "@/components/social/activity-card"
 import { RestaurantToggleWidget } from "@/components/profile/restaurant-toggle-widget"
 import { ThreeColumnLayout } from "@/components/layout/three-column"
-import { TastemakerPicksWidget } from "@/components/feed/tastemaker-picks-widget"
 import { MobileFeedHeader } from "@/components/navigation/mobile-feed-header"
 import { ActionButtons } from "@/components/feed/action-buttons"
 import { FeaturedListsSection } from "@/components/feed/featured-lists-section"
-import { TastemakerPostsSection } from "@/components/feed/tastemaker-posts-section"
-import { ContentModeSelector, type ContentMode } from "@/components/feed/content-mode-selector"
 import { FeedFiltersModal, type FeedFilters } from "@/components/modals/feed-filters-modal"
 import { CommentsModal } from "@/components/modals/comments-modal"
 import { ShareModal } from "@/components/modals/share-modal"
 import { AddRestaurantModal } from "@/components/modals/add-restaurant-modal"
 import { RankingResultModal } from "@/components/modals/ranking-result-modal"
-import { getFeaturedPosts } from "@/data/mock/tastemakerPosts"
 import { useAddRankedRestaurant } from "@/lib/hooks"
 import type { Activity, List, User, Restaurant, RankingResult } from "@/types"
 import type { RestaurantSubmissionData } from "@/components/modals/add-restaurant-modal"
@@ -29,7 +25,6 @@ export default function FeedPage() {
   const [featuredLists, setFeaturedLists] = React.useState<List[]>([])
   const [loading, setLoading] = React.useState(true)
   const [showFiltersModal, setShowFiltersModal] = React.useState(false)
-  const [contentMode, setContentMode] = React.useState<ContentMode>('featured-lists')
   const [filters, setFilters] = React.useState<FeedFilters>({
     rankingsOnly: false,
     topRatedOnly: false,
@@ -47,7 +42,6 @@ export default function FeedPage() {
   const [rankingResult, setRankingResult] = React.useState<RankingResult | null>(null)
   const [rankingData, setRankingData] = React.useState<RestaurantSubmissionData | null>(null)
 
-  const featuredPosts = getFeaturedPosts()
   const addRankedRestaurantMutation = useAddRankedRestaurant()
 
   React.useEffect(() => {
@@ -259,21 +253,11 @@ export default function FeedPage() {
         onFriendRecsClick={() => router.push("/lists?view=friends")}
       />
 
-      {/* Mobile: Content Mode Selector and Content Sections */}
-      <div className="md:hidden px-4 mb-4">
-        <ContentModeSelector mode={contentMode} onModeChange={setContentMode} />
-      </div>
-
-      {contentMode === 'featured-lists' ? (
-        <FeaturedListsSection
-          lists={featuredLists}
-          onSeeAllClick={() => router.push("/tastemakers")}
-        />
-      ) : (
-        <div className="md:hidden px-4">
-          <TastemakerPostsSection posts={featuredPosts} />
-        </div>
-      )}
+      {/* Mobile: Tastemakers Section */}
+      <FeaturedListsSection
+        lists={featuredLists}
+        onSeeAllClick={() => router.push("/tastemakers")}
+      />
 
       {/* Mobile: Feed Filters */}
       <div className="md:hidden px-4 pb-3 flex items-center gap-2">
@@ -296,16 +280,6 @@ export default function FeedPage() {
       <div className="container mx-auto px-4 py-6">
         {/* Mobile: Single column */}
         <div className="lg:hidden max-w-2xl mx-auto">
-          {/* Tastemaker Picks Widget - Mobile Only */}
-          {featuredPosts.length > 0 && (
-            <div className="mb-6">
-              <TastemakerPicksWidget
-                featuredPost={featuredPosts[0]}
-                recentPosts={featuredPosts.slice(1, 3)}
-              />
-            </div>
-          )}
-
           <div className="space-y-4">
             {filteredFeed.map((item) => (
               <ActivityCard
