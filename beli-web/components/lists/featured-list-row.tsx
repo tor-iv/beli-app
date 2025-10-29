@@ -41,14 +41,14 @@ export function FeaturedListRow({
         <h3 className="text-lg font-bold text-gray-900 truncate mb-1">
           {title}
         </h3>
-        <p className="text-base text-gray-600 line-clamp-2 leading-tight mb-1">
+        <p className="text-base text-gray-800 line-clamp-2 leading-tight mb-1">
           {description}
         </p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-700">
           {progressText}
         </p>
       </div>
-      <ChevronRight className="w-5 h-5 text-gray-400 ml-2 flex-shrink-0" />
+      <ChevronRight className="w-5 h-5 text-gray-800 ml-2 flex-shrink-0" />
     </Link>
   )
 }

@@ -36,7 +36,7 @@ export function MobileTabs({ tabs, activeTab, onChange, className }: MobileTabsP
                 !isLast && 'mr-6',
                 isActive
                   ? 'text-gray-900 font-semibold'
-                  : 'text-gray-500 font-medium hover:text-gray-700'
+                  : 'text-gray-700 font-medium hover:text-gray-700'
               )}
             >
               <span>{tab.label}</span>
@@ -44,7 +44,7 @@ export function MobileTabs({ tabs, activeTab, onChange, className }: MobileTabsP
                 <IoChevronDown
                   className={cn(
                     'h-3 w-3 transition-transform',
-                    isActive ? 'text-gray-900' : 'text-gray-500'
+                    isActive ? 'text-gray-900' : 'text-gray-700'
                   )}
                 />
               )}

@@ -16,7 +16,7 @@ export function ContentModeToggle({ mode, onModeChange }: ContentModeToggleProps
           ${
             mode === 'lists'
               ? 'bg-primary text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
           }
         `}
       >
@@ -30,7 +30,7 @@ export function ContentModeToggle({ mode, onModeChange }: ContentModeToggleProps
           ${
             mode === 'articles'
               ? 'bg-primary text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
           }
         `}
       >

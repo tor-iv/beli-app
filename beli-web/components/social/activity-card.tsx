@@ -116,7 +116,7 @@ export function ActivityCard({
               }}
             >
               <Heart
-                className={`h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-600'}`}
+                className={`h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-800'}`}
               />
             </Button>
 
@@ -129,7 +129,7 @@ export function ActivityCard({
                 onComment?.();
               }}
             >
-              <MessageCircle className="h-5 w-5 text-gray-600" />
+              <MessageCircle className="h-5 w-5 text-gray-800" />
             </Button>
 
             <Button
@@ -141,7 +141,7 @@ export function ActivityCard({
                 onShare?.();
               }}
             >
-              <Share2 className="h-5 w-5 text-gray-600" />
+              <Share2 className="h-5 w-5 text-gray-800" />
             </Button>
           </div>
 
@@ -155,7 +155,7 @@ export function ActivityCard({
                 onAddPress?.();
               }}
             >
-              <PlusCircle className="h-5 w-5 text-gray-600" />
+              <PlusCircle className="h-5 w-5 text-gray-800" />
             </Button>
 
             <Button
@@ -168,7 +168,7 @@ export function ActivityCard({
               }}
             >
               <Bookmark
-                className={`h-5 w-5 ${isBookmarked ? 'fill-[#0B7B7F] text-[#0B7B7F]' : 'text-gray-600'}`}
+                className={`h-5 w-5 ${isBookmarked ? 'fill-[#0B7B7F] text-[#0B7B7F]' : 'text-gray-800'}`}
               />
             </Button>
           </div>

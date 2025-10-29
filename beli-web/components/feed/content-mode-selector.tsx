@@ -19,7 +19,7 @@ export function ContentModeSelector({ mode, onModeChange }: ContentModeSelectorP
           ${
             mode === 'featured-lists'
               ? 'bg-[#0B7B7F] text-white shadow-sm'
-              : 'bg-transparent text-gray-600 hover:text-gray-900'
+              : 'bg-transparent text-gray-800 hover:text-gray-900'
           }
         `}
       >
@@ -32,7 +32,7 @@ export function ContentModeSelector({ mode, onModeChange }: ContentModeSelectorP
           ${
             mode === 'tastemaker-picks'
               ? 'bg-[#0B7B7F] text-white shadow-sm'
-              : 'bg-transparent text-gray-600 hover:text-gray-900'
+              : 'bg-transparent text-gray-800 hover:text-gray-900'
           }
         `}
       >

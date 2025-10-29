@@ -22,7 +22,7 @@ export function RestaurantListItemMobile({
       <div className="flex items-center gap-3 p-3 border-b border-gray-100 active:bg-gray-50 transition-colors">
         {/* Rank number */}
         {rank !== undefined && (
-          <span className="text-sm font-semibold text-gray-400 w-6 shrink-0 text-right">
+          <span className="text-sm font-semibold text-gray-800 w-6 shrink-0 text-right">
             {rank}
           </span>
         )}
@@ -34,19 +34,19 @@ export function RestaurantListItemMobile({
           </h3>
 
           {/* Cuisine and neighborhood */}
-          <p className="text-sm text-gray-600 truncate">
+          <p className="text-sm text-gray-800 truncate">
             {cuisine}
             {neighborhood && (
               <>
                 {' '}
-                <span className="text-gray-400">•</span> {neighborhood}
+                <span className="text-gray-800">•</span> {neighborhood}
               </>
             )}
           </p>
 
           {/* Distance */}
           {restaurant.distance !== undefined && restaurant.distance > 0 && (
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-700 mt-0.5">
               {restaurant.distance.toFixed(1)} mi
             </p>
           )}

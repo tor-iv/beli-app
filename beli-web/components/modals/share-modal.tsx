@@ -104,7 +104,7 @@ export function ShareModal({
       id: 'copy',
       label: 'Copy Link',
       icon: <Link2 className="h-8 w-8" />,
-      backgroundColor: '#8E8E93',
+      backgroundColor: '#48484A',
       action: handleCopyLink,
     },
     {
@@ -155,7 +155,7 @@ export function ShareModal({
                   <p className="text-base font-semibold text-gray-900">
                     {user.displayName}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-800">
                     @{user.username}
                   </p>
                 </div>
@@ -170,11 +170,11 @@ export function ShareModal({
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
                   {restaurant.name}
                 </h3>
-                <p className="text-sm text-gray-600 mb-1">
+                <p className="text-sm text-gray-800 mb-1">
                   {restaurant.cuisine.join(', ')} • {restaurant.location.city}, {restaurant.location.state}
                 </p>
                 {user && (
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-700">
                     1 visit
                   </p>
                 )}
@@ -216,7 +216,7 @@ export function ShareModal({
                     {option.icon}
                   </div>
                 </Button>
-                <p className="text-sm text-gray-600 mt-2 text-center">
+                <p className="text-sm text-gray-800 mt-2 text-center">
                   {option.label}
                 </p>
               </div>

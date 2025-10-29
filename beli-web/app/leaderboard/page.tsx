@@ -133,7 +133,7 @@ export default function LeaderboardPage() {
             className={`flex-1 py-2 px-2.5 rounded-md text-[13px] font-medium transition-all ${
               selectedTab === tab
                 ? 'bg-white text-gray-900 font-semibold shadow-sm'
-                : 'text-gray-600'
+                : 'text-gray-800'
             }`}
           >
             {tab}
@@ -142,7 +142,7 @@ export default function LeaderboardPage() {
       </div>
 
       {/* Subtitle */}
-      <p className="text-[13px] text-gray-600 mb-2">{getSubtitleText()}</p>
+      <p className="text-[13px] text-gray-800 mb-2">{getSubtitleText()}</p>
 
       {/* Filters */}
       <div className="flex gap-2 mb-4">
@@ -168,7 +168,7 @@ export default function LeaderboardPage() {
                     setShowMemberDropdown(false);
                   }}
                   className={`w-full text-left py-2.5 px-3.5 text-[13px] border-b border-gray-100 last:border-b-0 hover:bg-gray-50 ${
-                    option === memberFilter ? 'text-[#0B7B7F] font-semibold' : 'text-gray-600'
+                    option === memberFilter ? 'text-[#0B7B7F] font-semibold' : 'text-gray-800'
                   }`}
                 >
                   {option}
@@ -200,7 +200,7 @@ export default function LeaderboardPage() {
                     setShowCityDropdown(false);
                   }}
                   className={`w-full text-left py-2.5 px-3.5 text-[13px] border-b border-gray-100 last:border-b-0 hover:bg-gray-50 ${
-                    city === cityFilter ? 'text-[#0B7B7F] font-semibold' : 'text-gray-600'
+                    city === cityFilter ? 'text-[#0B7B7F] font-semibold' : 'text-gray-800'
                   }`}
                 >
                   {city}
@@ -220,7 +220,7 @@ export default function LeaderboardPage() {
             className="flex items-center py-[10px] border-b border-[#E5E5EA] hover:bg-gray-50 -mx-4 px-4 transition-colors"
           >
             {/* Rank */}
-            <span className="text-sm font-normal text-gray-600 w-6 mr-2">{user.rank}</span>
+            <span className="text-sm font-normal text-gray-800 w-6 mr-2">{user.rank}</span>
 
             {/* Avatar */}
             <Avatar className="w-10 h-10">
@@ -230,7 +230,7 @@ export default function LeaderboardPage() {
 
             {/* User Info */}
             <div className="flex-1 ml-2">
-              <p className="text-sm font-normal text-gray-600 mb-[2px] leading-tight">@{user.username}</p>
+              <p className="text-sm font-normal text-gray-800 mb-[2px] leading-tight">@{user.username}</p>
               <p className="text-xs font-normal text-[#22C55E] leading-tight">+{user.matchPercentage}% Match</p>
             </div>
 

@@ -6,3 +6,4 @@ export * from './use-leaderboard';
 export * from './use-featured-lists';
 export * from './use-list-progress';
 export * from './use-ranking';
+export * from './use-notifications';

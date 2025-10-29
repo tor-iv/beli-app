@@ -130,7 +130,7 @@ export function ListPickerModal({
                 <Icon
                   className={cn(
                     'h-5 w-5 mb-2',
-                    isSelected ? 'text-white' : 'text-gray-500'
+                    isSelected ? 'text-white' : 'text-gray-700'
                   )}
                 />
                 <span
@@ -144,7 +144,7 @@ export function ListPickerModal({
                 <span
                   className={cn(
                     'text-sm',
-                    isSelected ? 'text-white/80' : 'text-gray-500'
+                    isSelected ? 'text-white/80' : 'text-gray-700'
                   )}
                 >
                   {option.description}

@@ -55,13 +55,13 @@ export function ProfileActivityCard({
             <span className="font-semibold">{restaurantName}</span>
           </p>
           {cuisine && location && (
-            <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
+            <p className="text-sm text-gray-700 mt-0.5 flex items-center gap-1">
               <Utensils className="w-3 h-3" />
               {cuisine} · {location}
             </p>
           )}
           {visitCount !== undefined && (
-            <p className="text-sm text-gray-500 flex items-center gap-1">
+            <p className="text-sm text-gray-700 flex items-center gap-1">
               <RefreshCw className="w-3 h-3" />
               {visitCount} visit{visitCount !== 1 ? 's' : ''}
             </p>

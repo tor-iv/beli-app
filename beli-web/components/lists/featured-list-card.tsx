@@ -69,7 +69,7 @@ export function FeaturedListCard({ list, progress }: FeaturedListCardProps) {
 
             {/* Progress Text */}
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">
+              <span className="text-gray-800">
                 You've been to {progress.visited} of {progress.total}
               </span>
               <span className="text-primary font-semibold">

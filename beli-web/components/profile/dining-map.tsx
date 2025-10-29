@@ -29,7 +29,7 @@ export function DiningMap({
       <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Your Dining Map</h3>
-          <p className="text-sm text-gray-600 mt-0.5">
+          <p className="text-sm text-gray-800 mt-0.5">
             {totalCities} {cityText} • {totalRestaurants} {restaurantText}
           </p>
         </div>
@@ -39,7 +39,7 @@ export function DiningMap({
             className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
             aria-label="Share dining map"
           >
-            <Share2 className="w-5 h-5 text-gray-600" />
+            <Share2 className="w-5 h-5 text-gray-800" />
           </button>
         )}
       </div>

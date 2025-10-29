@@ -35,7 +35,7 @@ export function CategoryPills({
                 ${
                   isActive
                     ? 'bg-primary text-white border-primary'
-                    : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200'
+                    : 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200'
                 }
               `}
             >

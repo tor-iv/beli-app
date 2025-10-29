@@ -31,7 +31,7 @@ export function TasteProfileCategoryTabs({
               ${
                 isActive
                   ? 'bg-gray-100 text-gray-900 font-semibold'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-800 hover:text-gray-900'
               }
             `}
           >

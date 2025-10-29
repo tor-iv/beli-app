@@ -114,7 +114,7 @@ export default function ProfilePage() {
     return (
       <div className="container mx-auto px-4 py-6 max-w-3xl">
         <div className="flex justify-center items-center min-h-[400px]">
-          <div className="text-gray-500">Loading...</div>
+          <div className="text-gray-700">Loading...</div>
         </div>
       </div>
     );
@@ -174,7 +174,7 @@ export default function ProfilePage() {
                 SC
               </span>
             </div>
-            <p className="text-base text-gray-500 mt-1">
+            <p className="text-base text-gray-700 mt-1">
               Member since {formatMemberSince(user.memberSince)}
             </p>
 
@@ -222,15 +222,15 @@ export default function ProfilePage() {
             <div className="flex justify-around w-full max-w-md mt-8">
               <div className="text-center">
                 <div className="text-xl font-bold text-gray-900">{user.stats.followers}</div>
-                <div className="text-sm text-gray-500 mt-1">Followers</div>
+                <div className="text-sm text-gray-700 mt-1">Followers</div>
               </div>
               <div className="text-center">
                 <div className="text-xl font-bold text-gray-900">{user.stats.following}</div>
-                <div className="text-sm text-gray-500 mt-1">Following</div>
+                <div className="text-sm text-gray-700 mt-1">Following</div>
               </div>
               <div className="text-center">
                 <div className="text-xl font-bold text-gray-900">#{user.stats.rank}</div>
-                <div className="text-sm text-gray-500 mt-1">Rank on Beli</div>
+                <div className="text-sm text-gray-700 mt-1">Rank on Beli</div>
               </div>
             </div>
           </div>
@@ -330,7 +330,7 @@ export default function ProfilePage() {
             <TabsContent value="taste" className="mt-0">
               {tasteProfileLoading ? (
                 <div className="bg-white py-12 text-center">
-                  <p className="text-base text-gray-500">Loading taste profile...</p>
+                  <p className="text-base text-gray-700">Loading taste profile...</p>
                 </div>
               ) : tasteProfile ? (
                 <div className="py-6 space-y-6">
@@ -379,7 +379,7 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <div className="bg-white py-12 text-center">
-                  <p className="text-base text-gray-500">No taste profile data available</p>
+                  <p className="text-base text-gray-700">No taste profile data available</p>
                 </div>
               )}
             </TabsContent>

@@ -66,7 +66,7 @@ function DesktopLayout() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-gray-700">
               <p>No featured lists available</p>
             </div>
           )}
@@ -250,8 +250,8 @@ function MobileLayout() {
           onClick={() => alert('Search coming soon!')}
           className="w-full bg-gray-100 rounded-xl flex items-center px-4 py-3"
         >
-          <Search className="w-5 h-5 text-gray-400 mr-2" />
-          <span className="text-base text-gray-500">Search</span>
+          <Search className="w-5 h-5 text-gray-800 mr-2" />
+          <span className="text-base text-gray-700">Search</span>
         </button>
       </div>
 
@@ -291,7 +291,7 @@ function MobileLayout() {
                 />
               ))
             ) : (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 text-gray-700">
                 No articles found for this category
               </div>
             )}

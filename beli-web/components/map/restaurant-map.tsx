@@ -176,15 +176,15 @@ export function RestaurantMap({
                   <div className="font-semibold text-base mb-1 text-gray-900">
                     {restaurant.name}
                   </div>
-                  <div className="text-sm text-gray-600 mb-1">
+                  <div className="text-sm text-gray-800 mb-1">
                     {restaurant.location.neighborhood}
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-800">
                     {restaurant.cuisine.join(', ')}
                   </div>
                   <div className="flex items-center gap-2 mt-2 text-sm">
-                    <span className="text-gray-600">{restaurant.priceRange}</span>
-                    <span className="text-gray-400">•</span>
+                    <span className="text-gray-800">{restaurant.priceRange}</span>
+                    <span className="text-gray-800">•</span>
                     <span className="font-semibold" style={{ color: getRatingColor(restaurant.rating) }}>
                       {restaurant.rating.toFixed(1)}
                     </span>

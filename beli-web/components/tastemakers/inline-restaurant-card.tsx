@@ -80,7 +80,7 @@ export function InlineRestaurantCard({ restaurant, rank }: InlineRestaurantCardP
                   {restaurant.popularDishes.slice(0, 3).map((dish, idx) => (
                     <span
                       key={idx}
-                      className="text-sm text-gray-600 bg-gray-50 px-2 py-1 rounded"
+                      className="text-sm text-gray-800 bg-gray-50 px-2 py-1 rounded"
                     >
                       {dish}
                     </span>

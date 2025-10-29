@@ -15,7 +15,7 @@ import { CommentsModal } from "@/components/modals/comments-modal"
 import { ShareModal } from "@/components/modals/share-modal"
 import { AddRestaurantModal } from "@/components/modals/add-restaurant-modal"
 import { RankingResultModal } from "@/components/modals/ranking-result-modal"
-import { useAddRankedRestaurant } from "@/lib/hooks"
+import { useAddRankedRestaurant, useUnreadNotificationCount } from "@/lib/hooks"
 import type { Activity, List, User, Restaurant, RankingResult } from "@/types"
 import type { RestaurantSubmissionData } from "@/components/modals/add-restaurant-modal"
 
@@ -43,6 +43,7 @@ export default function FeedPage() {
   const [rankingData, setRankingData] = React.useState<RestaurantSubmissionData | null>(null)
 
   const addRankedRestaurantMutation = useAddRankedRestaurant()
+  const { data: unreadCount = 0 } = useUnreadNotificationCount()
 
   React.useEffect(() => {
     const loadData = async () => {
@@ -238,7 +239,7 @@ export default function FeedPage() {
     <div className="min-h-screen">
       {/* Mobile Feed Header */}
       <MobileFeedHeader
-        unreadNotificationCount={2}
+        unreadNotificationCount={unreadCount}
         onNotificationsClick={() => router.push("/notifications")}
         onReservationsClick={() => router.push("/reservations")}
         onGroupDinnerClick={() => router.push("/group-dinner")}

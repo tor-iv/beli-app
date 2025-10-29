@@ -209,7 +209,7 @@ export function RestaurantSwiper({
       {/* Desktop Keyboard Instructions */}
       {isDesktop && (
         <div className="text-center pb-2 px-4">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-700">
             Use{" "}
             <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded">
               ←
@@ -237,7 +237,7 @@ export function RestaurantSwiper({
             )}
             aria-label="Pass"
           >
-            <X className="h-7 w-7 text-gray-600" />
+            <X className="h-7 w-7 text-gray-800" />
           </IconButton>
 
           {/* Shuffle Button */}

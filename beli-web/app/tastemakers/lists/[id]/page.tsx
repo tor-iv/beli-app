@@ -74,7 +74,7 @@ export default function FeaturedListDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-gray-600">Loading...</div>
+        <div className="text-lg text-gray-800">Loading...</div>
       </div>
     )
   }
@@ -82,7 +82,7 @@ export default function FeaturedListDetailPage() {
   if (!list) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-gray-600">List not found</div>
+        <div className="text-lg text-gray-800">List not found</div>
       </div>
     )
   }
@@ -132,7 +132,7 @@ export default function FeaturedListDetailPage() {
               onClick={() => setViewMode('list')}
               className={`
                 flex-1 px-4 py-2 rounded-full flex items-center justify-center gap-2 transition-colors font-medium text-sm
-                ${viewMode === 'list' ? 'bg-primary text-white' : 'text-gray-600'}
+                ${viewMode === 'list' ? 'bg-primary text-white' : 'text-gray-800'}
               `}
             >
               <ListIcon className="w-4 h-4" />
@@ -142,7 +142,7 @@ export default function FeaturedListDetailPage() {
               onClick={() => setViewMode('map')}
               className={`
                 flex-1 px-4 py-2 rounded-full flex items-center justify-center gap-2 transition-colors font-medium text-sm
-                ${viewMode === 'map' ? 'bg-primary text-white' : 'text-gray-600'}
+                ${viewMode === 'map' ? 'bg-primary text-white' : 'text-gray-800'}
               `}
             >
               <MapPin className="w-4 h-4" />
@@ -170,7 +170,7 @@ export default function FeaturedListDetailPage() {
       {/* Description */}
       <div className="bg-white px-6 py-5 mb-6">
         <p className="text-gray-700 leading-relaxed mb-3">{list.description}</p>
-        <p className="text-sm text-gray-600 font-medium">
+        <p className="text-sm text-gray-800 font-medium">
           You've been to {userProgress.visited} of {userProgress.total}
         </p>
       </div>
@@ -194,8 +194,8 @@ export default function FeaturedListDetailPage() {
       ) : (
         <div className="px-4 pb-6">
           <div className="bg-white rounded-lg p-8 text-center">
-            <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">Map view coming soon!</p>
+            <MapPin className="w-12 h-12 text-gray-800 mx-auto mb-4" />
+            <p className="text-gray-800">Map view coming soon!</p>
           </div>
         </div>
       )}

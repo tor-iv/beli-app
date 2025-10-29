@@ -89,11 +89,11 @@ export function CommentsModal({
         <ScrollArea className="flex-1 px-6 -mx-6">
           {localComments.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <MessageCircle className="h-16 w-16 text-gray-400 mb-6" />
+              <MessageCircle className="h-16 w-16 text-gray-800 mb-6" />
               <p className="text-base font-semibold text-gray-700 mb-1.5">
                 No comments yet
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-700">
                 Be the first to comment!
               </p>
             </div>
@@ -112,7 +112,7 @@ export function CommentsModal({
                         <span className="text-sm font-semibold text-gray-900">
                           {commentUser.displayName}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-700">
                           {formatTimeAgo(comment.timestamp)}
                         </span>
                       </div>
@@ -153,7 +153,7 @@ export function CommentsModal({
                   onClick={handleSubmit}
                   disabled={!commentText.trim()}
                   size="icon"
-                  className="h-10 w-10 rounded-full bg-[#0B7B7F] hover:bg-[#0B7B7F]/90 disabled:bg-gray-200 disabled:text-gray-400 transition-all shadow-sm"
+                  className="h-10 w-10 rounded-full bg-[#0B7B7F] hover:bg-[#0B7B7F]/90 disabled:bg-gray-200 disabled:text-gray-800 transition-all shadow-sm"
                 >
                   <Send className="h-4 w-4" />
                 </Button>

@@ -35,15 +35,15 @@ export function TasteProfileList({
     <div className="bg-white mt-4 rounded-lg shadow-sm">
       {/* Header */}
       <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
-        <p className="text-base font-medium text-gray-600">
+        <p className="text-base font-medium text-gray-800">
           {totalCount} {totalCount === 1 ? 'Item' : 'Items'}
         </p>
         <button
           onClick={onSortPress}
           className="flex items-center gap-2 py-1 px-3 rounded-md border border-gray-200 hover:bg-gray-50 transition-colors"
         >
-          <ArrowUpDown className="w-4 h-4 text-gray-600" />
-          <span className="text-sm text-gray-600">{getSortLabel()}</span>
+          <ArrowUpDown className="w-4 h-4 text-gray-800" />
+          <span className="text-sm text-gray-800">{getSortLabel()}</span>
         </button>
       </div>
 
@@ -60,12 +60,12 @@ export function TasteProfileList({
             >
               <div className="flex-1 text-left">
                 <p className="text-base font-semibold text-gray-900 mb-1">{name}</p>
-                <p className="text-sm text-gray-600">{item.count} places</p>
+                <p className="text-sm text-gray-800">{item.count} places</p>
               </div>
 
               <div className="flex items-center gap-4">
                 <RatingBubble rating={item.avgScore} />
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                <ChevronRight className="w-5 h-5 text-gray-800 group-hover:text-gray-800 transition-colors" />
               </div>
             </button>
           );
