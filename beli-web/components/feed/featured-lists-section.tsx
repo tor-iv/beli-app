@@ -61,7 +61,7 @@ export function FeaturedListsSection({
       {/* Section Header */}
       <div className="flex items-center justify-between px-4 mb-3">
         <h2 className="text-xs font-semibold text-foreground tracking-wide">
-          FEATURED LISTS
+          TASTEMAKERS
         </h2>
         <button
           onClick={onSeeAllClick}

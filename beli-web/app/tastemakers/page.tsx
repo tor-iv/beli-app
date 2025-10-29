@@ -217,14 +217,41 @@ function MobileLayout() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="flex items-center justify-between px-4 py-3">
+          <button
+            onClick={() => window.history.back()}
+            className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Go back"
+          >
+            <svg
+              className="w-7 h-7 text-gray-900"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <h1 className="text-lg font-semibold text-gray-900">Tastemakers</h1>
+          <div className="w-9" /> {/* Spacer for centering */}
+        </div>
+      </div>
+
       {/* Search Bar - Placeholder */}
-      <div className="bg-white px-4 pt-4 pb-2">
+      <div className="bg-white px-4 pb-2">
         <button
           onClick={() => alert('Search coming soon!')}
           className="w-full bg-gray-100 rounded-xl flex items-center px-4 py-3"
         >
           <Search className="w-5 h-5 text-gray-400 mr-2" />
-          <span className="text-base text-gray-500">Search tastemakers...</span>
+          <span className="text-base text-gray-500">Search</span>
         </button>
       </div>
 

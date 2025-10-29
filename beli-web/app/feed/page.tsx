@@ -267,7 +267,7 @@ export default function FeedPage() {
       {contentMode === 'featured-lists' ? (
         <FeaturedListsSection
           lists={featuredLists}
-          onSeeAllClick={() => router.push("/lists/featured")}
+          onSeeAllClick={() => router.push("/tastemakers")}
         />
       ) : (
         <div className="md:hidden px-4">
