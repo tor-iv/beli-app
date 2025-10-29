@@ -175,6 +175,18 @@ export const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({
     setCurrentComparison(nextRestaurant);
   };
 
+  const handleTooTough = () => {
+    if (!rankingState) return;
+
+    // Stop ranking immediately and use current position
+    const finalState: RankingState = {
+      ...rankingState,
+      isComplete: true,
+    };
+
+    handleRankingComplete(finalState);
+  };
+
   const handleUndo = () => {
     if (!rankingState || rankingState.comparisonHistory.length === 0) return;
 
@@ -338,8 +350,12 @@ export const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({
                   </Text>
                   <Text style={styles.comparisonCardLocation} numberOfLines={1}>
                     {currentComparison.location.city}, {currentComparison.location.state}
-                    {currentComparison.rating && ` • ${currentComparison.rating.toFixed(1)}`}
                   </Text>
+                  {(currentComparison as any).userRating && (
+                    <Text style={styles.comparisonCardRanking}>
+                      {((currentComparison as any).userRating as number).toFixed(1)}
+                    </Text>
+                  )}
                 </Pressable>
               </View>
 
@@ -382,17 +398,10 @@ export const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({
                 </Pressable>
 
                 <Pressable
-                  style={[
-                    styles.tooToughButton,
-                    rankingState.skipsRemaining === 0 && styles.controlButtonDisabled,
-                  ]}
-                  onPress={handleSkip}
-                  disabled={rankingState.skipsRemaining === 0}
+                  style={styles.tooToughButton}
+                  onPress={handleTooTough}
                 >
-                  <Text style={[
-                    styles.tooToughButtonText,
-                    rankingState.skipsRemaining === 0 && styles.controlButtonTextDisabled,
-                  ]}>
+                  <Text style={styles.tooToughButtonText}>
                     Too tough
                   </Text>
                 </Pressable>
@@ -712,6 +721,13 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     lineHeight: 18,
     textAlign: 'center',
+  },
+  comparisonCardRanking: {
+    fontSize: 12,
+    color: colors.primary,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 6,
   },
   orCircle: {
     width: 50,

@@ -101,6 +101,94 @@ export class MockDataService {
     return finalScore;
   }
 
+  // Social relationship methods
+  // In-memory storage for following relationships (in a real app, this would be in a database)
+  private static followingRelationships: Map<string, Set<string>> = new Map([
+    // currentUser (id: '1') follows some users
+    ['1', new Set(['2', '3', '4', '5'])],
+    // Other users follow currentUser
+    ['2', new Set(['1', '3'])],
+    ['3', new Set(['1', '2'])],
+    ['4', new Set(['1'])],
+    ['5', new Set(['1'])],
+  ]);
+
+  static async isFollowing(userId: string, targetUserId: string): Promise<boolean> {
+    await delay(50); // Faster delay for social checks
+    const userFollowing = this.followingRelationships.get(userId);
+    return userFollowing?.has(targetUserId) || false;
+  }
+
+  static async followUser(userId: string, targetUserId: string): Promise<void> {
+    await delay(100);
+
+    // Get or create the following set for this user
+    let userFollowing = this.followingRelationships.get(userId);
+    if (!userFollowing) {
+      userFollowing = new Set();
+      this.followingRelationships.set(userId, userFollowing);
+    }
+
+    // Add the target user to following set
+    userFollowing.add(targetUserId);
+
+    // Update follower/following counts
+    const user = mockUsers.find(u => u.id === userId);
+    const targetUser = mockUsers.find(u => u.id === targetUserId);
+
+    if (user && user.stats) {
+      user.stats.following = (user.stats.following || 0) + 1;
+    }
+    if (targetUser && targetUser.stats) {
+      targetUser.stats.followers = (targetUser.stats.followers || 0) + 1;
+    }
+  }
+
+  static async unfollowUser(userId: string, targetUserId: string): Promise<void> {
+    await delay(100);
+
+    const userFollowing = this.followingRelationships.get(userId);
+    if (userFollowing) {
+      userFollowing.delete(targetUserId);
+
+      // Update follower/following counts
+      const user = mockUsers.find(u => u.id === userId);
+      const targetUser = mockUsers.find(u => u.id === targetUserId);
+
+      if (user && user.stats) {
+        user.stats.following = Math.max(0, (user.stats.following || 0) - 1);
+      }
+      if (targetUser && targetUser.stats) {
+        targetUser.stats.followers = Math.max(0, (targetUser.stats.followers || 0) - 1);
+      }
+    }
+  }
+
+  static async getFollowers(userId: string): Promise<User[]> {
+    await delay();
+    const followers: User[] = [];
+
+    // Find all users who follow this user
+    for (const [followerId, following] of this.followingRelationships.entries()) {
+      if (following.has(userId)) {
+        const follower = mockUsers.find(u => u.id === followerId);
+        if (follower) {
+          followers.push(follower);
+        }
+      }
+    }
+
+    return followers;
+  }
+
+  static async getFollowing(userId: string): Promise<User[]> {
+    await delay();
+    const following = this.followingRelationships.get(userId);
+    if (!following) return [];
+
+    return mockUsers.filter(u => following.has(u.id));
+  }
+
   // Restaurant-related methods
   static async getAllRestaurants(): Promise<Restaurant[]> {
     await delay();
@@ -1234,13 +1322,33 @@ export class MockDataService {
   static async getUserTasteProfile(userId: string, days: number = 30): Promise<import('@/types').TasteProfileStats> {
     await delay();
 
-    // Get all user's "been" restaurants
+    // Get all user's "been" restaurants - use Set for O(1) lookup
     const userRelations = mockUserRestaurantRelations.filter(
       rel => rel.userId === userId && rel.status === 'been'
     );
 
-    const restaurantIds = userRelations.map(rel => rel.restaurantId);
-    const restaurants = mockRestaurants.filter(r => restaurantIds.includes(r.id));
+    // Early return if no data
+    if (userRelations.length === 0) {
+      return {
+        last30Days: {
+          restaurantsCount: 0,
+          cuisinesCount: 0,
+          activityPercentile: 0,
+          primaryLocation: 'Unknown',
+        },
+        cuisineBreakdown: [],
+        cityBreakdown: [],
+        countryBreakdown: [],
+        diningLocations: [],
+        totalRestaurants: 0,
+        totalCities: 0,
+        totalCountries: 0,
+        totalCuisines: 0,
+      };
+    }
+
+    const restaurantIdsSet = new Set(userRelations.map(rel => rel.restaurantId));
+    const restaurants = mockRestaurants.filter(r => restaurantIdsSet.has(r.id));
 
     // Calculate last N days stats
     const daysAgo = new Date();
@@ -1250,48 +1358,83 @@ export class MockDataService {
       rel => rel.visitDate && new Date(rel.visitDate) >= daysAgo
     );
 
-    const recentRestaurantIds = recentRelations.map(rel => rel.restaurantId);
-    const recentRestaurants = mockRestaurants.filter(r => recentRestaurantIds.includes(r.id));
+    const recentRestaurantIdsSet = new Set(recentRelations.map(rel => rel.restaurantId));
+    const recentRestaurants = mockRestaurants.filter(r => recentRestaurantIdsSet.has(r.id));
 
     const recentCuisines = new Set(recentRestaurants.flatMap(r => r.cuisine));
 
     const user = await this.getUserById(userId);
     const primaryLocation = user?.location.city || 'Unknown';
 
-    // Calculate cuisine breakdown
+    // OPTIMIZED: Calculate all breakdowns in a single loop
     const cuisineMap = new Map<string, { count: number; totalScore: number; restaurantIds: string[] }>();
+    const cityMap = new Map<string, { count: number; totalScore: number; restaurantIds: string[]; state?: string }>();
+    const countryMap = new Map<string, { count: number; totalScore: number; restaurantIds: string[] }>();
+    const cityLocationMap = new Map<string, import('@/types').DiningLocation>();
 
+    // Single loop through restaurants - major performance improvement
     restaurants.forEach(restaurant => {
+      const restaurantId = restaurant.id;
+      const rating = restaurant.rating;
+
+      // Process cuisines - push instead of spread
       restaurant.cuisine.forEach(cuisine => {
-        const existing = cuisineMap.get(cuisine) || { count: 0, totalScore: 0, restaurantIds: [] };
-        cuisineMap.set(cuisine, {
-          count: existing.count + 1,
-          totalScore: existing.totalScore + restaurant.rating,
-          restaurantIds: [...existing.restaurantIds, restaurant.id],
-        });
+        let cuisineData = cuisineMap.get(cuisine);
+        if (!cuisineData) {
+          cuisineData = { count: 0, totalScore: 0, restaurantIds: [] };
+          cuisineMap.set(cuisine, cuisineData);
+        }
+        cuisineData.count++;
+        cuisineData.totalScore += rating;
+        cuisineData.restaurantIds.push(restaurantId); // Push instead of spread
       });
+
+      // Process cities - push instead of spread
+      const cityKey = `${restaurant.location.city}, ${restaurant.location.state}`;
+      let cityData = cityMap.get(cityKey);
+      if (!cityData) {
+        cityData = { count: 0, totalScore: 0, restaurantIds: [], state: restaurant.location.state };
+        cityMap.set(cityKey, cityData);
+      }
+      cityData.count++;
+      cityData.totalScore += rating;
+      cityData.restaurantIds.push(restaurantId); // Push instead of spread
+
+      // Process countries - push instead of spread
+      const country = 'United States'; // Mock: assume all restaurants are in US
+      let countryData = countryMap.get(country);
+      if (!countryData) {
+        countryData = { count: 0, totalScore: 0, restaurantIds: [] };
+        countryMap.set(country, countryData);
+      }
+      countryData.count++;
+      countryData.totalScore += rating;
+      countryData.restaurantIds.push(restaurantId); // Push instead of spread
+
+      // Process city locations - push instead of spread
+      const cityKey2 = restaurant.location.city;
+      let cityLocation = cityLocationMap.get(cityKey2);
+      if (!cityLocation) {
+        cityLocation = {
+          city: restaurant.location.city,
+          country: 'United States',
+          state: restaurant.location.state,
+          lat: restaurant.location.coordinates.lat,
+          lng: restaurant.location.coordinates.lng,
+          restaurantIds: [],
+        };
+        cityLocationMap.set(cityKey2, cityLocation);
+      }
+      cityLocation.restaurantIds.push(restaurantId); // Push instead of spread
     });
 
+    // Convert maps to arrays (only once at the end)
     const cuisineBreakdown: import('@/types').CuisineBreakdown[] = Array.from(cuisineMap.entries()).map(([cuisine, data]) => ({
       cuisine,
       count: data.count,
       avgScore: parseFloat((data.totalScore / data.count).toFixed(1)),
       restaurantIds: data.restaurantIds,
     }));
-
-    // Calculate city breakdown
-    const cityMap = new Map<string, { count: number; totalScore: number; restaurantIds: string[]; state?: string }>();
-
-    restaurants.forEach(restaurant => {
-      const cityKey = `${restaurant.location.city}, ${restaurant.location.state}`;
-      const existing = cityMap.get(cityKey) || { count: 0, totalScore: 0, restaurantIds: [], state: restaurant.location.state };
-      cityMap.set(cityKey, {
-        count: existing.count + 1,
-        totalScore: existing.totalScore + restaurant.rating,
-        restaurantIds: [...existing.restaurantIds, restaurant.id],
-        state: restaurant.location.state,
-      });
-    });
 
     const cityBreakdown: import('@/types').CityBreakdown[] = Array.from(cityMap.entries()).map(([city, data]) => ({
       city: city.split(',')[0].trim(),
@@ -1301,46 +1444,12 @@ export class MockDataService {
       restaurantIds: data.restaurantIds,
     }));
 
-    // Calculate country breakdown (mock - assuming mostly US)
-    const countryMap = new Map<string, { count: number; totalScore: number; restaurantIds: string[] }>();
-
-    restaurants.forEach(restaurant => {
-      const country = 'United States'; // Mock: assume all restaurants are in US
-      const existing = countryMap.get(country) || { count: 0, totalScore: 0, restaurantIds: [] };
-      countryMap.set(country, {
-        count: existing.count + 1,
-        totalScore: existing.totalScore + restaurant.rating,
-        restaurantIds: [...existing.restaurantIds, restaurant.id],
-      });
-    });
-
     const countryBreakdown: import('@/types').CountryBreakdown[] = Array.from(countryMap.entries()).map(([country, data]) => ({
       country,
       count: data.count,
       avgScore: parseFloat((data.totalScore / data.count).toFixed(1)),
       restaurantIds: data.restaurantIds,
     }));
-
-    // Generate dining locations with coordinates
-    const cityLocationMap = new Map<string, import('@/types').DiningLocation>();
-
-    restaurants.forEach(restaurant => {
-      const cityKey = restaurant.location.city;
-      const existing = cityLocationMap.get(cityKey);
-
-      if (!existing) {
-        cityLocationMap.set(cityKey, {
-          city: restaurant.location.city,
-          country: 'United States',
-          state: restaurant.location.state,
-          lat: restaurant.location.coordinates.lat,
-          lng: restaurant.location.coordinates.lng,
-          restaurantIds: [restaurant.id],
-        });
-      } else {
-        existing.restaurantIds.push(restaurant.id);
-      }
-    });
 
     const diningLocations: import('@/types').DiningLocation[] = Array.from(cityLocationMap.values());
 

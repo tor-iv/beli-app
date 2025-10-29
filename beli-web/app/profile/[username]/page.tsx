@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useMemo } from 'react';
 import { MockDataService } from '@/lib/mockDataService';
-import { User, Review, Restaurant, CuisineBreakdown, CityBreakdown, CountryBreakdown } from '@/types';
+import { CuisineBreakdown, CityBreakdown, CountryBreakdown } from '@/types';
 import { notFound, useRouter } from 'next/navigation';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -16,67 +16,67 @@ import { TasteProfileCategoryTabs, TasteProfileCategory } from '@/components/pro
 import { TasteProfileList, SortOption } from '@/components/profile/taste-profile-list';
 import { DiningMap } from '@/components/profile/dining-map';
 import { useTasteProfile } from '@/lib/hooks/use-taste-profile';
+import { useUserByUsername, useCurrentUser, useUserReviews, useIsFollowing } from '@/lib/hooks/use-user';
+import { useRestaurantsByIds } from '@/lib/hooks/use-restaurants';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Instagram, Newspaper, BarChart3 } from 'lucide-react';
 
 export default function ProfilePage({ params }: { params: { username: string } }) {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [isCurrentUser, setIsCurrentUser] = useState(false);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'activity' | 'taste'>('activity');
-  const [recentReviews, setRecentReviews] = useState<Review[]>([]);
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
 
   // Taste profile state
   const [tasteCategory, setTasteCategory] = useState<TasteProfileCategory>('cuisines');
   const [sortBy, setSortBy] = useState<SortOption>('count');
 
-  // Load taste profile data
+  // Load user data using React Query
+  const { data: user, isLoading: userLoading } = useUserByUsername(params.username);
+  const { data: currentUser } = useCurrentUser();
+  const { data: reviews = [] } = useUserReviews(user?.id || '');
+
+  // Check if current user is viewing own profile
+  const isCurrentUser = useMemo(() => {
+    return user?.id === currentUser?.id;
+  }, [user?.id, currentUser?.id]);
+
+  // Load following status only if not own profile
+  const { data: isFollowingData } = useIsFollowing(
+    currentUser?.id || '',
+    user?.id || '',
+  );
+
+  // Only load restaurants needed for reviews (not all 53!)
+  const reviewRestaurantIds = useMemo(() => {
+    return reviews.slice(0, 5).map(r => r.restaurantId);
+  }, [reviews]);
+
+  const { data: restaurants = [] } = useRestaurantsByIds(reviewRestaurantIds);
+
+  // Load taste profile data with enabled flag
   const { data: tasteProfile, isLoading: tasteProfileLoading } = useTasteProfile(
     user?.id || '',
     30
   );
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const [userData, currentUser, allRestaurants] = await Promise.all([
-          MockDataService.getUserByUsername(params.username),
-          MockDataService.getCurrentUser(),
-          MockDataService.getAllRestaurants(),
-        ]);
-
-        if (!userData) {
-          notFound();
-        }
-
-        const reviews = await MockDataService.getUserReviews(userData.id);
-
-        // Check if viewing own profile
-        const isOwnProfile = userData.id === currentUser.id;
-        setIsCurrentUser(isOwnProfile);
-
-        // Check if following this user (only if not own profile)
-        if (!isOwnProfile) {
-          const followingStatus = await MockDataService.isFollowing(currentUser.id, userData.id);
-          setIsFollowing(followingStatus);
-        }
-
-        setUser(userData);
-        setRestaurants(allRestaurants);
-        setRecentReviews(reviews.slice(0, 5));
-      } catch (error) {
-        console.error('Failed to load profile:', error);
-      } finally {
-        setLoading(false);
+  // Follow/unfollow mutation
+  const followMutation = useMutation({
+    mutationFn: async ({ follow }: { follow: boolean }) => {
+      if (!currentUser || !user) return;
+      if (follow) {
+        await MockDataService.followUser(currentUser.id, user.id);
+      } else {
+        await MockDataService.unfollowUser(currentUser.id, user.id);
       }
-    };
+    },
+    onSuccess: () => {
+      // Invalidate following query
+      queryClient.invalidateQueries({ queryKey: ['following', currentUser?.id, user?.id] });
+    },
+  });
 
-    loadProfile();
-  }, [params.username]);
-
-  if (loading) {
+  // Loading state
+  if (userLoading) {
     return (
       <div className="container mx-auto px-4 py-6 max-w-3xl">
         <div className="flex justify-center items-center min-h-[400px]">
@@ -86,6 +86,7 @@ export default function ProfilePage({ params }: { params: { username: string } }
     );
   }
 
+  // User not found
   if (!user) {
     notFound();
   }
@@ -94,8 +95,8 @@ export default function ProfilePage({ params }: { params: { username: string } }
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   };
 
-  // Get current category data for taste profile
-  const getCurrentCategoryData = () => {
+  // OPTIMIZED: Memoized function to get current category data for taste profile
+  const getCurrentCategoryData = useMemo(() => {
     if (!tasteProfile) return [];
 
     let data: Array<CuisineBreakdown | CityBreakdown | CountryBreakdown> = [];
@@ -120,7 +121,7 @@ export default function ProfilePage({ params }: { params: { username: string } }
         return b.avgScore - a.avgScore;
       }
     });
-  };
+  }, [tasteProfile, tasteCategory, sortBy]);
 
   const handleSortToggle = () => {
     setSortBy(prev => prev === 'count' ? 'avgScore' : 'count');
@@ -138,20 +139,11 @@ export default function ProfilePage({ params }: { params: { username: string } }
 
   const handleFollowToggle = async () => {
     if (!user) return;
-
-    try {
-      const currentUser = await MockDataService.getCurrentUser();
-      if (isFollowing) {
-        await MockDataService.unfollowUser(currentUser.id, user.id);
-        setIsFollowing(false);
-      } else {
-        await MockDataService.followUser(currentUser.id, user.id);
-        setIsFollowing(true);
-      }
-    } catch (error) {
-      console.error('Failed to toggle follow:', error);
-    }
+    followMutation.mutate({ follow: !isFollowingData });
   };
+
+  // Recent reviews for display (first 5)
+  const recentReviews = useMemo(() => reviews.slice(0, 5), [reviews]);
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -204,11 +196,12 @@ export default function ProfilePage({ params }: { params: { username: string } }
               ) : (
                 <>
                   <Button
-                    variant={isFollowing ? "outline" : "default"}
+                    variant={isFollowingData ? "outline" : "default"}
                     className="flex-1"
                     onClick={handleFollowToggle}
+                    disabled={followMutation.isPending}
                   >
-                    {isFollowing ? 'Following' : 'Follow'}
+                    {followMutation.isPending ? 'Loading...' : isFollowingData ? 'Following' : 'Follow'}
                   </Button>
                   <Button variant="outline" className="flex-1">
                     Share profile
@@ -367,7 +360,7 @@ export default function ProfilePage({ params }: { params: { username: string } }
                   {/* Category List */}
                   <div className="px-6">
                     <TasteProfileList
-                      data={getCurrentCategoryData()}
+                      data={getCurrentCategoryData}
                       totalCount={
                         tasteCategory === 'cuisines'
                           ? tasteProfile.totalCuisines

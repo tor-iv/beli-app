@@ -5,6 +5,7 @@ export function useRestaurants() {
   return useQuery({
     queryKey: ['restaurants'],
     queryFn: () => MockDataService.getAllRestaurants(),
+    staleTime: 10 * 60 * 1000, // 10 minutes - restaurants don't change often
   });
 }
 
@@ -13,6 +14,19 @@ export function useRestaurant(id: string) {
     queryKey: ['restaurant', id],
     queryFn: () => MockDataService.getRestaurantById(id),
     enabled: !!id,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+
+export function useRestaurantsByIds(ids: string[]) {
+  return useQuery({
+    queryKey: ['restaurants', 'byIds', ids.sort().join(',')],
+    queryFn: async () => {
+      const allRestaurants = await MockDataService.getAllRestaurants();
+      return allRestaurants.filter(r => ids.includes(r.id));
+    },
+    enabled: ids.length > 0,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 }
 

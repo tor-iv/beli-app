@@ -1376,7 +1376,7 @@ export class MockDataService {
   }
 
   // Ranking methods
-  static async getRankedRestaurants(userId: string, category: ListCategory): Promise<Restaurant[]> {
+  static async getRankedRestaurants(userId: string, category: ListCategory): Promise<(Restaurant & { userRating?: number })[]> {
     await delay();
 
     // Get all restaurants in the 'been' list for this user
@@ -1387,18 +1387,26 @@ export class MockDataService {
     // Filter by category (for now, all restaurants go into 'restaurants' category)
     // In a real app, you might filter by restaurant type based on category
 
-    // Get full restaurant objects with their rank indices
+    // Get full restaurant objects with their rank indices and user ratings
     const restaurantsWithRanks = relations
       .map(relation => {
         const restaurant = mockRestaurants.find(r => r.id === relation.restaurantId);
-        return restaurant ? { restaurant, rankIndex: relation.rankIndex ?? 999999 } : null;
+        return restaurant ? {
+          restaurant,
+          rankIndex: relation.rankIndex ?? 999999,
+          userRating: relation.rating
+        } : null;
       })
-      .filter((item): item is { restaurant: Restaurant; rankIndex: number } => item !== null);
+      .filter((item): item is { restaurant: Restaurant; rankIndex: number; userRating?: number } => item !== null);
 
     // Sort by rank index (lower index = higher rank)
     restaurantsWithRanks.sort((a, b) => a.rankIndex - b.rankIndex);
 
-    return restaurantsWithRanks.map(item => item.restaurant);
+    // Attach userRating to restaurant objects
+    return restaurantsWithRanks.map(item => ({
+      ...item.restaurant,
+      userRating: item.userRating
+    }));
   }
 
   static async insertRankedRestaurant(

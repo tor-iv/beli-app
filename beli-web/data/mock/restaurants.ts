@@ -159,6 +159,7 @@ export const mockRestaurants: Restaurant[] = [
       'https://images.unsplash.com/photo-1506354666786-959d6d497f1a?w=600&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1528137871618-79d2761e3fd5?w=600&auto=format&fit=crop',
     ],
+    menu: ['psp-1', 'psp-2', 'psp-3', 'psp-4', 'psp-5', 'psp-6', 'psp-7', 'psp-8'],
   },
 
   // MANHATTAN - GREENWICH VILLAGE
@@ -173,7 +174,9 @@ export const mockRestaurants: Restaurant[] = [
       state: 'NY',
       neighborhood: 'Greenwich Village',
       coordinates: { lat: 40.7308, lng: -74.0034 },
-    },
+  
+    menu: ['jp-1', 'jp-2', 'jp-3', 'jp-4', 'jp-5', 'jp-6', 'jp-7', 'jp-8'],
+  },
     rating: 7.8,
     images: ['https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400'],
     hours: {
@@ -222,7 +225,9 @@ export const mockRestaurants: Restaurant[] = [
       state: 'NY',
       neighborhood: 'Greenwich Village',
       coordinates: { lat: 40.7293, lng: -74.0024 },
-    },
+  
+    menu: ['min-1', 'min-2', 'min-3', 'min-4', 'min-5', 'min-6', 'min-7', 'min-8', 'min-9', 'min-10', 'min-11', 'min-12'],
+  },
     rating: 9.1,
     images: ['https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400'],
     hours: {
@@ -276,7 +281,9 @@ export const mockRestaurants: Restaurant[] = [
       state: 'NY',
       neighborhood: 'Lower East Side',
       coordinates: { lat: 40.7223, lng: -73.9873 },
-    },
+  
+    menu: ['katz-1', 'katz-2', 'katz-3', 'katz-4', 'katz-5', 'katz-6', 'katz-7', 'katz-8', 'katz-9', 'katz-10'],
+  },
     rating: 8.3,
     images: ['https://images.unsplash.com/photo-1551782450-17144efb9c50?w=400'],
     hours: {
@@ -326,7 +333,9 @@ export const mockRestaurants: Restaurant[] = [
       state: 'NY',
       neighborhood: 'East Village',
       coordinates: { lat: 40.7282, lng: -73.9857 },
-    },
+  
+    menu: ['momofo-1', 'momofo-2', 'momofo-3', 'momofo-4', 'momofo-5', 'momofo-6', 'momofo-7', 'momofo-8', 'momofo-9', 'momofo-10'],
+  },
     rating: 8.7,
     images: ['https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=400'],
     hours: {
@@ -378,7 +387,9 @@ export const mockRestaurants: Restaurant[] = [
       state: 'NY',
       neighborhood: 'Lower East Side',
       coordinates: { lat: 40.7219, lng: -73.9890 },
-    },
+  
+    menu: ['rd-1', 'rd-2', 'rd-3', 'rd-4', 'rd-5', 'rd-6', 'rd-7', 'rd-8', 'rd-9', 'rd-10'],
+  },
     rating: 8.6,
     images: ['https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400'],
     hours: {
@@ -1673,7 +1684,9 @@ export const mockRestaurants: Restaurant[] = [
       state: 'NY',
       neighborhood: 'West Village',
       coordinates: { lat: 40.7346, lng: -74.0062 },
-    },
+  
+    menu: ['lart-1', 'lart-2', 'lart-3', 'lart-4', 'lart-5', 'lart-6', 'lart-7', 'lart-8', 'lart-9', 'lart-10', 'lart-11', 'lart-12'],
+  },
     rating: 9.1,
     images: ['https://images.unsplash.com/photo-1525755662778-989d0524087e?w=400'],
     hours: {
@@ -1703,7 +1716,9 @@ export const mockRestaurants: Restaurant[] = [
       state: 'NY',
       neighborhood: 'West Village',
       coordinates: { lat: 40.7355, lng: -74.0063 },
-    },
+  
+    menu: ['ant-1', 'ant-2', 'ant-3', 'ant-4', 'ant-5', 'ant-6', 'ant-7', 'ant-8', 'ant-9', 'ant-10'],
+  },
     rating: 6.2,
     images: ['https://images.unsplash.com/photo-1481931098730-318b6f776db0?w=400'],
     hours: {
@@ -1733,7 +1748,9 @@ export const mockRestaurants: Restaurant[] = [
       state: 'NY',
       neighborhood: 'West Village',
       coordinates: { lat: 40.7339, lng: -74.0068 },
-    },
+  
+    menu: ['cg-1', 'cg-2', 'cg-3', 'cg-4', 'cg-5', 'cg-6', 'cg-7', 'cg-8'],
+  },
     rating: 3.4,
     images: ['https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=400'],
     hours: {
