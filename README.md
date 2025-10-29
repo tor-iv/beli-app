@@ -10,8 +10,6 @@
 
 ## 🎯 The Demo Experience
 
-**[Resume](/) → [Demo Hub](/demo) → [Live Features](/tastemakers)**
-
 This repository showcases three major features I built for Beli, demonstrating full-stack proficiency across mobile and web platforms. Each feature solves real user pain points in restaurant discovery and group dining coordination.
 
 ## 🚀 Features I Built
@@ -28,7 +26,7 @@ This repository showcases three major features I built for Beli, demonstrating f
 - Full Next.js App Router implementation with dynamic routes
 - Engagement metrics (followers, likes, bookmarks, views)
 
-**Tech Stack**: Next.js 15, TypeScript, App Router, shadcn/ui, Tailwind CSS
+**Tech Stack**: Next.js 16, TypeScript, App Router, shadcn/ui, Tailwind CSS
 
 **Files**: [`beli-web/app/tastemakers/`](beli-web/app/tastemakers/)
 
@@ -58,8 +56,6 @@ This repository showcases three major features I built for Beli, demonstrating f
 6. Party size support
 
 **Files**: [`beli-native/src/screens/GroupDinnerScreen.tsx`](beli-native/src/screens/GroupDinnerScreen.tsx), [`beli-native/src/components/group-dinner/`](beli-native/src/components/group-dinner/)
-
-**Documentation**: [group-dinner.md](group-dinner.md)
 
 ---
 
@@ -220,7 +216,7 @@ All built with a consistent modern premium casual design system.
 - **UI Components**: Custom components with Expo Vector Icons
 
 ### Web (beli-web/)
-- **Framework**: Next.js 15 with App Router
+- **Framework**: Next.js 16 with App Router
 - **Language**: TypeScript (strict mode)
 - **UI Library**: shadcn/ui + Tailwind CSS
 - **State Management**: Zustand + React Query (TanStack Query)
@@ -286,8 +282,6 @@ cd beli-native && npm start
 Each feature has comprehensive documentation showing my planning and technical thinking:
 
 ### Implemented Features
-- **[DEMO-PLAN.md](DEMO-PLAN.md)** - Complete demo experience implementation plan with all 7 features
-- **[group-dinner.md](group-dinner.md)** - 750-line Group Dinner feature spec with 6-factor algorithm
 - **[docs/what-to-order-feature.md](docs/what-to-order-feature.md)** - 350-line What to Order comprehensive guide
 - **[CLAUDE.md](CLAUDE.md)** - Development guide and architecture overview
 
@@ -301,12 +295,12 @@ Each feature has comprehensive documentation showing my planning and technical t
 
 ## 🎯 What's Next?
 
-The [DEMO-PLAN.md](DEMO-PLAN.md) outlines the next phase: creating an interactive demo experience that starts with my resume and guides founders through each feature with detailed explanations.
-
-**Planned Demo Flow**:
-1. **Landing Page** (`/`) - Interactive resume showcasing my background
-2. **Demo Hub** (`/demo`) - Overview of the three features with stats
-3. **Feature Tours** - Deep dives into each implementation with code highlights
+Potential enhancements include:
+- Backend integration with real API
+- Authentication and user management
+- Push notifications and real-time updates
+- Photo upload functionality
+- Payment and reservation integration
 
 ## 🤝 Let's Connect
 

@@ -194,7 +194,7 @@ export default function GroupDinnerTutorialPage() {
               <h3 className="font-semibold text-gray-900 mb-1">Decision-Free Dining</h3>
               <p className="text-sm text-gray-700">
                 Stop scrolling endlessly through options. We curate restaurants that fit your vibe and party size,
-                so you can swipe through a handful of great choices and pick one fast. Perfect for when you're
+                so you can swipe through a handful of great choices and pick one fast. Swipe right to save, swipe left to pass. Perfect for when you're
                 hungry, indecisive, or just need someone else to handle the planning.
               </p>
             </div>

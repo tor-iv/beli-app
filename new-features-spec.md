@@ -2,7 +2,7 @@
 **Lucky Spin | Restaurant Scavenger Hunt | Food Crawl | New Openings**
 
 **Version:** 1.1
-**Date:** October 27, 2025
+**Date:** October 27, 2024
 **Status:** Planning / Pre-Implementation
 
 ---
