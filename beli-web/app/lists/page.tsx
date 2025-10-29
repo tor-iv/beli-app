@@ -22,7 +22,13 @@ import { RestaurantListItemMobile } from '@/components/restaurant/restaurant-lis
 import { useListFilters } from '@/lib/stores/list-filters';
 import { useListCounts } from '@/lib/hooks/use-list-counts';
 import { Button } from '@/components/ui/button';
-import { IoShareSocial } from 'react-icons/io5';
+import { IoShareSocial, IoChevronDown, IoCheckmark } from 'react-icons/io5';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import dynamic from 'next/dynamic';
 
 // Dynamically import map component (client-side only)
@@ -103,6 +109,42 @@ function ListsContent() {
 
     loadViewRestaurants();
   }, [viewParam]);
+
+  // Load data for special list types (trending, recs_for_you, recs_from_friends)
+  useEffect(() => {
+    const loadSpecialListData = async () => {
+      // Only load if not in a view and we're on a special list
+      const specialLists: ListType[] = ['trending', 'recs_for_you', 'recs_from_friends'];
+      if (viewParam || !specialLists.includes(activeTab)) {
+        // Clear special list data when switching to regular lists
+        if (['been', 'want_to_try', 'recs', 'playlists'].includes(activeTab) && viewRestaurants) {
+          setViewRestaurants(null);
+        }
+        return;
+      }
+
+      setLoadingView(true);
+      try {
+        let specialRestaurants: Restaurant[] = [];
+
+        if (activeTab === 'trending') {
+          specialRestaurants = await MockDataService.getTrendingRestaurants();
+        } else if (activeTab === 'recs_for_you') {
+          specialRestaurants = await MockDataService.getNearbyRecommendations('current-user', 2.0, 20);
+        } else if (activeTab === 'recs_from_friends') {
+          specialRestaurants = await MockDataService.getFriendRecommendations('current-user', 20);
+        }
+
+        setViewRestaurants(specialRestaurants);
+      } catch (error) {
+        console.error('Failed to load special list data:', error);
+      } finally {
+        setLoadingView(false);
+      }
+    };
+
+    loadSpecialListData();
+  }, [activeTab, viewParam, viewRestaurants]);
 
   // Filter lists by type
   const filteredLists = lists?.filter(list => list.listType === activeTab) || [];
@@ -363,9 +405,13 @@ function ListsContent() {
           </div>
         </div>
 
-        {/* Category, Search, and Sort Row */}
-        <div className="flex flex-wrap items-center gap-3">
+        {/* Category Dropdown - Prominent on mobile */}
+        <div className="mb-3 md:mb-0">
           <CategoryDropdown />
+        </div>
+
+        {/* Search and Sort Row */}
+        <div className="flex items-center gap-3">
           <div className="flex-1 min-w-[200px]">
             <ListSearch />
           </div>
@@ -387,14 +433,68 @@ function ListsContent() {
 
           {/* Desktop Tabs */}
           <div className="hidden md:block">
-            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ListType)}>
-              <TabsList className="w-full mb-4 grid grid-cols-4">
-                <TabsTrigger value="been">Been</TabsTrigger>
-                <TabsTrigger value="want_to_try">Want to Try</TabsTrigger>
-                <TabsTrigger value="recs">Recs</TabsTrigger>
-                <TabsTrigger value="playlists">Playlists</TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <div className="flex items-center gap-2 mb-4">
+              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ListType)} className="flex-1">
+                <TabsList className="w-full grid grid-cols-4">
+                  <TabsTrigger value="been">Been</TabsTrigger>
+                  <TabsTrigger value="want_to_try">Want to Try</TabsTrigger>
+                  <TabsTrigger value="recs">Recs</TabsTrigger>
+                  <TabsTrigger value="playlists">Playlists</TabsTrigger>
+                </TabsList>
+              </Tabs>
+
+              {/* More Lists Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 gap-2 whitespace-nowrap"
+                  >
+                    <span>More Lists</span>
+                    <IoChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setActiveTab('recs_for_you');
+                      setIsInMoreView(true);
+                    }}
+                    className="flex items-center justify-between"
+                  >
+                    <span>Recs for You</span>
+                    {activeTab === 'recs_for_you' && (
+                      <IoCheckmark className="h-4 w-4 text-primary" />
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setActiveTab('recs_from_friends');
+                      setIsInMoreView(true);
+                    }}
+                    className="flex items-center justify-between"
+                  >
+                    <span>Recs from Friends</span>
+                    {activeTab === 'recs_from_friends' && (
+                      <IoCheckmark className="h-4 w-4 text-primary" />
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setActiveTab('trending');
+                      setIsInMoreView(true);
+                    }}
+                    className="flex items-center justify-between"
+                  >
+                    <span>Trending</span>
+                    {activeTab === 'trending' && (
+                      <IoCheckmark className="h-4 w-4 text-primary" />
+                    )}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
           {/* Filter Bar */}

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 export interface ListFilters {
   // Category filter
-  category: 'all' | 'restaurants' | 'bars' | 'bakeries' | 'coffee' | 'dessert';
+  category: 'all' | 'restaurants' | 'bars' | 'bakeries' | 'coffee_tea' | 'dessert';
 
   // Multi-select filters
   cities: string[];
@@ -155,7 +155,7 @@ export const CATEGORIES = [
   { value: 'restaurants', label: 'Restaurants' },
   { value: 'bars', label: 'Bars' },
   { value: 'bakeries', label: 'Bakeries' },
-  { value: 'coffee', label: 'Coffee & Tea' },
+  { value: 'coffee_tea', label: 'Coffee & Tea' },
   { value: 'dessert', label: 'Ice Cream & Dessert' },
 ] as const;
 
