@@ -88,6 +88,70 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
     createdAt: new Date('2024-01-08'),
     tags: ['Instagram Famous', 'Pizza'],
   },
+  {
+    userId: '1',
+    restaurantId: '200', // Death & Co
+    status: 'want_to_try',
+    notes: 'Heard this is one of the best cocktail bars in the city. Need to try their Old-Fashioned.',
+    createdAt: new Date('2024-02-08'),
+    tags: ['Cocktails', 'Date Night'],
+  },
+  {
+    userId: '1',
+    restaurantId: '201', // Please Don't Tell
+    status: 'want_to_try',
+    notes: 'Hidden speakeasy behind a phone booth. So intrigued!',
+    createdAt: new Date('2024-02-07'),
+    tags: ['Speakeasy', 'Cocktails'],
+  },
+  {
+    userId: '1',
+    restaurantId: '210', // Dominique Ansel Bakery
+    status: 'want_to_try',
+    notes: 'Need to try the famous Cronut! Heard it\'s worth the hype.',
+    createdAt: new Date('2024-02-06'),
+    tags: ['Pastry', 'Iconic'],
+  },
+  {
+    userId: '1',
+    restaurantId: '211', // Levain Bakery
+    status: 'want_to_try',
+    notes: 'Those massive cookies look incredible. Perfect for a cheat day.',
+    createdAt: new Date('2024-02-05'),
+    tags: ['Cookies', 'Dessert'],
+  },
+  {
+    userId: '1',
+    restaurantId: '220', // Blue Bottle Coffee
+    status: 'want_to_try',
+    notes: 'Third wave coffee spot. Good place to work from.',
+    createdAt: new Date('2024-02-04'),
+    tags: ['Coffee', 'Work Friendly'],
+  },
+  {
+    userId: '1',
+    restaurantId: '221', // Devoción
+    status: 'want_to_try',
+    notes: 'Colombian coffee in a beautiful space. Perfect for a coffee date.',
+    createdAt: new Date('2024-02-03'),
+    tags: ['Coffee', 'Date Spot'],
+  },
+  {
+    userId: '1',
+    restaurantId: '230', // Milk Bar
+    status: 'want_to_try',
+    notes: 'Cereal Milk soft serve sounds wild. Need to try it!',
+    createdAt: new Date('2024-02-02'),
+    tags: ['Dessert', 'Innovative'],
+  },
+  {
+    userId: '1',
+    restaurantId: '231', // Spot Dessert Bar
+    status: 'want_to_try',
+    notes: 'Those plated desserts look like art. Perfect for Instagram.',
+    createdAt: new Date('2024-02-01'),
+    tags: ['Dessert', 'Instagram Worthy'],
+  },
 
   // Sarah Kim (user 2) relations
   {

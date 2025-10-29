@@ -62,7 +62,7 @@ function RestaurantOptionCard({
         </h3>
 
         {/* Meta Row */}
-        <div className="flex items-center text-sm text-muted mb-2">
+        <div className="flex items-center text-sm text-gray-700 mb-2">
           <span>{restaurant.cuisine.join(", ")}</span>
           <span className="mx-1">•</span>
           <span>{restaurant.priceRange}</span>

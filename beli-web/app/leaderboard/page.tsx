@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useLeaderboard } from '@/lib/hooks/use-leaderboard';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -16,26 +16,15 @@ interface LeaderboardUser extends User {
 
 export default function LeaderboardPage() {
   const { data: allUsersData, isLoading } = useLeaderboard();
-  const [users, setUsers] = useState<LeaderboardUser[]>([]);
-  const [allUsers, setAllUsers] = useState<LeaderboardUser[]>([]);
   const [selectedTab, setSelectedTab] = useState<TabType>('Been');
   const [memberFilter, setMemberFilter] = useState('All Members');
   const [cityFilter, setCityFilter] = useState('All Cities');
   const [showMemberDropdown, setShowMemberDropdown] = useState(false);
   const [showCityDropdown, setShowCityDropdown] = useState(false);
 
-  useEffect(() => {
-    if (allUsersData) {
-      processLeaderboard();
-    }
-  }, [allUsersData, selectedTab]);
-
-  useEffect(() => {
-    applyFilters();
-  }, [memberFilter, cityFilter, allUsers]);
-
-  const processLeaderboard = () => {
-    if (!allUsersData) return;
+  // Memoize leaderboard processing - only recalculate when data or tab changes
+  const allUsers = useMemo(() => {
+    if (!allUsersData) return [];
 
     // Sort based on selected tab
     let sortedUsers = [...allUsersData];
@@ -54,7 +43,7 @@ export default function LeaderboardPage() {
         break;
     }
 
-    const leaderboardUsers = sortedUsers.map((user, index) => {
+    return sortedUsers.map((user, index) => {
       let score = 0;
       switch (selectedTab) {
         case 'Been':
@@ -78,12 +67,10 @@ export default function LeaderboardPage() {
         score,
       };
     });
+  }, [allUsersData, selectedTab]);
 
-    setAllUsers(leaderboardUsers);
-    setUsers(leaderboardUsers);
-  };
-
-  const applyFilters = () => {
+  // Memoize filtered users - only recalculate when filters or allUsers change
+  const users = useMemo(() => {
     let filtered = [...allUsers];
 
     // Apply city filter
@@ -97,22 +84,18 @@ export default function LeaderboardPage() {
     }
 
     // Re-rank after filtering
-    filtered = filtered.map((user, index) => ({
+    return filtered.map((user, index) => ({
       ...user,
       rank: index + 1,
     }));
+  }, [allUsers, cityFilter, memberFilter]);
 
-    setUsers(filtered);
-  };
-
-  const getUniqueCities = () => {
+  const uniqueCities = useMemo(() => {
     const cities = new Set(allUsers.map(user => user.location.city));
     return ['All Cities', ...Array.from(cities)];
-  };
+  }, [allUsers]);
 
-  const getMemberOptions = () => {
-    return ['All Members', 'Friends', 'Following'];
-  };
+  const memberOptions = ['All Members', 'Friends', 'Following'];
 
   const getSubtitleText = () => {
     switch (selectedTab) {
@@ -177,7 +160,7 @@ export default function LeaderboardPage() {
           </button>
           {showMemberDropdown && (
             <div className="absolute top-9 left-0 bg-white rounded-lg border border-gray-200 min-w-[140px] shadow-lg z-50">
-              {getMemberOptions().map((option) => (
+              {memberOptions.map((option) => (
                 <button
                   key={option}
                   onClick={() => {
@@ -209,7 +192,7 @@ export default function LeaderboardPage() {
           </button>
           {showCityDropdown && (
             <div className="absolute top-9 left-0 bg-white rounded-lg border border-gray-200 min-w-[140px] shadow-lg z-50">
-              {getUniqueCities().map((city) => (
+              {uniqueCities.map((city) => (
                 <button
                   key={city}
                   onClick={() => {

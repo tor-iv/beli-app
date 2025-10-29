@@ -15,36 +15,78 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { WhatToOrderModal } from '@/components/modals/what-to-order-modal';
 import { AddRestaurantModal } from '@/components/modals/add-restaurant-modal';
+import { RankingResultModal } from '@/components/modals/ranking-result-modal';
 import { RestaurantPageSkeleton } from '@/components/restaurant/restaurant-page-skeleton';
 import { useState, useEffect } from 'react';
-import { Restaurant } from '@/types';
+import { useAddRankedRestaurant } from '@/lib/hooks';
+import { Restaurant, User, RankingResult } from '@/types';
+import type { RestaurantSubmissionData } from '@/components/modals/add-restaurant-modal';
 
 export default function RestaurantPage() {
   const params = useParams();
   const id = params?.id as string;
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showWhatToOrder, setShowWhatToOrder] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
+  // Ranking state
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [rankingResult, setRankingResult] = useState<RankingResult | null>(null);
+  const [rankingData, setRankingData] = useState<RestaurantSubmissionData | null>(null);
+
+  const addRankedRestaurantMutation = useAddRankedRestaurant();
+
   useEffect(() => {
     const fetchRestaurant = async () => {
       setIsLoading(true);
-      const data = await MockDataService.getRestaurantById(id);
-      setRestaurant(data);
+      const [restaurantData, userData] = await Promise.all([
+        MockDataService.getRestaurantById(id),
+        MockDataService.getCurrentUser(),
+      ]);
+      setRestaurant(restaurantData);
+      setCurrentUser(userData);
       setIsLoading(false);
     };
     fetchRestaurant();
   }, [id]);
 
-  if (isLoading || !restaurant) {
+  if (isLoading || !restaurant || !currentUser) {
     return <RestaurantPageSkeleton />;
   }
 
-  const handleAddSubmit = (data: any) => {
-    console.log('Restaurant added:', data);
-    setShowAddModal(false);
-    // In real app, would call API
+  const handleRankingComplete = async (result: RankingResult, data: RestaurantSubmissionData) => {
+    try {
+      // Save to MockDataService
+      await addRankedRestaurantMutation.mutateAsync({
+        userId: currentUser.id,
+        restaurantId: restaurant.id,
+        result,
+        data: {
+          notes: data.notes || undefined,
+          photos: data.photos && data.photos.length > 0 ? data.photos : undefined,
+          tags: data.labels && data.labels.length > 0 ? data.labels : undefined,
+          companions: data.companions && data.companions.length > 0 ? data.companions : undefined,
+        },
+      });
+
+      // Store result for the result modal
+      setRankingResult(result);
+      setRankingData(data);
+
+      // Close add modal and show result modal
+      setShowAddModal(false);
+      setShowResultModal(true);
+    } catch (error) {
+      console.error('Error saving ranking:', error);
+    }
+  };
+
+  const handleResultDone = () => {
+    setShowResultModal(false);
+    setRankingResult(null);
+    setRankingData(null);
   };
 
   return (
@@ -52,9 +94,11 @@ export default function RestaurantPage() {
       {/* Map Header with Parallax */}
       <div className="relative">
         <RestaurantMapHeader restaurant={restaurant} />
+      </div>
 
-        {/* Navigation Overlay */}
-        <div className="absolute top-0 left-0 right-0 z-20 p-4">
+      {/* Navigation Overlay - Fixed at top */}
+      <div className="fixed top-0 left-0 right-0 z-40 p-4 pointer-events-none">
+        <div className="pointer-events-auto">
           <RestaurantNavOverlay restaurant={restaurant} />
         </div>
       </div>
@@ -175,8 +219,24 @@ export default function RestaurantPage() {
         open={showAddModal}
         onOpenChange={setShowAddModal}
         restaurant={restaurant}
-        onSubmit={handleAddSubmit}
+        userId={currentUser.id}
+        onRankingComplete={handleRankingComplete}
       />
+
+      {/* Ranking Result Modal */}
+      {rankingResult && (
+        <RankingResultModal
+          open={showResultModal}
+          onOpenChange={setShowResultModal}
+          restaurant={restaurant}
+          user={currentUser}
+          result={rankingResult}
+          notes={rankingData?.notes}
+          photos={rankingData?.photos}
+          visitCount={1}
+          onDone={handleResultDone}
+        />
+      )}
     </>
   );
 }

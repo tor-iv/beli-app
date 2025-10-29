@@ -21,10 +21,7 @@ export function useRestaurant(id: string) {
 export function useRestaurantsByIds(ids: string[]) {
   return useQuery({
     queryKey: ['restaurants', 'byIds', ids.sort().join(',')],
-    queryFn: async () => {
-      const allRestaurants = await MockDataService.getAllRestaurants();
-      return allRestaurants.filter(r => ids.includes(r.id));
-    },
+    queryFn: () => MockDataService.getRestaurantsByIds(ids),
     enabled: ids.length > 0,
     staleTime: 10 * 60 * 1000, // 10 minutes
   });

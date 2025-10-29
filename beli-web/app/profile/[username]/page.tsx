@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { MockDataService } from '@/lib/mockDataService';
 import { CuisineBreakdown, CityBreakdown, CountryBreakdown } from '@/types';
-import { notFound, useRouter } from 'next/navigation';
+import { notFound, useRouter, useParams } from 'next/navigation';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,8 +21,10 @@ import { useRestaurantsByIds } from '@/lib/hooks/use-restaurants';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Instagram, Newspaper, BarChart3 } from 'lucide-react';
 
-export default function ProfilePage({ params }: { params: { username: string } }) {
+export default function ProfilePage() {
   const router = useRouter();
+  const params = useParams();
+  const username = params?.username as string;
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'activity' | 'taste'>('activity');
 
@@ -31,7 +33,7 @@ export default function ProfilePage({ params }: { params: { username: string } }
   const [sortBy, setSortBy] = useState<SortOption>('count');
 
   // Load user data using React Query
-  const { data: user, isLoading: userLoading } = useUserByUsername(params.username);
+  const { data: user, isLoading: userLoading } = useUserByUsername(username);
   const { data: currentUser } = useCurrentUser();
   const { data: reviews = [] } = useUserReviews(user?.id || '');
 
@@ -53,10 +55,11 @@ export default function ProfilePage({ params }: { params: { username: string } }
 
   const { data: restaurants = [] } = useRestaurantsByIds(reviewRestaurantIds);
 
-  // Load taste profile data with enabled flag
+  // Load taste profile data only when taste tab is active
   const { data: tasteProfile, isLoading: tasteProfileLoading } = useTasteProfile(
     user?.id || '',
-    30
+    30,
+    activeTab === 'taste'
   );
 
   // Follow/unfollow mutation
@@ -74,26 +77,6 @@ export default function ProfilePage({ params }: { params: { username: string } }
       queryClient.invalidateQueries({ queryKey: ['following', currentUser?.id, user?.id] });
     },
   });
-
-  // Loading state
-  if (userLoading) {
-    return (
-      <div className="container mx-auto px-4 py-6 max-w-3xl">
-        <div className="flex justify-center items-center min-h-[400px]">
-          <div className="text-gray-500">Loading...</div>
-        </div>
-      </div>
-    );
-  }
-
-  // User not found
-  if (!user) {
-    notFound();
-  }
-
-  const formatMemberSince = (date: Date) => {
-    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  };
 
   // OPTIMIZED: Memoized function to get current category data for taste profile
   const getCurrentCategoryData = useMemo(() => {
@@ -123,6 +106,29 @@ export default function ProfilePage({ params }: { params: { username: string } }
     });
   }, [tasteProfile, tasteCategory, sortBy]);
 
+  // Recent reviews for display (first 5)
+  const recentReviews = useMemo(() => reviews.slice(0, 5), [reviews]);
+
+  // Loading state
+  if (userLoading) {
+    return (
+      <div className="container mx-auto px-4 py-6 max-w-3xl">
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="text-gray-500">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // User not found
+  if (!user) {
+    notFound();
+  }
+
+  const formatMemberSince = (date: Date) => {
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  };
+
   const handleSortToggle = () => {
     setSortBy(prev => prev === 'count' ? 'avgScore' : 'count');
   };
@@ -141,9 +147,6 @@ export default function ProfilePage({ params }: { params: { username: string } }
     if (!user) return;
     followMutation.mutate({ follow: !isFollowingData });
   };
-
-  // Recent reviews for display (first 5)
-  const recentReviews = useMemo(() => reviews.slice(0, 5), [reviews]);
 
   return (
     <div className="bg-gray-50 min-h-screen">

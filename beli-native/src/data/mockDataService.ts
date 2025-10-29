@@ -802,7 +802,8 @@ export class MockDataService {
 
   static async getGroupDinnerSuggestions(
     userId: string,
-    participantIds?: string[]
+    participantIds?: string[],
+    category?: ListCategory
   ): Promise<import('../types').GroupDinnerMatch[]> {
     await delay();
 
@@ -848,6 +849,9 @@ export class MockDataService {
 
       const restaurant = mockRestaurants.find(r => r.id === restaurantId);
       if (!restaurant) continue;
+
+      // Filter by category if specified
+      if (category && restaurant.category !== category) continue;
 
       // Calculate score
       let score = 0;

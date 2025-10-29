@@ -1,27 +1,81 @@
-import { MockDataService } from '@/lib/mockDataService';
-import { TastemakerCard } from '@/components/tastemakers/tastemaker-card';
-import { TastemakerPostCard } from '@/components/tastemakers/tastemaker-post-card';
+'use client'
 
-export default async function TastemakersPage() {
-  // Server-side data fetching
-  const tastemakers = await MockDataService.getTastemakers();
-  const featuredPosts = await MockDataService.getFeaturedTastemakerPosts(3);
-  const allPosts = await MockDataService.getTastemakerPosts(6);
+import { useState, useEffect, useMemo } from 'react'
+import { Search } from 'lucide-react'
+import { useTastemakerPosts } from '@/lib/hooks/use-tastemaker-posts'
+import { useFeaturedLists } from '@/lib/hooks'
+import { useCurrentUser } from '@/lib/hooks/use-user'
+import { TastemakerPostCard } from '@/components/tastemakers/tastemaker-post-card'
+import { CategoryPills } from '@/components/tastemakers/category-pills'
+import { ContentModeToggle } from '@/components/tastemakers/content-mode-toggle'
+import { FeaturedListRowWithProgress } from '@/components/lists/featured-list-row-with-progress'
+import { FeaturedListCardWithProgress } from '@/components/lists/featured-list-card-with-progress'
+
+// Desktop-only layout component
+function DesktopLayout() {
+  const [mode, setMode] = useState<'lists' | 'articles'>('articles')
+
+  const { data: user } = useCurrentUser()
+  const { data: featuredLists } = useFeaturedLists()
+  const { data: allPostsData } = useTastemakerPosts() // Fetch all posts once
+
+  // Memoize filtered and sliced posts
+  const featuredPosts = useMemo(
+    () => allPostsData?.filter(p => p.isFeatured).slice(0, 3) || [],
+    [allPostsData]
+  )
+  const allPosts = useMemo(
+    () => allPostsData?.slice(0, 6) || [],
+    [allPostsData]
+  )
 
   // Get the hero post (first featured post)
-  const heroPost = featuredPosts[0];
-  const otherFeaturedPosts = featuredPosts.slice(1);
+  const heroPost = featuredPosts[0]
+  const otherFeaturedPosts = featuredPosts.slice(1)
 
   return (
     <div className="container mx-auto px-4 py-6">
-      {/* Hero Section - Magazine Style */}
-      <div className="mb-12">
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold mb-3">Tastemakers</h1>
-          <p className="text-lg text-muted max-w-2xl mx-auto">
-            Discover curated guides and insider tips from NYC's most influential food experts
-          </p>
+      {/* Page Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-5xl font-bold mb-3">Tastemakers</h1>
+        <p className="text-lg text-muted max-w-2xl mx-auto mb-6">
+          {mode === 'lists'
+            ? 'Curated restaurant collections from NYC\'s top food experts'
+            : 'Discover curated guides and insider tips from NYC\'s most influential food experts'
+          }
+        </p>
+
+        {/* Toggle */}
+        <div className="max-w-md mx-auto">
+          <ContentModeToggle mode={mode} onModeChange={setMode} />
         </div>
+      </div>
+
+      {/* Content Area - Conditional based on mode */}
+      {mode === 'lists' ? (
+        // Featured Lists Mode
+        <div>
+          {featuredLists && featuredLists.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredLists.map((list) => (
+                <FeaturedListCardWithProgress
+                  key={list.id}
+                  list={list}
+                  userId={user?.id || ''}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              <p>No featured lists available</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        // Articles Mode - Magazine Style
+        <div>
+          {/* Hero Section - Magazine Style */}
+          <div className="mb-12">
 
         {/* Hero Featured Post - Full Width */}
         {heroPost && (
@@ -106,7 +160,7 @@ export default async function TastemakersPage() {
         )}
       </div>
 
-      {/* Category Navigation */}
+      {/* Category Navigation - Static for desktop */}
       <div className="mb-8">
         <div className="flex items-center gap-3 overflow-x-auto pb-2">
           <button className="px-4 py-2 bg-primary text-white rounded-full font-medium whitespace-nowrap hover:bg-primary/90 transition-colors">
@@ -141,37 +195,99 @@ export default async function TastemakersPage() {
           ))}
         </div>
       </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
-      {/* Top Tastemakers Section - Highlighted */}
-      <div className="mb-12 bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-3xl font-bold mb-2">Meet the Tastemakers</h2>
-            <p className="text-muted">NYC's most trusted food experts</p>
+// Mobile-only layout component
+function MobileLayout() {
+  const [mode, setMode] = useState<'lists' | 'articles'>('lists')
+  const [category, setCategory] = useState('All')
+
+  const { data: user } = useCurrentUser()
+  const { data: posts } = useTastemakerPosts()
+  const { data: featuredLists } = useFeaturedLists()
+
+  // Filter posts by category
+  const filteredPosts = category === 'All'
+    ? posts
+    : posts?.filter(p => p.tags.includes(category))
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Search Bar - Placeholder */}
+      <div className="bg-white px-4 pt-4 pb-2">
+        <button
+          onClick={() => alert('Search coming soon!')}
+          className="w-full bg-gray-100 rounded-xl flex items-center px-4 py-3"
+        >
+          <Search className="w-5 h-5 text-gray-400 mr-2" />
+          <span className="text-base text-gray-500">Search tastemakers...</span>
+        </button>
+      </div>
+
+      {/* Toggle Control */}
+      <ContentModeToggle mode={mode} onModeChange={setMode} />
+
+      {/* Content Area */}
+      {mode === 'lists' ? (
+        // Featured Lists Mode
+        <div className="bg-white">
+          {featuredLists?.map((list, index) => (
+            <FeaturedListRowWithProgress
+              key={list.id}
+              list={list}
+              userId={user?.id || ''}
+              isLast={index === (featuredLists?.length || 0) - 1}
+            />
+          ))}
+        </div>
+      ) : (
+        // Tastemaker Articles Mode
+        <div>
+          {/* Category Pills */}
+          <CategoryPills
+            selectedCategory={category}
+            onCategorySelect={setCategory}
+          />
+
+          {/* Articles Grid */}
+          <div className="px-4 pb-4 space-y-4">
+            {filteredPosts && filteredPosts.length > 0 ? (
+              filteredPosts.map((post) => (
+                <TastemakerPostCard
+                  key={post.id}
+                  post={post}
+                  variant="compact"
+                />
+              ))
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                No articles found for this category
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Top 3 in larger cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {tastemakers.slice(0, 3).map((tastemaker, index) => (
-            <div key={tastemaker.id} className="relative">
-              {index === 0 && (
-                <div className="absolute -top-2 -left-2 bg-yellow-400 text-yellow-900 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-lg z-10">
-                  #1
-                </div>
-              )}
-              <TastemakerCard tastemaker={tastemaker} />
-            </div>
-          ))}
-        </div>
-
-        {/* Rest in regular grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tastemakers.slice(3).map((tastemaker) => (
-            <TastemakerCard key={tastemaker.id} tastemaker={tastemaker} />
-          ))}
-        </div>
-      </div>
+      )}
     </div>
-  );
+  )
+}
+
+// Main page component with responsive switching
+export default function TastemakersPage() {
+  return (
+    <>
+      {/* Mobile Layout - visible only on mobile */}
+      <div className="md:hidden">
+        <MobileLayout />
+      </div>
+
+      {/* Desktop Layout - visible only on desktop */}
+      <div className="hidden md:block">
+        <DesktopLayout />
+      </div>
+    </>
+  )
 }

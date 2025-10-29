@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { EmptyState } from '@/components/ui/empty-state';
 import { MatchPercentageBadge } from '@/components/ui/match-percentage-badge';
 import { useSearchRestaurants } from '@/lib/hooks/use-restaurants';
-import { useSearchUsers, useUserMatchPercentage } from '@/lib/hooks/use-users';
+import { useSearchUsers, useUserMatchPercentage, useBatchMatchPercentages } from '@/lib/hooks/use-users';
 import { useUser } from '@/lib/hooks/use-user';
 import { RestaurantCard } from '@/components/restaurant/restaurant-card';
 import { RestaurantListItemCompact } from '@/components/restaurant/restaurant-list-item-compact';
@@ -28,26 +28,23 @@ const filterChips = [
   { id: 'trending', label: 'Trending', icon: TrendingUp },
 ];
 
-// Wrapper component to fetch and display user card with match percentage
-function UserCardWithMatch({ user, currentUserId }: { user: User; currentUserId: string }) {
-  const { data: matchPercentage } = useUserMatchPercentage(currentUserId, user.id);
-
+// Wrapper component to display user card with match percentage (percentage passed from parent)
+function UserCardWithMatch({ user, matchPercentage }: { user: User; matchPercentage?: number }) {
   return <UserCard user={user} matchPercentage={matchPercentage} />;
 }
 
-// Desktop user list item with match percentage
+// Desktop user list item with match percentage (percentage passed from parent)
 function UserListItem({
   user,
-  currentUserId,
+  matchPercentage,
   isSelected,
   onClick
 }: {
   user: User;
-  currentUserId: string;
+  matchPercentage?: number;
   isSelected: boolean;
   onClick: () => void;
 }) {
-  const { data: matchPercentage } = useUserMatchPercentage(currentUserId, user.id);
 
   return (
     <button
@@ -97,6 +94,10 @@ export default function SearchPage() {
   const { data: currentUser } = useUser('1'); // Current user ID
   const { data: restaurantResults, isLoading: restaurantsLoading } = useSearchRestaurants(query);
   const { data: userResults, isLoading: usersLoading } = useSearchUsers(query);
+
+  // Batch fetch match percentages for all user results (avoids N+1 queries)
+  const userIds = useMemo(() => userResults?.map(u => u.id) || [], [userResults]);
+  const { data: matchPercentages } = useBatchMatchPercentages(currentUser?.id || '1', userIds);
 
   useEffect(() => {
     // Load recent searches on mount
@@ -291,7 +292,11 @@ export default function SearchPage() {
                     <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                   ))
                 : userResults?.map((user) => (
-                    <UserCardWithMatch key={user.id} user={user} currentUserId={currentUser?.id || '1'} />
+                    <UserCardWithMatch
+                      key={user.id}
+                      user={user}
+                      matchPercentage={matchPercentages?.[user.id]}
+                    />
                   ))}
             </div>
 
@@ -312,7 +317,7 @@ export default function SearchPage() {
                       <UserListItem
                         key={user.id}
                         user={user}
-                        currentUserId={currentUser?.id || '1'}
+                        matchPercentage={matchPercentages?.[user.id]}
                         isSelected={selectedUser?.id === user.id}
                         onClick={() => setSelectedUser(user)}
                       />

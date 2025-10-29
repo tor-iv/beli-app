@@ -53,6 +53,7 @@ export interface Restaurant {
   popularDishes: string[];
   distance?: number;
   tags?: string[];
+  category?: ListCategory; // Category for filtering (restaurants, bars, bakeries, etc.)
   scores?: {
     recScore: number;
     friendScore: number;

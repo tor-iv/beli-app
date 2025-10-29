@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '400',
     lineHeight: 21,
-    color: colors.textSecondary,
+    color: colors.textPrimary,
   },
   ratingRow: {
     flexDirection: 'row',

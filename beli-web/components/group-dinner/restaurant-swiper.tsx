@@ -90,7 +90,7 @@ export function RestaurantSwiper({
     }).then(() => {
       if (isMounted.current) {
         setIsExiting(false)
-        controls.set({ x: 0 })
+        x.set(0)
       }
     })
   }

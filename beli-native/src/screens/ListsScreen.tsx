@@ -11,12 +11,12 @@ import { colors, typography, spacing } from '../theme';
 import {
   RestaurantListItem,
   LoadingSpinner,
-  TabSelector,
   FilterPills,
   CategoryDropdown,
   SortToggle,
   ViewMapButton
 } from '../components';
+import { TabSelector } from '../components/lists/TabSelector';
 import { MockDataService } from '../data/mockDataService';
 import type { Restaurant, ListCategory } from '../types';
 import type { BottomTabParamList, AppStackParamList } from '../navigation/types';
@@ -273,7 +273,12 @@ export default function ListsScreen() {
   const [goodForSearch, setGoodForSearch] = useState('');
 
   // Cache for loaded data by tab
-  const [cachedData, setCachedData] = useState<Partial<Record<ListType, Record<string, Restaurant[]>>>>({});
+  const [cachedData, setCachedData] = useState<Partial<Record<ListType, Record<string, Restaurant[]>>>>({
+    been: {},
+    want: {},
+    recs: {},
+    playlists: {},
+  });
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [listCounts, setListCounts] = useState<Record<string, number>>({});
 
@@ -345,7 +350,7 @@ export default function ListsScreen() {
     const query = searchQuery.toLowerCase();
     return restaurants.filter(restaurant =>
       restaurant.name.toLowerCase().includes(query) ||
-      restaurant.cuisine.some(c => c.toLowerCase().includes(query)) ||
+      (restaurant.cuisine || []).some(c => c.toLowerCase().includes(query)) ||
       restaurant.location.neighborhood?.toLowerCase().includes(query)
     );
   }, [restaurants, searchQuery]);
@@ -549,6 +554,7 @@ export default function ListsScreen() {
   const matchesCategory = (restaurant: Restaurant, category: ListCategory): boolean => {
     if (!category || category === 'restaurants') return true;
 
+    if (!restaurant?.cuisine) return true; // Include restaurants without cuisine data
     const cuisines = restaurant.cuisine.map(c => c.toLowerCase());
 
     switch (category) {
@@ -740,7 +746,7 @@ export default function ListsScreen() {
           setCachedData(prev => ({
             ...prev,
             [tab]: {
-              ...(prev[tab] || {}),
+              ...(prev[tab] ?? {}),
               [cacheKey]: []
             }
           }));
@@ -768,7 +774,7 @@ export default function ListsScreen() {
         setCachedData(prev => ({
           ...prev,
           [tab]: {
-            ...(prev[tab] || {}),
+            ...(prev[tab] ?? {}),
             [cacheKey]: restaurantsData
           }
         }));
@@ -801,7 +807,10 @@ export default function ListsScreen() {
     }
   };
 
-  const displayedTab = specialListOptions.includes(selectedTab) ? 'more' : selectedTab;
+  const validTabIds: ListType[] = ['been', 'want', 'recs', 'playlists', 'more'];
+  const displayedTab = specialListOptions.includes(selectedTab)
+    ? 'more'
+    : (validTabIds.includes(selectedTab) ? selectedTab : 'been');
 
   const listOptionCount = (optionId: 'been' | 'want', category: ListCategory) => {
     const count = listCounts[`${optionId}-${category}`];

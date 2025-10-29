@@ -8,8 +8,9 @@ import { RestaurantSwiper } from "@/components/group-dinner/restaurant-swiper"
 import { SelectionScreen } from "@/components/group-dinner/selection-screen"
 import { ConfirmationModal } from "@/components/group-dinner/confirmation-modal"
 import { ParticipantSelector } from "@/components/group-dinner/participant-selector"
+import { CategorySelectionModal } from "@/components/group-dinner/category-selection-modal"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import type { User, GroupDinnerMatch } from "@/types"
+import type { User, GroupDinnerMatch, ListCategory } from "@/types"
 
 export default function GroupDinnerPage() {
   const router = useRouter()
@@ -24,6 +25,8 @@ export default function GroupDinnerPage() {
   const [selectedMatch, setSelectedMatch] = React.useState<GroupDinnerMatch>()
   const [showConfirmationModal, setShowConfirmationModal] = React.useState(false)
   const [showParticipantSelector, setShowParticipantSelector] = React.useState(false)
+  const [selectedCategory, setSelectedCategory] = React.useState<ListCategory>('restaurants')
+  const [showCategoryModal, setShowCategoryModal] = React.useState(true)
   const [loading, setLoading] = React.useState(true)
 
   // Load initial data
@@ -32,7 +35,7 @@ export default function GroupDinnerPage() {
       try {
         const user = await MockDataService.getCurrentUser()
         setCurrentUser(user)
-        await loadMatches(user.id, [])
+        // Don't load matches yet - wait for category selection
       } catch (error) {
         console.error("Failed to initialize:", error)
       }
@@ -40,13 +43,22 @@ export default function GroupDinnerPage() {
     init()
   }, [])
 
+  // Load matches when category is selected or participants change
+  React.useEffect(() => {
+    if (currentUser && !showCategoryModal) {
+      const participantIds = selectedParticipants.map(p => p.id)
+      loadMatches(currentUser.id, participantIds, selectedCategory)
+    }
+  }, [currentUser, selectedParticipants, selectedCategory, showCategoryModal])
+
   // Load suggestions based on participants
-  const loadMatches = async (userId: string, participantIds: string[]) => {
+  const loadMatches = async (userId: string, participantIds: string[], category?: ListCategory) => {
     setLoading(true)
     try {
       const suggestions = await MockDataService.getGroupDinnerSuggestions(
         userId,
-        participantIds.length > 0 ? participantIds : undefined
+        participantIds.length > 0 ? participantIds : undefined,
+        category
       )
       setMatches(suggestions)
       setCurrentIndex(0)
@@ -86,7 +98,7 @@ export default function GroupDinnerPage() {
   const handleShuffle = async () => {
     if (!currentUser) return
     const participantIds = selectedParticipants.map((p) => p.id)
-    await loadMatches(currentUser.id, participantIds)
+    await loadMatches(currentUser.id, participantIds, selectedCategory)
     setSavedRestaurants([])
     setShowSelectionScreen(false)
   }
@@ -103,7 +115,7 @@ export default function GroupDinnerPage() {
     setSelectedParticipants(participants)
     setShowParticipantSelector(false)
     if (currentUser) {
-      await loadMatches(currentUser.id, participants.map((p) => p.id))
+      await loadMatches(currentUser.id, participants.map((p) => p.id), selectedCategory)
     }
   }
 
@@ -112,6 +124,14 @@ export default function GroupDinnerPage() {
     setShowConfirmationModal(false)
     setSelectedMatch(undefined)
     // User can continue swiping with remaining cards
+  }
+
+  // Handle category selection
+  const handleSelectCategory = (category: ListCategory) => {
+    setSelectedCategory(category)
+    setShowCategoryModal(false)
+    // Reset saved restaurants when changing category
+    setSavedRestaurants([])
   }
 
   if (!currentUser) {
@@ -234,6 +254,13 @@ export default function GroupDinnerPage() {
         participants={selectedParticipants}
         onClose={() => setShowConfirmationModal(false)}
         onKeepSwiping={handleKeepSwiping}
+      />
+
+      <CategorySelectionModal
+        open={showCategoryModal}
+        selectedCategory={selectedCategory}
+        onSelectCategory={handleSelectCategory}
+        onOpenChange={setShowCategoryModal}
       />
     </div>
   )

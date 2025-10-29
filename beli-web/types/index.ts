@@ -53,6 +53,7 @@ export interface Restaurant {
   popularDishes: string[];
   distance?: number;
   tags?: string[];
+  category?: ListCategory; // Category for filtering (restaurants, bars, bakeries, etc.)
   scores?: {
     recScore: number;
     friendScore: number;
@@ -99,6 +100,7 @@ export interface UserRestaurantRelation {
   restaurantId: string;
   status: 'been' | 'want_to_try' | 'recommended';
   rating?: number;
+  rankIndex?: number; // Position in ranked list (0 = highest rank)
   notes?: string;
   photos?: string[];
   tags?: string[];
@@ -392,4 +394,37 @@ export interface TasteProfileStats {
   totalCities: number;
   totalCountries: number;
   totalCuisines: number;
+}
+
+// Ranking types
+export type InitialSentiment = 'liked' | 'fine' | 'disliked';
+
+export interface RankingComparison {
+  restaurantId: string;
+  choice: 'left' | 'right' | 'skip';
+  leftBound: number;
+  rightBound: number;
+  comparisonRestaurantId: string;
+}
+
+export interface RankingState {
+  targetRestaurantId: string;
+  category: ListCategory;
+  initialSentiment: InitialSentiment;
+  rankedList: Restaurant[];
+  comparisonHistory: RankingComparison[];
+  currentLeftBound: number;
+  currentRightBound: number;
+  skipsRemaining: number;
+  isComplete: boolean;
+}
+
+export interface RankingResult {
+  restaurantId: string;
+  category: ListCategory;
+  finalPosition: number;
+  totalRestaurants: number;
+  rating: number;           // 0-10 scale
+  percentile: number;       // 0-100
+  comparisonsCount: number;
 }

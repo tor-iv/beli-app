@@ -6,6 +6,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Moody Tongue Pizza',
     cuisine: ['Pizza', 'Japanese'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '345 E 6th St',
       city: 'New York',
@@ -61,6 +62,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Balthazar',
     cuisine: ['French', 'Bistro'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: '80 Spring St',
       city: 'New York',
@@ -112,6 +114,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Prince Street Pizza',
     cuisine: ['Pizza', 'Italian'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '27 Prince St',
       city: 'New York',
@@ -164,6 +167,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Joe\'s Pizza',
     cuisine: ['Pizza', 'Italian'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '7 Carmine St',
       city: 'New York',
@@ -214,6 +218,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Minetta Tavern',
     cuisine: ['American', 'Steakhouse'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '113 MacDougal St',
       city: 'New York',
@@ -267,6 +272,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Katz\'s Delicatessen',
     cuisine: ['Deli', 'Jewish'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '205 E Houston St',
       city: 'New York',
@@ -318,6 +324,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Momofuku Noodle Bar',
     cuisine: ['Asian', 'Ramen'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '171 1st Ave',
       city: 'New York',
@@ -370,6 +377,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Russ & Daughters',
     cuisine: ['Jewish', 'Appetizing'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '179 E Houston St',
       city: 'New York',
@@ -406,6 +414,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Xi\'an Famous Foods',
     cuisine: ['Chinese', 'Hand-Pulled Noodles'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '81 St Marks Pl',
       city: 'New York',
@@ -438,6 +447,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Joe\'s Shanghai',
     cuisine: ['Chinese', 'Soup Dumplings'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '9 Pell St',
       city: 'New York',
@@ -472,6 +482,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Le Bernardin',
     cuisine: ['French', 'Seafood'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '155 W 51st St',
       city: 'New York',
@@ -505,6 +516,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Halal Guys',
     cuisine: ['Middle Eastern', 'Halal'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '307 E 53rd St',
       city: 'New York',
@@ -539,6 +551,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Eleven Madison Park',
     cuisine: ['American', 'Fine Dining'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '11 Madison Ave',
       city: 'New York',
@@ -572,6 +585,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Shake Shack',
     cuisine: ['American', 'Burgers'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '23rd St & Madison Ave',
       city: 'New York',
@@ -606,6 +620,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Locanda Verde',
     cuisine: ['Italian'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: '377 Greenwich St',
       city: 'New York',
@@ -641,6 +656,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Daniel',
     cuisine: ['French', 'Fine Dining'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '60 E 65th St',
       city: 'New York',
@@ -674,6 +690,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'The Carlyle Restaurant',
     cuisine: ['American', 'Fine Dining'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '35 E 76th St',
       city: 'New York',
@@ -709,6 +726,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Jacob\'s Pickles',
     cuisine: ['American', 'Southern'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '509 Amsterdam Ave',
       city: 'New York',
@@ -741,6 +759,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Gray\'s Papaya',
     cuisine: ['Hot Dogs', 'American'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '2090 Broadway',
       city: 'New York',
@@ -775,6 +794,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Peter Luger Steak House',
     cuisine: ['Steakhouse', 'German'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '178 Broadway',
       city: 'Brooklyn',
@@ -808,6 +828,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'L\'industrie Pizzeria',
     cuisine: ['Pizza', 'Italian'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '254 S 2nd St',
       city: 'Brooklyn',
@@ -842,6 +863,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Cecconi\'s',
     cuisine: ['Italian'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: '55 Water St',
       city: 'Brooklyn',
@@ -877,6 +899,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Al di La Trattoria',
     cuisine: ['Italian'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '248 5th Ave',
       city: 'Brooklyn',
@@ -911,6 +934,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Taverna Kyclades',
     cuisine: ['Greek', 'Seafood'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '33-07 Ditmars Blvd',
       city: 'Astoria',
@@ -945,6 +969,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Ivan Ramen',
     cuisine: ['Ramen', 'Japanese'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '25 Clinton St',
       city: 'New York',
@@ -964,6 +989,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'The NoMad Restaurant',
     cuisine: ['American', 'French'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '1170 Broadway',
       city: 'New York',
@@ -983,6 +1009,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Artichoke Basille\'s Pizza',
     cuisine: ['Pizza'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '328 E 14th St',
       city: 'New York',
@@ -1002,6 +1029,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Blue Hill',
     cuisine: ['American', 'Farm-to-Table'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '75 Washington Pl',
       city: 'New York',
@@ -1021,6 +1049,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Mamoun\'s Falafel',
     cuisine: ['Middle Eastern'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '119 MacDougal St',
       city: 'New York',
@@ -1040,6 +1069,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'The Spotted Pig',
     cuisine: ['British', 'Gastropub'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '314 W 11th St',
       city: 'New York',
@@ -1059,6 +1089,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Sarabeth\'s',
     cuisine: ['American', 'Brunch'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '423 Amsterdam Ave',
       city: 'New York',
@@ -1078,6 +1109,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'San Marzano',
     cuisine: ['Ukrainian', 'European'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '144 2nd Ave',
       city: 'New York',
@@ -1106,6 +1138,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Jua',
     cuisine: ['Korean', 'Fine Dining'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '36 E 22nd St',
       city: 'New York',
@@ -1134,6 +1167,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Omars Mediterranean Cuisine',
     cuisine: ['Mediterranean', 'Middle Eastern'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '1435 2nd Ave',
       city: 'New York',
@@ -1164,6 +1198,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Alouette',
     cuisine: ['Danish'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: 'Frederiksstaden',
       city: 'Copenhagen',
@@ -1202,6 +1237,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Maido',
     cuisine: ['Japanese', 'Peruvian'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: 'El Palacio del Virrey',
       city: 'Lima',
@@ -1232,6 +1268,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Mérito',
     cuisine: ['Peruvian', 'Venezuelan'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: 'Lima',
       city: 'Lima',
@@ -1262,6 +1299,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Restaurante Casa Benigna',
     cuisine: ['Spanish'],
     priceRange: '€€€',
+    category: 'restaurants',
     location: {
       address: 'Ciudad Jardín',
       city: 'Madrid',
@@ -1294,6 +1332,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Death & Co',
     cuisine: ['Cocktail Bar'],
     priceRange: '$$$',
+    category: 'bars',
     location: {
       address: '433 E 6th St',
       city: 'New York',
@@ -1324,6 +1363,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Please Don\'t Tell',
     cuisine: ['Cocktail Bar'],
     priceRange: '$$$',
+    category: 'bars',
     location: {
       address: '113 St Marks Pl',
       city: 'New York',
@@ -1354,6 +1394,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Employees Only',
     cuisine: ['Cocktail Bar'],
     priceRange: '$$$',
+    category: 'bars',
     location: {
       address: '510 Hudson St',
       city: 'New York',
@@ -1386,6 +1427,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Dominique Ansel Bakery',
     cuisine: ['Bakery'],
     priceRange: '$$',
+    category: 'bakeries',
     location: {
       address: '189 Spring St',
       city: 'New York',
@@ -1416,6 +1458,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Levain Bakery',
     cuisine: ['Bakery'],
     priceRange: '$$',
+    category: 'bakeries',
     location: {
       address: '167 W 74th St',
       city: 'New York',
@@ -1446,6 +1489,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Breads Bakery',
     cuisine: ['Bakery'],
     priceRange: '$$',
+    category: 'bakeries',
     location: {
       address: '18 E 16th St',
       city: 'New York',
@@ -1478,6 +1522,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Blue Bottle Coffee - Bryant Park',
     cuisine: ['Coffee'],
     priceRange: '$$',
+    category: 'coffee_tea',
     location: {
       address: '54 W 40th St',
       city: 'New York',
@@ -1508,6 +1553,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Devoción',
     cuisine: ['Coffee'],
     priceRange: '$$',
+    category: 'coffee_tea',
     location: {
       address: '69 Grand St',
       city: 'Brooklyn',
@@ -1538,6 +1584,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Cha-An Teahouse',
     cuisine: ['Tea House'],
     priceRange: '$$',
+    category: 'coffee_tea',
     location: {
       address: '230 E 9th St',
       city: 'New York',
@@ -1570,6 +1617,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Milk Bar Flagship',
     cuisine: ['Dessert'],
     priceRange: '$$',
+    category: 'dessert',
     location: {
       address: '1196 Broadway',
       city: 'New York',
@@ -1600,6 +1648,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Spot Dessert Bar',
     cuisine: ['Dessert'],
     priceRange: '$$',
+    category: 'dessert',
     location: {
       address: '13 St Marks Pl',
       city: 'New York',
@@ -1630,6 +1679,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Van Leeuwen Ice Cream',
     cuisine: ['Ice Cream'],
     priceRange: '$$',
+    category: 'dessert',
     location: {
       address: '172 Ludlow St',
       city: 'New York',
@@ -1660,6 +1710,7 @@ export const mockRestaurants: Restaurant[] = [
     name: "L'Artusi",
     cuisine: ['Italian'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: '228 W 10th St',
       city: 'New York',
@@ -1691,6 +1742,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Anton\'s',
     cuisine: ['American', 'New American'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: '570 Hudson St',
       city: 'New York',
@@ -1722,6 +1774,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Cowgirl',
     cuisine: ['Tex-Mex', 'American'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '519 Hudson St',
       city: 'New York',
@@ -1753,6 +1806,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Thai Villa',
     cuisine: ['Thai'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '5 Carmine St',
       city: 'New York',
@@ -1784,6 +1838,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Bombay Spice',
     cuisine: ['Indian'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '99 University Pl',
       city: 'New York',
@@ -1815,6 +1870,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Taco Loco',
     cuisine: ['Mexican'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '92 St Marks Pl',
       city: 'New York',
@@ -1846,6 +1902,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Le Coq Rico',
     cuisine: ['French'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: '30 E 20th St',
       city: 'New York',
@@ -1877,6 +1934,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Seoul Kitchen',
     cuisine: ['Korean'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '15 W 32nd St',
       city: 'New York',
@@ -1908,6 +1966,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Ethiopian Oasis',
     cuisine: ['Ethiopian'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '247 W 116th St',
       city: 'New York',
@@ -1939,6 +1998,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Ramen House',
     cuisine: ['Japanese', 'Ramen'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '175 2nd Ave',
       city: 'New York',
@@ -1970,6 +2030,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'La Pecora Bianca',
     cuisine: ['Italian'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: '1133 Broadway',
       city: 'New York',
@@ -2001,6 +2062,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Pho Saigon',
     cuisine: ['Vietnamese'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '73 Mulberry St',
       city: 'New York',
@@ -2032,6 +2094,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Steakhouse Prime',
     cuisine: ['Steakhouse', 'American'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '145 W 53rd St',
       city: 'New York',
@@ -2063,6 +2126,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Mediterranean Breeze',
     cuisine: ['Mediterranean', 'Greek'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '405 E 13th St',
       city: 'New York',
@@ -2094,6 +2158,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Dim Sum Palace',
     cuisine: ['Chinese', 'Dim Sum'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '88 E Broadway',
       city: 'New York',
@@ -2125,6 +2190,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Vegan Garden',
     cuisine: ['Vegan', 'American'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '256 W 23rd St',
       city: 'New York',
@@ -2156,6 +2222,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Tapas Barcelona',
     cuisine: ['Spanish', 'Tapas'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: '173 W 4th St',
       city: 'New York',
@@ -2187,6 +2254,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Burger Joint Deluxe',
     cuisine: ['American', 'Burgers'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '119 W 56th St',
       city: 'New York',

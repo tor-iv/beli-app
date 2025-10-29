@@ -17,9 +17,10 @@ import {
   RestaurantSwiper,
   ConfirmationModal,
   SelectionScreen,
+  CategorySelectionModal,
 } from '../components/group-dinner';
 import { MockDataService } from '../data/mockDataService';
-import type { User, GroupDinnerMatch } from '../types';
+import type { User, GroupDinnerMatch, ListCategory } from '../types';
 import type { AppStackParamList } from '../navigation/types';
 
 type GroupDinnerScreenNavigationProp = StackNavigationProp<AppStackParamList>;
@@ -36,16 +37,18 @@ export default function GroupDinnerScreen() {
   const [selectedMatch, setSelectedMatch] = useState<GroupDinnerMatch | null>(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [shuffleCount, setShuffleCount] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<ListCategory>('restaurants');
+  const [showCategoryModal, setShowCategoryModal] = useState(true);
 
   useEffect(() => {
     loadUser();
   }, []);
 
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && !showCategoryModal) {
       loadMatches();
     }
-  }, [currentUser, selectedParticipants, shuffleCount]);
+  }, [currentUser, selectedParticipants, shuffleCount, selectedCategory, showCategoryModal]);
 
   const loadUser = async () => {
     try {
@@ -64,7 +67,8 @@ export default function GroupDinnerScreen() {
       const participantIds = selectedParticipants.map(p => p.id);
       const suggestions = await MockDataService.getGroupDinnerSuggestions(
         currentUser.id,
-        participantIds.length > 0 ? participantIds : undefined
+        participantIds.length > 0 ? participantIds : undefined,
+        selectedCategory
       );
       setMatches(suggestions);
     } catch (error) {
@@ -72,6 +76,13 @@ export default function GroupDinnerScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSelectCategory = (category: ListCategory) => {
+    setSelectedCategory(category);
+    setShowCategoryModal(false);
+    // Reset saved restaurants when changing category
+    setSavedRestaurants([]);
   };
 
   const handleSwipeLeft = (match: GroupDinnerMatch) => {
@@ -253,6 +264,14 @@ export default function GroupDinnerScreen() {
         onClose={() => setShowConfirmationModal(false)}
         onViewDetails={handleViewDetails}
         onKeepSwiping={handleKeepSwiping}
+      />
+
+      {/* Category Selection Modal */}
+      <CategorySelectionModal
+        visible={showCategoryModal}
+        selectedCategory={selectedCategory}
+        onSelectCategory={handleSelectCategory}
+        onClose={() => setShowCategoryModal(false)}
       />
     </SafeAreaView>
   );

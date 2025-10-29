@@ -4,3 +4,4 @@ export { default as ParticipantSelector } from './ParticipantSelector';
 export { default as ParticipantSearchModal } from './ParticipantSearchModal';
 export { default as ConfirmationModal } from './ConfirmationModal';
 export { default as SelectionScreen } from './SelectionScreen';
+export { CategorySelectionModal } from './CategorySelectionModal';

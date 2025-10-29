@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import { Utensils } from "lucide-react"
 import { MockDataService } from "@/lib/mockDataService"
 import { ActivityCard } from "@/components/social/activity-card"
-import { TrendingWidget } from "@/components/feed/trending-widget"
 import { RestaurantToggleWidget } from "@/components/profile/restaurant-toggle-widget"
 import { ThreeColumnLayout } from "@/components/layout/three-column"
 import { TastemakerPicksWidget } from "@/components/feed/tastemaker-picks-widget"
@@ -17,8 +16,12 @@ import { ContentModeSelector, type ContentMode } from "@/components/feed/content
 import { FeedFiltersModal, type FeedFilters } from "@/components/modals/feed-filters-modal"
 import { CommentsModal } from "@/components/modals/comments-modal"
 import { ShareModal } from "@/components/modals/share-modal"
+import { AddRestaurantModal } from "@/components/modals/add-restaurant-modal"
+import { RankingResultModal } from "@/components/modals/ranking-result-modal"
 import { getFeaturedPosts } from "@/data/mock/tastemakerPosts"
-import type { Activity, List, User, Restaurant } from "@/types"
+import { useAddRankedRestaurant } from "@/lib/hooks"
+import type { Activity, List, User, Restaurant, RankingResult } from "@/types"
+import type { RestaurantSubmissionData } from "@/components/modals/add-restaurant-modal"
 
 export default function FeedPage() {
   const router = useRouter()
@@ -37,7 +40,15 @@ export default function FeedPage() {
   const [showCommentsModal, setShowCommentsModal] = React.useState(false)
   const [showShareModal, setShowShareModal] = React.useState(false)
 
+  // Ranking state
+  const [selectedRestaurant, setSelectedRestaurant] = React.useState<Restaurant | null>(null)
+  const [showAddModal, setShowAddModal] = React.useState(false)
+  const [showResultModal, setShowResultModal] = React.useState(false)
+  const [rankingResult, setRankingResult] = React.useState<RankingResult | null>(null)
+  const [rankingData, setRankingData] = React.useState<RestaurantSubmissionData | null>(null)
+
   const featuredPosts = getFeaturedPosts()
+  const addRankedRestaurantMutation = useAddRankedRestaurant()
 
   React.useEffect(() => {
     const loadData = async () => {
@@ -123,8 +134,44 @@ export default function FeedPage() {
   }
 
   const handleAddPress = (restaurant: Restaurant) => {
-    // TODO: Implement add restaurant modal/functionality
-    console.log('Add restaurant:', restaurant.name)
+    setSelectedRestaurant(restaurant)
+    setShowAddModal(true)
+  }
+
+  const handleRankingComplete = async (result: RankingResult, data: RestaurantSubmissionData) => {
+    if (!currentUser || !selectedRestaurant) return
+
+    try {
+      // Save to MockDataService
+      await addRankedRestaurantMutation.mutateAsync({
+        userId: currentUser.id,
+        restaurantId: selectedRestaurant.id,
+        result,
+        data: {
+          notes: data.notes || undefined,
+          photos: data.photos && data.photos.length > 0 ? data.photos : undefined,
+          tags: data.labels && data.labels.length > 0 ? data.labels : undefined,
+          companions: data.companions && data.companions.length > 0 ? data.companions : undefined,
+        },
+      })
+
+      // Store result for the result modal
+      setRankingResult(result)
+      setRankingData(data)
+
+      // Close add modal and show result modal
+      setShowAddModal(false)
+      setShowResultModal(true)
+    } catch (error) {
+      console.error('Error saving ranking:', error)
+    }
+  }
+
+  const handleResultDone = () => {
+    setShowResultModal(false)
+    setRankingResult(null)
+    setRankingData(null)
+    setSelectedRestaurant(null)
   }
 
   const handleAddComment = (content: string) => {
@@ -292,7 +339,6 @@ export default function FeedPage() {
                   <span className="text-lg font-semibold text-gray-900">Eat Now</span>
                 </button>
 
-                <TrendingWidget />
                 <RestaurantToggleWidget defaultView="reserve" />
               </div>
             }
@@ -347,6 +393,32 @@ export default function FeedPage() {
           onOpenChange={setShowShareModal}
           restaurant={selectedActivity.restaurant}
           user={selectedActivity.user}
+        />
+      )}
+
+      {/* Add Restaurant Modal */}
+      {selectedRestaurant && currentUser && (
+        <AddRestaurantModal
+          open={showAddModal}
+          onOpenChange={setShowAddModal}
+          restaurant={selectedRestaurant}
+          userId={currentUser.id}
+          onRankingComplete={handleRankingComplete}
+        />
+      )}
+
+      {/* Ranking Result Modal */}
+      {rankingResult && selectedRestaurant && currentUser && (
+        <RankingResultModal
+          open={showResultModal}
+          onOpenChange={setShowResultModal}
+          restaurant={selectedRestaurant}
+          user={currentUser}
+          result={rankingResult}
+          notes={rankingData?.notes}
+          photos={rankingData?.photos}
+          visitCount={1}
+          onDone={handleResultDone}
         />
       )}
     </div>

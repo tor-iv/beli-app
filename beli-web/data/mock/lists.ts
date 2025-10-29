@@ -8,6 +8,7 @@ export const mockLists: List[] = [
     name: 'Top 10 NYC Pizza Places',
     description: 'The ultimate guide to the best pizza slices in the five boroughs',
     restaurants: ['2', '3', '20', '26'], // Prince Street, Joe's, L'industrie, Artichoke
+    thumbnailImage: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&h=500&fit=crop',
     isPublic: true,
     category: 'restaurants',
     listType: 'playlists',
@@ -20,6 +21,7 @@ export const mockLists: List[] = [
     name: 'Michelin Star Restaurants',
     description: 'NYC\'s finest dining establishments with Michelin recognition',
     restaurants: ['10', '12', '15', '25'], // Le Bernardin, Eleven Madison Park, Daniel, NoMad
+    thumbnailImage: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=500&fit=crop',
     isPublic: true,
     category: 'restaurants',
     listType: 'playlists',
@@ -32,6 +34,7 @@ export const mockLists: List[] = [
     name: 'Best Date Night Spots',
     description: 'Romantic restaurants perfect for special occasions',
     restaurants: ['1', '4', '10', '14', '15', '21'], // Balthazar, Minetta, Le Bernardin, Locanda Verde, Daniel, Cecconi's
+    thumbnailImage: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=500&fit=crop',
     isPublic: true,
     category: 'restaurants',
     listType: 'playlists',
@@ -44,6 +47,7 @@ export const mockLists: List[] = [
     name: 'Late Night Eats',
     description: 'Where to eat when everything else is closed',
     restaurants: ['3', '11', '18', '26', '28'], // Joe's Pizza, Halal Guys, Gray's Papaya, Artichoke, Mamoun's
+    thumbnailImage: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=500&fit=crop',
     isPublic: true,
     category: 'restaurants',
     listType: 'playlists',
@@ -56,6 +60,7 @@ export const mockLists: List[] = [
     name: 'Hidden Gems',
     description: 'Under-the-radar spots that deserve more attention',
     restaurants: ['22', '23', '24', '8'], // Al di La, Taverna Kyclades, Ivan Ramen, Xi'an Famous Foods
+    thumbnailImage: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&h=500&fit=crop',
     isPublic: true,
     category: 'restaurants',
     listType: 'playlists',
@@ -68,6 +73,7 @@ export const mockLists: List[] = [
     name: 'Vegetarian Paradise',
     description: 'Plant-based dining done right',
     restaurants: ['27', '12'], // Blue Hill, Eleven Madison Park
+    thumbnailImage: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=500&fit=crop',
     isPublic: true,
     category: 'restaurants',
     listType: 'playlists',
@@ -80,6 +86,7 @@ export const mockLists: List[] = [
     name: 'Budget-Friendly Favorites',
     description: 'Great food that won\'t break the bank (under $15)',
     restaurants: ['3', '8', '9', '11', '13', '18', '26', '28'], // Joe's, Xi'an, Joe's Shanghai, Halal Guys, Shake Shack, Gray's, Artichoke, Mamoun's
+    thumbnailImage: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=500&fit=crop',
     isPublic: true,
     category: 'restaurants',
     listType: 'playlists',
@@ -432,4 +439,4 @@ export const getUserListsByType = (userId: string, listType: ListScope, category
   );
 
 // Featured lists that appear on the home feed
-export const featuredLists = mockLists.filter(list => list.userId === 'admin');
+export const featuredLists = mockLists.filter(list => list.userId === 'admin' && list.listType === 'playlists');

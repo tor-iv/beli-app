@@ -12,10 +12,13 @@ import { mockTastemakerPosts, getFeaturedPosts, getPostsByUserId } from '@/data/
 import { mockReservations, getUserPriorityLevel, getAvailableReservations, getClaimedReservationsByUser, getSharedReservationsByUser, getReservationReminders } from '@/data/mock/reservations';
 import { allMenuItems, restaurantMenus } from '@/data/mock/menuItems';
 
-// Simulate network delay - reduced for better UX
-const delay = (ms: number = 150) => new Promise(resolve => setTimeout(resolve, ms));
+// Simulate network delay - reduced for better development performance
+const delay = (ms: number = 50) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class MockDataService {
+  // In-memory cache for match percentages (5-minute TTL)
+  private static matchPercentageCache = new Map<string, { value: number, timestamp: number }>();
+  private static readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
   // User-related methods
   static async getCurrentUser(): Promise<User> {
     await delay();
@@ -48,6 +51,13 @@ export class MockDataService {
   }
 
   static async getUserMatchPercentage(userId: string, targetUserId: string): Promise<number> {
+    // Check cache first
+    const cacheKey = `${userId}-${targetUserId}`;
+    const cached = this.matchPercentageCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+      return cached.value; // Return cached value without delay
+    }
+
     await delay();
 
     // Get both users' restaurant relations
@@ -98,7 +108,63 @@ export class MockDataService {
     const variance = Math.floor(Math.random() * 11) - 5; // -5 to +5
     const finalScore = Math.max(30, Math.min(99, Math.floor(matchScore + variance)));
 
+    // Cache the result
+    this.matchPercentageCache.set(cacheKey, { value: finalScore, timestamp: Date.now() });
+
     return finalScore;
+  }
+
+  // Batch version of getUserMatchPercentage to avoid N+1 queries
+  static async getBatchMatchPercentages(userId: string, targetUserIds: string[]): Promise<Record<string, number>> {
+    await delay();
+
+    const results: Record<string, number> = {};
+
+    // Get user's relations once
+    const userRelations = mockUserRestaurantRelations.filter(
+      rel => rel.userId === userId && (rel.status === 'been' || rel.status === 'want_to_try')
+    );
+    const userRestaurantIds = new Set(userRelations.map(rel => rel.restaurantId));
+
+    // Get user's cuisines once
+    const userCuisines = new Set<string>();
+    userRelations.forEach(rel => {
+      const restaurant = mockRestaurants.find(r => r.id === rel.restaurantId);
+      restaurant?.cuisine.forEach(c => userCuisines.add(c));
+    });
+
+    // Calculate match percentage for each target user
+    targetUserIds.forEach(targetUserId => {
+      const targetRelations = mockUserRestaurantRelations.filter(
+        rel => rel.userId === targetUserId && (rel.status === 'been' || rel.status === 'want_to_try')
+      );
+
+      if (userRelations.length === 0 || targetRelations.length === 0) {
+        results[targetUserId] = Math.floor(Math.random() * 21) + 30;
+        return;
+      }
+
+      const targetRestaurantIds = new Set(targetRelations.map(rel => rel.restaurantId));
+      const intersection = [...userRestaurantIds].filter(id => targetRestaurantIds.has(id));
+      const union = new Set([...userRestaurantIds, ...targetRestaurantIds]);
+      const jaccardSimilarity = intersection.length / union.size;
+
+      const targetCuisines = new Set<string>();
+      targetRelations.forEach(rel => {
+        const restaurant = mockRestaurants.find(r => r.id === rel.restaurantId);
+        restaurant?.cuisine.forEach(c => targetCuisines.add(c));
+      });
+
+      const cuisineIntersection = [...userCuisines].filter(c => targetCuisines.has(c));
+      const cuisineUnion = new Set([...userCuisines, ...targetCuisines]);
+      const cuisineSimilarity = cuisineIntersection.length / cuisineUnion.size;
+
+      const matchScore = (jaccardSimilarity * 0.7 + cuisineSimilarity * 0.3) * 100;
+      const variance = Math.floor(Math.random() * 11) - 5;
+      results[targetUserId] = Math.max(30, Math.min(99, Math.floor(matchScore + variance)));
+    });
+
+    return results;
   }
 
   // Social relationship methods
@@ -264,7 +330,8 @@ export class MockDataService {
 
   static async getRestaurantsByIds(restaurantIds: string[]): Promise<Restaurant[]> {
     await delay();
-    return mockRestaurants.filter(restaurant => restaurantIds.includes(restaurant.id));
+    const idSet = new Set(restaurantIds);
+    return mockRestaurants.filter(restaurant => idSet.has(restaurant.id));
   }
 
   static async getTrendingRestaurants(): Promise<Restaurant[]> {
@@ -473,6 +540,31 @@ export class MockDataService {
     if (index > -1) {
       mockLists.splice(index, 1);
     }
+  }
+
+  static async getUserListProgress(userId: string, listId: string): Promise<{ visited: number; total: number }> {
+    await delay();
+
+    const list = mockLists.find(l => l.id === listId);
+    if (!list) {
+      return { visited: 0, total: 0 };
+    }
+
+    // Get user's been list to check which restaurants they've visited (direct access to avoid nested delay)
+    const userRelations = mockUserRestaurantRelations.filter(relation => relation.userId === userId);
+    const visitedRestaurantIds = userRelations
+      .filter(rel => rel.status === 'been')
+      .map(rel => rel.restaurantId);
+
+    // Count how many restaurants in the list the user has been to
+    const visited = list.restaurants.filter(restaurantId =>
+      visitedRestaurantIds.includes(restaurantId)
+    ).length;
+
+    return {
+      visited,
+      total: list.restaurants.length,
+    };
   }
 
   // Leaderboard
@@ -1216,7 +1308,8 @@ export class MockDataService {
 
   static async getGroupDinnerSuggestions(
     userId: string,
-    participantIds?: string[]
+    participantIds?: string[],
+    category?: import('@/types').ListCategory
   ): Promise<import('@/types').GroupDinnerMatch[]> {
     await delay();
 
@@ -1262,6 +1355,9 @@ export class MockDataService {
 
       const restaurant = mockRestaurants.find(r => r.id === restaurantId);
       if (!restaurant) continue;
+
+      // Filter by category if specified
+      if (category && restaurant.category !== category) continue;
 
       // Calculate score
       let score = 0;
@@ -1469,6 +1565,99 @@ export class MockDataService {
       totalCountries: countryMap.size,
       totalCuisines: cuisineMap.size,
     };
+  }
+
+  // Ranking methods
+  static async getRankedRestaurants(userId: string, category: import('@/types').ListCategory): Promise<(import('@/types').Restaurant & { userRating?: number })[]> {
+    await delay();
+
+    // Get all restaurants in the 'been' list for this user
+    const relations = mockUserRestaurantRelations.filter(
+      relation => relation.userId === userId && relation.status === 'been'
+    );
+
+    // Filter by category (for now, all restaurants go into 'restaurants' category)
+    // In a real app, you might filter by restaurant type based on category
+
+    // Get full restaurant objects with their rank indices and user ratings
+    const restaurantsWithRanks = relations
+      .map(relation => {
+        const restaurant = mockRestaurants.find(r => r.id === relation.restaurantId);
+        return restaurant ? {
+          restaurant,
+          rankIndex: relation.rankIndex ?? 999999,
+          userRating: relation.rating
+        } : null;
+      })
+      .filter((item): item is { restaurant: import('@/types').Restaurant; rankIndex: number; userRating: number | undefined } => item !== null);
+
+    // Sort by rank index (lower index = higher rank)
+    restaurantsWithRanks.sort((a, b) => a.rankIndex - b.rankIndex);
+
+    // Attach userRating to restaurant objects
+    return restaurantsWithRanks.map(item => ({
+      ...item.restaurant,
+      userRating: item.userRating
+    }));
+  }
+
+  static async insertRankedRestaurant(
+    userId: string,
+    restaurantId: string,
+    category: import('@/types').ListCategory,
+    position: number,
+    rating: number,
+    data?: {
+      notes?: string;
+      photos?: string[];
+      tags?: string[];
+      companions?: string[];
+    }
+  ): Promise<import('@/types').UserRestaurantRelation> {
+    await delay();
+
+    // Update rank indices for existing restaurants at or after this position
+    await this.updateRankIndices(userId, category, position);
+
+    // Create the new relation with rank index
+    const newRelation: import('@/types').UserRestaurantRelation = {
+      userId,
+      restaurantId,
+      status: 'been',
+      rating,
+      rankIndex: position,
+      notes: data?.notes,
+      photos: data?.photos,
+      tags: data?.tags,
+      companions: data?.companions,
+      createdAt: new Date(),
+      visitDate: new Date(),
+    };
+
+    // Add to the list
+    mockUserRestaurantRelations.push(newRelation);
+
+    return newRelation;
+  }
+
+  static async updateRankIndices(
+    userId: string,
+    category: import('@/types').ListCategory,
+    fromIndex: number
+  ): Promise<void> {
+    await delay();
+
+    // Find all relations for this user in the 'been' status
+    const relations = mockUserRestaurantRelations.filter(
+      relation => relation.userId === userId && relation.status === 'been'
+    );
+
+    // Increment rank index for all items at or after the insertion point
+    relations.forEach(relation => {
+      if (relation.rankIndex !== undefined && relation.rankIndex >= fromIndex) {
+        relation.rankIndex += 1;
+      }
+    });
   }
 }
 

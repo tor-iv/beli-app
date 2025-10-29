@@ -15,6 +15,7 @@ import {
 import {
   BottomSheet,
   BottomSheetContent,
+  BottomSheetTitle,
 } from "@/components/ui/bottom-sheet"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
@@ -117,7 +118,7 @@ export function ConfirmationModal({
       <BottomSheetContent height="auto" className="p-0">
         {/* Header */}
         <div className="px-4 py-3 border-b">
-          <h2 className="text-xl font-bold">Dinner Confirmed!</h2>
+          <BottomSheetTitle className="text-xl font-bold">Dinner Confirmed!</BottomSheetTitle>
         </div>
 
         {/* Restaurant Image with Success Badge */}
@@ -145,7 +146,7 @@ export function ConfirmationModal({
           </h3>
 
           {/* Meta */}
-          <p className="text-base text-secondary mb-2">
+          <p className="text-base text-gray-900 mb-2">
             {restaurant.cuisine.join(", ")} • {restaurant.priceRange}
           </p>
 

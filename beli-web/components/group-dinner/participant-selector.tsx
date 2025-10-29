@@ -5,6 +5,7 @@ import { X, CheckCircle2, Circle } from "lucide-react"
 import {
   BottomSheet,
   BottomSheetContent,
+  BottomSheetTitle,
 } from "@/components/ui/bottom-sheet"
 import { Button } from "@/components/ui/button"
 import { SearchBar } from "@/components/navigation/search-bar"
@@ -136,7 +137,7 @@ export function ParticipantSelector({
       <BottomSheetContent className="p-0 h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0">
-          <h2 className="text-xl font-bold">Add People</h2>
+          <BottomSheetTitle className="text-xl font-bold">Add People</BottomSheetTitle>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"

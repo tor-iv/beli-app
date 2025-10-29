@@ -6,6 +6,7 @@ import {
   BottomSheet,
   BottomSheetContent,
   BottomSheetClose,
+  BottomSheetTitle,
 } from "@/components/ui/bottom-sheet"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -88,7 +89,7 @@ export function FeedFiltersModal({
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-foreground">Filter feed</h2>
+              <BottomSheetTitle className="text-xl font-bold text-foreground">Filter feed</BottomSheetTitle>
               <span className="bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
                 SC
               </span>

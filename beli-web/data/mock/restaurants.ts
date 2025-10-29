@@ -6,6 +6,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Moody Tongue Pizza',
     cuisine: ['Pizza', 'Japanese'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '345 E 6th St',
       city: 'New York',
@@ -63,6 +64,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Balthazar',
     cuisine: ['French', 'Bistro'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: '80 Spring St',
       city: 'New York',
@@ -116,6 +118,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Prince Street Pizza',
     cuisine: ['Pizza', 'Italian'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '27 Prince St',
       city: 'New York',
@@ -168,15 +171,15 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Joe\'s Pizza',
     cuisine: ['Pizza', 'Italian'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '7 Carmine St',
       city: 'New York',
       state: 'NY',
       neighborhood: 'Greenwich Village',
       coordinates: { lat: 40.7308, lng: -74.0034 },
-  
+    },
     menu: ['jp-1', 'jp-2', 'jp-3', 'jp-4', 'jp-5', 'jp-6', 'jp-7', 'jp-8'],
-  },
     rating: 7.8,
     images: ['https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400'],
     hours: {
@@ -219,15 +222,15 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Minetta Tavern',
     cuisine: ['American', 'Steakhouse'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '113 MacDougal St',
       city: 'New York',
       state: 'NY',
       neighborhood: 'Greenwich Village',
       coordinates: { lat: 40.7293, lng: -74.0024 },
-  
+    },
     menu: ['min-1', 'min-2', 'min-3', 'min-4', 'min-5', 'min-6', 'min-7', 'min-8', 'min-9', 'min-10', 'min-11', 'min-12'],
-  },
     rating: 9.1,
     images: ['https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400'],
     hours: {
@@ -275,15 +278,15 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Katz\'s Delicatessen',
     cuisine: ['Deli', 'Jewish'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '205 E Houston St',
       city: 'New York',
       state: 'NY',
       neighborhood: 'Lower East Side',
       coordinates: { lat: 40.7223, lng: -73.9873 },
-  
+    },
     menu: ['katz-1', 'katz-2', 'katz-3', 'katz-4', 'katz-5', 'katz-6', 'katz-7', 'katz-8', 'katz-9', 'katz-10'],
-  },
     rating: 8.3,
     images: ['https://images.unsplash.com/photo-1551782450-17144efb9c50?w=400'],
     hours: {
@@ -327,15 +330,15 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Momofuku Noodle Bar',
     cuisine: ['Asian', 'Ramen'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '171 1st Ave',
       city: 'New York',
       state: 'NY',
       neighborhood: 'East Village',
       coordinates: { lat: 40.7282, lng: -73.9857 },
-  
+    },
     menu: ['momofo-1', 'momofo-2', 'momofo-3', 'momofo-4', 'momofo-5', 'momofo-6', 'momofo-7', 'momofo-8', 'momofo-9', 'momofo-10'],
-  },
     rating: 8.7,
     images: ['https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=400'],
     hours: {
@@ -381,15 +384,15 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Russ & Daughters',
     cuisine: ['Jewish', 'Appetizing'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '179 E Houston St',
       city: 'New York',
       state: 'NY',
       neighborhood: 'Lower East Side',
       coordinates: { lat: 40.7219, lng: -73.9890 },
-  
+    },
     menu: ['rd-1', 'rd-2', 'rd-3', 'rd-4', 'rd-5', 'rd-6', 'rd-7', 'rd-8', 'rd-9', 'rd-10'],
-  },
     rating: 8.6,
     images: ['https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400'],
     hours: {
@@ -419,6 +422,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Xi\'an Famous Foods',
     cuisine: ['Chinese', 'Hand-Pulled Noodles'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '81 St Marks Pl',
       city: 'New York',
@@ -426,6 +430,7 @@ export const mockRestaurants: Restaurant[] = [
       neighborhood: 'East Village',
       coordinates: { lat: 40.7281, lng: -73.9846 },
     },
+    menu: ['xian-1', 'xian-2', 'xian-3', 'xian-4', 'xian-5', 'xian-6', 'xian-7', 'xian-8'],
     rating: 8.2,
     images: ['https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=400'],
     hours: {
@@ -451,6 +456,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Joe\'s Shanghai',
     cuisine: ['Chinese', 'Soup Dumplings'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '9 Pell St',
       city: 'New York',
@@ -485,6 +491,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Le Bernardin',
     cuisine: ['French', 'Seafood'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '155 W 51st St',
       city: 'New York',
@@ -492,6 +499,7 @@ export const mockRestaurants: Restaurant[] = [
       neighborhood: 'Midtown',
       coordinates: { lat: 40.7614, lng: -73.9776 },
     },
+    menu: ['leb-1', 'leb-2', 'leb-3', 'leb-4', 'leb-5', 'leb-6', 'leb-7', 'leb-8', 'leb-9', 'leb-10', 'leb-11', 'leb-12'],
     rating: 9.2,
     images: ['https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400'],
     hours: {
@@ -520,6 +528,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Halal Guys',
     cuisine: ['Middle Eastern', 'Halal'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '307 E 53rd St',
       city: 'New York',
@@ -554,6 +563,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Eleven Madison Park',
     cuisine: ['American', 'Fine Dining'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '11 Madison Ave',
       city: 'New York',
@@ -561,6 +571,7 @@ export const mockRestaurants: Restaurant[] = [
       neighborhood: 'Flatiron',
       coordinates: { lat: 40.7420, lng: -73.9870 },
     },
+    menu: ['emp-1', 'emp-2', 'emp-3', 'emp-4', 'emp-5', 'emp-6', 'emp-7', 'emp-8', 'emp-9', 'emp-10', 'emp-11', 'emp-12'],
     rating: 9.0,
     images: ['https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400'],
     hours: {
@@ -589,6 +600,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Shake Shack',
     cuisine: ['American', 'Burgers'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '23rd St & Madison Ave',
       city: 'New York',
@@ -623,6 +635,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Locanda Verde',
     cuisine: ['Italian'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: '377 Greenwich St',
       city: 'New York',
@@ -630,6 +643,7 @@ export const mockRestaurants: Restaurant[] = [
       neighborhood: 'Tribeca',
       coordinates: { lat: 40.7216, lng: -74.0100 },
     },
+    menu: ['loc-1', 'loc-2', 'loc-3', 'loc-4', 'loc-5', 'loc-6', 'loc-7', 'loc-8', 'loc-9', 'loc-10'],
     rating: 8.5,
     images: ['https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400'],
     hours: {
@@ -658,6 +672,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Daniel',
     cuisine: ['French', 'Fine Dining'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '60 E 65th St',
       city: 'New York',
@@ -665,6 +680,7 @@ export const mockRestaurants: Restaurant[] = [
       neighborhood: 'Upper East Side',
       coordinates: { lat: 40.7677, lng: -73.9700 },
     },
+    menu: ['dan-1', 'dan-2', 'dan-3', 'dan-4', 'dan-5', 'dan-6', 'dan-7', 'dan-8', 'dan-9', 'dan-10', 'dan-11', 'dan-12'],
     rating: 9.3,
     images: ['https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400'],
     hours: {
@@ -692,6 +708,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'The Carlyle Restaurant',
     cuisine: ['American', 'Fine Dining'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '35 E 76th St',
       city: 'New York',
@@ -727,6 +744,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Jacob\'s Pickles',
     cuisine: ['American', 'Southern'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '509 Amsterdam Ave',
       city: 'New York',
@@ -759,6 +777,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Gray\'s Papaya',
     cuisine: ['Hot Dogs', 'American'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '2090 Broadway',
       city: 'New York',
@@ -793,6 +812,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Peter Luger Steak House',
     cuisine: ['Steakhouse', 'German'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '178 Broadway',
       city: 'Brooklyn',
@@ -826,6 +846,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'L\'industrie Pizzeria',
     cuisine: ['Pizza', 'Italian'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '254 S 2nd St',
       city: 'Brooklyn',
@@ -860,6 +881,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Cecconi\'s',
     cuisine: ['Italian'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: '55 Water St',
       city: 'Brooklyn',
@@ -867,6 +889,7 @@ export const mockRestaurants: Restaurant[] = [
       neighborhood: 'DUMBO',
       coordinates: { lat: 40.7033, lng: -73.9904 },
     },
+    menu: ['cec-1', 'cec-2', 'cec-3', 'cec-4', 'cec-5', 'cec-6', 'cec-7', 'cec-8', 'cec-9', 'cec-10'],
     rating: 8.7,
     images: ['https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400'],
     hours: {
@@ -895,6 +918,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Al di La Trattoria',
     cuisine: ['Italian'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '248 5th Ave',
       city: 'Brooklyn',
@@ -902,6 +926,7 @@ export const mockRestaurants: Restaurant[] = [
       neighborhood: 'Park Slope',
       coordinates: { lat: 40.6726, lng: -73.9826 },
     },
+    menu: ['aldila-1', 'aldila-2', 'aldila-3', 'aldila-4', 'aldila-5', 'aldila-6', 'aldila-7', 'aldila-8', 'aldila-9', 'aldila-10'],
     rating: 8.3,
     images: ['https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400'],
     hours: {
@@ -929,6 +954,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Taverna Kyclades',
     cuisine: ['Greek', 'Seafood'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '33-07 Ditmars Blvd',
       city: 'Astoria',
@@ -936,6 +962,7 @@ export const mockRestaurants: Restaurant[] = [
       neighborhood: 'Astoria',
       coordinates: { lat: 40.7753, lng: -73.9067 },
     },
+    menu: ['kyk-1', 'kyk-2', 'kyk-3', 'kyk-4', 'kyk-5', 'kyk-6', 'kyk-7', 'kyk-8', 'kyk-9', 'kyk-10'],
     rating: 8.4,
     images: ['https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400'],
     hours: {
@@ -963,6 +990,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Ivan Ramen',
     cuisine: ['Ramen', 'Japanese'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '25 Clinton St',
       city: 'New York',
@@ -970,6 +998,7 @@ export const mockRestaurants: Restaurant[] = [
       neighborhood: 'Lower East Side',
       coordinates: { lat: 40.7210, lng: -73.9844 },
     },
+    menu: ['ivan-1', 'ivan-2', 'ivan-3', 'ivan-4', 'ivan-5', 'ivan-6', 'ivan-7', 'ivan-8'],
     rating: 8.5,
     images: ['https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=400'],
     popularDishes: ['Triple Pork Ramen', 'Mazesoba', 'Pork Buns'],
@@ -982,6 +1011,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'The NoMad Restaurant',
     cuisine: ['American', 'French'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '1170 Broadway',
       city: 'New York',
@@ -989,6 +1019,7 @@ export const mockRestaurants: Restaurant[] = [
       neighborhood: 'NoMad',
       coordinates: { lat: 40.7458, lng: -73.9878 },
     },
+    menu: ['nomad-1', 'nomad-2', 'nomad-3', 'nomad-4', 'nomad-5', 'nomad-6', 'nomad-7', 'nomad-8', 'nomad-9', 'nomad-10', 'nomad-11', 'nomad-12'],
     rating: 9.1,
     images: ['https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400'],
     popularDishes: ['Roasted Chicken', 'Foie Gras', 'Milk & Honey'],
@@ -1001,6 +1032,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Artichoke Basille\'s Pizza',
     cuisine: ['Pizza'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '328 E 14th St',
       city: 'New York',
@@ -1020,6 +1052,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Blue Hill',
     cuisine: ['American', 'Farm-to-Table'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '75 Washington Pl',
       city: 'New York',
@@ -1039,6 +1072,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Mamoun\'s Falafel',
     cuisine: ['Middle Eastern'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '119 MacDougal St',
       city: 'New York',
@@ -1058,6 +1092,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'The Spotted Pig',
     cuisine: ['British', 'Gastropub'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '314 W 11th St',
       city: 'New York',
@@ -1077,6 +1112,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Sarabeth\'s',
     cuisine: ['American', 'Brunch'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '423 Amsterdam Ave',
       city: 'New York',
@@ -1096,6 +1132,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'San Marzano',
     cuisine: ['Ukrainian', 'European'],
     priceRange: '$',
+    category: 'restaurants',
     location: {
       address: '144 2nd Ave',
       city: 'New York',
@@ -1103,6 +1140,7 @@ export const mockRestaurants: Restaurant[] = [
       neighborhood: 'Ukrainian Village, Manhattan',
       coordinates: { lat: 40.7294, lng: -73.9871 },
     },
+    menu: ['sanm-1', 'sanm-2', 'sanm-3', 'sanm-4', 'sanm-5', 'sanm-6', 'sanm-7', 'sanm-8'],
     rating: 8.5,
     images: ['https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400'],
     hours: {
@@ -1124,6 +1162,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Jua',
     cuisine: ['Korean', 'Fine Dining'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: '36 E 22nd St',
       city: 'New York',
@@ -1152,6 +1191,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Omars Mediterranean Cuisine',
     cuisine: ['Mediterranean', 'Middle Eastern'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '1435 2nd Ave',
       city: 'New York',
@@ -1182,6 +1222,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Alouette',
     cuisine: ['Danish'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: 'Frederiksstaden',
       city: 'Copenhagen',
@@ -1189,6 +1230,7 @@ export const mockRestaurants: Restaurant[] = [
       neighborhood: 'Frederiksstaden',
       coordinates: { lat: 55.6761, lng: 12.5683 },
     },
+    menu: ['alou-1', 'alou-2', 'alou-3', 'alou-4', 'alou-5', 'alou-6', 'alou-7', 'alou-8', 'alou-9', 'alou-10', 'alou-11', 'alou-12'],
     rating: 10.0,
     images: ['https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400'],
     hours: {
@@ -1220,6 +1262,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Maido',
     cuisine: ['Japanese', 'Peruvian'],
     priceRange: '$$$$',
+    category: 'restaurants',
     location: {
       address: 'El Palacio del Virrey',
       city: 'Lima',
@@ -1250,6 +1293,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Mérito',
     cuisine: ['Peruvian', 'Venezuelan'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: 'Lima',
       city: 'Lima',
@@ -1280,6 +1324,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Restaurante Casa Benigna',
     cuisine: ['Spanish'],
     priceRange: '€€€',
+    category: 'restaurants',
     location: {
       address: 'Ciudad Jardín',
       city: 'Madrid',
@@ -1312,6 +1357,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Death & Co',
     cuisine: ['Cocktail Bar'],
     priceRange: '$$$',
+    category: 'bars',
     location: {
       address: '433 E 6th St',
       city: 'New York',
@@ -1342,6 +1388,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Please Don\'t Tell',
     cuisine: ['Cocktail Bar'],
     priceRange: '$$$',
+    category: 'bars',
     location: {
       address: '113 St Marks Pl',
       city: 'New York',
@@ -1372,6 +1419,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Employees Only',
     cuisine: ['Cocktail Bar'],
     priceRange: '$$$',
+    category: 'bars',
     location: {
       address: '510 Hudson St',
       city: 'New York',
@@ -1404,6 +1452,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Dominique Ansel Bakery',
     cuisine: ['Bakery'],
     priceRange: '$$',
+    category: 'bakeries',
     location: {
       address: '189 Spring St',
       city: 'New York',
@@ -1434,6 +1483,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Levain Bakery',
     cuisine: ['Bakery'],
     priceRange: '$$',
+    category: 'bakeries',
     location: {
       address: '167 W 74th St',
       city: 'New York',
@@ -1464,6 +1514,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Breads Bakery',
     cuisine: ['Bakery'],
     priceRange: '$$',
+    category: 'bakeries',
     location: {
       address: '18 E 16th St',
       city: 'New York',
@@ -1496,6 +1547,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Blue Bottle Coffee - Bryant Park',
     cuisine: ['Coffee'],
     priceRange: '$$',
+    category: 'coffee_tea',
     location: {
       address: '54 W 40th St',
       city: 'New York',
@@ -1526,6 +1578,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Devoción',
     cuisine: ['Coffee'],
     priceRange: '$$',
+    category: 'coffee_tea',
     location: {
       address: '69 Grand St',
       city: 'Brooklyn',
@@ -1556,6 +1609,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Cha-An Teahouse',
     cuisine: ['Tea House'],
     priceRange: '$$',
+    category: 'coffee_tea',
     location: {
       address: '230 E 9th St',
       city: 'New York',
@@ -1588,6 +1642,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Milk Bar Flagship',
     cuisine: ['Dessert'],
     priceRange: '$$',
+    category: 'dessert',
     location: {
       address: '1196 Broadway',
       city: 'New York',
@@ -1618,6 +1673,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Spot Dessert Bar',
     cuisine: ['Dessert'],
     priceRange: '$$',
+    category: 'dessert',
     location: {
       address: '13 St Marks Pl',
       city: 'New York',
@@ -1648,6 +1704,7 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Van Leeuwen Ice Cream',
     cuisine: ['Ice Cream'],
     priceRange: '$$',
+    category: 'dessert',
     location: {
       address: '172 Ludlow St',
       city: 'New York',
@@ -1678,15 +1735,15 @@ export const mockRestaurants: Restaurant[] = [
     name: "L'Artusi",
     cuisine: ['Italian'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: '228 W 10th St',
       city: 'New York',
       state: 'NY',
       neighborhood: 'West Village',
       coordinates: { lat: 40.7346, lng: -74.0062 },
-  
+    },
     menu: ['lart-1', 'lart-2', 'lart-3', 'lart-4', 'lart-5', 'lart-6', 'lart-7', 'lart-8', 'lart-9', 'lart-10', 'lart-11', 'lart-12'],
-  },
     rating: 9.1,
     images: ['https://images.unsplash.com/photo-1525755662778-989d0524087e?w=400'],
     hours: {
@@ -1710,15 +1767,15 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Anton\'s',
     cuisine: ['American', 'New American'],
     priceRange: '$$$',
+    category: 'restaurants',
     location: {
       address: '570 Hudson St',
       city: 'New York',
       state: 'NY',
       neighborhood: 'West Village',
       coordinates: { lat: 40.7355, lng: -74.0063 },
-  
+    },
     menu: ['ant-1', 'ant-2', 'ant-3', 'ant-4', 'ant-5', 'ant-6', 'ant-7', 'ant-8', 'ant-9', 'ant-10'],
-  },
     rating: 6.2,
     images: ['https://images.unsplash.com/photo-1481931098730-318b6f776db0?w=400'],
     hours: {
@@ -1742,15 +1799,15 @@ export const mockRestaurants: Restaurant[] = [
     name: 'Cowgirl',
     cuisine: ['Tex-Mex', 'American'],
     priceRange: '$$',
+    category: 'restaurants',
     location: {
       address: '519 Hudson St',
       city: 'New York',
       state: 'NY',
       neighborhood: 'West Village',
       coordinates: { lat: 40.7339, lng: -74.0068 },
-  
+    },
     menu: ['cg-1', 'cg-2', 'cg-3', 'cg-4', 'cg-5', 'cg-6', 'cg-7', 'cg-8'],
-  },
     rating: 3.4,
     images: ['https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=400'],
     hours: {
