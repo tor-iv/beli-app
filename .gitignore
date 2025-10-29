@@ -61,3 +61,6 @@ next-env.d.ts
 
 # Build info
 *.tsbuildinfo
+
+# Design assets (keep locally, exclude from repo)
+beli-images/
