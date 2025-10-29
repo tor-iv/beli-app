@@ -252,6 +252,7 @@ export interface GroupDinnerMatch {
 export type MenuItemCategory = 'appetizer' | 'entree' | 'side' | 'dessert' | 'drink';
 export type PortionSize = 'small' | 'medium' | 'large' | 'shareable';
 export type HungerLevel = 'light' | 'moderate' | 'very-hungry';
+export type MealTime = 'breakfast' | 'lunch' | 'dinner' | 'any-time';
 
 export interface MenuItem {
   id: string;
@@ -266,6 +267,7 @@ export interface MenuItem {
   isVegetarian?: boolean;
   isGlutenFree?: boolean;
   spiceLevel?: 1 | 2 | 3 | 4 | 5;
+  mealTime?: MealTime[]; // Which meals this item is suitable for
 }
 
 export interface OrderSuggestion {
@@ -273,8 +275,60 @@ export interface OrderSuggestion {
   restaurantId: string;
   partySize: number;
   hungerLevel: HungerLevel;
+  mealTime: MealTime;
   items: Array<MenuItem & { quantity: number }>;
   totalPrice: number;
   reasoning: string[];
   estimatedSharability: string; // e.g., "Perfect for 4 people"
+}
+
+// Taste Profile types
+export interface CuisineBreakdown {
+  cuisine: string;
+  count: number;
+  avgScore: number;
+  restaurantIds: string[];
+}
+
+export interface CityBreakdown {
+  city: string;
+  state?: string;
+  count: number;
+  avgScore: number;
+  restaurantIds: string[];
+}
+
+export interface CountryBreakdown {
+  country: string;
+  count: number;
+  avgScore: number;
+  restaurantIds: string[];
+}
+
+export interface DiningLocation {
+  city: string;
+  country: string;
+  state?: string;
+  lat: number;
+  lng: number;
+  restaurantIds: string[];
+}
+
+export interface Last30DaysStats {
+  restaurantsCount: number;
+  cuisinesCount: number;
+  activityPercentile: number; // e.g., 96 means "Top 4%"
+  primaryLocation: string; // e.g., "New York"
+}
+
+export interface TasteProfileStats {
+  last30Days: Last30DaysStats;
+  cuisineBreakdown: CuisineBreakdown[];
+  cityBreakdown: CityBreakdown[];
+  countryBreakdown: CountryBreakdown[];
+  diningLocations: DiningLocation[];
+  totalRestaurants: number;
+  totalCities: number;
+  totalCountries: number;
+  totalCuisines: number;
 }

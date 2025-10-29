@@ -30,3 +30,6 @@ export * from './modals';
 
 // Challenge components
 export * from './challenge';
+
+// Profile components
+export * from './profile';

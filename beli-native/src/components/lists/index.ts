@@ -3,3 +3,4 @@ export { TabSelector } from './TabSelector';
 export { SortToggle } from './SortToggle';
 export { ListCard } from './ListCard';
 export { CategoryDropdown } from './CategoryDropdown';
+export { FeaturedListCard } from './FeaturedListCard';

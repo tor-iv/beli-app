@@ -6,9 +6,9 @@ import type { CompositeNavigationProp, RouteProp } from '@react-navigation/nativ
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { colors, typography, spacing } from '../theme';
-import { SearchBar, LoadingSpinner, EmptyState } from '../components';
+import { SearchBar, LoadingSpinner, EmptyState, UserSearchResultCard } from '../components';
 import { MockDataService } from '../data/mockDataService';
-import type { Restaurant } from '../data/mock/types';
+import type { Restaurant, User } from '../data/mock/types';
 import type { BottomTabParamList, AppStackParamList } from '../navigation/types';
 
 type SearchScreenNavigationProp = CompositeNavigationProp<
@@ -31,10 +31,19 @@ export default function SearchScreen() {
   const [activeSegment, setActiveSegment] = useState<'Restaurants' | 'Members'>('Restaurants');
   const [location, setLocation] = useState('Current Location');
 
+  // Member search state
+  const [filteredMembers, setFilteredMembers] = useState<User[]>([]);
+  const [searchingMembers, setSearchingMembers] = useState(false);
+  const [memberMatchPercentages, setMemberMatchPercentages] = useState<Record<string, number>>({});
+
   const handleLocationPress = () => {};
 
   const handleRestaurantPress = (restaurantId: string) => {
     navigation.navigate('RestaurantInfo', { restaurantId });
+  };
+
+  const handleMemberPress = (userId: string) => {
+    navigation.navigate('UserProfile', { userId });
   };
 
   useEffect(() => {
@@ -96,6 +105,62 @@ export default function SearchScreen() {
       clearTimeout(timeoutId);
     };
   }, [searchQuery, restaurants, activeSegment]);
+
+  // Member search effect
+  useEffect(() => {
+    if (activeSegment !== 'Members') {
+      setSearchingMembers(false);
+      setFilteredMembers([]);
+      return;
+    }
+
+    const trimmedQuery = searchQuery.trim();
+
+    if (!trimmedQuery) {
+      setFilteredMembers([]);
+      setSearchingMembers(false);
+      return;
+    }
+
+    let isCancelled = false;
+    setSearchingMembers(true);
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        const results = await MockDataService.searchUsers(trimmedQuery);
+        if (!isCancelled) {
+          setFilteredMembers(results);
+
+          // Load match percentages for all results
+          const percentages: Record<string, number> = {};
+          await Promise.all(
+            results.map(async (user) => {
+              const match = await MockDataService.getUserMatchPercentage(user.id);
+              percentages[user.id] = match;
+            })
+          );
+
+          if (!isCancelled) {
+            setMemberMatchPercentages(percentages);
+          }
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          console.error('Member search failed:', error);
+          setFilteredMembers([]);
+        }
+      } finally {
+        if (!isCancelled) {
+          setSearchingMembers(false);
+        }
+      }
+    }, 200);
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, [searchQuery, activeSegment]);
 
   const loadRestaurants = async () => {
     try {
@@ -285,11 +350,57 @@ export default function SearchScreen() {
 
   const renderContent = () => {
     if (activeSegment === 'Members') {
+      // Handle member search loading
+      if (searchQuery.trim() && searchingMembers) {
+        return (
+          <View style={styles.loadingContainer}>
+            <LoadingSpinner size="large" />
+          </View>
+        );
+      }
+
+      // Handle empty search query
+      if (!searchQuery.trim()) {
+        return (
+          <EmptyState
+            title="Search members"
+            description="Find and follow friends by name or username"
+            icon="people-outline"
+          />
+        );
+      }
+
+      // Handle no results
+      if (filteredMembers.length === 0) {
+        return (
+          <EmptyState
+            title="No members found"
+            description={`No results for "${searchQuery}"`}
+            icon="search-outline"
+          />
+        );
+      }
+
+      // Render member search results
       return (
-        <EmptyState
-          title="Search members"
-          description="Find and follow friends by name or username"
-          iconName="people-outline"
+        <FlatList
+          data={filteredMembers}
+          renderItem={({ item }) => (
+            <UserSearchResultCard
+              user={item}
+              matchPercentage={memberMatchPercentages[item.id] || 0}
+              onPress={() => handleMemberPress(item.id)}
+            />
+          )}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.listContent}
+          ListHeaderComponent={() => (
+            <View style={styles.listHeader}>
+              <Text style={styles.sectionTitle}>Results</Text>
+            </View>
+          )}
         />
       );
     }
@@ -311,7 +422,7 @@ export default function SearchScreen() {
               ? `No results for "${searchQuery}"`
               : 'Search for restaurants by name, cuisine, or neighborhood'
           }
-          iconName="search-outline"
+          icon="search-outline"
         />
       );
     }
@@ -324,7 +435,7 @@ export default function SearchScreen() {
         <EmptyState
           title="No recent searches"
           description="Start typing to find restaurants or explore quick actions"
-          iconName="time-outline"
+          icon="time-outline"
         />
       );
     }

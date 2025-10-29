@@ -1,13 +1,21 @@
 export type BottomTabParamList = {
   Feed: undefined;
-  Lists: { initialTab?: 'been' | 'recs' | 'playlists' | 'want' | 'recs_for_you' | 'recs_from_friends' | 'trending' } | undefined;
+  Lists: {
+    initialTab?: 'been' | 'recs' | 'playlists' | 'want' | 'recs_for_you' | 'recs_from_friends' | 'trending';
+    filterType?: 'cuisine' | 'city' | 'country';
+    filterValue?: string;
+    sortBy?: 'count' | 'avgScore';
+  } | undefined;
   Search: { autoFocus?: boolean } | undefined;
   Leaderboard: undefined;
   Profile: undefined;
 };
 
 export type AppStackParamList = {
-  Tabs: undefined;
+  Tabs: {
+    screen?: keyof BottomTabParamList;
+    params?: BottomTabParamList[keyof BottomTabParamList];
+  } | undefined;
   RestaurantInfo: {
     restaurantId: string;
   };
@@ -16,6 +24,12 @@ export type AppStackParamList = {
   ReservationSharing: undefined;
   GroupDinner: undefined;
   FeaturedLists: undefined;
+  FeaturedListDetail: {
+    listId: string;
+  };
+  UserProfile: {
+    userId: string;
+  };
 
   // Settings Screens
   SettingsHub: undefined;

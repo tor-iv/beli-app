@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import {
   Modal,
   View,
-  Text,
+  Text as RNText,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Restaurant, OrderSuggestion, HungerLevel } from '../../types';
+import { Restaurant, OrderSuggestion, HungerLevel, MealTime } from '../../types';
 import { colors, spacing, typography, shadows } from '../../theme';
 import { Button } from '../base';
 import { MockDataService } from '../../data/mockDataService';
@@ -24,6 +24,16 @@ interface WhatToOrderModalProps {
 }
 
 type Step = 'setup' | 'suggestions';
+
+// Helper function to auto-detect meal time based on current hour
+const getMealTimeFromHour = (): MealTime => {
+  const hour = new Date().getHours();
+
+  if (hour >= 5 && hour < 11) return 'breakfast';
+  if (hour >= 11 && hour < 16) return 'lunch';
+  if (hour >= 16 && hour < 22) return 'dinner';
+  return 'any-time';
+};
 
 const HUNGER_LEVELS: Array<{
   value: HungerLevel;
@@ -81,10 +91,12 @@ export default function WhatToOrderModal({
   const handleGenerateSuggestions = async () => {
     setLoading(true);
     try {
+      const detectedMealTime = getMealTimeFromHour();
       const result = await MockDataService.generateOrderSuggestion(
         restaurant.id,
         partySize,
-        hungerLevel
+        hungerLevel,
+        detectedMealTime
       );
       setSuggestion(result);
       setStep('suggestions');
@@ -125,10 +137,12 @@ export default function WhatToOrderModal({
 
     // Generate new suggestion
     try {
+      const detectedMealTime = getMealTimeFromHour();
       const result = await MockDataService.generateOrderSuggestion(
         restaurant.id,
         partySize,
-        hungerLevel
+        hungerLevel,
+        detectedMealTime
       );
       setSuggestion(result);
     } catch (error) {
@@ -157,7 +171,7 @@ export default function WhatToOrderModal({
       <View style={styles.setupContent}>
         {/* Party Size Selector */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>How many people?</Text>
+          <RNText style={styles.sectionTitle}>How many people?</RNText>
           <View style={styles.partySizeContainer}>
             <TouchableOpacity
               style={[
@@ -175,10 +189,10 @@ export default function WhatToOrderModal({
             </TouchableOpacity>
 
             <View style={styles.partySizeDisplay}>
-              <Text style={styles.partySizeNumber}>{partySize}</Text>
-              <Text style={styles.partySizeLabel}>
+              <RNText style={styles.partySizeNumber}>{partySize}</RNText>
+              <RNText style={styles.partySizeLabel}>
                 {partySize === 1 ? 'person' : 'people'}
-              </Text>
+              </RNText>
             </View>
 
             <TouchableOpacity
@@ -200,7 +214,7 @@ export default function WhatToOrderModal({
 
         {/* Hunger Level Selector */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>How hungry are you?</Text>
+          <RNText style={styles.sectionTitle}>How hungry are you?</RNText>
           <View style={styles.hungerLevelsContainer}>
             {HUNGER_LEVELS.map(level => (
               <TouchableOpacity
@@ -229,22 +243,22 @@ export default function WhatToOrderModal({
                     />
                   </View>
                   <View style={styles.hungerLevelTextContainer}>
-                    <Text
+                    <RNText
                       style={[
                         styles.hungerLevelLabel,
                         hungerLevel === level.value && styles.hungerLevelLabelSelected,
                       ]}
                     >
                       {level.label}
-                    </Text>
-                    <Text
+                    </RNText>
+                    <RNText
                       style={[
                         styles.hungerLevelDescription,
                         hungerLevel === level.value && styles.hungerLevelDescriptionSelected,
                       ]}
                     >
                       {level.description}
-                    </Text>
+                    </RNText>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -282,28 +296,28 @@ export default function WhatToOrderModal({
           <View style={styles.summaryCard}>
             <View style={styles.summaryHeader}>
               <View>
-                <Text style={styles.summaryPrice}>
+                <RNText style={styles.summaryPrice}>
                   ${suggestion.totalPrice.toFixed(2)}
-                </Text>
-                <Text style={styles.summaryPricePerPerson}>
+                </RNText>
+                <RNText style={styles.summaryPricePerPerson}>
                   ${(suggestion.totalPrice / suggestion.partySize).toFixed(2)} per person
-                </Text>
+                </RNText>
               </View>
               <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
                 <Ionicons name="share-outline" size={24} color={colors.primary} />
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.summaryDescription}>
+            <RNText style={styles.summaryDescription}>
               {suggestion.estimatedSharability}
-            </Text>
+            </RNText>
 
             {/* Reasoning Chips */}
             <View style={styles.reasoningContainer}>
               {suggestion.reasoning.map((reason, index) => (
                 <View key={index} style={styles.reasoningChip}>
                   <Ionicons name="checkmark-circle" size={16} color={colors.success} />
-                  <Text style={styles.reasoningText}>{reason}</Text>
+                  <RNText style={styles.reasoningText}>{reason}</RNText>
                 </View>
               ))}
             </View>
@@ -316,31 +330,31 @@ export default function WhatToOrderModal({
                 <Image source={{ uri: item.imageUrl }} style={styles.menuItemImage} />
                 <View style={styles.menuItemContent}>
                   <View style={styles.menuItemHeader}>
-                    <Text style={styles.menuItemName}>{item.name}</Text>
+                    <RNText style={styles.menuItemName}>{item.name}</RNText>
                     {item.quantity > 1 && (
                       <View style={styles.quantityBadge}>
-                        <Text style={styles.quantityText}>×{item.quantity}</Text>
+                        <RNText style={styles.quantityText}>×{item.quantity}</RNText>
                       </View>
                     )}
                   </View>
-                  <Text style={styles.menuItemDescription} numberOfLines={2}>
+                  <RNText style={styles.menuItemDescription} numberOfLines={2}>
                     {item.description}
-                  </Text>
+                  </RNText>
                   <View style={styles.menuItemFooter}>
-                    <Text style={styles.menuItemPrice}>
+                    <RNText style={styles.menuItemPrice}>
                       ${(item.price * item.quantity).toFixed(2)}
-                    </Text>
+                    </RNText>
                     <View style={styles.menuItemMeta}>
                       <View style={styles.portionSizeBadge}>
-                        <Text style={styles.portionSizeText}>
+                        <RNText style={styles.portionSizeText}>
                           {item.portionSize === 'shareable' ? '🍽️ Shareable' :
                            item.portionSize === 'large' ? 'Large' :
                            item.portionSize === 'medium' ? 'Medium' : 'Small'}
-                        </Text>
+                        </RNText>
                       </View>
                       {item.isVegetarian && (
                         <View style={styles.dietaryBadge}>
-                          <Text style={styles.dietaryText}>🌱</Text>
+                          <RNText style={styles.dietaryText}>🌱</RNText>
                         </View>
                       )}
                     </View>
@@ -392,9 +406,9 @@ export default function WhatToOrderModal({
               color={colors.textPrimary}
             />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>
+          <RNText style={styles.headerTitle}>
             {step === 'setup' ? 'What Should We Order?' : 'Your Order'}
-          </Text>
+          </RNText>
           <View style={{ width: 28 }} />
         </View>
 
@@ -404,7 +418,7 @@ export default function WhatToOrderModal({
           <View style={styles.loadingOverlay}>
             <View style={styles.loadingCard}>
               <ActivityIndicator size="large" color={colors.primary} />
-              <Text style={styles.loadingText}>Creating your perfect order...</Text>
+              <RNText style={styles.loadingText}>Creating your perfect order...</RNText>
             </View>
           </View>
         )}
@@ -428,8 +442,9 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.borderLight,
   },
   headerTitle: {
-    ...typography.textStyles.h3,
+    fontSize: 20,
     fontWeight: '600',
+    lineHeight: 26,
     color: colors.textPrimary,
   },
   setupContent: {
@@ -440,8 +455,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing['2xl'],
   },
   sectionTitle: {
-    ...typography.textStyles.h3,
+    fontSize: 20,
     fontWeight: '600',
+    lineHeight: 26,
     color: colors.textPrimary,
     marginBottom: spacing.lg,
   },
@@ -477,7 +493,9 @@ const styles = StyleSheet.create({
     lineHeight: 56,
   },
   partySizeLabel: {
-    ...typography.textStyles.body,
+    fontSize: 15,
+    fontWeight: '400',
+    lineHeight: 21,
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },
@@ -514,17 +532,18 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   hungerLevelLabel: {
-    ...typography.textStyles.body,
     fontSize: 16,
     fontWeight: '600',
+    lineHeight: 20,
     color: colors.textPrimary,
   },
   hungerLevelLabelSelected: {
     fontWeight: '700',
   },
   hungerLevelDescription: {
-    ...typography.textStyles.caption,
     fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 18,
     color: colors.textSecondary,
   },
   hungerLevelDescriptionSelected: {
@@ -564,7 +583,9 @@ const styles = StyleSheet.create({
     lineHeight: 42,
   },
   summaryPricePerPerson: {
-    ...typography.textStyles.caption,
+    fontSize: 13,
+    fontWeight: '400',
+    lineHeight: 17,
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },
@@ -577,7 +598,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   summaryDescription: {
-    ...typography.textStyles.body,
+    fontSize: 15,
+    fontWeight: '400',
+    lineHeight: 21,
     color: colors.textPrimary,
     marginBottom: spacing.md,
   },
@@ -596,9 +619,10 @@ const styles = StyleSheet.create({
     borderRadius: spacing.borderRadius.md,
   },
   reasoningText: {
-    ...typography.textStyles.caption,
-    color: colors.success,
+    fontSize: 13,
     fontWeight: '500',
+    lineHeight: 17,
+    color: colors.success,
   },
   menuItemsContainer: {
     paddingHorizontal: spacing.lg,
@@ -625,9 +649,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   menuItemName: {
-    ...typography.textStyles.h3,
     fontSize: 18,
     fontWeight: '600',
+    lineHeight: 24,
     color: colors.textPrimary,
     flex: 1,
   },
@@ -639,12 +663,15 @@ const styles = StyleSheet.create({
     marginLeft: spacing.sm,
   },
   quantityText: {
-    ...typography.textStyles.caption,
-    color: colors.textInverse,
+    fontSize: 13,
     fontWeight: '700',
+    lineHeight: 17,
+    color: colors.textInverse,
   },
   menuItemDescription: {
-    ...typography.textStyles.body,
+    fontSize: 15,
+    fontWeight: '400',
+    lineHeight: 21,
     color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
@@ -654,10 +681,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   menuItemPrice: {
-    ...typography.textStyles.body,
-    fontWeight: '700',
-    color: colors.primary,
     fontSize: 18,
+    fontWeight: '700',
+    lineHeight: 24,
+    color: colors.primary,
   },
   menuItemMeta: {
     flexDirection: 'row',
@@ -670,9 +697,10 @@ const styles = StyleSheet.create({
     borderRadius: spacing.borderRadius.sm,
   },
   portionSizeText: {
-    ...typography.textStyles.caption,
-    color: colors.textSecondary,
     fontSize: 11,
+    fontWeight: '400',
+    lineHeight: 14,
+    color: colors.textSecondary,
   },
   dietaryBadge: {
     backgroundColor: 'rgba(52, 199, 89, 0.1)',
@@ -712,8 +740,9 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   loadingText: {
-    ...typography.textStyles.body,
-    color: colors.textPrimary,
+    fontSize: 15,
     fontWeight: '500',
+    lineHeight: 21,
+    color: colors.textPrimary,
   },
 });

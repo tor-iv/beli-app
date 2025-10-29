@@ -11,13 +11,20 @@ import {
   ProfileStatCard,
   AchievementBanner,
   Button,
-  TabSelector,
   ProfileActivityCard,
   HamburgerMenu,
+  TasteProfileSummaryCard,
+  DiningMap,
+  TasteProfileCategoryTab,
+  TasteProfileList,
 } from '../components';
+import { TabSelector } from '../components/navigation/TabSelector';
+import { SortOptionsModal } from '../components/modals/SortOptionsModal';
 import { MockDataService } from '../data/mockDataService';
-import type { User, Review, Restaurant } from '../data/mock/types';
+import type { User, Review, Restaurant, TasteProfileStats, CuisineBreakdown, CityBreakdown, CountryBreakdown } from '../types';
 import type { AppStackParamList } from '../navigation/types';
+import type { TasteProfileCategory } from '../components/profile/TasteProfileCategoryTab';
+import type { SortOption } from '../components/profile/TasteProfileList';
 
 type TabId = 'activity' | 'taste';
 type ProfileScreenNavigationProp = StackNavigationProp<AppStackParamList>;
@@ -31,6 +38,12 @@ export default function ProfileScreen() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [menuVisible, setMenuVisible] = useState(false);
 
+  // Taste profile state
+  const [tasteProfile, setTasteProfile] = useState<TasteProfileStats | null>(null);
+  const [activeCategory, setActiveCategory] = useState<TasteProfileCategory>('cuisines');
+  const [sortBy, setSortBy] = useState<SortOption>('count');
+  const [sortModalVisible, setSortModalVisible] = useState(false);
+
   useEffect(() => {
     loadProfile();
   }, []);
@@ -42,11 +55,15 @@ export default function ProfileScreen() {
         MockDataService.getAllRestaurants(),
       ]);
 
-      const reviews = await MockDataService.getUserReviews(currentUser.id);
+      const [reviews, tasteProfileData] = await Promise.all([
+        MockDataService.getUserReviews(currentUser.id),
+        MockDataService.getUserTasteProfile(currentUser.id),
+      ]);
 
       setUser(currentUser);
       setRestaurants(allRestaurants);
       setRecentReviews(reviews.slice(0, 5));
+      setTasteProfile(tasteProfileData);
     } catch (error) {
       console.error('Failed to load profile:', error);
     } finally {
@@ -82,6 +99,62 @@ export default function ProfileScreen() {
     { id: 'activity', label: 'Recent Activity', icon: 'newspaper' as const },
     { id: 'taste', label: 'Taste Profile', icon: 'stats-chart' as const },
   ];
+
+  // Get current category data
+  const getCurrentCategoryData = (): Array<CuisineBreakdown | CityBreakdown | CountryBreakdown> => {
+    if (!tasteProfile) return [];
+
+    let data: Array<CuisineBreakdown | CityBreakdown | CountryBreakdown> = [];
+
+    switch (activeCategory) {
+      case 'cuisines':
+        data = tasteProfile.cuisineBreakdown;
+        break;
+      case 'cities':
+        data = tasteProfile.cityBreakdown;
+        break;
+      case 'countries':
+        data = tasteProfile.countryBreakdown;
+        break;
+    }
+
+    // Sort data
+    return [...data].sort((a, b) => {
+      if (sortBy === 'count') {
+        return b.count - a.count;
+      } else {
+        return b.avgScore - a.avgScore;
+      }
+    });
+  };
+
+  const handleTasteProfileItemPress = (item: CuisineBreakdown | CityBreakdown | CountryBreakdown) => {
+    // Determine filter type and value
+    let filterType: 'cuisine' | 'city' | 'country';
+    let filterValue: string;
+
+    if ('cuisine' in item) {
+      filterType = 'cuisine';
+      filterValue = item.cuisine;
+    } else if ('city' in item) {
+      filterType = 'city';
+      filterValue = item.city;
+    } else {
+      filterType = 'country';
+      filterValue = item.country;
+    }
+
+    // Navigate to Lists screen with filter
+    navigation.navigate('Tabs', {
+      screen: 'Lists',
+      params: {
+        initialTab: 'been',
+        filterType,
+        filterValue,
+        sortBy,
+      },
+    });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -235,9 +308,42 @@ export default function ProfileScreen() {
           </View>
         )}
 
-        {activeTab === 'taste' && (
+        {activeTab === 'taste' && tasteProfile && (
           <View style={styles.tabContent}>
-            <Text style={styles.placeholder}>Taste Profile coming soon...</Text>
+            {/* Summary Card */}
+            <TasteProfileSummaryCard
+              stats={tasteProfile.last30Days}
+              onShare={() => console.log('Share summary')}
+            />
+
+            {/* Dining Map */}
+            <DiningMap
+              locations={tasteProfile.diningLocations}
+              totalCities={tasteProfile.totalCities}
+              totalRestaurants={tasteProfile.totalRestaurants}
+              onShare={() => console.log('Share map')}
+            />
+
+            {/* Category Tabs */}
+            <TasteProfileCategoryTab
+              activeCategory={activeCategory}
+              onCategoryChange={setActiveCategory}
+            />
+
+            {/* List */}
+            <TasteProfileList
+              data={getCurrentCategoryData()}
+              totalCount={
+                activeCategory === 'cuisines'
+                  ? tasteProfile.totalCuisines
+                  : activeCategory === 'cities'
+                  ? tasteProfile.totalCities
+                  : tasteProfile.totalCountries
+              }
+              sortBy={sortBy}
+              onSortPress={() => setSortModalVisible(true)}
+              onItemPress={handleTasteProfileItemPress}
+            />
           </View>
         )}
 
@@ -250,6 +356,14 @@ export default function ProfileScreen() {
         visible={menuVisible}
         onClose={() => setMenuVisible(false)}
         navigation={navigation}
+      />
+
+      {/* Sort Modal */}
+      <SortOptionsModal
+        visible={sortModalVisible}
+        currentSort={sortBy}
+        onSelectSort={setSortBy}
+        onClose={() => setSortModalVisible(false)}
       />
     </SafeAreaView>
   );

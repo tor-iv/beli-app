@@ -17,6 +17,7 @@ interface SelectionScreenProps {
   onSelectRestaurant: (match: GroupDinnerMatch) => void;
   onStartOver: () => void;
   onViewDetails: (match: GroupDinnerMatch) => void;
+  onBack: () => void;
 }
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -27,15 +28,23 @@ export default function SelectionScreen({
   onSelectRestaurant,
   onStartOver,
   onViewDetails,
+  onBack,
 }: SelectionScreenProps) {
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
+        <TouchableOpacity onPress={onBack} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+        </TouchableOpacity>
         <View style={styles.headerContent}>
           <Ionicons name="checkmark-circle" size={28} color={colors.success} />
           <Text style={styles.headerTitle}>Choose Your Spot!</Text>
         </View>
+        <View style={{ width: 24 }} />
+      </View>
+
+      <View style={styles.headerSubtitleContainer}>
         <Text style={styles.headerSubtitle}>
           You've saved {savedRestaurants.length} great option{savedRestaurants.length !== 1 ? 's' : ''}
         </Text>
@@ -153,6 +162,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: colors.cardWhite,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
@@ -164,13 +176,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    marginBottom: spacing.xs,
+    flex: 1,
+    justifyContent: 'center',
+    marginLeft: -24,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: '700',
     lineHeight: 29,
     color: colors.textPrimary,
+  },
+  headerSubtitleContainer: {
+    backgroundColor: colors.cardWhite,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.borderLight,
   },
   headerSubtitle: {
     fontSize: 15,
@@ -245,7 +266,9 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.ratingExcellent,
+    backgroundColor: colors.white,
+    borderWidth: 1.5,
+    borderColor: '#D9D9DE',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.sm,
@@ -253,7 +276,7 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 16,
     fontWeight: '700',
-    color: colors.textInverse,
+    color: colors.ratingExcellent,
   },
   ratingCount: {
     fontSize: 13,

@@ -187,7 +187,9 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.ratingExcellent,
+    backgroundColor: colors.white,
+    borderWidth: 1.5,
+    borderColor: '#D9D9DE',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.sm,
@@ -195,7 +197,7 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 18,
     fontWeight: '700',
-    color: colors.textInverse,
+    color: colors.ratingExcellent,
   },
   ratingCount: {
     fontSize: 13,

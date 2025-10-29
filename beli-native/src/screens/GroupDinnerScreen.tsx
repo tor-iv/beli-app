@@ -118,6 +118,11 @@ export default function GroupDinnerScreen() {
     setShowSelectionScreen(false);
   };
 
+  const handleBackFromSelection = () => {
+    setShowSelectionScreen(false);
+    // Keep saved restaurants so user can continue swiping and save more
+  };
+
   const handleViewDetailsFromSelection = (match: GroupDinnerMatch) => {
     navigation.navigate('RestaurantInfo', { restaurantId: match.restaurant.id });
   };
@@ -151,6 +156,7 @@ export default function GroupDinnerScreen() {
           onSelectRestaurant={handleSelectRestaurant}
           onStartOver={handleStartOver}
           onViewDetails={handleViewDetailsFromSelection}
+          onBack={handleBackFromSelection}
         />
       </SafeAreaView>
     );

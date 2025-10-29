@@ -6,13 +6,13 @@ import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { colors, typography, spacing } from '../theme';
-import { ActivityCard, LoadingSpinner, AddRestaurantModal } from '../components';
+import { ActivityCard, LoadingSpinner, AddRestaurantModal, FeaturedListCard } from '../components';
 import type { RestaurantSubmissionData } from '../components';
 import HamburgerMenu from '../components/modals/HamburgerMenu';
 import { FeedFiltersModal, type FeedFilters } from '../components/modals/FeedFiltersModal';
 import { MockDataService } from '../data/mockDataService';
 import type { Activity } from '../data/mock/types';
-import type { Restaurant } from '../types';
+import type { Restaurant, List } from '../types';
 import type { BottomTabParamList, AppStackParamList } from '../navigation/types';
 
 type FeedScreenNavigationProp = CompositeNavigationProp<
@@ -24,6 +24,7 @@ export default function FeedScreen() {
   const navigation = useNavigation<FeedScreenNavigationProp>();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
+  const [featuredLists, setFeaturedLists] = useState<List[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -82,6 +83,16 @@ export default function FeedScreen() {
     }
   };
 
+  const loadFeaturedLists = async () => {
+    try {
+      const lists = await MockDataService.getFeaturedLists();
+      // Show first 6 featured lists in the feed
+      setFeaturedLists(lists.slice(0, 6));
+    } catch (error) {
+      console.error('Failed to load featured lists:', error);
+    }
+  };
+
   const loadNotificationCount = async () => {
     try {
       const count = await MockDataService.getUnreadNotificationCount();
@@ -93,6 +104,7 @@ export default function FeedScreen() {
 
   useEffect(() => {
     loadFeed();
+    loadFeaturedLists();
     loadNotificationCount();
   }, []);
 
@@ -298,36 +310,29 @@ export default function FeedScreen() {
       )}
 
       {/* Featured Lists */}
-      <View style={styles.featuredSection}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>FEATURED LISTS</Text>
-          <Pressable onPress={() => navigation.navigate('FeaturedLists')}>
-            <Text style={styles.seeAllText}>See all</Text>
-          </Pressable>
+      {featuredLists.length > 0 && (
+        <View style={styles.featuredSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>FEATURED LISTS</Text>
+            <Pressable onPress={() => navigation.navigate('FeaturedLists')}>
+              <Text style={styles.seeAllText}>See all</Text>
+            </Pressable>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.featuredScroll}
+          >
+            {featuredLists.map((list) => (
+              <FeaturedListCard
+                key={list.id}
+                list={list}
+                onPress={() => navigation.navigate('FeaturedListDetail', { listId: list.id })}
+              />
+            ))}
+          </ScrollView>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.featuredScroll}>
-          <View style={styles.featuredCard}>
-            <Image
-              source={{ uri: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300&h=200&fit=crop' }}
-              style={styles.featuredImage}
-            />
-            <View style={styles.featuredOverlay}>
-              <Text style={styles.featuredCardTitle}>Top 10 NYC Spanish</Text>
-              <Text style={styles.featuredCardSubtitle}>You've been to 0 of 10</Text>
-            </View>
-          </View>
-          <View style={styles.featuredCard}>
-            <Image
-              source={{ uri: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=300&h=200&fit=crop' }}
-              style={styles.featuredImage}
-            />
-            <View style={styles.featuredOverlay}>
-              <Text style={styles.featuredCardTitle}>Top 10 NYC Sports Bars</Text>
-              <Text style={styles.featuredCardSubtitle}>You've been to 1 of 10</Text>
-            </View>
-          </View>
-        </ScrollView>
-      </View>
+      )}
 
       {/* Feed Header */}
       <View style={styles.feedHeader}>
@@ -564,37 +569,7 @@ const styles = StyleSheet.create({
   },
   featuredScroll: {
     paddingLeft: spacing.lg,
-  },
-  featuredCard: {
-    width: 200,
-    height: 120,
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginRight: spacing.md,
-    position: 'relative',
-  },
-  featuredImage: {
-    width: '100%',
-    height: '100%',
-  },
-  featuredOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    padding: spacing.sm,
-  },
-  featuredCardTitle: {
-    color: colors.white,
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 2,
-  },
-  featuredCardSubtitle: {
-    color: colors.white,
-    fontSize: 12,
-    opacity: 0.9,
+    paddingRight: spacing.lg,
   },
 
   // Feed Header Styles

@@ -1,11 +1,15 @@
 import { User } from '../../types';
+import { Image } from 'react-native';
+
+// Resolve local asset to URI
+const profileTorImage = Image.resolveAssetSource(require('../../../assets/profile-tor.jpeg')).uri;
 
 export const mockUsers: User[] = [
   {
     id: '1',
-    username: 'torcox',
+    username: 'tor_iv',
     displayName: 'Tor Cox',
-    avatar: 'https://i.pravatar.cc/150?img=1',
+    avatar: profileTorImage,
     bio: 'Food enthusiast exploring NYC 🍕 | Always hunting for the perfect slice',
     stats: {
       followers: 234,

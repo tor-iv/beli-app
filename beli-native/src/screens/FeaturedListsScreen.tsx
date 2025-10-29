@@ -66,8 +66,7 @@ export default function FeaturedListsScreen() {
   };
 
   const handleListPress = (listId: string) => {
-    // Navigate to list detail screen (to be implemented)
-    Alert.alert('Coming Soon', 'List detail view will be added soon.');
+    navigation.navigate('FeaturedListDetail', { listId });
   };
 
   const handleSearchPress = () => {

@@ -199,6 +199,11 @@ export default function ConfirmationModal({
             <TouchableOpacity style={styles.keepSwipingButton} onPress={onKeepSwiping}>
               <Text style={styles.keepSwipingText}>Keep Swiping</Text>
             </TouchableOpacity>
+
+            {/* Done Button */}
+            <TouchableOpacity style={styles.doneButton} onPress={onClose}>
+              <Text style={styles.doneButtonText}>Done</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>
@@ -221,8 +226,9 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.borderLight,
   },
   headerTitle: {
-    ...typography.textStyles.h3,
+    fontSize: 20,
     fontWeight: '600',
+    lineHeight: 26,
     color: colors.textPrimary,
   },
   image: {
@@ -239,14 +245,15 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   successText: {
-    ...typography.textStyles.body,
+    fontSize: 15,
     fontWeight: '600',
+    lineHeight: 21,
     color: colors.success,
   },
   restaurantName: {
-    ...typography.textStyles.h1,
     fontSize: 28,
     fontWeight: '700',
+    lineHeight: 34,
     color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
@@ -254,11 +261,15 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   metaText: {
-    ...typography.textStyles.body,
+    fontSize: 15,
+    fontWeight: '400',
+    lineHeight: 21,
     color: colors.textSecondary,
   },
   address: {
-    ...typography.textStyles.body,
+    fontSize: 15,
+    fontWeight: '400',
+    lineHeight: 21,
     color: colors.textSecondary,
     marginBottom: spacing.lg,
   },
@@ -273,16 +284,18 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   availabilityText: {
-    ...typography.textStyles.body,
+    fontSize: 15,
     fontWeight: '600',
+    lineHeight: 21,
     color: colors.primary,
   },
   participantsSection: {
     marginBottom: spacing.lg,
   },
   sectionTitle: {
-    ...typography.textStyles.body,
+    fontSize: 15,
     fontWeight: '600',
+    lineHeight: 21,
     color: colors.textPrimary,
     marginBottom: spacing.md,
   },
@@ -296,7 +309,9 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   participantName: {
-    ...typography.textStyles.caption,
+    fontSize: 13,
+    fontWeight: '400',
+    lineHeight: 17,
     color: colors.textSecondary,
   },
   actionsSection: {
@@ -324,13 +339,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   actionButtonText: {
-    ...typography.textStyles.body,
+    fontSize: 15,
     fontWeight: '600',
+    lineHeight: 21,
     color: colors.textPrimary,
     marginBottom: 2,
   },
   actionButtonSubtext: {
-    ...typography.textStyles.caption,
+    fontSize: 13,
+    fontWeight: '400',
+    lineHeight: 17,
     color: colors.textSecondary,
   },
   keepSwipingButton: {
@@ -338,8 +356,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   keepSwipingText: {
-    ...typography.textStyles.body,
+    fontSize: 15,
     fontWeight: '600',
+    lineHeight: 21,
     color: colors.primary,
+  },
+  doneButton: {
+    backgroundColor: colors.background,
+    paddingVertical: spacing.md,
+    borderRadius: spacing.borderRadius.lg,
+    alignItems: 'center',
+    marginTop: spacing.sm,
+  },
+  doneButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    lineHeight: 21,
+    color: colors.textSecondary,
   },
 });

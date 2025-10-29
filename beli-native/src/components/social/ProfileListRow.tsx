@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing } from '../../theme';
 
 interface ProfileListRowProps {
-  icon: 'checkmark-circle' | 'bookmark' | 'heart';
+  icon: 'checkmark-circle' | 'bookmark' | 'heart' | 'people';
   label: string;
   count?: number;
   onPress?: () => void;
@@ -23,6 +23,7 @@ export const ProfileListRow: React.FC<ProfileListRowProps> = ({
     'checkmark-circle': 'checkmark-circle-outline',
     'bookmark': 'bookmark-outline',
     'heart': 'heart-outline',
+    'people': 'people-outline',
   };
 
   const outlineIcon = iconMap[icon] || icon;

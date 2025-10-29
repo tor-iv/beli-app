@@ -8,6 +8,8 @@ import NotificationsScreen from '../screens/NotificationsScreen';
 import ReservationSharingScreen from '../screens/ReservationSharingScreen';
 import GroupDinnerScreen from '../screens/GroupDinnerScreen';
 import FeaturedListsScreen from '../screens/FeaturedListsScreen';
+import FeaturedListDetailScreen from '../screens/FeaturedListDetailScreen';
+import UserProfileScreen from '../screens/UserProfileScreen';
 
 // Settings Screens
 import SettingsHubScreen from '../screens/SettingsHubScreen';
@@ -77,6 +79,16 @@ const AppNavigator: React.FC = () => {
       <Stack.Screen
         name="FeaturedLists"
         component={FeaturedListsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="FeaturedListDetail"
+        component={FeaturedListDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="UserProfile"
+        component={UserProfileScreen}
         options={{ headerShown: false }}
       />
 

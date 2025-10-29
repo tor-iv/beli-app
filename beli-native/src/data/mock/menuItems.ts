@@ -13,6 +13,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'shareable',
     tags: ['signature', 'popular'],
     popularity: 95,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'mt-2',
@@ -25,6 +26,7 @@ export const allMenuItems: MenuItem[] = [
     tags: ['vegetarian'],
     popularity: 88,
     isVegetarian: true,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'mt-3',
@@ -37,6 +39,7 @@ export const allMenuItems: MenuItem[] = [
     tags: ['spicy', 'popular'],
     popularity: 92,
     spiceLevel: 3,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'mt-4',
@@ -49,6 +52,7 @@ export const allMenuItems: MenuItem[] = [
     tags: ['vegetarian', 'premium'],
     popularity: 85,
     isVegetarian: true,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'mt-5',
@@ -61,6 +65,7 @@ export const allMenuItems: MenuItem[] = [
     tags: ['salad'],
     popularity: 75,
     isVegetarian: true,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'mt-6',
@@ -73,6 +78,7 @@ export const allMenuItems: MenuItem[] = [
     tags: ['spicy'],
     popularity: 82,
     spiceLevel: 2,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'mt-7',
@@ -85,6 +91,7 @@ export const allMenuItems: MenuItem[] = [
     tags: ['dessert', 'signature'],
     popularity: 80,
     isVegetarian: true,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'mt-8',
@@ -96,6 +103,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'small',
     tags: ['cocktail', 'signature'],
     popularity: 78,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'mt-9',
@@ -108,6 +116,7 @@ export const allMenuItems: MenuItem[] = [
     tags: ['vegan'],
     popularity: 70,
     isVegetarian: true,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'mt-10',
@@ -120,6 +129,7 @@ export const allMenuItems: MenuItem[] = [
     tags: ['classic', 'vegetarian'],
     popularity: 72,
     isVegetarian: true,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
 
   // Balthazar French Bistro Menu
@@ -133,6 +143,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'large',
     tags: ['signature', 'popular'],
     popularity: 96,
+    mealTime: ['lunch', 'dinner'],
   },
   {
     id: 'bal-2',
@@ -144,6 +155,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'large',
     tags: ['seafood', 'signature'],
     popularity: 90,
+    mealTime: ['lunch', 'dinner'],
   },
   {
     id: 'bal-3',
@@ -155,6 +167,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'small',
     tags: ['classic', 'french'],
     popularity: 85,
+    mealTime: ['dinner'],
   },
   {
     id: 'bal-4',
@@ -166,6 +179,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'medium',
     tags: ['classic', 'popular'],
     popularity: 93,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'bal-5',
@@ -177,6 +191,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'large',
     tags: ['classic'],
     popularity: 87,
+    mealTime: ['dinner'],
   },
   {
     id: 'bal-6',
@@ -188,6 +203,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'medium',
     tags: ['lunch', 'classic'],
     popularity: 80,
+    mealTime: ['breakfast', 'lunch', 'any-time'],
   },
   {
     id: 'bal-7',
@@ -200,6 +216,7 @@ export const allMenuItems: MenuItem[] = [
     tags: ['dessert', 'classic'],
     popularity: 88,
     isVegetarian: true,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'bal-8',
@@ -211,6 +228,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'small',
     tags: ['cocktail', 'champagne'],
     popularity: 82,
+    mealTime: ['breakfast', 'lunch', 'dinner', 'any-time'],
   },
   {
     id: 'bal-9',
@@ -222,6 +240,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'small',
     tags: ['raw', 'signature'],
     popularity: 79,
+    mealTime: ['lunch', 'dinner'],
   },
   {
     id: 'bal-10',
@@ -234,6 +253,7 @@ export const allMenuItems: MenuItem[] = [
     tags: ['dessert', 'chocolate'],
     popularity: 85,
     isVegetarian: true,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'bal-11',
@@ -245,6 +265,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'large',
     tags: ['seafood'],
     popularity: 84,
+    mealTime: ['lunch', 'dinner'],
   },
   {
     id: 'bal-12',
@@ -256,6 +277,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'large',
     tags: ['salad', 'healthy'],
     popularity: 76,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
 
   // Add more restaurants here...
@@ -272,6 +294,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'large',
     tags: ['signature', 'pasta'],
     popularity: 94,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'ital-2',
@@ -284,6 +307,7 @@ export const allMenuItems: MenuItem[] = [
     tags: ['vegetarian', 'popular'],
     popularity: 90,
     isVegetarian: true,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'ital-3',
@@ -295,6 +319,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'large',
     tags: ['classic', 'signature'],
     popularity: 88,
+    mealTime: ['dinner'],
   },
   {
     id: 'ital-4',
@@ -306,6 +331,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'small',
     tags: ['fried'],
     popularity: 82,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'ital-5',
@@ -318,6 +344,7 @@ export const allMenuItems: MenuItem[] = [
     tags: ['dessert', 'classic'],
     popularity: 92,
     isVegetarian: true,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'ital-6',
@@ -329,6 +356,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'large',
     tags: ['pasta', 'popular'],
     popularity: 89,
+    mealTime: ['lunch', 'dinner'],
   },
   {
     id: 'ital-7',
@@ -340,6 +368,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'small',
     tags: ['cocktail', 'classic'],
     popularity: 85,
+    mealTime: ['lunch', 'dinner', 'any-time'],
   },
   {
     id: 'ital-8',
@@ -351,6 +380,7 @@ export const allMenuItems: MenuItem[] = [
     portionSize: 'large',
     tags: ['seafood', 'healthy'],
     popularity: 80,
+    mealTime: ['lunch', 'dinner'],
   },
 ];
 

@@ -350,6 +350,29 @@ export default function ListsScreen() {
     );
   }, [restaurants, searchQuery]);
 
+  const sortedRestaurants = useMemo(() => {
+    const restaurantsToSort = isSearchActive ? filteredRestaurants : restaurants;
+    const sorted = [...restaurantsToSort];
+
+    if (sortBy === 'rating') {
+      // Sort by score (rating) - use averageScore or recScore
+      sorted.sort((a, b) => {
+        const scoreA = a.scores?.averageScore ?? a.scores?.recScore ?? 0;
+        const scoreB = b.scores?.averageScore ?? b.scores?.recScore ?? 0;
+        return sortOrder === 'desc' ? scoreB - scoreA : scoreA - scoreB;
+      });
+    } else if (sortBy === 'distance') {
+      // Sort by distance
+      sorted.sort((a, b) => {
+        const distanceA = a.distance ?? Infinity;
+        const distanceB = b.distance ?? Infinity;
+        return sortOrder === 'asc' ? distanceA - distanceB : distanceB - distanceA;
+      });
+    }
+
+    return sorted;
+  }, [restaurants, filteredRestaurants, isSearchActive, sortBy, sortOrder]);
+
   const mapMarkers = useMemo(() => {
     const restaurantsToMap = isSearchActive ? filteredRestaurants : restaurants;
     return restaurantsToMap
@@ -429,6 +452,33 @@ export default function ListsScreen() {
   useEffect(() => {
     initializeData();
   }, []);
+
+  // Handle route params for taste profile filtering
+  useEffect(() => {
+    if (route.params?.filterType && route.params?.filterValue) {
+      const { filterType, filterValue } = route.params;
+
+      // Apply filter based on type
+      if (filterType === 'cuisine') {
+        // Find matching cuisine ID
+        const cuisineOption = CUISINE_OPTIONS.find(
+          opt => opt.label.toLowerCase() === filterValue.toLowerCase()
+        );
+        if (cuisineOption) {
+          setSelectedCuisines([cuisineOption.id]);
+        }
+      } else if (filterType === 'city') {
+        // Find matching city ID
+        const cityOption = CITY_OPTIONS.find(
+          opt => opt.city?.toLowerCase() === filterValue.toLowerCase()
+        );
+        if (cityOption) {
+          setSelectedCities([cityOption.id]);
+        }
+      }
+      // Note: Country filtering is not directly supported in current filter system
+    }
+  }, [route.params]);
 
   useEffect(() => {
     loadRestaurants();
@@ -701,7 +751,7 @@ export default function ListsScreen() {
       let restaurantsData = await MockDataService.getRestaurantsWithStatus(restaurantIds, {
         openNow: selectedFilters.includes('open_now'),
         acceptsReservations: selectedFilters.includes('reserve'),
-        sortBy: sortBy,
+        // Sorting is now handled by sortedRestaurants useMemo, not by the service
       });
 
       restaurantsData = filterByCategory(restaurantsData, category);
@@ -865,7 +915,12 @@ export default function ListsScreen() {
   };
 
   const handleSortToggle = () => {
-    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+    setSortBy(prev => {
+      const newSortBy = prev === 'rating' ? 'distance' : 'rating';
+      // Set appropriate sort order: desc for rating (highest first), asc for distance (closest first)
+      setSortOrder(newSortBy === 'rating' ? 'desc' : 'asc');
+      return newSortBy;
+    });
   };
 
   const handleSearchPress = () => {
@@ -1205,7 +1260,7 @@ export default function ListsScreen() {
       {viewMode === 'list' && !isSearchActive && (
         <View style={styles.sortSection}>
           <SortToggle
-            sortBy="Score"
+            sortBy={sortBy === 'rating' ? 'Score' : 'Distance'}
             sortOrder={sortOrder}
             onPress={handleSortToggle}
           />
@@ -1238,7 +1293,7 @@ export default function ListsScreen() {
         <FlatList
           style={styles.content}
           contentContainerStyle={styles.listContentContainer}
-          data={isSearchActive ? filteredRestaurants : restaurants}
+          data={sortedRestaurants}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           renderItem={({ item, index }) => (
@@ -1966,20 +2021,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.white,
     paddingHorizontal: spacing.edgePadding,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
+    paddingVertical: spacing.sm,
   },
 
   searchButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    borderWidth: 1,
-    borderColor: colors.borderMedium,
+    padding: spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.white,
   },
 
   content: {
