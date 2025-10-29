@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, AlertCircle } from 'lucide-react'
 
 export default function ResumePage() {
   const router = useRouter()
@@ -56,6 +56,14 @@ export default function ResumePage() {
           </div>
         </div>
 
+        {/* Disclaimer Banner */}
+        <div className="mb-6 bg-amber-50 border-l-4 border-amber-400 rounded-lg p-4 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-900">
+            <strong>Note:</strong> Ratings are playful self-assessments inspired by Beli's restaurant review system—not actual performance metrics!
+          </p>
+        </div>
+
         {/* CTA Button */}
         <div className="mb-8">
           <button
@@ -69,7 +77,7 @@ export default function ResumePage() {
 
         {/* Experience Section */}
         <h2 className="text-2xl md:text-3xl font-bold mb-4 pb-2 border-b-2 border-primary">
-          Your Professional Journey
+          Experience
         </h2>
 
         <div className="bg-white rounded-2xl p-6 mb-4 shadow-card hover:shadow-card-hover transition-shadow">

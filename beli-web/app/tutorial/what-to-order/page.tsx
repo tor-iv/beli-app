@@ -31,7 +31,7 @@ export default function WhatToOrderTutorialPage() {
       {/* Tutorial Banner */}
       <TutorialBanner
         featureName="What to Order"
-        description="Smart menu recommendations based on party size and hunger level"
+        description="Analyzes your group's past ratings and favorite dishes to recommend the perfect order based on party size and hunger level"
       />
 
       {/* Header */}
@@ -42,7 +42,7 @@ export default function WhatToOrderTutorialPage() {
               What to Order
             </h1>
             <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
-              Our smart algorithm analyzes party size, hunger level, and menu data to suggest the perfect dishes for your group
+              Our smart algorithm analyzes your group's past ratings, favorite dishes, party size, and hunger level to suggest the perfect order that everyone will love
             </p>
           </div>
         </div>
@@ -118,15 +118,15 @@ export default function WhatToOrderTutorialPage() {
             <div className="flex gap-4">
               <div className="flex-shrink-0">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-primary" />
+                  <Sparkles className="w-5 h-5 text-primary" />
                 </div>
               </div>
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">
-                  1. Party Size Analysis
+                  1. Group Preference Analysis
                 </h4>
                 <p className="text-gray-600 text-sm">
-                  The algorithm calculates total servings needed based on your group size and adjusts for sharing.
+                  Analyzes your group's past ratings, favorite dishes, and dietary needs to prioritize menu items that match everyone's tastes—ensuring the whole table is satisfied.
                 </p>
               </div>
             </div>
@@ -135,15 +135,15 @@ export default function WhatToOrderTutorialPage() {
             <div className="flex gap-4">
               <div className="flex-shrink-0">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Utensils className="w-5 h-5 text-primary" />
+                  <Users className="w-5 h-5 text-primary" />
                 </div>
               </div>
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">
-                  2. Hunger Level Multiplier
+                  2. Party Size Analysis
                 </h4>
                 <p className="text-gray-600 text-sm">
-                  Applies a multiplier (0.75x for light, 1.0x for medium, 1.5x for very hungry) to adjust portion recommendations.
+                  The algorithm calculates total servings needed based on your group size and adjusts for sharing.
                 </p>
               </div>
             </div>
@@ -152,12 +152,29 @@ export default function WhatToOrderTutorialPage() {
             <div className="flex gap-4">
               <div className="flex-shrink-0">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Utensils className="w-5 h-5 text-primary" />
+                </div>
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2">
+                  3. Hunger Level Multiplier
+                </h4>
+                <p className="text-gray-600 text-sm">
+                  Applies a multiplier (0.75x for light, 1.0x for medium, 1.5x for very hungry) to adjust portion recommendations.
+                </p>
+              </div>
+            </div>
+
+            {/* Step 4 */}
+            <div className="flex gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-primary" />
                 </div>
               </div>
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">
-                  3. Smart Dish Selection
+                  4. Smart Dish Selection
                 </h4>
                 <p className="text-gray-600 text-sm">
                   Balances dish variety (mains, appetizers, sides, desserts) and ensures you get great value for your group.

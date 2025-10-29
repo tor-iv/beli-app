@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     lineHeight: 21,
-    color: colors.textPrimary,
+    color: '#000000', // Explicit black for visibility
     marginBottom: spacing.md,
   },
   participantsList: {
@@ -342,14 +342,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     lineHeight: 21,
-    color: colors.textPrimary,
+    color: '#1A1A1A', // Explicit dark gray for visibility
     marginBottom: 2,
   },
   actionButtonSubtext: {
     fontSize: 13,
     fontWeight: '400',
     lineHeight: 17,
-    color: colors.textSecondary,
+    color: '#666666', // Explicit medium gray for visibility
   },
   keepSwipingButton: {
     paddingVertical: spacing.md,

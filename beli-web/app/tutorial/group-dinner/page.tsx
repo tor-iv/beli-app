@@ -158,7 +158,7 @@ export default function GroupDinnerTutorialPage() {
       {/* Tutorial Banner */}
       <TutorialBanner
         featureName="Group Dinner"
-        description="Uses your group's past ratings and favorite dishes to find restaurants that will leave everyone full and happy"
+        description="Last minute plans and overwhelmed by choices? Let us do the thinking for you—swipe through curated matches and find the perfect spot fast"
       />
 
       {/* Mobile Header */}
@@ -171,7 +171,7 @@ export default function GroupDinnerTutorialPage() {
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold">Group Dinner</h1>
           <p className="text-muted mt-1">
-            Smart matching based on past ratings, favorite dishes, and party size • Use{" "}
+            Quick decision-making for when you need a spot but don't know where to go • Use{" "}
             <kbd className="px-1.5 py-0.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded">
               ←
             </kbd>{" "}
@@ -191,11 +191,11 @@ export default function GroupDinnerTutorialPage() {
               <Sparkles className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 mb-1">Smart Group Matching</h3>
+              <h3 className="font-semibold text-gray-900 mb-1">Decision-Free Dining</h3>
               <p className="text-sm text-gray-700">
-                The algorithm analyzes your group's past ratings, favorite dishes, and dietary needs
-                to suggest restaurants with the perfect menu for your party size—ensuring everyone
-                leaves full and satisfied.
+                Stop scrolling endlessly through options. We curate restaurants that fit your vibe and party size,
+                so you can swipe through a handful of great choices and pick one fast. Perfect for when you're
+                hungry, indecisive, or just need someone else to handle the planning.
               </p>
             </div>
           </div>
