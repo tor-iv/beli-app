@@ -120,6 +120,37 @@
             color: var(--white);
         }
 
+        /* Disclaimer Banner */
+        .disclaimer-banner {
+            background: #FFFBEB;
+            border-left: 4px solid #F59E0B;
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+        }
+
+        .alert-icon {
+            width: 20px;
+            height: 20px;
+            color: #D97706;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .disclaimer-banner p {
+            font-size: var(--font-sm);
+            color: #78350F;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .disclaimer-banner strong {
+            font-weight: 600;
+        }
+
         /* Section Headers */
         .section-header {
             font-size: var(--font-xl);
@@ -133,7 +164,7 @@
         /* Experience Cards */
         .experience-card {
             background: var(--card-bg);
-            border-radius: var(--radius-lg);
+            border-radius: 24px;
             padding: var(--spacing-xl);
             margin-bottom: var(--spacing-lg);
             box-shadow: 0 2px 8px var(--shadow);
@@ -195,15 +226,15 @@
         }
 
         .rating-excellent {
-            color: #22C55E;
+            color: #22C55E; /* green-600 for 9.0+ */
         }
 
         .rating-good {
-            color: #84CC16;
+            color: #84CC16; /* lime-600 for 8.0-8.9 */
         }
 
         .rating-average {
-            color: #F59E0B;
+            color: #F59E0B; /* orange for below 8.0 */
         }
 
         /* Achievements list */
@@ -249,7 +280,7 @@
 
         .skill-item {
             background: var(--card-bg);
-            border-radius: var(--radius-md);
+            border-radius: 16px;
             padding: var(--spacing-sm) var(--spacing-xs);
             box-shadow: 0 2px 8px var(--shadow);
             display: flex;
@@ -287,7 +318,7 @@
         /* Education Card */
         .education-card {
             background: var(--card-bg);
-            border-radius: var(--radius-lg);
+            border-radius: 24px;
             padding: var(--spacing-xl);
             margin-bottom: var(--spacing-lg);
             box-shadow: 0 2px 8px var(--shadow);
@@ -325,7 +356,7 @@
         /* Projects */
         .project-card {
             background: var(--card-bg);
-            border-radius: var(--radius-lg);
+            border-radius: 24px;
             padding: var(--spacing-xl);
             margin-bottom: var(--spacing-lg);
             box-shadow: 0 2px 8px var(--shadow);
@@ -368,7 +399,7 @@
         /* Hobbies */
         .hobbies-list {
             background: var(--card-bg);
-            border-radius: var(--radius-lg);
+            border-radius: 24px;
             padding: var(--spacing-xl);
             box-shadow: 0 2px 8px var(--shadow);
             font-size: var(--font-base);
@@ -451,6 +482,11 @@
                 padding: 2px 5px;
             }
 
+            /* Hide disclaimer banner in print */
+            .disclaimer-banner {
+                display: none;
+            }
+
             /* Compact section headers */
             .section-header {
                 font-size: 13px;
@@ -466,6 +502,7 @@
                 box-shadow: none;
                 border: 1px solid var(--border-light);
                 page-break-inside: avoid;
+                border-radius: 12px;
             }
 
             .experience-header {
@@ -518,6 +555,7 @@
                 margin-bottom: 5px;
                 box-shadow: none;
                 border: 1px solid var(--border-light);
+                border-radius: 12px;
             }
 
             .education-header {
@@ -558,6 +596,7 @@
                 padding: 4px 3px;
                 box-shadow: none;
                 border: 1px solid var(--border-light);
+                border-radius: 8px;
             }
 
             .skill-rating {
@@ -581,6 +620,7 @@
                 box-shadow: none;
                 border: 1px solid var(--border-light);
                 page-break-inside: avoid;
+                border-radius: 12px;
             }
 
             .project-header {
@@ -610,6 +650,7 @@
                 line-height: 1.3;
                 box-shadow: none;
                 border: 1px solid var(--border-light);
+                border-radius: 12px;
             }
 
             /* Compact disclaimer for print */
@@ -675,8 +716,20 @@
         </div>
     </div>
 
+    <!-- Disclaimer Banner -->
+    <div class="disclaimer-banner">
+        <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <p>
+            <strong>Note:</strong> Ratings are playful self-assessments inspired by Beli's restaurant review system—not actual performance metrics!
+        </p>
+    </div>
+
     <!-- Experience Section -->
-    <h2 class="section-header">Your Professional Journey</h2>
+    <h2 class="section-header">Experience</h2>
 
     <div class="experience-card">
         <div class="experience-header">
@@ -810,7 +863,7 @@
     <div class="skills-grid">
         <div class="skill-item">
             <div class="skill-rating rating-excellent">9.0</div>
-            <div class="skill-name">Apache Airflow</div>
+            <div class="skill-name">Airflow</div>
         </div>
         <div class="skill-item">
             <div class="skill-rating rating-excellent">9.0</div>
@@ -835,14 +888,14 @@
         </div>
         <div class="skill-item">
             <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">AWS Lambda</div>
+            <div class="skill-name">Lambda</div>
         </div>
         <div class="skill-item">
             <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">AWS S3</div>
+            <div class="skill-name">S3</div>
         </div>
         <div class="skill-item">
-            <div class="skill-rating rating-excellent">8.5</div>
+            <div class="skill-rating rating-good">8.5</div>
             <div class="skill-name">Docker</div>
         </div>
         <div class="skill-item">
@@ -868,7 +921,7 @@
         </div>
         <div class="skill-item">
             <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">Google Cloud Vision</div>
+            <div class="skill-name">Cloud Vision</div>
         </div>
         <div class="skill-item">
             <div class="skill-rating rating-good">8.0</div>
