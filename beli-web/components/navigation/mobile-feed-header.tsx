@@ -90,9 +90,9 @@ export function MobileFeedHeader({
       <div className="px-4 pb-3">
         <button
           onClick={onSearchClick}
-          className="w-full flex items-center bg-white rounded-lg shadow-button px-3 py-2.5 text-left"
+          className="w-full flex items-center bg-white rounded-lg shadow-button border border-gray-300 px-3 py-2.5 text-left"
         >
-          <Search className="h-5 w-5 text-secondary mr-2 flex-shrink-0" />
+          <Search className="h-5 w-5 text-gray-600 mr-2 flex-shrink-0" />
           <span className="text-base text-tertiary">Search a restaurant, member, etc.</span>
         </button>
       </div>
