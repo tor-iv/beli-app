@@ -52,7 +52,7 @@ cd beli-web && npx tsc --noEmit          # TypeScript type checking
 - Always run commands from `beli-web/` directory
 - Dev server runs on http://localhost:3000
 - TypeScript strict mode is enabled
-- Uses Next.js 15 with App Router
+- Uses Next.js 16 with App Router
 - Automatically deploys to Vercel on push to main
 
 **Deployment:**
@@ -75,7 +75,8 @@ This is a monorepo structure:
 ### Tech Stack
 
 **Mobile (beli-native/):**
-- **Framework**: React Native with Expo SDK 54
+- **Framework**: React Native 0.81.4 with Expo SDK 54
+- **React Version**: 19.1.0
 - **Navigation**: React Navigation 7 (bottom tabs + stack)
 - **State Management**: Zustand (store directory exists but not yet implemented)
 - **Data Layer**: MockDataService class (`src/data/mockDataService.ts`)
@@ -83,7 +84,7 @@ This is a monorepo structure:
 - **Maps**: react-native-maps for location features
 
 **Web (beli-web/):**
-- **Framework**: Next.js 15 with App Router
+- **Framework**: Next.js 16 with App Router
 - **Navigation**: Next.js file-based routing
 - **State Management**: Zustand + React Query (TanStack Query)
 - **Data Layer**: MockDataService (copied from mobile, adapted for web)
@@ -200,6 +201,12 @@ Available hooks:
 - `useListCounts(userId)` - Count of restaurants in each list
 - `useTastemakerPosts()` - Tastemaker articles
 - `useRanking()` - User ranking data
+- `useFeaturedLists()` - Curated restaurant lists
+- `useListProgress()` - Track progress through lists
+- `useTasteProfile()` - User taste preferences
+- `useUsers()` - User search and discovery
+- `useNotifications()` - User notifications
+- `useMediaQuery()` - Responsive breakpoint detection
 
 ### Navigation Structure
 
@@ -221,7 +228,7 @@ Additional screens:
 
 **Web (Next.js App Router):**
 File-based routing in [beli-web/app/](beli-web/app/):
-- `/` - Home/landing page
+- `/` - Home/landing page with demo experience
 - `/feed` - Social activity feed
 - `/lists` - User's restaurant lists
 - `/search` - Restaurant and user search
@@ -232,6 +239,13 @@ File-based routing in [beli-web/app/](beli-web/app/):
 - `/tastemakers/[id]` - Individual tastemaker profiles
 - `/tastemakers/post/[postId]` - Tastemaker articles
 - `/group-dinner` - Group dining coordinator
+- `/tutorial` - Onboarding tutorial
+- `/settings/*` - Settings pages (account, privacy, notifications, etc.)
+- `/challenge` - Challenge tracking
+- `/notifications` - Notifications center
+- `/faq` - Frequently asked questions
+- `/import` - Import data feature
+- `/reservations` - Reservation management
 
 Navigation components in [components/navigation/](beli-web/components/navigation/)
 
@@ -358,13 +372,15 @@ import { cn } from '@/lib/utils';
 
 **Mobile:**
 - **Expo SDK 54** with React Native 0.81.4 - Use expo-compatible packages only
+- **React 19.1.0** - Latest stable React version
 - **TypeScript strict mode** - All types must be properly defined
 - **No dark mode** - Light theme only
 - **Portrait orientation only** - Not optimized for landscape
 - **iOS Simulator recommended** - Primary development target
 
 **Web:**
-- **Next.js 15** with App Router - Use server/client components appropriately
+- **Next.js 16** with App Router - Use server/client components appropriately
+- **React 19.2.0** - Latest stable React version
 - **TypeScript strict mode** - All types must be properly defined
 - **Path alias** - Use `@/*` for imports (configured in [tsconfig.json](beli-web/tsconfig.json))
 - **Image optimization** - Configured for Unsplash and Pravatar in [next.config.ts](beli-web/next.config.ts)
