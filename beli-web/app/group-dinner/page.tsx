@@ -1,0 +1,233 @@
+"use client"
+
+import * as React from "react"
+import { useRouter } from "next/navigation"
+import { Users, Plus } from "lucide-react"
+import { MockDataService } from "@/lib/mockDataService"
+import { RestaurantSwiper } from "@/components/group-dinner/restaurant-swiper"
+import { SelectionScreen } from "@/components/group-dinner/selection-screen"
+import { ConfirmationModal } from "@/components/group-dinner/confirmation-modal"
+import { ParticipantSelector } from "@/components/group-dinner/participant-selector"
+import { Avatar } from "@/components/ui/avatar"
+import type { User, GroupDinnerMatch } from "@/types"
+
+export default function GroupDinnerPage() {
+  const router = useRouter()
+
+  // State
+  const [currentUser, setCurrentUser] = React.useState<User>()
+  const [selectedParticipants, setSelectedParticipants] = React.useState<User[]>([])
+  const [matches, setMatches] = React.useState<GroupDinnerMatch[]>([])
+  const [currentIndex, setCurrentIndex] = React.useState(0)
+  const [savedRestaurants, setSavedRestaurants] = React.useState<GroupDinnerMatch[]>([])
+  const [showSelectionScreen, setShowSelectionScreen] = React.useState(false)
+  const [selectedMatch, setSelectedMatch] = React.useState<GroupDinnerMatch>()
+  const [showConfirmationModal, setShowConfirmationModal] = React.useState(false)
+  const [showParticipantSelector, setShowParticipantSelector] = React.useState(false)
+  const [loading, setLoading] = React.useState(true)
+
+  // Load initial data
+  React.useEffect(() => {
+    const init = async () => {
+      try {
+        const user = await MockDataService.getCurrentUser()
+        setCurrentUser(user)
+        await loadMatches(user.id, [])
+      } catch (error) {
+        console.error("Failed to initialize:", error)
+      }
+    }
+    init()
+  }, [])
+
+  // Load suggestions based on participants
+  const loadMatches = async (userId: string, participantIds: string[]) => {
+    setLoading(true)
+    try {
+      const suggestions = await MockDataService.getGroupDinnerSuggestions(
+        userId,
+        participantIds.length > 0 ? participantIds : undefined
+      )
+      setMatches(suggestions)
+      setCurrentIndex(0)
+    } catch (error) {
+      console.error("Failed to load matches:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Handle swipe right (save)
+  const handleSwipeRight = (match: GroupDinnerMatch) => {
+    if (savedRestaurants.length < 3) {
+      const newSaved = [...savedRestaurants, match]
+      setSavedRestaurants(newSaved)
+
+      if (newSaved.length === 3) {
+        setShowSelectionScreen(true)
+      }
+    }
+    setCurrentIndex((prev) => prev + 1)
+  }
+
+  // Handle swipe left (pass)
+  const handleSwipeLeft = (match: GroupDinnerMatch) => {
+    setCurrentIndex((prev) => prev + 1)
+  }
+
+  // Handle restaurant selection from selection screen
+  const handleSelectRestaurant = (match: GroupDinnerMatch) => {
+    setSelectedMatch(match)
+    setShowSelectionScreen(false)
+    setShowConfirmationModal(true)
+  }
+
+  // Handle shuffle
+  const handleShuffle = async () => {
+    if (!currentUser) return
+    const participantIds = selectedParticipants.map((p) => p.id)
+    await loadMatches(currentUser.id, participantIds)
+    setSavedRestaurants([])
+    setShowSelectionScreen(false)
+  }
+
+  // Handle start over
+  const handleStartOver = () => {
+    setSavedRestaurants([])
+    setShowSelectionScreen(false)
+    setCurrentIndex(0)
+  }
+
+  // Handle participant confirmation
+  const handleParticipantsConfirm = async (participants: User[]) => {
+    setSelectedParticipants(participants)
+    setShowParticipantSelector(false)
+    if (currentUser) {
+      await loadMatches(currentUser.id, participants.map((p) => p.id))
+    }
+  }
+
+  // Handle keep swiping from confirmation
+  const handleKeepSwiping = () => {
+    setShowConfirmationModal(false)
+    setSelectedMatch(undefined)
+    // User can continue swiping with remaining cards
+  }
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Mobile Header */}
+      <div className="md:hidden bg-white px-4 py-3 border-b flex-shrink-0">
+        <h1 className="text-2xl font-bold">Group Dinner</h1>
+      </div>
+
+      {/* Desktop Header */}
+      <div className="hidden md:block bg-white px-6 py-4 border-b flex-shrink-0">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold">Group Dinner</h1>
+          <p className="text-secondary mt-1">Find the perfect restaurant for your group</p>
+        </div>
+      </div>
+
+      {/* Participant Section */}
+      <div className="bg-white border-b p-4 flex-shrink-0">
+        <button
+          onClick={() => setShowParticipantSelector(true)}
+          className="w-full max-w-2xl mx-auto"
+        >
+          {selectedParticipants.length > 0 ? (
+            /* Selected Participants Display */
+            <div className="flex items-center gap-3 bg-primary/5 rounded-lg p-3 hover:bg-primary/10 transition-colors">
+              <Users className="h-5 w-5 text-primary flex-shrink-0" />
+              <div className="flex-1 text-left">
+                <p className="text-sm font-semibold text-primary">
+                  Dining with {selectedParticipants.length} {selectedParticipants.length === 1 ? "person" : "people"}
+                </p>
+                <p className="text-xs text-secondary">
+                  {selectedParticipants.map(p => p.displayName).join(", ")}
+                </p>
+              </div>
+              <div className="flex -space-x-2">
+                {selectedParticipants.slice(0, 3).map((user) => (
+                  <Avatar
+                    key={user.id}
+                    src={user.avatar}
+                    alt={user.displayName}
+                    className="h-8 w-8 border-2 border-white"
+                  />
+                ))}
+                {selectedParticipants.length > 3 && (
+                  <div className="h-8 w-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center">
+                    <span className="text-xs font-semibold text-gray-600">
+                      +{selectedParticipants.length - 3}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* Empty State - Add Participants */
+            <div className="flex items-center justify-center gap-2 py-3 text-primary font-medium hover:bg-primary/5 rounded-lg transition-colors">
+              <Plus className="h-5 w-5" />
+              <span>Add people you're eating with</span>
+            </div>
+          )}
+        </button>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full">
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-secondary">Finding perfect matches...</p>
+            </div>
+          </div>
+        ) : showSelectionScreen ? (
+          <SelectionScreen
+            savedRestaurants={savedRestaurants}
+            onSelectRestaurant={handleSelectRestaurant}
+            onStartOver={handleStartOver}
+            onBack={() => setShowSelectionScreen(false)}
+            onViewDetails={(id) => router.push(`/restaurant/${id}`)}
+          />
+        ) : (
+          <RestaurantSwiper
+            matches={matches}
+            currentIndex={currentIndex}
+            savedCount={savedRestaurants.length}
+            onSwipeRight={handleSwipeRight}
+            onSwipeLeft={handleSwipeLeft}
+            onShuffle={handleShuffle}
+          />
+        )}
+      </div>
+
+      {/* Modals */}
+      <ParticipantSelector
+        open={showParticipantSelector}
+        selected={selectedParticipants}
+        currentUser={currentUser}
+        onClose={() => setShowParticipantSelector(false)}
+        onConfirm={handleParticipantsConfirm}
+      />
+
+      <ConfirmationModal
+        open={showConfirmationModal}
+        match={selectedMatch}
+        participants={selectedParticipants}
+        onClose={() => setShowConfirmationModal(false)}
+        onKeepSwiping={handleKeepSwiping}
+      />
+    </div>
+  )
+}

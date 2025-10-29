@@ -1038,6 +1038,138 @@ export class MockDataService {
       estimatedSharability,
     };
   }
+
+  // Group Dinner methods
+  static async getUserFriends(userId: string): Promise<User[]> {
+    await delay();
+    // Return users who the current user is following (simplified)
+    // In a real app, this would be a proper friends/following relationship
+    return mockUsers.filter(u => u.id !== userId).slice(0, 10);
+  }
+
+  static async getRecentDiningCompanions(userId: string): Promise<User[]> {
+    await delay();
+    // For now, return a subset of friends
+    // In a real app, this would track who you've actually dined with
+    return mockUsers.filter(u => u.id !== userId).slice(0, 5);
+  }
+
+  static async getRestaurantAvailability(restaurantId: string, date: Date): Promise<{ available: boolean; timeSlot?: string }> {
+    await delay();
+    // Mock availability - in reality this would check reservation system
+    const randomAvailable = Math.random() > 0.3; // 70% chance of availability
+    const timeSlots = ['6:00 PM', '6:30 PM', '7:00 PM', '7:30 PM', '8:00 PM', '8:30 PM'];
+    const randomSlot = timeSlots[Math.floor(Math.random() * timeSlots.length)];
+
+    return {
+      available: randomAvailable,
+      timeSlot: randomAvailable ? randomSlot : undefined
+    };
+  }
+
+  static async getGroupDinnerSuggestions(
+    userId: string,
+    participantIds?: string[]
+  ): Promise<import('@/types').GroupDinnerMatch[]> {
+    await delay();
+
+    const isGroup = participantIds && participantIds.length > 0;
+    const allUserIds = isGroup ? [userId, ...participantIds] : [userId];
+
+    // Get want-to-try restaurants for all participants
+    const wantToTryRelations = mockUserRestaurantRelations.filter(
+      rel => allUserIds.includes(rel.userId) && rel.status === 'want_to_try'
+    );
+
+    // Get restaurants that have been visited recently (to filter out)
+    const recentlyVisited = mockUserRestaurantRelations.filter(
+      rel => allUserIds.includes(rel.userId) &&
+      rel.status === 'been' &&
+      rel.visitDate &&
+      (new Date().getTime() - new Date(rel.visitDate).getTime()) < 30 * 24 * 60 * 60 * 1000 // 30 days
+    ).map(rel => rel.restaurantId);
+
+    // Get all users for dietary restrictions
+    const users = await Promise.all(allUserIds.map(id => this.getUserById(id)));
+    const allDietaryRestrictions = users
+      .filter((u): u is User => u !== null)
+      .flatMap(u => u.dietaryRestrictions || []);
+
+    // Count how many people have each restaurant on their want-to-try list
+    const restaurantCounts = new Map<string, { count: number; userIds: string[] }>();
+
+    wantToTryRelations.forEach(rel => {
+      const existing = restaurantCounts.get(rel.restaurantId) || { count: 0, userIds: [] };
+      restaurantCounts.set(rel.restaurantId, {
+        count: existing.count + 1,
+        userIds: [...existing.userIds, rel.userId]
+      });
+    });
+
+    // Build scored matches
+    const matches: import('@/types').GroupDinnerMatch[] = [];
+
+    for (const [restaurantId, data] of Array.from(restaurantCounts.entries())) {
+      // Skip recently visited
+      if (recentlyVisited.includes(restaurantId)) continue;
+
+      const restaurant = mockRestaurants.find(r => r.id === restaurantId);
+      if (!restaurant) continue;
+
+      // Calculate score
+      let score = 0;
+      const matchReasons: string[] = [];
+
+      // Want-to-try overlap (70% weight)
+      const overlapRatio = data.count / allUserIds.length;
+      const wantToTryScore = overlapRatio * 70;
+      score += wantToTryScore;
+
+      if (data.count === allUserIds.length) {
+        matchReasons.push('Everyone wants to try this!');
+      } else if (data.count > 1) {
+        matchReasons.push(`On ${data.count} want-to-try lists`);
+      } else {
+        matchReasons.push('On your want-to-try list');
+      }
+
+      // Dietary compatibility (20% weight)
+      // For simplicity, assume all restaurants can accommodate dietary restrictions in mock
+      const dietaryScore = 20;
+      score += dietaryScore;
+      if (allDietaryRestrictions.length > 0) {
+        matchReasons.push('Accommodates dietary restrictions');
+      }
+
+      // Location convenience (10% weight)
+      // In real app, would calculate distance from participants
+      const locationScore = restaurant.distance ? Math.max(0, 10 - restaurant.distance) : 10;
+      score += locationScore;
+      if (restaurant.distance && restaurant.distance < 2) {
+        matchReasons.push('Nearby location');
+      }
+
+      // Get availability
+      const availability = await this.getRestaurantAvailability(restaurantId, new Date());
+
+      matches.push({
+        restaurant,
+        score: Math.round(score),
+        onListsCount: data.count,
+        participants: data.userIds,
+        matchReasons,
+        availability: availability.available ? {
+          date: new Date().toLocaleDateString(),
+          timeSlot: availability.timeSlot || 'Various times'
+        } : undefined
+      });
+    }
+
+    // Sort by score (highest first)
+    matches.sort((a, b) => b.score - a.score);
+
+    return matches;
+  }
 }
 
 export default MockDataService;

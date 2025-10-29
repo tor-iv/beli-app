@@ -320,3 +320,24 @@ export interface OrderSuggestion {
   reasoning: string[];
   estimatedSharability: string; // e.g., "Perfect for 4 people"
 }
+
+// Group Dinner types
+export interface GroupDinnerSession {
+  id: string;
+  userId: string;
+  participants: string[]; // user IDs (can be empty for solo)
+  selectedRestaurant?: string;
+  createdAt: Date;
+}
+
+export interface GroupDinnerMatch {
+  restaurant: Restaurant;
+  score: number;
+  onListsCount: number; // how many want-to-try lists
+  participants: string[]; // who has it on their list
+  matchReasons: string[];
+  availability?: {
+    date: string;
+    timeSlot: string;
+  };
+}
