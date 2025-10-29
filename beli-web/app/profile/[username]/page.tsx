@@ -21,6 +21,8 @@ import { Instagram, Newspaper, BarChart3 } from 'lucide-react';
 export default function ProfilePage({ params }: { params: { username: string } }) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [isCurrentUser, setIsCurrentUser] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'activity' | 'taste'>('activity');
   const [recentReviews, setRecentReviews] = useState<Review[]>([]);
@@ -39,18 +41,29 @@ export default function ProfilePage({ params }: { params: { username: string } }
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const [currentUser, allRestaurants] = await Promise.all([
+        const [userData, currentUser, allRestaurants] = await Promise.all([
+          MockDataService.getUserByUsername(params.username),
           MockDataService.getCurrentUser(),
           MockDataService.getAllRestaurants(),
         ]);
 
-        if (!currentUser) {
+        if (!userData) {
           notFound();
         }
 
-        const reviews = await MockDataService.getUserReviews(currentUser.id);
+        const reviews = await MockDataService.getUserReviews(userData.id);
 
-        setUser(currentUser);
+        // Check if viewing own profile
+        const isOwnProfile = userData.id === currentUser.id;
+        setIsCurrentUser(isOwnProfile);
+
+        // Check if following this user (only if not own profile)
+        if (!isOwnProfile) {
+          const followingStatus = await MockDataService.isFollowing(currentUser.id, userData.id);
+          setIsFollowing(followingStatus);
+        }
+
+        setUser(userData);
         setRestaurants(allRestaurants);
         setRecentReviews(reviews.slice(0, 5));
       } catch (error) {
@@ -61,7 +74,7 @@ export default function ProfilePage({ params }: { params: { username: string } }
     };
 
     loadProfile();
-  }, []);
+  }, [params.username]);
 
   if (loading) {
     return (
@@ -123,6 +136,23 @@ export default function ProfilePage({ params }: { params: { username: string } }
     console.log('Share taste profile');
   };
 
+  const handleFollowToggle = async () => {
+    if (!user) return;
+
+    try {
+      const currentUser = await MockDataService.getCurrentUser();
+      if (isFollowing) {
+        await MockDataService.unfollowUser(currentUser.id, user.id);
+        setIsFollowing(false);
+      } else {
+        await MockDataService.followUser(currentUser.id, user.id);
+        setIsFollowing(true);
+      }
+    } catch (error) {
+      console.error('Failed to toggle follow:', error);
+    }
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="container mx-auto max-w-3xl">
@@ -162,12 +192,29 @@ export default function ProfilePage({ params }: { params: { username: string } }
 
             {/* Action Buttons */}
             <div className="flex gap-3 mt-4 w-full max-w-md">
-              <Button variant="outline" className="flex-1">
-                Edit profile
-              </Button>
-              <Button variant="outline" className="flex-1">
-                Share profile
-              </Button>
+              {isCurrentUser ? (
+                <>
+                  <Button variant="outline" className="flex-1">
+                    Edit profile
+                  </Button>
+                  <Button variant="outline" className="flex-1">
+                    Share profile
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant={isFollowing ? "outline" : "default"}
+                    className="flex-1"
+                    onClick={handleFollowToggle}
+                  >
+                    {isFollowing ? 'Following' : 'Follow'}
+                  </Button>
+                  <Button variant="outline" className="flex-1">
+                    Share profile
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* Instagram Link */}

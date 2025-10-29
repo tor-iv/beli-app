@@ -27,6 +27,11 @@ export class MockDataService {
     return mockUsers.find(user => user.id === userId) || null;
   }
 
+  static async getUserByUsername(username: string): Promise<User | null> {
+    await delay();
+    return mockUsers.find(user => user.username === username) || null;
+  }
+
   static async searchUsers(query: string): Promise<User[]> {
     await delay();
     const lowercaseQuery = query.toLowerCase();

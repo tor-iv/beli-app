@@ -15,12 +15,14 @@ import { FeaturedListsSection } from "@/components/feed/featured-lists-section"
 import { TastemakerPostsSection } from "@/components/feed/tastemaker-posts-section"
 import { ContentModeSelector, type ContentMode } from "@/components/feed/content-mode-selector"
 import { FeedFiltersModal, type FeedFilters } from "@/components/modals/feed-filters-modal"
+import { CommentsModal } from "@/components/modals/comments-modal"
+import { ShareModal } from "@/components/modals/share-modal"
 import { getFeaturedPosts } from "@/data/mock/tastemakerPosts"
-import type { FeedItem, List } from "@/types"
+import type { Activity, List, User, Restaurant } from "@/types"
 
 export default function FeedPage() {
   const router = useRouter()
-  const [feed, setFeed] = React.useState<FeedItem[]>([])
+  const [feed, setFeed] = React.useState<Activity[]>([])
   const [featuredLists, setFeaturedLists] = React.useState<List[]>([])
   const [loading, setLoading] = React.useState(true)
   const [showFiltersModal, setShowFiltersModal] = React.useState(false)
@@ -30,18 +32,24 @@ export default function FeedPage() {
     topRatedOnly: false,
     restaurantsOnly: false,
   })
+  const [currentUser, setCurrentUser] = React.useState<User | null>(null)
+  const [selectedActivity, setSelectedActivity] = React.useState<Activity | null>(null)
+  const [showCommentsModal, setShowCommentsModal] = React.useState(false)
+  const [showShareModal, setShowShareModal] = React.useState(false)
 
   const featuredPosts = getFeaturedPosts()
 
   React.useEffect(() => {
     const loadData = async () => {
       try {
-        const [feedData, listsData] = await Promise.all([
+        const [feedData, listsData, userData] = await Promise.all([
           MockDataService.getActivityFeed(),
           MockDataService.getFeaturedLists(),
+          MockDataService.getCurrentUser(),
         ])
-        setFeed(feedData)
+        setFeed(feedData as Activity[])
         setFeaturedLists(listsData)
+        setCurrentUser(userData)
       } catch (error) {
         console.error("Failed to load feed data:", error)
       } finally {
@@ -50,6 +58,102 @@ export default function FeedPage() {
     }
     loadData()
   }, [])
+
+  // Interaction handlers
+  const handleLike = (activityId: string) => {
+    if (!currentUser) return
+
+    setFeed((prevFeed) =>
+      prevFeed.map((activity) => {
+        if (activity.id === activityId) {
+          const likes = activity.interactions?.likes || []
+          const isLiked = likes.includes(currentUser.id)
+
+          return {
+            ...activity,
+            interactions: {
+              ...activity.interactions,
+              likes: isLiked
+                ? likes.filter((id) => id !== currentUser.id)
+                : [...likes, currentUser.id],
+              comments: activity.interactions?.comments || [],
+              bookmarks: activity.interactions?.bookmarks || [],
+            },
+          }
+        }
+        return activity
+      })
+    )
+  }
+
+  const handleComment = (activity: Activity) => {
+    setSelectedActivity(activity)
+    setShowCommentsModal(true)
+  }
+
+  const handleShare = (activity: Activity) => {
+    setSelectedActivity(activity)
+    setShowShareModal(true)
+  }
+
+  const handleBookmark = (activityId: string) => {
+    if (!currentUser) return
+
+    setFeed((prevFeed) =>
+      prevFeed.map((activity) => {
+        if (activity.id === activityId) {
+          const bookmarks = activity.interactions?.bookmarks || []
+          const isBookmarked = bookmarks.includes(currentUser.id)
+
+          return {
+            ...activity,
+            interactions: {
+              ...activity.interactions,
+              bookmarks: isBookmarked
+                ? bookmarks.filter((id) => id !== currentUser.id)
+                : [...bookmarks, currentUser.id],
+              likes: activity.interactions?.likes || [],
+              comments: activity.interactions?.comments || [],
+            },
+          }
+        }
+        return activity
+      })
+    )
+  }
+
+  const handleAddPress = (restaurant: Restaurant) => {
+    // TODO: Implement add restaurant modal/functionality
+    console.log('Add restaurant:', restaurant.name)
+  }
+
+  const handleAddComment = (content: string) => {
+    if (!selectedActivity || !currentUser) return
+
+    setFeed((prevFeed) =>
+      prevFeed.map((activity) => {
+        if (activity.id === selectedActivity.id) {
+          const newComment = {
+            id: `comment-${Date.now()}`,
+            userId: currentUser.id,
+            content,
+            timestamp: new Date(),
+          }
+
+          return {
+            ...activity,
+            interactions: {
+              ...activity.interactions,
+              comments: [...(activity.interactions?.comments || []), newComment],
+              likes: activity.interactions?.likes || [],
+              bookmarks: activity.interactions?.bookmarks || [],
+            },
+          }
+        }
+        return activity
+      })
+    )
+  }
 
   // Apply filters to feed
   const filteredFeed = React.useMemo(() => {
@@ -157,7 +261,16 @@ export default function FeedPage() {
 
           <div className="space-y-4">
             {filteredFeed.map((item) => (
-              <ActivityCard key={item.id} activity={item} />
+              <ActivityCard
+                key={item.id}
+                activity={item}
+                currentUserId={currentUser?.id}
+                onLike={() => handleLike(item.id)}
+                onComment={() => handleComment(item)}
+                onShare={() => handleShare(item)}
+                onBookmark={() => handleBookmark(item.id)}
+                onAddPress={() => handleAddPress(item.restaurant)}
+              />
             ))}
           </div>
         </div>
@@ -188,7 +301,16 @@ export default function FeedPage() {
                 <h1 className="text-2xl font-bold mb-6">Your Feed</h1>
                 <div className="space-y-4">
                   {feed.map((item) => (
-                    <ActivityCard key={item.id} activity={item} />
+                    <ActivityCard
+                      key={item.id}
+                      activity={item}
+                      currentUserId={currentUser?.id}
+                      onLike={() => handleLike(item.id)}
+                      onComment={() => handleComment(item)}
+                      onShare={() => handleShare(item)}
+                      onBookmark={() => handleBookmark(item.id)}
+                      onAddPress={() => handleAddPress(item.restaurant)}
+                    />
                   ))}
                 </div>
               </div>
@@ -206,6 +328,27 @@ export default function FeedPage() {
         onClose={() => setShowFiltersModal(false)}
         onApply={handleApplyFilters}
       />
+
+      {/* Comments Modal */}
+      {selectedActivity && (
+        <CommentsModal
+          open={showCommentsModal}
+          onOpenChange={setShowCommentsModal}
+          activity={selectedActivity}
+          currentUser={currentUser || undefined}
+          onAddComment={handleAddComment}
+        />
+      )}
+
+      {/* Share Modal */}
+      {selectedActivity && (
+        <ShareModal
+          open={showShareModal}
+          onOpenChange={setShowShareModal}
+          restaurant={selectedActivity.restaurant}
+          user={selectedActivity.user}
+        />
+      )}
     </div>
   )
 }

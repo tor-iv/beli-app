@@ -2,6 +2,7 @@
 
 import { ArrowUpDown, ChevronRight } from 'lucide-react';
 import { CuisineBreakdown, CityBreakdown, CountryBreakdown } from '@/types';
+import { RatingBubble } from '@/components/rating/rating-bubble';
 
 export type SortOption = 'count' | 'avgScore';
 
@@ -11,25 +12,6 @@ interface TasteProfileListProps {
   sortBy: SortOption;
   onSortPress: () => void;
   onItemPress: (item: CuisineBreakdown | CityBreakdown | CountryBreakdown) => void;
-}
-
-function getRatingColor(rating: number): string {
-  if (rating >= 8.0) return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-  if (rating >= 7.0) return 'bg-green-100 text-green-700 border-green-200';
-  if (rating >= 5.0) return 'bg-orange-100 text-orange-700 border-orange-200';
-  return 'bg-red-100 text-red-700 border-red-200';
-}
-
-function RatingBubble({ rating }: { rating: number }) {
-  const colorClasses = getRatingColor(rating);
-
-  return (
-    <div
-      className={`flex items-center justify-center w-11 h-11 rounded-full border ${colorClasses} font-semibold text-sm`}
-    >
-      {rating.toFixed(1)}
-    </div>
-  );
 }
 
 export function TasteProfileList({

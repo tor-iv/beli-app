@@ -1,11 +1,19 @@
-import { FeedItem } from '@/types';
+import { Activity } from '@/types';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { RatingBubble } from '@/components/rating/rating-bubble';
+import { Heart, MessageCircle, Share2, Bookmark, PlusCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 interface ActivityCardProps {
-  activity: FeedItem;
+  activity: Activity;
+  currentUserId?: string;
+  onLike?: () => void;
+  onComment?: () => void;
+  onShare?: () => void;
+  onBookmark?: () => void;
+  onAddPress?: () => void;
 }
 
 function formatTimeAgo(timestamp: Date | string): string {
@@ -24,7 +32,18 @@ function formatTimeAgo(timestamp: Date | string): string {
   return `${weeks}w ago`;
 }
 
-export function ActivityCard({ activity }: ActivityCardProps) {
+export function ActivityCard({
+  activity,
+  currentUserId,
+  onLike,
+  onComment,
+  onShare,
+  onBookmark,
+  onAddPress
+}: ActivityCardProps) {
+  const isLiked = currentUserId && activity.interactions?.likes?.includes(currentUserId);
+  const isBookmarked = currentUserId && activity.interactions?.bookmarks?.includes(currentUserId);
+
   return (
     <Card className="beli-card">
       <CardHeader>
@@ -72,7 +91,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
         )}
 
         {activity.photos && activity.photos.length > 0 && (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2 mb-3">
             {activity.photos.slice(0, 4).map((photo, i) => (
               <img
                 key={i}
@@ -83,6 +102,77 @@ export function ActivityCard({ activity }: ActivityCardProps) {
             ))}
           </div>
         )}
+
+        {/* Social Actions */}
+        <div className="flex items-center justify-between mt-3 pt-3 border-t">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 gap-1 hover:bg-transparent"
+              onClick={(e) => {
+                e.preventDefault();
+                onLike?.();
+              }}
+            >
+              <Heart
+                className={`h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-600'}`}
+              />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 gap-1 hover:bg-transparent"
+              onClick={(e) => {
+                e.preventDefault();
+                onComment?.();
+              }}
+            >
+              <MessageCircle className="h-5 w-5 text-gray-600" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 gap-1 hover:bg-transparent"
+              onClick={(e) => {
+                e.preventDefault();
+                onShare?.();
+              }}
+            >
+              <Share2 className="h-5 w-5 text-gray-600" />
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 gap-1 hover:bg-transparent"
+              onClick={(e) => {
+                e.preventDefault();
+                onAddPress?.();
+              }}
+            >
+              <PlusCircle className="h-5 w-5 text-gray-600" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 gap-1 hover:bg-transparent"
+              onClick={(e) => {
+                e.preventDefault();
+                onBookmark?.();
+              }}
+            >
+              <Bookmark
+                className={`h-5 w-5 ${isBookmarked ? 'fill-[#0B7B7F] text-[#0B7B7F]' : 'text-gray-600'}`}
+              />
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

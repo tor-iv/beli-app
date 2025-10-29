@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useLeaderboard } from '@/lib/hooks/use-leaderboard';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import type { User } from '@/types';
@@ -230,9 +231,10 @@ export default function LeaderboardPage() {
       {/* Leaderboard List */}
       <div className="pb-4">
         {users.map((user) => (
-          <div
+          <Link
             key={user.id}
-            className="flex items-center py-[10px] border-b border-[#E5E5EA]"
+            href={`/profile/${user.username}`}
+            className="flex items-center py-[10px] border-b border-[#E5E5EA] hover:bg-gray-50 -mx-4 px-4 transition-colors"
           >
             {/* Rank */}
             <span className="text-sm font-normal text-gray-600 w-6 mr-2">{user.rank}</span>
@@ -251,7 +253,7 @@ export default function LeaderboardPage() {
 
             {/* Score */}
             <span className="text-[17px] font-semibold text-gray-900">{user.score}</span>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
