@@ -1,7 +1,10 @@
 import { MenuItem } from '@/types';
+import { demoMenuItems } from '@/lib/demo-data';
 
 // Comprehensive menu data for restaurants
 export const allMenuItems: MenuItem[] = [
+  // Demo Restaurant Menu Items (for tutorial)
+  ...demoMenuItems,
   // Moody Tongue Pizza Menu
   {
     id: 'mt-1',
@@ -2968,6 +2971,7 @@ export const allMenuItems: MenuItem[] = [
 
 // Map restaurant IDs to their menu item IDs
 export const restaurantMenus: Record<string, string[]> = {
+  'demo-restaurant-1': ['menu-1', 'menu-2', 'menu-3', 'menu-4', 'menu-5', 'menu-6', 'menu-7', 'menu-8', 'menu-9', 'menu-10', 'menu-11', 'menu-12'],
   'moody-tongue': ['mt-1', 'mt-2', 'mt-3', 'mt-4', 'mt-5', 'mt-6', 'mt-7', 'mt-8', 'mt-9', 'mt-10'],
   '1': ['bal-1', 'bal-2', 'bal-3', 'bal-4', 'bal-5', 'bal-6', 'bal-7', 'bal-8', 'bal-9', 'bal-10', 'bal-11', 'bal-12'],
   '2': ['psp-1', 'psp-2', 'psp-3', 'psp-4', 'psp-5', 'psp-6', 'psp-7', 'psp-8'],

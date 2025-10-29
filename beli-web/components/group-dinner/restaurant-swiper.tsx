@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { motion, PanInfo, useMotionValue, useTransform, useAnimation } from "framer-motion"
 import { X, Shuffle, Heart, CheckCircle2 } from "lucide-react"
 import { GroupDinnerCard } from "./group-dinner-card"
@@ -26,6 +27,7 @@ export function RestaurantSwiper({
   onSwipeLeft,
   onShuffle,
 }: RestaurantSwiperProps) {
+  const router = useRouter()
   const [isExiting, setIsExiting] = React.useState(false)
   const isMounted = React.useRef(false)
   const x = useMotionValue(0)
@@ -199,7 +201,7 @@ export function RestaurantSwiper({
               savedCount={savedCount}
               onViewDetails={() => {
                 // Navigate to restaurant details
-                window.location.href = `/restaurant/${currentMatch.restaurant.id}`
+                router.push(`/restaurant/${currentMatch.restaurant.id}`)
               }}
             />
           </motion.div>

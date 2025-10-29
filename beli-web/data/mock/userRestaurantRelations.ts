@@ -535,4 +535,196 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
     createdAt: new Date('2024-01-07'),
     tags: ['Authentic', 'Greece', 'Olive Oil'],
   },
+
+  // Additional want-to-try entries for better Group Dinner demo experience
+  {
+    userId: '1',
+    restaurantId: '4', // Minetta Tavern
+    status: 'want_to_try',
+    notes: 'Need to try the famous Black Label Burger.',
+    createdAt: new Date('2024-02-10'),
+    tags: ['Burger', 'Date Night'],
+  },
+  {
+    userId: '1',
+    restaurantId: '6', // Momofuku
+    status: 'want_to_try',
+    notes: 'Heard great things about the pork buns.',
+    createdAt: new Date('2024-02-11'),
+    tags: ['Asian Fusion', 'Pork Buns'],
+  },
+  {
+    userId: '1',
+    restaurantId: '7', // RedFarm
+    status: 'want_to_try',
+    notes: 'Want to try the creative dim sum.',
+    createdAt: new Date('2024-02-12'),
+    tags: ['Dim Sum', 'Chinese'],
+  },
+  {
+    userId: '1',
+    restaurantId: '8', // Xi'an Famous Foods
+    status: 'want_to_try',
+    notes: 'Craving those hand-pulled noodles.',
+    createdAt: new Date('2024-02-13'),
+    tags: ['Noodles', 'Chinese'],
+  },
+  {
+    userId: '1',
+    restaurantId: '14', // Locanda Verde
+    status: 'want_to_try',
+    notes: 'Andrew Carmellini\'s Italian - must try.',
+    createdAt: new Date('2024-02-14'),
+    tags: ['Italian', 'Brunch'],
+  },
+  {
+    userId: '1',
+    restaurantId: '15', // Daniel
+    status: 'want_to_try',
+    notes: 'Special occasion spot - French fine dining.',
+    createdAt: new Date('2024-02-15'),
+    tags: ['Fine Dining', 'French'],
+  },
+  {
+    userId: '1',
+    restaurantId: '21', // Ceconi's
+    status: 'want_to_try',
+    notes: 'Looking forward to trying this new spot.',
+    createdAt: new Date('2024-02-16'),
+    tags: ['Italian', 'New'],
+  },
+  {
+    userId: '1',
+    restaurantId: '22', // Aldila
+    status: 'want_to_try',
+    notes: 'Indonesian food sounds amazing.',
+    createdAt: new Date('2024-02-17'),
+    tags: ['Indonesian', 'Exotic'],
+  },
+
+  // User 2 (common participant) want-to-try
+  {
+    userId: '2',
+    restaurantId: '4', // Minetta Tavern
+    status: 'want_to_try',
+    notes: 'Group said this burger is legendary.',
+    createdAt: new Date('2024-02-09'),
+    tags: ['Burger'],
+  },
+  {
+    userId: '2',
+    restaurantId: '7', // RedFarm
+    status: 'want_to_try',
+    notes: 'Heard the dim sum is incredible.',
+    createdAt: new Date('2024-02-10'),
+    tags: ['Dim Sum'],
+  },
+  {
+    userId: '2',
+    restaurantId: '10', // Le Bernardin
+    status: 'want_to_try',
+    notes: 'Dream seafood spot.',
+    createdAt: new Date('2024-02-11'),
+    tags: ['Seafood', 'Michelin'],
+  },
+  {
+    userId: '2',
+    restaurantId: '14', // Locanda Verde
+    status: 'want_to_try',
+    notes: 'Perfect for weekend brunch.',
+    createdAt: new Date('2024-02-12'),
+    tags: ['Brunch', 'Italian'],
+  },
+  {
+    userId: '2',
+    restaurantId: '25', // Nomad
+    status: 'want_to_try',
+    notes: 'That roast chicken looks amazing.',
+    createdAt: new Date('2024-02-13'),
+    tags: ['American', 'Roast Chicken'],
+  },
+
+  // User 3 want-to-try
+  {
+    userId: '3',
+    restaurantId: '6', // Momofuku
+    status: 'want_to_try',
+    notes: 'Pork buns are calling my name.',
+    createdAt: new Date('2024-02-08'),
+    tags: ['Asian', 'Pork Buns'],
+  },
+  {
+    userId: '3',
+    restaurantId: '8', // Xi'an Famous Foods
+    status: 'want_to_try',
+    notes: 'Need those spicy noodles.',
+    createdAt: new Date('2024-02-09'),
+    tags: ['Spicy', 'Noodles'],
+  },
+  {
+    userId: '3',
+    restaurantId: '12', // Eleven Madison Park
+    status: 'want_to_try',
+    notes: 'Once in a lifetime dining experience.',
+    createdAt: new Date('2024-02-10'),
+    tags: ['Fine Dining', 'Special'],
+  },
+  {
+    userId: '3',
+    restaurantId: '15', // Daniel
+    status: 'want_to_try',
+    notes: 'French perfection.',
+    createdAt: new Date('2024-02-11'),
+    tags: ['French', 'Elegant'],
+  },
+  {
+    userId: '3',
+    restaurantId: '22', // Aldila
+    status: 'want_to_try',
+    notes: 'Love trying new cuisines.',
+    createdAt: new Date('2024-02-12'),
+    tags: ['Indonesian', 'Adventure'],
+  },
+
+  // User 4 want-to-try
+  {
+    userId: '4',
+    restaurantId: '4', // Minetta Tavern
+    status: 'want_to_try',
+    notes: 'Everyone raves about this burger.',
+    createdAt: new Date('2024-02-07'),
+    tags: ['Burger', 'Must-Try'],
+  },
+  {
+    userId: '4',
+    restaurantId: '6', // Momofuku
+    status: 'want_to_try',
+    notes: 'David Chang is a legend.',
+    createdAt: new Date('2024-02-08'),
+    tags: ['Celebrity Chef'],
+  },
+  {
+    userId: '4',
+    restaurantId: '7', // RedFarm
+    status: 'want_to_try',
+    notes: 'Creative Chinese sounds perfect.',
+    createdAt: new Date('2024-02-09'),
+    tags: ['Creative', 'Chinese'],
+  },
+  {
+    userId: '4',
+    restaurantId: '21', // Ceconi's
+    status: 'want_to_try',
+    notes: 'Great for a casual dinner.',
+    createdAt: new Date('2024-02-10'),
+    tags: ['Italian', 'Casual'],
+  },
+  {
+    userId: '4',
+    restaurantId: '25', // Nomad
+    status: 'want_to_try',
+    notes: 'Upscale but approachable.',
+    createdAt: new Date('2024-02-11'),
+    tags: ['American', 'Upscale'],
+  },
 ];

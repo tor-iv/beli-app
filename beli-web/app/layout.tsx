@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "Your social restaurant discovery platform",
   icons: {
     icon: '/favicon.ico',
-    apple: '/icon.png',
+    apple: '/apple-icon.png',
   },
 };
 
