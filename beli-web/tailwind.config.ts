@@ -32,8 +32,8 @@ const config: Config = {
   			},
   			foreground: '#000000',
   			muted: {
-  				DEFAULT: '#8E8E93',
-  				foreground: '#C7C7CC'
+  				DEFAULT: '#6B6B70',
+  				foreground: '#8E8E93'
   			},
   			background: '#FAFAFA',
   			card: {

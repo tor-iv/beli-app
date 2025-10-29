@@ -16,6 +16,7 @@ import { FilterBar } from '@/components/lists/FilterBar';
 import { ListSearch } from '@/components/lists/ListSearch';
 import { SortSelector } from '@/components/lists/SortSelector';
 import { CategoryDropdown } from '@/components/lists/CategoryDropdown';
+import { MoreMenu } from '@/components/lists/MoreMenu';
 import { useListFilters } from '@/lib/stores/list-filters';
 import { Button } from '@/components/ui/button';
 import { IoShareSocial } from 'react-icons/io5';
@@ -27,7 +28,7 @@ const RestaurantMap = dynamic(
   { ssr: false, loading: () => <div className="flex items-center justify-center h-full">Loading map...</div> }
 );
 
-type ListType = 'been' | 'want_to_try' | 'recs';
+type ListType = 'been' | 'want_to_try' | 'recs' | 'playlists';
 type ViewType = 'reserve' | 'nearby' | 'trending' | 'friends' | null;
 type RightPanelView = 'detail' | 'map';
 
@@ -313,6 +314,7 @@ function ListsContent() {
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">{getViewTitle(viewParam)}</h1>
           <div className="flex items-center gap-2">
+            <MoreMenu />
             <Button
               variant="outline"
               size="sm"
@@ -341,10 +343,11 @@ function ListsContent() {
 
       {!viewParam && (
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ListType)}>
-          <TabsList className="w-full mb-4 grid grid-cols-3">
+          <TabsList className="w-full mb-4 grid grid-cols-4">
             <TabsTrigger value="been">Been</TabsTrigger>
             <TabsTrigger value="want_to_try">Want to Try</TabsTrigger>
-            <TabsTrigger value="recs">Recommendations</TabsTrigger>
+            <TabsTrigger value="recs">Recs</TabsTrigger>
+            <TabsTrigger value="playlists">Playlists</TabsTrigger>
           </TabsList>
 
           {/* Filter Bar */}
