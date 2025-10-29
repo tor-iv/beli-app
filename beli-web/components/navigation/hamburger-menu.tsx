@@ -202,13 +202,13 @@ export function HamburgerMenu({
                 <div
                   key={item.id}
                   className={cn(
-                    "flex items-center px-4 py-3 min-h-[60px]",
+                    "flex items-center px-4 py-4",
                     item.backgroundColor
                   )}
                 >
-                  <Icon className="h-6 w-6 text-primary flex-shrink-0" />
+                  <Icon className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
                   <div className="flex-1 ml-3">
-                    <p className="text-[17px] font-semibold text-primary">{item.label}</p>
+                    <p className="text-[17px] font-semibold text-primary leading-snug">{item.label}</p>
                   </div>
                 </div>
               )
@@ -218,25 +218,25 @@ export function HamburgerMenu({
               <>
                 <Icon
                   className={cn(
-                    "h-6 w-6 flex-shrink-0",
+                    "h-6 w-6 flex-shrink-0 mt-0.5",
                     item.destructive ? "text-red-500" : "text-secondary"
                   )}
                 />
-                <div className="flex-1 ml-3">
+                <div className="flex-1 ml-3 min-w-0">
                   <p
                     className={cn(
-                      "text-[17px]",
+                      "text-[17px] leading-snug",
                       item.destructive ? "text-red-500" : "text-foreground"
                     )}
                   >
                     {item.label}
                   </p>
                   {item.sublabel && (
-                    <p className="text-xs text-secondary mt-0.5">{item.sublabel}</p>
+                    <p className="text-sm text-secondary mt-1 leading-snug">{item.sublabel}</p>
                   )}
                 </div>
                 {item.showChevron && (
-                  <ChevronRight className="h-5 w-5 text-secondary flex-shrink-0" />
+                  <ChevronRight className="h-5 w-5 text-secondary flex-shrink-0 ml-2" />
                 )}
               </>
             )
@@ -247,7 +247,7 @@ export function HamburgerMenu({
                   key={item.id}
                   href={item.href}
                   onClick={() => handleItemClick(item)}
-                  className="flex items-center px-4 py-3 min-h-[60px] hover:bg-gray-50 transition-colors"
+                  className="flex items-start px-4 py-4 hover:bg-gray-50 transition-colors"
                 >
                   {content}
                 </a>
@@ -258,7 +258,7 @@ export function HamburgerMenu({
               <button
                 key={item.id}
                 onClick={() => handleItemClick(item)}
-                className="w-full flex items-center px-4 py-3 min-h-[60px] hover:bg-gray-50 transition-colors"
+                className="w-full flex items-start px-4 py-4 hover:bg-gray-50 transition-colors text-left"
               >
                 {content}
               </button>
@@ -271,10 +271,10 @@ export function HamburgerMenu({
           {/* Log Out */}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center px-4 py-3 min-h-[60px] hover:bg-gray-50 transition-colors"
+            className="w-full flex items-start px-4 py-4 hover:bg-gray-50 transition-colors text-left"
           >
-            <LogOut className="h-6 w-6 text-red-500 flex-shrink-0" />
-            <span className="text-[17px] text-red-500 ml-3">Log Out</span>
+            <LogOut className="h-6 w-6 text-red-500 flex-shrink-0 mt-0.5" />
+            <span className="text-[17px] text-red-500 ml-3 leading-snug">Log Out</span>
           </button>
         </div>
       </SheetContent>

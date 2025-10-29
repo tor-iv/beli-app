@@ -10,7 +10,7 @@ export function useNotifications() {
     queryKey: ['notifications'],
     queryFn: () => MockDataService.getNotifications(),
     refetchInterval: 30000, // Refresh every 30 seconds
-    staleTime: 10000, // Consider data stale after 10 seconds
+    staleTime: 30000, // Consider data stale after 30 seconds (matches refetchInterval)
   });
 }
 
@@ -22,7 +22,7 @@ export function useUnreadNotificationCount() {
     queryKey: ['notifications', 'unread-count'],
     queryFn: () => MockDataService.getUnreadNotificationCount(),
     refetchInterval: 30000, // Refresh every 30 seconds
-    staleTime: 10000,
+    staleTime: 30000, // Consider data stale after 30 seconds (matches refetchInterval)
   });
 }
 

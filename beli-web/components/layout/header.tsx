@@ -14,8 +14,11 @@ import {
   IoTrophy,
   IoTrophyOutline,
   IoPersonCircle,
-  IoPersonCircleOutline
+  IoPersonCircleOutline,
+  IoNotifications,
+  IoNotificationsOutline
 } from 'react-icons/io5';
+import { useUnreadNotificationCount } from '@/lib/hooks/use-notifications';
 
 const navigation = [
   { name: 'Feed', href: '/feed', icon: IoDocument, outlineIcon: IoDocumentOutline },
@@ -28,6 +31,8 @@ const navigation = [
 
 export function Header() {
   const pathname = usePathname();
+  const { data: unreadCount } = useUnreadNotificationCount();
+  const isNotificationsActive = pathname?.startsWith('/notifications');
 
   return (
     <>
@@ -62,6 +67,26 @@ export function Header() {
                   </Link>
                 );
               })}
+
+              {/* Notifications Bell */}
+              <Link
+                href="/notifications"
+                className={cn(
+                  'relative flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary',
+                  isNotificationsActive ? 'text-primary' : 'text-muted'
+                )}
+              >
+                {isNotificationsActive ? (
+                  <IoNotifications className="w-5 h-5" />
+                ) : (
+                  <IoNotificationsOutline className="w-5 h-5" />
+                )}
+                {unreadCount && unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </Link>
             </nav>
           </div>
         </div>

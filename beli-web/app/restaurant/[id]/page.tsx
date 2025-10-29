@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { WhatToOrderModal } from '@/components/modals/what-to-order-modal';
 import { AddRestaurantModal } from '@/components/modals/add-restaurant-modal';
 import { RankingResultModal } from '@/components/modals/ranking-result-modal';
+import { ReserveModal } from '@/components/modals/reserve-modal';
 import { RestaurantPageSkeleton } from '@/components/restaurant/restaurant-page-skeleton';
 import { useState, useEffect } from 'react';
 import { useAddRankedRestaurant } from '@/lib/hooks';
@@ -30,6 +31,7 @@ export default function RestaurantPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showWhatToOrder, setShowWhatToOrder] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showReserveModal, setShowReserveModal] = useState(false);
 
   // Ranking state
   const [showResultModal, setShowResultModal] = useState(false);
@@ -92,7 +94,7 @@ export default function RestaurantPage() {
   return (
     <>
       {/* Map Header with Parallax */}
-      <div className="relative">
+      <div className="relative z-0">
         <RestaurantMapHeader restaurant={restaurant} />
       </div>
 
@@ -131,6 +133,7 @@ export default function RestaurantPage() {
                 <RestaurantActionButtons
                   restaurant={restaurant}
                   onWhatToOrder={() => setShowWhatToOrder(true)}
+                  onReserve={() => setShowReserveModal(true)}
                 />
               </div>
 
@@ -221,6 +224,12 @@ export default function RestaurantPage() {
         restaurant={restaurant}
         userId={currentUser.id}
         onRankingComplete={handleRankingComplete}
+      />
+
+      <ReserveModal
+        open={showReserveModal}
+        onOpenChange={setShowReserveModal}
+        restaurant={restaurant}
       />
 
       {/* Ranking Result Modal */}

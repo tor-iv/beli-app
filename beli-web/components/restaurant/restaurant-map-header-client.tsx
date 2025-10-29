@@ -78,7 +78,7 @@ export default function RestaurantMapHeaderClient({ restaurant }: RestaurantMapH
   return (
     <motion.div
       ref={containerRef}
-      className="w-full h-full"
+      className="relative z-0 w-full h-full"
       style={{ y, opacity }}
     >
       <MapContainer

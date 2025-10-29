@@ -1,17 +1,19 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Utensils, Globe, Phone, Navigation } from 'lucide-react';
+import { Utensils, Globe, Phone, Navigation, Calendar } from 'lucide-react';
 import { Restaurant } from '@/types';
 
 interface RestaurantActionButtonsProps {
   restaurant: Restaurant;
   onWhatToOrder?: () => void;
+  onReserve?: () => void;
 }
 
 export function RestaurantActionButtons({
   restaurant,
   onWhatToOrder,
+  onReserve,
 }: RestaurantActionButtonsProps) {
   const hasMenu = restaurant.menu && restaurant.menu.length > 0;
   const hasWebsite = !!restaurant.website;
@@ -57,6 +59,16 @@ export function RestaurantActionButtons({
 
   return (
     <div className="grid grid-cols-2 gap-3">
+      {/* Reserve Now */}
+      <Button
+        variant="outline"
+        className="flex flex-col items-center justify-center h-20 gap-1"
+        onClick={onReserve}
+      >
+        <Calendar className="h-5 w-5" />
+        <span className="text-xs">Reserve Now</span>
+      </Button>
+
       {/* What to Order */}
       <Button
         variant="outline"
