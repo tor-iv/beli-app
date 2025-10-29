@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLists } from '@/lib/hooks/use-lists';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,6 +12,13 @@ import { useRestaurants } from '@/lib/hooks/use-restaurants';
 import { Restaurant } from '@/types';
 import { MockDataService } from '@/lib/mockDataService';
 import { ViewToggle } from '@/components/ui/view-toggle';
+import { FilterBar } from '@/components/lists/FilterBar';
+import { ListSearch } from '@/components/lists/ListSearch';
+import { SortSelector } from '@/components/lists/SortSelector';
+import { CategoryDropdown } from '@/components/lists/CategoryDropdown';
+import { useListFilters } from '@/lib/stores/list-filters';
+import { Button } from '@/components/ui/button';
+import { IoShareSocial } from 'react-icons/io5';
 import dynamic from 'next/dynamic';
 
 // Dynamically import map component (client-side only)
@@ -37,6 +44,9 @@ function ListsContent() {
   const [visibleRestaurants, setVisibleRestaurants] = useState<Restaurant[]>([]);
   const { data: lists, isLoading: listsLoading } = useLists();
   const { data: allRestaurants } = useRestaurants();
+
+  // Get filters from store
+  const filters = useListFilters();
 
   // Sync activeTab with URL parameter
   useEffect(() => {

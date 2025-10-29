@@ -310,12 +310,12 @@ export function AddRestaurantModal({
                   {/* Left Card - Target Restaurant */}
                   <button
                     onClick={() => handleComparisonChoice("left")}
-                    className="w-[45%] aspect-[0.85] flex flex-col items-center justify-center px-5 py-10 border-[1.5px] border-gray-200 rounded-2xl bg-white hover:bg-gray-50 transition-colors"
+                    className="w-[45%] min-h-[200px] flex flex-col items-center justify-center px-5 py-10 border-[1.5px] border-gray-200 rounded-2xl bg-white hover:bg-gray-50 transition-colors"
                   >
-                    <p className="text-[22px] font-bold text-foreground text-center leading-7 mb-2 line-clamp-2">
+                    <p className="text-[22px] font-bold text-foreground text-center leading-7 mb-2 line-clamp-3 break-words w-full">
                       {restaurant.name}
                     </p>
-                    <p className="text-[13px] text-secondary text-center line-clamp-1">
+                    <p className="text-[13px] text-secondary text-center leading-[18px] line-clamp-2 w-full">
                       {restaurant.location.city}, {restaurant.location.state}
                     </p>
                   </button>
@@ -328,12 +328,12 @@ export function AddRestaurantModal({
                   {/* Right Card - Comparison Restaurant */}
                   <button
                     onClick={() => handleComparisonChoice("right")}
-                    className="w-[45%] aspect-[0.85] flex flex-col items-center justify-center px-5 py-10 border-[1.5px] border-gray-200 rounded-2xl bg-white hover:bg-gray-50 transition-colors"
+                    className="w-[45%] min-h-[200px] flex flex-col items-center justify-center px-5 py-10 border-[1.5px] border-gray-200 rounded-2xl bg-white hover:bg-gray-50 transition-colors"
                   >
-                    <p className="text-[22px] font-bold text-foreground text-center leading-7 mb-2 line-clamp-2">
+                    <p className="text-[22px] font-bold text-foreground text-center leading-7 mb-2 line-clamp-3 break-words w-full">
                       {currentComparison.name}
                     </p>
-                    <p className="text-[13px] text-secondary text-center line-clamp-1">
+                    <p className="text-[13px] text-secondary text-center leading-[18px] line-clamp-2 w-full">
                       {currentComparison.location.city}, {currentComparison.location.state}
                     </p>
                     {(currentComparison as any).userRating && (
