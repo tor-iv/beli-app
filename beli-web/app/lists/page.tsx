@@ -16,8 +16,11 @@ import { FilterBar } from '@/components/lists/FilterBar';
 import { ListSearch } from '@/components/lists/ListSearch';
 import { SortSelector } from '@/components/lists/SortSelector';
 import { CategoryDropdown } from '@/components/lists/CategoryDropdown';
-import { MoreMenu } from '@/components/lists/MoreMenu';
+import { MobileTabs, DEFAULT_MOBILE_TABS, type MobileTabId } from '@/components/lists/MobileTabs';
+import { ListPickerModal, type ListOptionId } from '@/components/lists/ListPickerModal';
+import { RestaurantListItemMobile } from '@/components/restaurant/restaurant-list-item-mobile';
 import { useListFilters } from '@/lib/stores/list-filters';
+import { useListCounts } from '@/lib/hooks/use-list-counts';
 import { Button } from '@/components/ui/button';
 import { IoShareSocial } from 'react-icons/io5';
 import dynamic from 'next/dynamic';
@@ -28,7 +31,7 @@ const RestaurantMap = dynamic(
   { ssr: false, loading: () => <div className="flex items-center justify-center h-full">Loading map...</div> }
 );
 
-type ListType = 'been' | 'want_to_try' | 'recs' | 'playlists';
+type ListType = 'been' | 'want_to_try' | 'recs' | 'playlists' | 'recs_for_you' | 'recs_from_friends' | 'trending';
 type ViewType = 'reserve' | 'nearby' | 'trending' | 'friends' | null;
 type RightPanelView = 'detail' | 'map';
 
@@ -43,11 +46,18 @@ function ListsContent() {
   const [loadingView, setLoadingView] = useState(false);
   const [rightPanelView, setRightPanelView] = useState<RightPanelView>('detail');
   const [visibleRestaurants, setVisibleRestaurants] = useState<Restaurant[]>([]);
+  const [isListPickerOpen, setIsListPickerOpen] = useState(false);
+  const [isInMoreView, setIsInMoreView] = useState(false);
+
   const { data: lists, isLoading: listsLoading } = useLists();
   const { data: allRestaurants } = useRestaurants();
+  const { data: listCounts } = useListCounts();
 
   // Get filters from store
   const filters = useListFilters();
+
+  // Determine which tab to display (show 'more' if in special list view)
+  const displayedTab: MobileTabId = isInMoreView ? 'more' : (activeTab as MobileTabId);
 
   // Sync activeTab with URL parameter
   useEffect(() => {
@@ -307,6 +317,29 @@ function ListsContent() {
     }
   };
 
+  // Handle mobile tab change
+  const handleMobileTabChange = (tabId: MobileTabId) => {
+    if (tabId === 'more') {
+      setIsListPickerOpen(true);
+      return;
+    }
+    setActiveTab(tabId as ListType);
+    setIsInMoreView(false);
+  };
+
+  // Handle list selection from modal
+  const handleListSelection = (listId: ListOptionId) => {
+    const specialLists: ListOptionId[] = ['recs_for_you', 'recs_from_friends', 'trending'];
+
+    if (specialLists.includes(listId)) {
+      setActiveTab(listId as ListType);
+      setIsInMoreView(true);
+    } else {
+      setActiveTab(listId as ListType);
+      setIsInMoreView(false);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-6">
       {/* Header */}
@@ -314,7 +347,6 @@ function ListsContent() {
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">{getViewTitle(viewParam)}</h1>
           <div className="flex items-center gap-2">
-            <MoreMenu />
             <Button
               variant="outline"
               size="sm"
@@ -342,21 +374,45 @@ function ListsContent() {
       </div>
 
       {!viewParam && (
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ListType)}>
-          <TabsList className="w-full mb-4 grid grid-cols-4">
-            <TabsTrigger value="been">Been</TabsTrigger>
-            <TabsTrigger value="want_to_try">Want to Try</TabsTrigger>
-            <TabsTrigger value="recs">Recs</TabsTrigger>
-            <TabsTrigger value="playlists">Playlists</TabsTrigger>
-          </TabsList>
+        <>
+          {/* Mobile Tabs */}
+          <div className="md:hidden">
+            <MobileTabs
+              tabs={DEFAULT_MOBILE_TABS}
+              activeTab={displayedTab}
+              onChange={handleMobileTabChange}
+              className="mb-4"
+            />
+          </div>
+
+          {/* Desktop Tabs */}
+          <div className="hidden md:block">
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ListType)}>
+              <TabsList className="w-full mb-4 grid grid-cols-4">
+                <TabsTrigger value="been">Been</TabsTrigger>
+                <TabsTrigger value="want_to_try">Want to Try</TabsTrigger>
+                <TabsTrigger value="recs">Recs</TabsTrigger>
+                <TabsTrigger value="playlists">Playlists</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
 
           {/* Filter Bar */}
           <div className="mb-6">
             <FilterBar />
           </div>
 
-          <TabsContent value={activeTab}>
-            {listsLoading ? (
+          {/* List Picker Modal for Mobile */}
+          <ListPickerModal
+            open={isListPickerOpen}
+            onOpenChange={setIsListPickerOpen}
+            selectedList={activeTab as ListOptionId}
+            onSelectList={handleListSelection}
+            listCounts={listCounts}
+          />
+
+          {/* Restaurant content - shown for both mobile and desktop */}
+          {listsLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <Skeleton key={i} className="h-48 w-full" />
@@ -364,10 +420,14 @@ function ListsContent() {
             </div>
           ) : restaurantsData.length > 0 ? (
             <>
-              {/* Mobile: Single unified list */}
-              <div className="md:hidden grid grid-cols-1 gap-4">
+              {/* Mobile: Compact list items */}
+              <div className="md:hidden">
                 {restaurantsData.map((restaurant, index) => (
-                  <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                  <RestaurantListItemMobile
+                    key={restaurant.id}
+                    restaurant={restaurant}
+                    rank={index + 1}
+                  />
                 ))}
               </div>
 
@@ -419,8 +479,7 @@ function ListsContent() {
               <p>No {activeTab.replace('_', ' ')} lists yet</p>
             </div>
           )}
-        </TabsContent>
-      </Tabs>
+        </>
       )}
 
       {/* View mode rendering */}
@@ -434,10 +493,14 @@ function ListsContent() {
             </div>
           ) : viewRestaurants.length > 0 ? (
             <>
-              {/* Mobile: Grid layout */}
-              <div className="md:hidden grid grid-cols-1 gap-4">
-                {viewRestaurants.map((restaurant) => (
-                  <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+              {/* Mobile: Compact list items */}
+              <div className="md:hidden">
+                {viewRestaurants.map((restaurant, index) => (
+                  <RestaurantListItemMobile
+                    key={restaurant.id}
+                    restaurant={restaurant}
+                    rank={index + 1}
+                  />
                 ))}
               </div>
 

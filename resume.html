@@ -229,12 +229,22 @@
             font-weight: 700;
         }
 
+        /* Skill Category Headers */
+        .skill-category-header {
+            font-size: var(--font-base);
+            font-weight: 600;
+            color: var(--primary);
+            margin: var(--spacing-lg) 0 var(--spacing-md) 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         /* Skills Grid */
         .skills-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: var(--spacing-md);
-            margin-bottom: var(--spacing-xl);
+            margin-bottom: var(--spacing-md);
         }
 
         .skill-item {
@@ -529,31 +539,39 @@
                 padding: 2px 6px;
             }
 
+            /* Skill category headers - compact for print */
+            .skill-category-header {
+                font-size: 9px;
+                font-weight: 600;
+                margin: 4px 0 2px 0;
+                letter-spacing: 0.3px;
+            }
+
             /* Skills grid - more compact */
             .skills-grid {
                 grid-template-columns: repeat(6, 1fr);
-                gap: 4px;
-                margin-bottom: 6px;
+                gap: 3px;
+                margin-bottom: 3px;
             }
 
             .skill-item {
-                padding: 5px 4px;
+                padding: 4px 3px;
                 box-shadow: none;
                 border: 1px solid var(--border-light);
             }
 
             .skill-rating {
-                width: 24px;
-                height: 24px;
-                font-size: 9px;
-                margin-bottom: 3px;
+                width: 22px;
+                height: 22px;
+                font-size: 8.5px;
+                margin-bottom: 2px;
                 background: #FFFFFF !important;
                 border: 1.5px solid #D9D9DE !important;
             }
 
             .skill-name {
-                font-size: 7.5px;
-                line-height: 1.2;
+                font-size: 7px;
+                line-height: 1.1;
             }
 
             /* Compact projects */
@@ -737,6 +755,8 @@
     <!-- Skills -->
     <h2 class="section-header">Technical Skills</h2>
 
+    <!-- Languages -->
+    <h3 class="skill-category-header">Languages</h3>
     <div class="skills-grid">
         <div class="skill-item">
             <div class="skill-rating rating-excellent">9.5</div>
@@ -748,7 +768,11 @@
         </div>
         <div class="skill-item">
             <div class="skill-rating rating-excellent">8.5</div>
-            <div class="skill-name">React</div>
+            <div class="skill-name">TypeScript</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-good">8.0</div>
+            <div class="skill-name">Node.js</div>
         </div>
         <div class="skill-item">
             <div class="skill-rating rating-good">8.5</div>
@@ -758,9 +782,35 @@
             <div class="skill-rating rating-good">8.0</div>
             <div class="skill-name">Java</div>
         </div>
+    </div>
+
+    <!-- Frameworks & Libraries -->
+    <h3 class="skill-category-header">Frameworks & Libraries</h3>
+    <div class="skills-grid">
+        <div class="skill-item">
+            <div class="skill-rating rating-excellent">8.5</div>
+            <div class="skill-name">React</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-excellent">8.5</div>
+            <div class="skill-name">Next.js</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-good">8.0</div>
+            <div class="skill-name">Flask</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-good">8.0</div>
+            <div class="skill-name">pandas</div>
+        </div>
+    </div>
+
+    <!-- Data & Streaming -->
+    <h3 class="skill-category-header">Data & Streaming</h3>
+    <div class="skills-grid">
         <div class="skill-item">
             <div class="skill-rating rating-excellent">9.0</div>
-            <div class="skill-name">Airflow</div>
+            <div class="skill-name">Apache Airflow</div>
         </div>
         <div class="skill-item">
             <div class="skill-rating rating-excellent">9.0</div>
@@ -774,17 +824,59 @@
             <div class="skill-rating rating-good">7.5</div>
             <div class="skill-name">MongoDB</div>
         </div>
+    </div>
+
+    <!-- Cloud & Infrastructure -->
+    <h3 class="skill-category-header">Cloud & Infrastructure</h3>
+    <div class="skills-grid">
         <div class="skill-item">
             <div class="skill-rating rating-excellent">9.0</div>
             <div class="skill-name">AWS</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-excellent">8.5</div>
+            <div class="skill-name">AWS Lambda</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-excellent">8.5</div>
+            <div class="skill-name">AWS S3</div>
         </div>
         <div class="skill-item">
             <div class="skill-rating rating-good">8.0</div>
             <div class="skill-name">Docker</div>
         </div>
         <div class="skill-item">
+            <div class="skill-rating rating-good">8.0</div>
+            <div class="skill-name">Firebase</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-good">8.0</div>
+            <div class="skill-name">Vercel</div>
+        </div>
+        <div class="skill-item">
             <div class="skill-rating rating-excellent">9.5</div>
             <div class="skill-name">Linux</div>
+        </div>
+    </div>
+
+    <!-- APIs & Integration -->
+    <h3 class="skill-category-header">APIs & Integration</h3>
+    <div class="skills-grid">
+        <div class="skill-item">
+            <div class="skill-rating rating-good">8.0</div>
+            <div class="skill-name">Supabase</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-good">8.0</div>
+            <div class="skill-name">Google Cloud Vision</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-good">8.0</div>
+            <div class="skill-name">PayPal API</div>
+        </div>
+        <div class="skill-item">
+            <div class="skill-rating rating-good">7.5</div>
+            <div class="skill-name">Stripe</div>
         </div>
     </div>
 
