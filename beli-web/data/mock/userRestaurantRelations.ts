@@ -106,6 +106,14 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
   },
   {
     userId: '1',
+    restaurantId: '202', // Employees Only
+    status: 'want_to_try',
+    notes: 'Award-winning cocktail bar. Their signature Amelia cocktail is supposed to be incredible.',
+    createdAt: new Date('2024-02-06'),
+    tags: ['Cocktails', 'West Village'],
+  },
+  {
+    userId: '1',
     restaurantId: '210', // Dominique Ansel Bakery
     status: 'want_to_try',
     notes: 'Need to try the famous Cronut! Heard it\'s worth the hype.',
@@ -119,6 +127,14 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
     notes: 'Those massive cookies look incredible. Perfect for a cheat day.',
     createdAt: new Date('2024-02-05'),
     tags: ['Cookies', 'Dessert'],
+  },
+  {
+    userId: '1',
+    restaurantId: '212', // Breads Bakery
+    status: 'want_to_try',
+    notes: 'Their chocolate babka is legendary. Need to get there early!',
+    createdAt: new Date('2024-02-04'),
+    tags: ['Babka', 'Bakery'],
   },
   {
     userId: '1',
@@ -138,6 +154,14 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
   },
   {
     userId: '1',
+    restaurantId: '222', // Cha-An Teahouse
+    status: 'want_to_try',
+    notes: 'Japanese tea ceremony experience. The matcha latte and dessert sets look amazing.',
+    createdAt: new Date('2024-02-02'),
+    tags: ['Tea', 'Japanese', 'Quiet'],
+  },
+  {
+    userId: '1',
     restaurantId: '230', // Milk Bar
     status: 'want_to_try',
     notes: 'Cereal Milk soft serve sounds wild. Need to try it!',
@@ -151,6 +175,14 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
     notes: 'Those plated desserts look like art. Perfect for Instagram.',
     createdAt: new Date('2024-02-01'),
     tags: ['Dessert', 'Instagram Worthy'],
+  },
+  {
+    userId: '1',
+    restaurantId: '232', // Van Leeuwen Ice Cream
+    status: 'want_to_try',
+    notes: 'Artisanal ice cream with vegan options. The honeycomb flavor sounds incredible!',
+    createdAt: new Date('2024-01-31'),
+    tags: ['Ice Cream', 'Vegan Options'],
   },
 
   // Sarah Kim (user 2) relations

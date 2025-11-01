@@ -77,9 +77,9 @@
         /* Header - Profile Style */
         .header {
             background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-2xl);
-            margin-bottom: var(--spacing-xl);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
             box-shadow: 0 2px 8px var(--shadow);
             text-align: center;
         }
@@ -94,30 +94,36 @@
         .header .contact {
             font-size: var(--font-sm);
             color: var(--text-secondary);
-            margin-bottom: var(--spacing-md);
+            display: inline;
         }
 
         .header .links {
-            display: flex;
-            gap: var(--spacing-lg);
-            justify-content: center;
-            flex-wrap: wrap;
+            display: inline;
+            font-size: var(--font-sm);
+        }
+
+        .header .links::before {
+            content: " • ";
+            color: var(--text-secondary);
         }
 
         .header .links a {
             color: var(--primary);
             text-decoration: none;
-            font-size: var(--font-sm);
             font-weight: 600;
-            padding: var(--spacing-sm) var(--spacing-lg);
-            border-radius: var(--radius-full);
-            background: var(--primary-light);
-            transition: all 0.2s;
+            margin: 0 4px;
+            transition: opacity 0.2s;
         }
 
         .header .links a:hover {
-            background: var(--primary);
-            color: var(--white);
+            opacity: 0.7;
+        }
+
+        .header .links a:not(:last-child)::after {
+            content: " •";
+            color: var(--text-secondary);
+            margin-left: 4px;
+            font-weight: normal;
         }
 
         /* Disclaimer Banner */
@@ -156,17 +162,17 @@
             font-size: var(--font-xl);
             font-weight: 700;
             color: var(--text-primary);
-            margin: var(--spacing-2xl) 0 var(--spacing-lg) 0;
-            padding-bottom: var(--spacing-sm);
+            margin: var(--spacing-lg) 0 var(--spacing-md) 0;
+            padding-bottom: var(--spacing-xs);
             border-bottom: 2px solid var(--primary);
         }
 
         /* Experience Cards */
         .experience-card {
             background: var(--card-bg);
-            border-radius: 24px;
-            padding: var(--spacing-xl);
-            margin-bottom: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
             box-shadow: 0 2px 8px var(--shadow);
             transition: all 0.3s;
         }
@@ -212,15 +218,15 @@
 
         /* Rating Bubble */
         .rating-bubble {
-            width: 44px;
-            height: 44px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: #FFFFFF;
             border: 1.5px solid #D9D9DE;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: var(--font-base);
+            font-size: var(--font-sm);
             font-weight: 700;
             flex-shrink: 0;
         }
@@ -240,15 +246,15 @@
         /* Achievements list */
         .achievements {
             list-style: none;
-            margin-top: var(--spacing-md);
+            margin-top: var(--spacing-sm);
         }
 
         .achievements li {
             padding-left: var(--spacing-lg);
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: var(--spacing-xs);
             position: relative;
-            font-size: var(--font-base);
-            line-height: 1.5;
+            font-size: var(--font-sm);
+            line-height: 1.4;
             color: var(--text-primary);
         }
 
@@ -260,67 +266,26 @@
             font-weight: 700;
         }
 
-        /* Skill Category Headers */
-        .skill-category-header {
+        /* Skills Compact */
+        .skills-compact {
             font-size: var(--font-sm);
-            font-weight: 600;
-            color: var(--primary);
-            margin: var(--spacing-md) 0 var(--spacing-sm) 0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Skills Grid */
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: var(--spacing-sm);
+            color: var(--text-primary);
+            line-height: 1.7;
             margin-bottom: var(--spacing-md);
         }
 
-        .skill-item {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: var(--spacing-sm) var(--spacing-xs);
-            box-shadow: 0 2px 8px var(--shadow);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            transition: all 0.2s;
-        }
-
-        .skill-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-        }
-
-        .skill-rating {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #FFFFFF;
-            border: 1.5px solid #D9D9DE;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: var(--font-sm);
+        .skill-inline-category {
             font-weight: 700;
-            margin-bottom: var(--spacing-xs);
-        }
-
-        .skill-name {
-            font-size: var(--font-xs);
-            font-weight: 600;
-            color: var(--text-primary);
+            color: var(--primary);
+            margin-right: 6px;
         }
 
         /* Education Card */
         .education-card {
             background: var(--card-bg);
-            border-radius: 24px;
-            padding: var(--spacing-xl);
-            margin-bottom: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
             box-shadow: 0 2px 8px var(--shadow);
         }
 
@@ -356,9 +321,9 @@
         /* Projects */
         .project-card {
             background: var(--card-bg);
-            border-radius: 24px;
-            padding: var(--spacing-xl);
-            margin-bottom: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
             box-shadow: 0 2px 8px var(--shadow);
             transition: all 0.2s;
         }
@@ -399,20 +364,20 @@
         /* Hobbies */
         .hobbies-list {
             background: var(--card-bg);
-            border-radius: 24px;
-            padding: var(--spacing-xl);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
             box-shadow: 0 2px 8px var(--shadow);
-            font-size: var(--font-base);
+            font-size: var(--font-sm);
             color: var(--text-primary);
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         /* Disclaimer */
         .disclaimer {
             background: var(--card-bg);
             border-radius: var(--radius-md);
-            padding: var(--spacing-lg);
-            margin-top: var(--spacing-xl);
+            padding: var(--spacing-md);
+            margin-top: var(--spacing-md);
             box-shadow: 0 2px 8px var(--shadow);
             border-left: 3px solid var(--primary);
         }
@@ -577,40 +542,15 @@
                 padding: 2px 6px;
             }
 
-            /* Skill category headers - compact for print */
-            .skill-category-header {
-                font-size: 9px;
-                font-weight: 600;
-                margin: 4px 0 2px 0;
-                letter-spacing: 0.3px;
+            /* Skills compact - tight for print */
+            .skills-compact {
+                font-size: 7.5px;
+                line-height: 1.4;
+                margin-bottom: 6px;
             }
 
-            /* Skills grid - more compact */
-            .skills-grid {
-                grid-template-columns: repeat(6, 1fr);
-                gap: 3px;
-                margin-bottom: 3px;
-            }
-
-            .skill-item {
-                padding: 4px 3px;
-                box-shadow: none;
-                border: 1px solid var(--border-light);
-                border-radius: 8px;
-            }
-
-            .skill-rating {
-                width: 22px;
-                height: 22px;
-                font-size: 8.5px;
-                margin-bottom: 2px;
-                background: #FFFFFF !important;
-                border: 1.5px solid #D9D9DE !important;
-            }
-
-            .skill-name {
-                font-size: 7px;
-                line-height: 1.1;
+            .skill-inline-category {
+                font-weight: 700;
             }
 
             /* Compact projects */
@@ -669,7 +609,6 @@
 
             /* Remove hover effects */
             .experience-card:hover,
-            .skill-item:hover,
             .project-card:hover {
                 transform: none;
                 box-shadow: none;
@@ -692,10 +631,6 @@
 
             .rating-bubble {
                 align-self: flex-start;
-            }
-
-            .skills-grid {
-                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             }
         }
     </style>
@@ -808,129 +743,12 @@
     <!-- Skills -->
     <h2 class="section-header">Technical Skills</h2>
 
-    <!-- Languages -->
-    <h3 class="skill-category-header">Languages</h3>
-    <div class="skills-grid">
-        <div class="skill-item">
-            <div class="skill-rating rating-excellent">9.5</div>
-            <div class="skill-name">Python</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-excellent">9.0</div>
-            <div class="skill-name">JavaScript</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-excellent">8.5</div>
-            <div class="skill-name">TypeScript</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">Node.js</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.5</div>
-            <div class="skill-name">C/C++</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">Java</div>
-        </div>
-    </div>
-
-    <!-- Frameworks & Libraries -->
-    <h3 class="skill-category-header">Frameworks & Libraries</h3>
-    <div class="skills-grid">
-        <div class="skill-item">
-            <div class="skill-rating rating-excellent">8.5</div>
-            <div class="skill-name">React</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-excellent">8.5</div>
-            <div class="skill-name">Next.js</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">Flask</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">pandas</div>
-        </div>
-    </div>
-
-    <!-- Data & Streaming -->
-    <h3 class="skill-category-header">Data & Streaming</h3>
-    <div class="skills-grid">
-        <div class="skill-item">
-            <div class="skill-rating rating-excellent">9.0</div>
-            <div class="skill-name">Airflow</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-excellent">9.0</div>
-            <div class="skill-name">Kafka</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">PostgreSQL</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">7.5</div>
-            <div class="skill-name">MongoDB</div>
-        </div>
-    </div>
-
-    <!-- Cloud & Infrastructure -->
-    <h3 class="skill-category-header">Cloud & Infrastructure</h3>
-    <div class="skills-grid">
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">AWS</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">Lambda</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">S3</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.5</div>
-            <div class="skill-name">Docker</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">Firebase</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">Vercel</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-excellent">9.5</div>
-            <div class="skill-name">Linux</div>
-        </div>
-    </div>
-
-    <!-- APIs & Integration -->
-    <h3 class="skill-category-header">APIs & Integration</h3>
-    <div class="skills-grid">
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">Supabase</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">Cloud Vision</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">8.0</div>
-            <div class="skill-name">PayPal API</div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-rating rating-good">7.5</div>
-            <div class="skill-name">Stripe</div>
-        </div>
+    <div class="skills-compact">
+        <span class="skill-inline-category">Languages:</span> Python • JavaScript • TypeScript • Node.js • C/C++ • Java<br>
+        <span class="skill-inline-category">Frameworks:</span> React • Next.js • Flask • pandas<br>
+        <span class="skill-inline-category">Data & Streaming:</span> Airflow • Kafka • PostgreSQL • MongoDB<br>
+        <span class="skill-inline-category">Cloud:</span> AWS • Lambda • S3 • Docker • Firebase • Vercel • Linux<br>
+        <span class="skill-inline-category">APIs:</span> Supabase • Cloud Vision • PayPal API • Stripe
     </div>
 
     <!-- Projects -->
@@ -972,10 +790,6 @@
     <div class="hobbies-list">
         Ceramics and pottery • Baking/Cooking • Fantasy/Sci-fi • Chinese (Language) (Very Bad at it) • Yo-yo • Travel • Eating • Rec Sports • Urban Planning • Climbing • Lifting
     </div>
-
-    <!-- Disclaimer -->
-    <div class="disclaimer">
-        <p>* Ratings are playful self-assessments inspired by restaurant reviews, not actual performance metrics. They reflect enthusiasm and comfort level rather than objective skill measurements.</p>
-    </div>
+    
 </body>
 </html>
