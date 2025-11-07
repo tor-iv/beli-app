@@ -27,7 +27,7 @@ export function latLngToPixelPercent(lat: number, lng: number): { x: number; y: 
 
   // Normalize to 0-100% (invert y because map coordinates start from top)
   // The constant 3.14159 approximates the range of Mercator projection
-  const y = (1 - (mercatorY / Math.PI)) * 50;
+  const y = (1 - mercatorY / Math.PI) * 50;
 
   // Clamp to valid percentage range
   return {
@@ -45,7 +45,7 @@ export function latLngToPixelPercent(lat: number, lng: number): { x: number; y: 
 export function positionDotsOnMap(
   locations: Array<{ lat: number; lng: number; city: string; restaurantIds: string[] }>
 ): Array<{ x: number; y: number; city: string; restaurantIds: string[] }> {
-  return locations.map(location => {
+  return locations.map((location) => {
     const position = latLngToPixelPercent(location.lat, location.lng);
     return {
       ...location,

@@ -18,7 +18,7 @@ interface SwitchRowProps {
   onChange: (checked: boolean) => void;
 }
 
-export function SwitchRow({ id, label, description, checked, onChange }: SwitchRowProps) {
+export const SwitchRow = ({ id, label, description, checked, onChange }: SwitchRowProps) => {
   return (
     <div className="flex items-center justify-between">
       <Label htmlFor={id} className="flex-1 cursor-pointer">

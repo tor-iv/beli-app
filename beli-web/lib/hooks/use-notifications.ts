@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { NotificationService } from '@/lib/services';
-import { Notification } from '@/types';
+
+import type { Notification } from '@/types';
 
 /**
  * Hook to fetch notifications with auto-refresh
@@ -46,9 +48,7 @@ export function useMarkNotificationAsRead() {
       if (previousNotifications) {
         queryClient.setQueryData<Notification[]>(
           ['notifications'],
-          previousNotifications.map(n =>
-            n.id === notificationId ? { ...n, isRead: true } : n
-          )
+          previousNotifications.map((n) => (n.id === notificationId ? { ...n, isRead: true } : n))
         );
       }
 

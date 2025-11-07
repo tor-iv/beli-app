@@ -1,7 +1,8 @@
 'use client';
 
-import { cn } from '@/lib/utils';
 import { IoChevronDown } from 'react-icons/io5';
+
+import { cn } from '@/lib/utils';
 
 export type MobileTabId = 'been' | 'want_to_try' | 'recs' | 'playlists' | 'more';
 
@@ -18,10 +19,10 @@ interface MobileTabsProps {
   className?: string;
 }
 
-export function MobileTabs({ tabs, activeTab, onChange, className }: MobileTabsProps) {
+export const MobileTabs = ({ tabs, activeTab, onChange, className }: MobileTabsProps) => {
   return (
-    <div className={cn('border-b border-gray-200 bg-white overflow-x-auto', className)}>
-      <div className="flex px-4 min-w-full">
+    <div className={cn('overflow-x-auto border-b border-gray-200 bg-white', className)}>
+      <div className="flex min-w-full px-4">
         {tabs.map((tab, index) => {
           const isActive = activeTab === tab.id;
           const isLast = index === tabs.length - 1;
@@ -31,12 +32,12 @@ export function MobileTabs({ tabs, activeTab, onChange, className }: MobileTabsP
               key={tab.id}
               onClick={() => onChange(tab.id)}
               className={cn(
-                'relative px-0 py-3 text-[15px] whitespace-nowrap transition-colors min-h-[48px]',
+                'relative min-h-[48px] whitespace-nowrap px-0 py-3 text-[15px] transition-colors',
                 'flex items-center gap-1',
                 !isLast && 'mr-6',
                 isActive
-                  ? 'text-gray-900 font-semibold'
-                  : 'text-gray-700 font-medium hover:text-gray-700'
+                  ? 'font-semibold text-gray-900'
+                  : 'font-medium text-gray-700 hover:text-gray-700'
               )}
             >
               <span>{tab.label}</span>
@@ -51,7 +52,7 @@ export function MobileTabs({ tabs, activeTab, onChange, className }: MobileTabsP
 
               {/* Active indicator - 3px underline */}
               {isActive && (
-                <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gray-900 rounded-full" />
+                <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-gray-900" />
               )}
             </button>
           );

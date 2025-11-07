@@ -19,6 +19,7 @@ This is the web version of Beli, built with Next.js 16 and the App Router. It pr
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - npm or yarn
 
@@ -91,6 +92,7 @@ beli-web/
 ## Key Features
 
 ### Implemented
+
 - **Feed**: Social activity stream with restaurant discoveries
 - **Lists**: Been/Want-to-try/Recommendations tracking
 - **Search**: Restaurant and user search with filters
@@ -106,6 +108,7 @@ beli-web/
 The app uses `MockDataService` ([lib/mockDataService.ts](lib/mockDataService.ts)) to simulate backend functionality. All data is mock data with simulated network delays.
 
 React Query hooks in [lib/hooks/](lib/hooks/) provide caching and state management:
+
 - `useRestaurants()` - Restaurant data
 - `useUser()` - User profiles
 - `useFeed()` - Activity feed
@@ -116,6 +119,7 @@ React Query hooks in [lib/hooks/](lib/hooks/) provide caching and state manageme
 ## Styling
 
 Uses Tailwind CSS with custom design tokens defined in:
+
 - [tailwind.config.ts](tailwind.config.ts) - Tailwind configuration
 - [app/globals.css](app/globals.css) - Global styles and CSS variables
 
@@ -124,6 +128,7 @@ shadcn/ui components in [components/ui/](components/ui/) provide the base UI lay
 ## Deployment
 
 The app is configured to deploy automatically to Vercel:
+
 - Push to `main` branch triggers production deployment
 - Pull requests create preview deployments
 - Root directory is set to `beli-web/` in Vercel project settings

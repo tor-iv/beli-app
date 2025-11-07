@@ -1,8 +1,9 @@
 'use client';
 
 import { ChevronRight } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface AchievementBannerProps {
   emoji: string;
@@ -12,25 +13,25 @@ interface AchievementBannerProps {
   onSetNewGoal?: () => void;
 }
 
-export function AchievementBanner({
+export const AchievementBanner = ({
   emoji,
   text,
   progress = 1,
   daysLeft,
   onSetNewGoal,
-}: AchievementBannerProps) {
+}: AchievementBannerProps) => {
   return (
     <Card className="border-gray-200">
       <CardContent className="p-4">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="mb-3 flex items-center gap-2">
           <span className="text-2xl">{emoji}</span>
-          <p className="text-lg text-gray-900 flex-1">{text}</p>
+          <p className="flex-1 text-lg text-gray-900">{text}</p>
         </div>
 
         {progress !== undefined && (
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden mb-3">
+          <div className="mb-3 h-2 overflow-hidden rounded-full bg-gray-200">
             <div
-              className="h-full bg-primary rounded-full transition-all"
+              className="h-full rounded-full bg-primary transition-all"
               style={{ width: `${progress * 100}%` }}
             />
           </div>
@@ -44,10 +45,10 @@ export function AchievementBanner({
             <Button
               variant="ghost"
               onClick={onSetNewGoal}
-              className="text-primary hover:text-primary/90 p-0 h-auto gap-1"
+              className="h-auto gap-1 p-0 text-primary hover:text-primary/90"
             >
               <span className="font-medium">Set a new goal</span>
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="h-5 w-5" />
             </Button>
           )}
         </div>

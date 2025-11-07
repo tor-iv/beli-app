@@ -1,13 +1,16 @@
 'use client';
 
-import { useListFilters } from '@/lib/stores/list-filters';
-import { FilterPill } from './FilterPill';
-import { Button } from '@/components/ui/button';
-import { IoFunnelOutline, IoClose } from 'react-icons/io5';
 import { useState } from 'react';
-import { FilterModal } from './FilterModal';
+import { IoFunnelOutline, IoClose } from 'react-icons/io5';
 
-export function FilterBar() {
+import { Button } from '@/components/ui/button';
+import { useListFilters } from '@/lib/stores/list-filters';
+
+import { FilterModal } from './FilterModal';
+import { FilterPill } from './FilterPill';
+
+
+export const FilterBar = () => {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const filters = useListFilters();
   const activeFilterCount = filters.getActiveFilterCount();
@@ -18,7 +21,7 @@ export function FilterBar() {
 
   return (
     <>
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="scrollbar-hide flex items-center gap-2 overflow-x-auto pb-2">
         {/* Filter button - always visible */}
         <Button
           variant={activeFilterCount > 0 ? 'default' : 'outline'}

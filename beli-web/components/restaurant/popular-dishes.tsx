@@ -1,11 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface PopularDishesProps {
   dishes?: string[];
 }
 
-export function PopularDishes({ dishes }: PopularDishesProps) {
+export const PopularDishes = ({ dishes }: PopularDishesProps) => {
   if (!dishes || dishes.length === 0) return null;
 
   return (

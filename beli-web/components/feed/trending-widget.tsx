@@ -1,9 +1,10 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 
-export function TrendingWidget() {
+import { Card, CardContent } from '@/components/ui/card';
+
+export const TrendingWidget = () => {
   const trending = [
     { tag: '#BrunchSpots', count: '1.2k posts' },
     { tag: '#DateNight', count: '890 posts' },
@@ -15,15 +16,15 @@ export function TrendingWidget() {
   return (
     <Card className="beli-card">
       <CardContent className="p-4">
-        <h3 className="font-semibold mb-4">Trending</h3>
+        <h3 className="mb-4 font-semibold">Trending</h3>
         <div className="space-y-3">
           {trending.map((item, index) => (
             <Link
               key={index}
               href={`/search?q=${encodeURIComponent(item.tag)}`}
-              className="block hover:bg-gray-50 p-2 rounded-lg transition-colors -mx-2"
+              className="-mx-2 block rounded-lg p-2 transition-colors hover:bg-gray-50"
             >
-              <div className="font-medium text-sm text-primary">{item.tag}</div>
+              <div className="text-sm font-medium text-primary">{item.tag}</div>
               <div className="text-xs text-muted">{item.count}</div>
             </Link>
           ))}

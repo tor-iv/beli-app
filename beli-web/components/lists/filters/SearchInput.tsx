@@ -1,5 +1,6 @@
-import { Input } from '@/components/ui/input';
 import { IoSearch } from 'react-icons/io5';
+
+import { Input } from '@/components/ui/input';
 
 /**
  * Search input with icon for filtering lists
@@ -14,7 +15,7 @@ interface SearchInputProps {
   placeholder?: string;
 }
 
-export function SearchInput({ value, onChange, placeholder = 'Search...' }: SearchInputProps) {
+export const SearchInput = ({ value, onChange, placeholder = 'Search...' }: SearchInputProps) => {
   return (
     <div className="relative">
       <IoSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

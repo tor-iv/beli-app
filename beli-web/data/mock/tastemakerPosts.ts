@@ -1,4 +1,4 @@
-import { TastemakerPost } from '@/types';
+import type { TastemakerPost } from '@/types';
 
 export const mockTastemakerPosts: TastemakerPost[] = [
   {
@@ -6,7 +6,8 @@ export const mockTastemakerPosts: TastemakerPost[] = [
     userId: 'tm-1', // Alex Pizza King
     title: 'The Ultimate NYC Pizza Slice Guide',
     subtitle: 'After trying 100+ pizzerias, here are the 10 slices you absolutely need to try',
-    coverImage: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1200&h=600&fit=crop',
+    coverImage:
+      'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1200&h=600&fit=crop',
     content: `I've spent the last three years on a mission: to find the perfect New York slice. After visiting over 100 pizzerias across all five boroughs, I've finally narrowed it down to my top 10.
 
 **What Makes a Great Slice?**
@@ -49,7 +50,8 @@ Trust me on these. Your taste buds will thank you.`,
     userId: 'tm-2', // Emma Fine Dining
     title: 'Where to Take Your Partner for Anniversary Dinner',
     subtitle: 'Seven restaurants that will make your special night unforgettable',
-    coverImage: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&h=600&fit=crop',
+    coverImage:
+      'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&h=600&fit=crop',
     content: `Anniversary dinners are pressure. You want somewhere special, somewhere memorable, but also somewhere that feels personal and not just expensive for expensive's sake.
 
 After reviewing NYC's fine dining scene for five years, here are my go-to recommendations for that perfect anniversary meal.
@@ -137,8 +139,9 @@ Trust these spots. I've eaten at all of them at least 50 times.`,
     id: 'post-4',
     userId: 'tm-4', // Rachel Vegan
     title: 'Plant-Based Fine Dining Has Arrived',
-    subtitle: 'NYC\'s vegan scene is finally getting the respect it deserves',
-    coverImage: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=1200&h=600&fit=crop',
+    subtitle: "NYC's vegan scene is finally getting the respect it deserves",
+    coverImage:
+      'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=1200&h=600&fit=crop',
     content: `Remember when vegan fine dining meant a sad portobello mushroom "steak"? Yeah, those days are over.
 
 NYC's plant-based dining scene has evolved dramatically, and it's not just for vegans anymore. These restaurants are destinations in their own right.
@@ -183,9 +186,10 @@ Give them a shot. Your taste buds (and the planet) will thank you.`,
   {
     id: 'post-5',
     userId: 'tm-5', // Ryan Ramen
-    title: 'Real Ramen vs. The Hype: A Tokyo Native\'s Take',
+    title: "Real Ramen vs. The Hype: A Tokyo Native's Take",
     subtitle: 'What NYC gets right (and wrong) about ramen',
-    coverImage: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=1200&h=600&fit=crop',
+    coverImage:
+      'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=1200&h=600&fit=crop',
     content: `I lived in Tokyo for four years, eating ramen almost daily. Now I'm in NYC, and I have thoughts.
 
 **The Good News:**
@@ -234,7 +238,8 @@ Start with Ivan Ramen or Ippudo. If you like what you taste, then branch out. Bu
     userId: 'tm-6', // Jamie Brunch
     title: 'The Definitive NYC Brunch Power Rankings',
     subtitle: 'Where to spend your Saturday morning (and yes, bottomless matters)',
-    coverImage: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=1200&h=600&fit=crop',
+    coverImage:
+      'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=1200&h=600&fit=crop',
     content: `Brunch is serious business in NYC. After three years of weekend research (somebody's gotta do it), here are my definitive rankings.
 
 **The Elite Tier:**
@@ -288,9 +293,10 @@ Remember: brunch is a marathon, not a sprint. Pace yourself.`,
   {
     id: 'post-7',
     userId: 'tm-7', // Maya Desserts
-    title: 'Sugar Rush: NYC\'s Best Dessert Crawl',
+    title: "Sugar Rush: NYC's Best Dessert Crawl",
     subtitle: 'A three-stop journey to satisfy every sweet tooth',
-    coverImage: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=1200&h=600&fit=crop',
+    coverImage:
+      'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=1200&h=600&fit=crop',
     content: `As a pastry chef, I'm extremely picky about desserts. But these three spots? Absolutely worth the calories.
 
 **Stop 1: The Cookie**
@@ -338,9 +344,10 @@ Your dentist might hate me for this guide, but your taste buds will love me.`,
   {
     id: 'post-8',
     userId: 'tm-8', // Olivia Wine
-    title: 'Wine Pairing Doesn\'t Have to Be Pretentious',
-    subtitle: 'A sommelier\'s guide to actually enjoying wine with your meal',
-    coverImage: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=1200&h=600&fit=crop',
+    title: "Wine Pairing Doesn't Have to Be Pretentious",
+    subtitle: "A sommelier's guide to actually enjoying wine with your meal",
+    coverImage:
+      'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=1200&h=600&fit=crop',
     content: `Wine culture can be intimidating. As a sommelier, I've seen too many people order the wrong wine because they were afraid to ask questions.
 
 Let's fix that.
@@ -394,8 +401,10 @@ Wine should enhance your meal, not complicate it. If you're stressed about the p
     id: 'post-9',
     userId: 'tm-1', // Alex Pizza King
     title: 'The Ultimate NYC Pizza Neighborhood Power Ranking',
-    subtitle: 'From Williamsburg to the Upper West Side - which neighborhoods have the best slices?',
-    coverImage: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=1200&h=600&fit=crop',
+    subtitle:
+      'From Williamsburg to the Upper West Side - which neighborhoods have the best slices?',
+    coverImage:
+      'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=1200&h=600&fit=crop',
     content: `After three years of eating pizza across all five boroughs, I've ranked NYC neighborhoods by their pizza quality. Some results might surprise you.
 
 **The Methodology:**
@@ -456,7 +465,7 @@ The best pizza in NYC isn't always in Manhattan. Sometimes you need to take the 
   {
     id: 'post-10',
     userId: 'tm-2', // Emma Fine Dining
-    title: 'NYC\'s New Restaurant Openings Worth the Hype',
+    title: "NYC's New Restaurant Openings Worth the Hype",
     subtitle: 'I ate at every buzzy new spot this month. Here are the ones that actually deliver.',
     coverImage: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&h=600&fit=crop',
     content: `Every month brings a wave of new restaurant openings in NYC. Most don't live up to the hype. But these five? They're the real deal.
@@ -529,7 +538,8 @@ New doesn't always mean better. But when a restaurant truly delivers something s
     userId: 'tm-3', // David Street Food
     title: 'The NYC Food Cart Power Rankings',
     subtitle: 'Street food that rivals sit-down restaurants, all under $15',
-    coverImage: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=1200&h=600&fit=crop',
+    coverImage:
+      'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=1200&h=600&fit=crop',
     content: `Food carts are the soul of NYC dining. Here's my definitive ranking of the best ones, neighborhood by neighborhood.
 
 **The Rules:**
@@ -621,7 +631,8 @@ Some of the best food in NYC comes from carts. Don't let the lack of seats fool 
     userId: 'tm-7', // Maya Desserts
     title: 'NYC Bakeries That Are Worth Waking Up Early For',
     subtitle: 'From croissants to babka, these pastries justify the morning alarm',
-    coverImage: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&h=600&fit=crop',
+    coverImage:
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&h=600&fit=crop',
     content: `As a pastry chef, I'm incredibly picky about baked goods. These bakeries are doing something special enough to get me out of bed before 8am.
 
 **The Early Bird List:**
@@ -712,15 +723,15 @@ The best pastries in NYC are worth setting an alarm for. Your future self will t
 
 // Helper to get featured posts
 export const getFeaturedPosts = (): TastemakerPost[] => {
-  return mockTastemakerPosts.filter(post => post.isFeatured);
+  return mockTastemakerPosts.filter((post) => post.isFeatured);
 };
 
 // Helper to get posts by user
 export const getPostsByUserId = (userId: string): TastemakerPost[] => {
-  return mockTastemakerPosts.filter(post => post.userId === userId);
+  return mockTastemakerPosts.filter((post) => post.userId === userId);
 };
 
 // Helper to get posts by tag
 export const getPostsByTag = (tag: string): TastemakerPost[] => {
-  return mockTastemakerPosts.filter(post => post.tags.includes(tag));
+  return mockTastemakerPosts.filter((post) => post.tags.includes(tag));
 };

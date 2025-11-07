@@ -1,14 +1,14 @@
 import { useState, useMemo } from 'react';
-import {
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from '@/components/ui/accordion';
-import { FilterSectionType } from '@/lib/config/filter-config';
-import { SearchInput } from './SearchInput';
-import { CheckboxList } from './CheckboxList';
+
+import { AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
+
+
 import { ButtonGrid } from './ButtonGrid';
 import { ButtonRow } from './ButtonRow';
+import { CheckboxList } from './CheckboxList';
+import { SearchInput } from './SearchInput';
+
+import type { FilterSectionType } from '@/lib/config/filter-config';
 
 /**
  * Reusable filter section component that handles all common filter UI patterns
@@ -49,7 +49,7 @@ interface FilterSectionProps {
   children?: React.ReactNode;
 }
 
-export function FilterSection({
+export const FilterSection = ({
   id,
   title,
   type,
@@ -63,7 +63,7 @@ export function FilterSection({
   gridCols = 2,
   singleSelect = false,
   children,
-}: FilterSectionProps) {
+}: FilterSectionProps) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Filter items based on search query (for searchable lists)
@@ -87,9 +87,7 @@ export function FilterSection({
     }
     if (selectedLabel) {
       return (
-        <span className="ml-2 text-sm font-normal text-muted-foreground">
-          ({selectedLabel})
-        </span>
+        <span className="ml-2 text-sm font-normal text-muted-foreground">({selectedLabel})</span>
       );
     }
     return null;

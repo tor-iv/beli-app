@@ -1,5 +1,7 @@
 'use client';
 
+import { Accordion } from '@/components/ui/accordion';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -8,11 +10,10 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Accordion } from '@/components/ui/accordion';
-import { useListFilters } from '@/lib/stores/list-filters';
 import { FILTER_SECTIONS } from '@/lib/config/filter-config';
+import { useListFilters } from '@/lib/stores/list-filters';
+
 import { FilterSection, SwitchRow } from './filters';
 
 /**
@@ -27,7 +28,7 @@ interface FilterModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function FilterModal({ open, onOpenChange }: FilterModalProps) {
+export const FilterModal = ({ open, onOpenChange }: FilterModalProps) => {
   const filters = useListFilters();
 
   const handleApply = () => {
@@ -43,9 +44,7 @@ export function FilterModal({ open, onOpenChange }: FilterModalProps) {
       <DialogContent className="max-h-[90vh] max-w-2xl p-0">
         <DialogHeader className="border-b p-6 pb-4">
           <DialogTitle className="text-2xl">Filters</DialogTitle>
-          <DialogDescription>
-            Refine your restaurant list with advanced filters
-          </DialogDescription>
+          <DialogDescription>Refine your restaurant list with advanced filters</DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="max-h-[calc(90vh-180px)] px-6">
@@ -53,7 +52,7 @@ export function FilterModal({ open, onOpenChange }: FilterModalProps) {
             {/* Render all standard filter sections from configuration */}
             {FILTER_SECTIONS.filter((section) => section.type !== 'custom').map((section) => {
               const storeKey = section.storeKey!;
-              let selectedItems = filters[storeKey] as string[] | string | number | null;
+              const selectedItems = filters[storeKey] as string[] | string | number | null;
               let onToggle: ((item: string) => void) | undefined;
               let onSelect: ((value: string | number | null) => void) | undefined;
 

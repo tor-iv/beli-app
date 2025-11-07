@@ -16,33 +16,31 @@ const iconMap = {
   heart: Heart,
 };
 
-export function ProfileListRow({
+export const ProfileListRow = ({
   icon,
   label,
   count,
   onPress,
   isLast = false,
-}: ProfileListRowProps) {
+}: ProfileListRowProps) => {
   const IconComponent = iconMap[icon];
 
   return (
     <button
       onClick={onPress}
-      className={`w-full flex items-center justify-between bg-white px-6 py-4 hover:bg-gray-50 transition-colors ${
+      className={`flex w-full items-center justify-between bg-white px-6 py-4 transition-colors hover:bg-gray-50 ${
         !isLast ? 'border-b border-gray-200' : ''
       }`}
       type="button"
       aria-label={`View ${label}${count !== undefined ? ` (${count} items)` : ''}`}
     >
       <div className="flex items-center gap-3">
-        <IconComponent className="w-6 h-6 text-gray-900" />
+        <IconComponent className="h-6 w-6 text-gray-900" />
         <span className="text-lg text-gray-900">{label}</span>
       </div>
       <div className="flex items-center gap-2">
-        {count !== undefined && (
-          <span className="text-xl font-bold text-gray-900">{count}</span>
-        )}
-        <ChevronRight className="w-5 h-5 text-gray-800" />
+        {count !== undefined && <span className="text-xl font-bold text-gray-900">{count}</span>}
+        <ChevronRight className="h-5 w-5 text-gray-800" />
       </div>
     </button>
   );

@@ -6,9 +6,12 @@
  * - User ranking comparisons
  */
 
-import { delay } from '../base/BaseService';
 import { mockUsers } from '@/data/mock/users';
-import { User } from '@/types';
+
+import { delay } from '../base/BaseService';
+
+import type { User } from '@/types';
+
 
 export class LeaderboardService {
   /**
@@ -24,12 +27,10 @@ export class LeaderboardService {
 
     // Filter by city if provided
     if (city) {
-      users = users.filter(user => user.location.city === city);
+      users = users.filter((user) => user.location.city === city);
     }
 
     // Sort by rank (lower is better)
-    return users
-      .sort((a, b) => a.stats.rank - b.stats.rank)
-      .slice(0, limit);
+    return users.sort((a, b) => a.stats.rank - b.stats.rank).slice(0, limit);
   }
 }

@@ -1,8 +1,17 @@
-import { useReducer, Reducer } from 'react';
-import { Restaurant } from '@/types';
+import { useReducer } from 'react';
+
+import type { Restaurant } from '@/types';
+import type { Reducer } from 'react';
 
 // List types
-export type ListType = 'been' | 'want_to_try' | 'recs' | 'playlists' | 'recs_for_you' | 'recs_from_friends' | 'trending';
+export type ListType =
+  | 'been'
+  | 'want_to_try'
+  | 'recs'
+  | 'playlists'
+  | 'recs_for_you'
+  | 'recs_from_friends'
+  | 'trending';
 export type RightPanelView = 'detail' | 'map';
 
 // State interface

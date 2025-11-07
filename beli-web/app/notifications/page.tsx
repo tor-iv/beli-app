@@ -1,11 +1,13 @@
 'use client';
 
-import * as React from 'react';
-import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import * as React from 'react';
+
 import { NotificationListItem } from '@/components/social/notification-list-item';
 import { useNotifications, useMarkNotificationAsRead } from '@/lib/hooks';
-import { Notification } from '@/types';
+
+import type { Notification } from '@/types';
 
 export default function NotificationsPage() {
   const router = useRouter();
@@ -41,13 +43,13 @@ export default function NotificationsPage() {
     return (
       <div className="min-h-screen bg-[#FAFAFA]">
         {/* Header */}
-        <div className="sticky top-0 z-10 h-11 bg-white flex items-center justify-between px-2">
+        <div className="sticky top-0 z-10 flex h-11 items-center justify-between bg-white px-2">
           <button
             onClick={() => router.back()}
-            className="w-11 h-11 flex items-center justify-center"
+            className="flex h-11 w-11 items-center justify-center"
             aria-label="Go back"
           >
-            <ChevronLeft className="w-7 h-7 text-black" />
+            <ChevronLeft className="h-7 w-7 text-black" />
           </button>
           <h1 className="text-[20px] font-bold text-black">Notifications</h1>
           <div className="w-11" /> {/* Spacer for symmetry */}
@@ -55,7 +57,7 @@ export default function NotificationsPage() {
 
         {/* Loading state */}
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-4 border-[#0A6C70] border-t-transparent rounded-full animate-spin" />
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#0A6C70] border-t-transparent" />
         </div>
       </div>
     );
@@ -64,27 +66,27 @@ export default function NotificationsPage() {
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       {/* Mobile Header */}
-      <div className="lg:hidden sticky top-0 z-10 h-11 bg-white flex items-center justify-between px-2">
+      <div className="sticky top-0 z-10 flex h-11 items-center justify-between bg-white px-2 lg:hidden">
         <button
           onClick={() => router.back()}
-          className="w-11 h-11 flex items-center justify-center"
+          className="flex h-11 w-11 items-center justify-center"
           aria-label="Go back"
         >
-          <ChevronLeft className="w-7 h-7 text-black" />
+          <ChevronLeft className="h-7 w-7 text-black" />
         </button>
         <h1 className="text-[20px] font-bold text-black">Notifications</h1>
         <div className="w-11" /> {/* Spacer for symmetry */}
       </div>
 
       {/* Desktop Header */}
-      <div className="hidden lg:block bg-white border-b border-[#E5E5EA]">
-        <div className="max-w-3xl mx-auto h-11 flex items-center justify-between px-2">
+      <div className="hidden border-b border-[#E5E5EA] bg-white lg:block">
+        <div className="mx-auto flex h-11 max-w-3xl items-center justify-between px-2">
           <button
             onClick={() => router.back()}
-            className="w-11 h-11 flex items-center justify-center"
+            className="flex h-11 w-11 items-center justify-center"
             aria-label="Go back"
           >
-            <ChevronLeft className="w-7 h-7 text-black" />
+            <ChevronLeft className="h-7 w-7 text-black" />
           </button>
           <h1 className="text-[20px] font-bold text-black">Notifications</h1>
           <div className="w-11" /> {/* Spacer for symmetry */}
@@ -92,9 +94,9 @@ export default function NotificationsPage() {
       </div>
 
       {/* Content Container */}
-      <div className="lg:max-w-3xl lg:mx-auto">
+      <div className="lg:mx-auto lg:max-w-3xl">
         {/* Section Header */}
-        <div className="px-4 pt-4 pb-3 bg-[#FAFAFA]">
+        <div className="bg-[#FAFAFA] px-4 pb-3 pt-4">
           <h2 className="text-[30px] font-bold text-black">Earlier</h2>
         </div>
 
@@ -109,13 +111,13 @@ export default function NotificationsPage() {
                 />
                 {/* Separator - show for all except last item */}
                 {index < notifications.length - 1 && (
-                  <div className="h-[0.5px] bg-[#E5E5EA] mx-4" />
+                  <div className="mx-4 h-[0.5px] bg-[#E5E5EA]" />
                 )}
               </React.Fragment>
             ))
           ) : (
             <div className="py-20 text-center">
-              <p className="text-[#8E8E93] text-[15px]">No notifications yet</p>
+              <p className="text-[15px] text-[#8E8E93]">No notifications yet</p>
             </div>
           )}
         </div>

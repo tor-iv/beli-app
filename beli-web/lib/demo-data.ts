@@ -1,4 +1,4 @@
-import type { Restaurant, MenuItem } from '@/types'
+import type { Restaurant, MenuItem } from '@/types';
 
 export const demoRestaurant: Restaurant = {
   id: 'demo-restaurant-1',
@@ -16,9 +16,7 @@ export const demoRestaurant: Restaurant = {
       lng: -74.0028,
     },
   },
-  images: [
-    'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80',
-  ],
+  images: ['https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80'],
   popularDishes: ['Margherita Pizza', 'Pepperoni Pizza', 'Garlic Knots'],
   hours: {
     monday: '10:00 AM - 11:00 PM',
@@ -33,7 +31,7 @@ export const demoRestaurant: Restaurant = {
   ratingCount: 342,
   acceptsReservations: false,
   category: 'restaurants',
-}
+};
 
 export const demoMenuItems: MenuItem[] = [
   // Pizzas (Entrees)
@@ -185,7 +183,7 @@ export const demoMenuItems: MenuItem[] = [
     popularity: 92,
     isVegetarian: true,
   },
-]
+];
 
 // Pre-configured scenarios for the demo
 export const demoScenarios = [
@@ -221,4 +219,4 @@ export const demoScenarios = [
     hungerLevel: 'very-hungry' as const,
     icon: '🎉',
   },
-]
+];

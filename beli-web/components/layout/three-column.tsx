@@ -1,7 +1,9 @@
 'use client';
 
-import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+
+import type { ReactNode } from 'react';
+
 
 interface ThreeColumnLayoutProps {
   left?: ReactNode;
@@ -28,7 +30,7 @@ interface ThreeColumnLayoutProps {
   hideRightOnMobile?: boolean;
 }
 
-export function ThreeColumnLayout({
+export const ThreeColumnLayout = ({
   left,
   center,
   right,
@@ -39,7 +41,7 @@ export function ThreeColumnLayout({
   stickySidebars = true,
   hideLeftOnMobile = true,
   hideRightOnMobile = true,
-}: ThreeColumnLayoutProps) {
+}: ThreeColumnLayoutProps) => {
   return (
     <div
       className={cn(
@@ -54,7 +56,7 @@ export function ThreeColumnLayout({
         <aside
           className={cn(
             hideLeftOnMobile && 'hidden lg:block',
-            stickySidebars && 'lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] overflow-auto',
+            stickySidebars && 'overflow-auto lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)]',
             leftClassName
           )}
         >
@@ -68,7 +70,7 @@ export function ThreeColumnLayout({
         <aside
           className={cn(
             hideRightOnMobile && 'hidden lg:block',
-            stickySidebars && 'lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] overflow-auto',
+            stickySidebars && 'overflow-auto lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)]',
             rightClassName
           )}
         >

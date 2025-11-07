@@ -9,16 +9,16 @@ interface QuickStatsProps {
   rank: number;
 }
 
-export function QuickStats({
+export const QuickStats = ({
   beenCount = 0,
   wantToTryCount = 0,
   currentStreak = 0,
   rank = 0,
-}: QuickStatsProps) {
+}: QuickStatsProps) => {
   return (
     <Card className="beli-card">
       <CardContent className="p-4">
-        <h3 className="font-semibold mb-4">Your Stats</h3>
+        <h3 className="mb-4 font-semibold">Your Stats</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <div className="text-2xl font-bold text-primary">{beenCount}</div>

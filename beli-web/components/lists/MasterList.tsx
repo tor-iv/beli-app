@@ -1,6 +1,7 @@
-import { Restaurant } from '@/types';
 import { RestaurantListItemCompact } from '@/components/restaurant/restaurant-list-item-compact';
 import { ScrollArea } from '@/components/ui/scroll-area';
+
+import type { Restaurant } from '@/types';
 
 /**
  * Master list component for desktop master/detail view
@@ -16,7 +17,7 @@ interface MasterListProps {
   onSelect: (restaurant: Restaurant) => void;
 }
 
-export function MasterList({ restaurants, selectedRestaurant, onSelect }: MasterListProps) {
+export const MasterList = ({ restaurants, selectedRestaurant, onSelect }: MasterListProps) => {
   return (
     <ScrollArea className="h-[calc(100vh-200px)]">
       <div className="space-y-2 pr-4">
@@ -27,8 +28,8 @@ export function MasterList({ restaurants, selectedRestaurant, onSelect }: Master
             onClick={() => onSelect(restaurant)}
             className={`cursor-pointer transition-all ${
               selectedRestaurant?.id === restaurant.id
-                ? 'ring-2 ring-primary rounded-lg'
-                : 'hover:bg-gray-50 rounded-lg'
+                ? 'rounded-lg ring-2 ring-primary'
+                : 'rounded-lg hover:bg-gray-50'
             }`}
           >
             <RestaurantListItemCompact

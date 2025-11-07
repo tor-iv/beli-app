@@ -8,11 +8,14 @@
  * - User match percentages (taste compatibility)
  */
 
-import { delay, matchPercentageCache } from '../base/BaseService';
-import { mockUsers, currentUser } from '@/data/mock/users';
-import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
 import { mockRestaurants } from '@/data/mock/restaurants';
-import { User } from '@/types';
+import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
+import { mockUsers, currentUser } from '@/data/mock/users';
+
+import { delay, matchPercentageCache } from '../base/BaseService';
+
+import type { User } from '@/types';
+
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -33,7 +36,7 @@ export class UserService {
    */
   static async getUserById(userId: string): Promise<User | null> {
     await delay();
-    return mockUsers.find(user => user.id === userId) || null;
+    return mockUsers.find((user) => user.id === userId) || null;
   }
 
   /**
@@ -43,7 +46,7 @@ export class UserService {
    */
   static async getUserByUsername(username: string): Promise<User | null> {
     await delay();
-    return mockUsers.find(user => user.username === username) || null;
+    return mockUsers.find((user) => user.username === username) || null;
   }
 
   /**
@@ -54,9 +57,10 @@ export class UserService {
   static async searchUsers(query: string): Promise<User[]> {
     await delay();
     const lowercaseQuery = query.toLowerCase();
-    return mockUsers.filter(user =>
-      user.username.toLowerCase().includes(lowercaseQuery) ||
-      user.displayName.toLowerCase().includes(lowercaseQuery)
+    return mockUsers.filter(
+      (user) =>
+        user.username.toLowerCase().includes(lowercaseQuery) ||
+        user.displayName.toLowerCase().includes(lowercaseQuery)
     );
   }
 
@@ -67,7 +71,7 @@ export class UserService {
    */
   static async getUserStats(userId: string): Promise<User['stats'] | null> {
     await delay();
-    const user = mockUsers.find(u => u.id === userId);
+    const user = mockUsers.find((u) => u.id === userId);
     return user?.stats || null;
   }
 
@@ -92,10 +96,11 @@ export class UserService {
 
     // Get both users' restaurant relations
     const userRelations = mockUserRestaurantRelations.filter(
-      rel => rel.userId === userId && (rel.status === 'been' || rel.status === 'want_to_try')
+      (rel) => rel.userId === userId && (rel.status === 'been' || rel.status === 'want_to_try')
     );
     const targetRelations = mockUserRestaurantRelations.filter(
-      rel => rel.userId === targetUserId && (rel.status === 'been' || rel.status === 'want_to_try')
+      (rel) =>
+        rel.userId === targetUserId && (rel.status === 'been' || rel.status === 'want_to_try')
     );
 
     if (userRelations.length === 0 || targetRelations.length === 0) {
@@ -104,10 +109,10 @@ export class UserService {
     }
 
     // Calculate overlap in restaurants
-    const userRestaurantIds = new Set(userRelations.map(rel => rel.restaurantId));
-    const targetRestaurantIds = new Set(targetRelations.map(rel => rel.restaurantId));
+    const userRestaurantIds = new Set(userRelations.map((rel) => rel.restaurantId));
+    const targetRestaurantIds = new Set(targetRelations.map((rel) => rel.restaurantId));
 
-    const intersection = [...userRestaurantIds].filter(id => targetRestaurantIds.has(id));
+    const intersection = [...userRestaurantIds].filter((id) => targetRestaurantIds.has(id));
     const union = new Set([...userRestaurantIds, ...targetRestaurantIds]);
 
     // Jaccard similarity coefficient
@@ -117,17 +122,17 @@ export class UserService {
     const userCuisines = new Set<string>();
     const targetCuisines = new Set<string>();
 
-    userRelations.forEach(rel => {
-      const restaurant = mockRestaurants.find(r => r.id === rel.restaurantId);
-      restaurant?.cuisine.forEach(c => userCuisines.add(c));
+    userRelations.forEach((rel) => {
+      const restaurant = mockRestaurants.find((r) => r.id === rel.restaurantId);
+      restaurant?.cuisine.forEach((c) => userCuisines.add(c));
     });
 
-    targetRelations.forEach(rel => {
-      const restaurant = mockRestaurants.find(r => r.id === rel.restaurantId);
-      restaurant?.cuisine.forEach(c => targetCuisines.add(c));
+    targetRelations.forEach((rel) => {
+      const restaurant = mockRestaurants.find((r) => r.id === rel.restaurantId);
+      restaurant?.cuisine.forEach((c) => targetCuisines.add(c));
     });
 
-    const cuisineIntersection = [...userCuisines].filter(c => targetCuisines.has(c));
+    const cuisineIntersection = [...userCuisines].filter((c) => targetCuisines.has(c));
     const cuisineUnion = new Set([...userCuisines, ...targetCuisines]);
     const cuisineSimilarity = cuisineIntersection.length / cuisineUnion.size;
 
@@ -152,28 +157,32 @@ export class UserService {
    * @param targetUserIds - Array of target user IDs
    * @returns Object mapping user IDs to match percentages
    */
-  static async getBatchMatchPercentages(userId: string, targetUserIds: string[]): Promise<Record<string, number>> {
+  static async getBatchMatchPercentages(
+    userId: string,
+    targetUserIds: string[]
+  ): Promise<Record<string, number>> {
     await delay();
 
     const results: Record<string, number> = {};
 
     // Get user's relations once
     const userRelations = mockUserRestaurantRelations.filter(
-      rel => rel.userId === userId && (rel.status === 'been' || rel.status === 'want_to_try')
+      (rel) => rel.userId === userId && (rel.status === 'been' || rel.status === 'want_to_try')
     );
-    const userRestaurantIds = new Set(userRelations.map(rel => rel.restaurantId));
+    const userRestaurantIds = new Set(userRelations.map((rel) => rel.restaurantId));
 
     // Get user's cuisines once
     const userCuisines = new Set<string>();
-    userRelations.forEach(rel => {
-      const restaurant = mockRestaurants.find(r => r.id === rel.restaurantId);
-      restaurant?.cuisine.forEach(c => userCuisines.add(c));
+    userRelations.forEach((rel) => {
+      const restaurant = mockRestaurants.find((r) => r.id === rel.restaurantId);
+      restaurant?.cuisine.forEach((c) => userCuisines.add(c));
     });
 
     // Calculate match percentage for each target user
-    targetUserIds.forEach(targetUserId => {
+    targetUserIds.forEach((targetUserId) => {
       const targetRelations = mockUserRestaurantRelations.filter(
-        rel => rel.userId === targetUserId && (rel.status === 'been' || rel.status === 'want_to_try')
+        (rel) =>
+          rel.userId === targetUserId && (rel.status === 'been' || rel.status === 'want_to_try')
       );
 
       if (userRelations.length === 0 || targetRelations.length === 0) {
@@ -181,21 +190,22 @@ export class UserService {
         return;
       }
 
-      const targetRestaurantIds = new Set(targetRelations.map(rel => rel.restaurantId));
-      const intersection = [...userRestaurantIds].filter(id => targetRestaurantIds.has(id));
+      const targetRestaurantIds = new Set(targetRelations.map((rel) => rel.restaurantId));
+      const intersection = [...userRestaurantIds].filter((id) => targetRestaurantIds.has(id));
       const union = new Set([...userRestaurantIds, ...targetRestaurantIds]);
       const jaccardSimilarity = intersection.length / union.size;
 
       // Get target user's cuisines
       const targetCuisines = new Set<string>();
-      targetRelations.forEach(rel => {
-        const restaurant = mockRestaurants.find(r => r.id === rel.restaurantId);
-        restaurant?.cuisine.forEach(c => targetCuisines.add(c));
+      targetRelations.forEach((rel) => {
+        const restaurant = mockRestaurants.find((r) => r.id === rel.restaurantId);
+        restaurant?.cuisine.forEach((c) => targetCuisines.add(c));
       });
 
-      const cuisineIntersection = [...userCuisines].filter(c => targetCuisines.has(c));
+      const cuisineIntersection = [...userCuisines].filter((c) => targetCuisines.has(c));
       const cuisineUnion = new Set([...userCuisines, ...targetCuisines]);
-      const cuisineSimilarity = cuisineUnion.size > 0 ? cuisineIntersection.length / cuisineUnion.size : 0;
+      const cuisineSimilarity =
+        cuisineUnion.size > 0 ? cuisineIntersection.length / cuisineUnion.size : 0;
 
       // Combined score
       const matchScore = (jaccardSimilarity * 0.7 + cuisineSimilarity * 0.3) * 100;

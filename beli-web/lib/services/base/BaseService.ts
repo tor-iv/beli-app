@@ -12,7 +12,7 @@
  * @param ms - Delay in milliseconds (default: 50ms)
  */
 export async function delay(ms: number = 50): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**

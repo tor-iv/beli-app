@@ -1,4 +1,4 @@
-import { User, TastemakerBadge } from '@/types';
+import type { User, TastemakerBadge } from '@/types';
 
 // Tastemaker badge definitions
 export const tastemakerBadges: Record<string, TastemakerBadge> = {
@@ -134,8 +134,12 @@ export const mockTastemakers: User[] = [
     isTastemaker: true,
     tastemakerProfile: {
       specialty: 'Fine Dining & Michelin Stars',
-      tagline: 'Elevating your special occasions with NYC\'s finest tables',
-      badges: [tastemakerBadges.verified, tastemakerBadges.michelin_hunter, tastemakerBadges.wine_expert],
+      tagline: "Elevating your special occasions with NYC's finest tables",
+      badges: [
+        tastemakerBadges.verified,
+        tastemakerBadges.michelin_hunter,
+        tastemakerBadges.wine_expert,
+      ],
       featuredListsCount: 18,
       totalPosts: 31,
       engagementRate: 11.2,
@@ -172,8 +176,12 @@ export const mockTastemakers: User[] = [
     isTastemaker: true,
     tastemakerProfile: {
       specialty: 'Street Food & Budget Eats',
-      tagline: 'Proving great food doesn\'t need to be expensive',
-      badges: [tastemakerBadges.verified, tastemakerBadges.budget_guru, tastemakerBadges.street_food_explorer],
+      tagline: "Proving great food doesn't need to be expensive",
+      badges: [
+        tastemakerBadges.verified,
+        tastemakerBadges.budget_guru,
+        tastemakerBadges.street_food_explorer,
+      ],
       featuredListsCount: 15,
       totalPosts: 28,
       engagementRate: 9.8,
@@ -209,7 +217,7 @@ export const mockTastemakers: User[] = [
     isTastemaker: true,
     tastemakerProfile: {
       specialty: 'Plant-Based Dining',
-      tagline: 'Discovering NYC\'s best vegan & plant-forward restaurants',
+      tagline: "Discovering NYC's best vegan & plant-forward restaurants",
       badges: [tastemakerBadges.verified, tastemakerBadges.vegan_queen],
       featuredListsCount: 14,
       totalPosts: 26,
@@ -321,7 +329,7 @@ export const mockTastemakers: User[] = [
     isTastemaker: true,
     tastemakerProfile: {
       specialty: 'Desserts & Pastries',
-      tagline: 'Your guide to NYC\'s sweetest destinations',
+      tagline: "Your guide to NYC's sweetest destinations",
       badges: [tastemakerBadges.verified, tastemakerBadges.dessert_connoisseur],
       featuredListsCount: 13,
       totalPosts: 25,
@@ -360,7 +368,11 @@ export const mockTastemakers: User[] = [
     tastemakerProfile: {
       specialty: 'Wine & Fine Dining',
       tagline: 'Pairing exceptional food with the perfect wine',
-      badges: [tastemakerBadges.verified, tastemakerBadges.wine_expert, tastemakerBadges.fine_dining_specialist],
+      badges: [
+        tastemakerBadges.verified,
+        tastemakerBadges.wine_expert,
+        tastemakerBadges.fine_dining_specialist,
+      ],
       featuredListsCount: 16,
       totalPosts: 29,
       engagementRate: 11.8,
@@ -396,8 +408,8 @@ export const mockTastemakers: User[] = [
     memberSince: new Date('2019-03-15'),
     isTastemaker: true,
     tastemakerProfile: {
-      specialty: 'Chef\'s Perspective & Kitchen Insights',
-      tagline: 'Reviewing restaurants through a chef\'s lens',
+      specialty: "Chef's Perspective & Kitchen Insights",
+      tagline: "Reviewing restaurants through a chef's lens",
       badges: [tastemakerBadges.verified, tastemakerBadges.fine_dining_specialist],
       featuredListsCount: 17,
       totalPosts: 32,
@@ -435,7 +447,7 @@ export const mockTastemakers: User[] = [
     isTastemaker: true,
     tastemakerProfile: {
       specialty: 'Spicy & South Asian Cuisine',
-      tagline: 'Finding NYC\'s best spicy dishes and authentic flavors',
+      tagline: "Finding NYC's best spicy dishes and authentic flavors",
       badges: [tastemakerBadges.verified],
       featuredListsCount: 10,
       totalPosts: 18,
@@ -472,7 +484,7 @@ export const mockTastemakers: User[] = [
     isTastemaker: true,
     tastemakerProfile: {
       specialty: 'Cocktails & Bar Culture',
-      tagline: 'NYC\'s best bars and the stories behind the drinks',
+      tagline: "NYC's best bars and the stories behind the drinks",
       badges: [tastemakerBadges.verified],
       featuredListsCount: 14,
       totalPosts: 21,
@@ -510,7 +522,7 @@ export const mockTastemakers: User[] = [
     isTastemaker: true,
     tastemakerProfile: {
       specialty: 'Seafood & Raw Bars',
-      tagline: 'Diving deep into NYC\'s seafood scene',
+      tagline: "Diving deep into NYC's seafood scene",
       badges: [tastemakerBadges.verified],
       featuredListsCount: 12,
       totalPosts: 19,
@@ -564,12 +576,12 @@ export const mockTastemakers: User[] = [
 
 // Helper to get a specific tastemaker by ID
 export const getTastemakerById = (id: string): User | undefined => {
-  return mockTastemakers.find(tm => tm.id === id);
+  return mockTastemakers.find((tm) => tm.id === id);
 };
 
 // Helper to get tastemakers by specialty
 export const getTastemakersBySpecialty = (specialty: string): User[] => {
-  return mockTastemakers.filter(tm =>
+  return mockTastemakers.filter((tm) =>
     tm.tastemakerProfile?.specialty.toLowerCase().includes(specialty.toLowerCase())
   );
 };

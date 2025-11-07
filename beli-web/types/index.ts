@@ -155,13 +155,7 @@ export interface ActivityComment {
 }
 
 // List types
-export type ListCategory =
-  | 'restaurants'
-  | 'bars'
-  | 'bakeries'
-  | 'coffee_tea'
-  | 'dessert'
-  | 'other';
+export type ListCategory = 'restaurants' | 'bars' | 'bakeries' | 'coffee_tea' | 'dessert' | 'other';
 
 export type ListScope = 'been' | 'want_to_try' | 'recs' | 'playlists';
 
@@ -184,25 +178,25 @@ export type UserList = List;
 
 // Notification types
 export type NotificationType =
-  | 'rating_liked'      // Someone liked your rating
-  | 'bookmark_liked'    // Someone liked your bookmark
-  | 'comment'           // Someone commented
-  | 'follow'            // Someone followed you
-  | 'list_bookmark'     // Someone bookmarked from your list
-  | 'streak'            // Streak achievement
-  | 'recommendation';   // Someone recommended a place
+  | 'rating_liked' // Someone liked your rating
+  | 'bookmark_liked' // Someone liked your bookmark
+  | 'comment' // Someone commented
+  | 'follow' // Someone followed you
+  | 'list_bookmark' // Someone bookmarked from your list
+  | 'streak' // Streak achievement
+  | 'recommendation'; // Someone recommended a place
 
 export interface Notification {
   id: string;
   type: NotificationType;
-  actorUser?: User;           // The user who performed the action
+  actorUser?: User; // The user who performed the action
   targetRestaurant?: Restaurant; // Restaurant involved
-  targetList?: string;        // List name if applicable
-  commentText?: string;       // For comment notifications
-  streakCount?: number;       // For streak notifications
+  targetList?: string; // List name if applicable
+  commentText?: string; // For comment notifications
+  streakCount?: number; // For streak notifications
   timestamp: Date;
   isRead: boolean;
-  actionDescription: string;  // "liked your rating of", "commented on your bookmarking of"
+  actionDescription: string; // "liked your rating of", "commented on your bookmarking of"
 }
 
 // Tastemaker types
@@ -417,7 +411,7 @@ export interface RankingState {
   targetRestaurantId: string;
   category: ListCategory;
   initialSentiment: InitialSentiment;
-  rankedList: RankedRestaurant[];  // Type-safe with userRating
+  rankedList: RankedRestaurant[]; // Type-safe with userRating
   comparisonHistory: RankingComparison[];
   currentLeftBound: number;
   currentRightBound: number;
@@ -430,8 +424,8 @@ export interface RankingResult {
   category: ListCategory;
   finalPosition: number;
   totalRestaurants: number;
-  rating: number;           // 0-10 scale
-  percentile: number;       // 0-100
+  rating: number; // 0-10 scale
+  percentile: number; // 0-100
   comparisonsCount: number;
 }
 

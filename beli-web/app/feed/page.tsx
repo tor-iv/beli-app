@@ -1,26 +1,22 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
-import { ActivityCard } from "@/components/social/activity-card"
-import { ThreeColumnLayout } from "@/components/layout/three-column"
-import { MobileFeedHeader } from "@/components/navigation/mobile-feed-header"
-import { ActionButtons } from "@/components/feed/action-buttons"
-import { FeaturedListsSection } from "@/components/feed/featured-lists-section"
-import { DesktopFeedSidebar } from "@/components/feed/DesktopFeedSidebar"
-import { FeedFiltersModal, type FeedFilters } from "@/components/modals/feed-filters-modal"
-import { CommentsModal } from "@/components/modals/comments-modal"
-import { ShareModal } from "@/components/modals/share-modal"
-import { AddRestaurantModal } from "@/components/modals/add-restaurant-modal"
-import { RankingResultModal } from "@/components/modals/ranking-result-modal"
-import {
-  useUnreadNotificationCount,
-  useFeed,
-  useFeaturedLists,
-  useCurrentUser,
-} from "@/lib/hooks"
-import { useFeedFilters } from "@/lib/hooks/use-feed-filters"
-import { useFeedModals } from "@/lib/hooks/use-feed-modals"
+import { useRouter } from 'next/navigation';
+import * as React from 'react';
+
+import { ActionButtons } from '@/components/feed/action-buttons';
+import { DesktopFeedSidebar } from '@/components/feed/DesktopFeedSidebar';
+import { FeaturedListsSection } from '@/components/feed/featured-lists-section';
+import { ThreeColumnLayout } from '@/components/layout/three-column';
+import { AddRestaurantModal } from '@/components/modals/add-restaurant-modal';
+import { CommentsModal } from '@/components/modals/comments-modal';
+import { FeedFiltersModal, type FeedFilters } from '@/components/modals/feed-filters-modal';
+import { RankingResultModal } from '@/components/modals/ranking-result-modal';
+import { ShareModal } from '@/components/modals/share-modal';
+import { MobileFeedHeader } from '@/components/navigation/mobile-feed-header';
+import { ActivityCard } from '@/components/social/activity-card';
+import { useUnreadNotificationCount, useFeed, useFeaturedLists, useCurrentUser } from '@/lib/hooks';
+import { useFeedFilters } from '@/lib/hooks/use-feed-filters';
+import { useFeedModals } from '@/lib/hooks/use-feed-modals';
 
 /**
  * Feed page - Social activity feed with restaurant discoveries
@@ -29,43 +25,42 @@ import { useFeedModals } from "@/lib/hooks/use-feed-modals"
  */
 
 export default function FeedPage() {
-  const router = useRouter()
+  const router = useRouter();
 
   // React Query hooks for data fetching
-  const { data: feed = [], isLoading: feedLoading } = useFeed()
-  const { data: featuredLists = [], isLoading: listsLoading } = useFeaturedLists()
-  const { data: currentUser } = useCurrentUser()
-  const { data: unreadCount = 0 } = useUnreadNotificationCount()
+  const { data: feed = [], isLoading: feedLoading } = useFeed();
+  const { data: featuredLists = [], isLoading: listsLoading } = useFeaturedLists();
+  const { data: currentUser } = useCurrentUser();
+  const { data: unreadCount = 0 } = useUnreadNotificationCount();
 
   // Modal state and handlers (extracted to custom hook)
-  const { modalState, setModalState, handlers } = useFeedModals(currentUser, feed)
+  const { modalState, setModalState, handlers } = useFeedModals(currentUser, feed);
 
   // Filter state
-  const [showFiltersModal, setShowFiltersModal] = React.useState(false)
+  const [showFiltersModal, setShowFiltersModal] = React.useState(false);
   const [filters, setFilters] = React.useState<FeedFilters>({
     rankingsOnly: false,
     topRatedOnly: false,
     restaurantsOnly: false,
-  })
+  });
 
-  const loading = feedLoading || listsLoading
+  const loading = feedLoading || listsLoading;
 
   // Apply filters to feed (extracted to custom hook)
-  const filteredFeed = useFeedFilters(feed, filters)
+  const filteredFeed = useFeedFilters(feed, filters);
 
   const handleApplyFilters = React.useCallback((newFilters: FeedFilters) => {
-    setFilters(newFilters)
-  }, [])
+    setFilters(newFilters);
+  }, []);
 
-  const hasActiveFilters =
-    filters.rankingsOnly || filters.topRatedOnly || filters.restaurantsOnly
+  const hasActiveFilters = filters.rankingsOnly || filters.topRatedOnly || filters.restaurantsOnly;
 
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-6">
         <p>Loading feed...</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -73,38 +68,38 @@ export default function FeedPage() {
       {/* Mobile Feed Header */}
       <MobileFeedHeader
         unreadNotificationCount={unreadCount}
-        onNotificationsClick={() => router.push("/notifications")}
-        onReservationsClick={() => router.push("/reservations")}
-        onGroupDinnerClick={() => router.push("/group-dinner")}
-        onSearchClick={() => router.push("/search")}
+        onNotificationsClick={() => router.push('/notifications')}
+        onReservationsClick={() => router.push('/reservations')}
+        onGroupDinnerClick={() => router.push('/group-dinner')}
+        onSearchClick={() => router.push('/search')}
       />
 
       {/* Mobile: Action Buttons */}
       <ActionButtons
-        onReserveClick={() => router.push("/lists?view=reserve")}
-        onRecsNearbyClick={() => router.push("/lists?view=nearby")}
-        onTrendingClick={() => router.push("/lists?view=trending")}
-        onFriendRecsClick={() => router.push("/lists?view=friends")}
+        onReserveClick={() => router.push('/lists?view=reserve')}
+        onRecsNearbyClick={() => router.push('/lists?view=nearby')}
+        onTrendingClick={() => router.push('/lists?view=trending')}
+        onFriendRecsClick={() => router.push('/lists?view=friends')}
       />
 
       {/* Mobile: Tastemakers Section */}
       <FeaturedListsSection
         lists={featuredLists}
-        onSeeAllClick={() => router.push("/tastemakers")}
+        onSeeAllClick={() => router.push('/tastemakers')}
       />
 
       {/* Mobile: Feed Filters */}
-      <div className="md:hidden px-4 pb-3 flex items-center gap-2">
+      <div className="flex items-center gap-2 px-4 pb-3 md:hidden">
         <button
           onClick={() => setShowFiltersModal(true)}
-          className="flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3 py-1.5 shadow-button hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 shadow-button transition-colors hover:bg-gray-50"
         >
           <span className="text-sm font-medium">Filters</span>
-          <span className="bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+          <span className="rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-white">
             SC
           </span>
           {hasActiveFilters && (
-            <span className="bg-primary text-white text-xs rounded-full h-5 min-w-[20px] px-1.5 flex items-center justify-center">
+            <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1.5 text-xs text-white">
               {Object.values(filters).filter(Boolean).length}
             </span>
           )}
@@ -113,7 +108,7 @@ export default function FeedPage() {
 
       <div className="container mx-auto px-4 py-6">
         {/* Mobile: Single column */}
-        <div className="lg:hidden max-w-2xl mx-auto">
+        <div className="mx-auto max-w-2xl lg:hidden">
           <div className="space-y-4">
             {filteredFeed.map((item) => (
               <ActivityCard
@@ -135,8 +130,8 @@ export default function FeedPage() {
           <ThreeColumnLayout
             left={<DesktopFeedSidebar />}
             center={
-              <div className="max-w-2xl mx-auto">
-                <h1 className="text-2xl font-bold mb-6">Your Feed</h1>
+              <div className="mx-auto max-w-2xl">
+                <h1 className="mb-6 text-2xl font-bold">Your Feed</h1>
                 <div className="space-y-4">
                   {filteredFeed.map((item) => (
                     <ActivityCard
@@ -214,5 +209,5 @@ export default function FeedPage() {
         />
       )}
     </div>
-  )
+  );
 }

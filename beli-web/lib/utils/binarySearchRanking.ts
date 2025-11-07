@@ -1,4 +1,4 @@
-import {
+import type {
   Restaurant,
   RankedRestaurant,
   RankingState,
@@ -138,9 +138,10 @@ export function undoLastComparison(state: RankingState): RankingState {
   const previousComparison = comparisonHistory[comparisonHistory.length - 1];
 
   // Restore skips if the last action was a skip
-  const newSkipsRemaining = previousComparison.choice === 'skip'
-    ? Math.min(state.skipsRemaining + 1, 2)
-    : state.skipsRemaining;
+  const newSkipsRemaining =
+    previousComparison.choice === 'skip'
+      ? Math.min(state.skipsRemaining + 1, 2)
+      : state.skipsRemaining;
 
   return {
     ...state,
@@ -163,10 +164,7 @@ export function undoLastComparison(state: RankingState): RankingState {
  * This maps positions to a 5.0-10.0 range, which is more realistic
  * than using the full 0-10 scale.
  */
-export function calculateRating(
-  position: number,
-  totalCount: number
-): number {
+export function calculateRating(position: number, totalCount: number): number {
   // Handle edge case: first restaurant in list
   if (totalCount === 0) {
     return 7.5; // Default rating for first restaurant
@@ -229,9 +227,8 @@ export function getRankingProgress(state: RankingState): {
   const estimatedRemaining = rangeSize > 0 ? Math.ceil(Math.log2(rangeSize)) : 0;
   const estimatedTotal = comparisonHistory.length + estimatedRemaining;
 
-  const percentComplete = estimatedTotal > 0
-    ? Math.round((comparisonHistory.length / estimatedTotal) * 100)
-    : 100;
+  const percentComplete =
+    estimatedTotal > 0 ? Math.round((comparisonHistory.length / estimatedTotal) * 100) : 100;
 
   return {
     currentComparison: comparisonHistory.length + 1,

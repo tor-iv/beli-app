@@ -1,6 +1,11 @@
-import { useReducer, Reducer } from 'react';
+import { useReducer } from 'react';
+
+import type {
+  RatingType,
+  ListTypeKey,
+} from '@/components/modals/add-restaurant/initial-rating-step';
 import type { RankedRestaurant, RankingState } from '@/types';
-import type { RatingType, ListTypeKey } from '@/components/modals/add-restaurant/initial-rating-step';
+import type { Reducer } from 'react';
 
 // Modal phases
 export type ModalPhase = 'initial' | 'ranking' | 'complete';

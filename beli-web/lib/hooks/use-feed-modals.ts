@@ -1,12 +1,14 @@
 import { useState, useCallback } from 'react';
+
 import {
   useAddRankedRestaurant,
   useLikeActivity,
   useBookmarkActivity,
   useAddComment,
 } from '@/lib/hooks';
-import type { Activity, Restaurant, User, RankingResult } from '@/types';
+
 import type { RestaurantSubmissionData } from '@/components/modals/add-restaurant-modal';
+import type { Activity, Restaurant, User, RankingResult } from '@/types';
 
 /**
  * Modal state type for managing all feed modals with discriminated union
@@ -16,7 +18,12 @@ export type ModalState =
   | { type: 'comments'; activity: Activity }
   | { type: 'share'; activity: Activity }
   | { type: 'add'; restaurant: Restaurant }
-  | { type: 'result'; restaurant: Restaurant; result: RankingResult; data: RestaurantSubmissionData }
+  | {
+      type: 'result';
+      restaurant: Restaurant;
+      result: RankingResult;
+      data: RestaurantSubmissionData;
+    }
   | { type: null };
 
 /**

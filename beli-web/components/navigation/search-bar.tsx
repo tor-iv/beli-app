@@ -1,12 +1,13 @@
-import * as React from "react"
-import { Search, X } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Search, X } from 'lucide-react';
+import * as React from 'react';
+
+import { cn } from '@/lib/utils';
 
 export interface SearchBarProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  value: string
-  onChangeText: (text: string) => void
-  onClear?: () => void
-  showIcon?: boolean
+  value: string;
+  onChangeText: (text: string) => void;
+  onClear?: () => void;
+  showIcon?: boolean;
 }
 
 export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
@@ -14,7 +15,7 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
     {
       value,
       onChangeText,
-      placeholder = "Search restaurants, cuisine, occasion",
+      placeholder = 'Search restaurants, cuisine, occasion',
       onFocus,
       onBlur,
       onClear,
@@ -27,22 +28,25 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
     ref
   ) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChangeText(e.target.value)
-    }
+      onChangeText(e.target.value);
+    };
 
     const handleClear = () => {
       if (onClear) {
-        onClear()
+        onClear();
       } else {
-        onChangeText("")
+        onChangeText('');
       }
-    }
+    };
 
     return (
-      <div className={cn("relative flex items-center bg-white rounded-lg shadow-button px-3 py-2", className)}>
-        {showIcon && (
-          <Search className="h-[18px] w-[18px] text-secondary mr-2 flex-shrink-0" />
+      <div
+        className={cn(
+          'relative flex items-center rounded-lg bg-white px-3 py-2 shadow-button',
+          className
         )}
+      >
+        {showIcon && <Search className="mr-2 h-[18px] w-[18px] flex-shrink-0 text-secondary" />}
 
         <input
           ref={ref}
@@ -54,7 +58,7 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
           onBlur={onBlur}
           autoFocus={autoFocus}
           disabled={disabled}
-          className="flex-1 text-base bg-transparent outline-none placeholder:text-tertiary disabled:cursor-not-allowed"
+          className="placeholder:text-tertiary flex-1 bg-transparent text-base outline-none disabled:cursor-not-allowed"
           {...props}
         />
 
@@ -62,15 +66,15 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
           <button
             type="button"
             onClick={handleClear}
-            className="ml-2 p-1 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
+            className="ml-2 flex-shrink-0 rounded-full p-1 transition-colors hover:bg-gray-100"
             aria-label="Clear search"
           >
             <X className="h-[18px] w-[18px] text-secondary" />
           </button>
         )}
       </div>
-    )
+    );
   }
-)
+);
 
-SearchBar.displayName = "SearchBar"
+SearchBar.displayName = 'SearchBar';

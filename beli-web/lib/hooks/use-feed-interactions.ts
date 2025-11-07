@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { FeedInteractionService } from '@/lib/services';
-import { Activity, ActivityComment } from '@/types';
+
+import type { Activity, ActivityComment } from '@/types';
 
 /**
  * Hook to toggle like on an activity
@@ -10,7 +12,11 @@ export function useLikeActivity() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ activityId, userId, isLiked }: {
+    mutationFn: async ({
+      activityId,
+      userId,
+      isLiked,
+    }: {
       activityId: string;
       userId: string;
       isLiked: boolean;
@@ -32,7 +38,7 @@ export function useLikeActivity() {
       if (previousFeed) {
         queryClient.setQueryData<Activity[]>(
           ['feed'],
-          previousFeed.map(activity => {
+          previousFeed.map((activity) => {
             if (activity.id === activityId && activity.interactions) {
               const likes = [...activity.interactions.likes];
               if (isLiked) {
@@ -80,7 +86,11 @@ export function useBookmarkActivity() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ activityId, userId, isBookmarked }: {
+    mutationFn: async ({
+      activityId,
+      userId,
+      isBookmarked,
+    }: {
       activityId: string;
       userId: string;
       isBookmarked: boolean;
@@ -102,7 +112,7 @@ export function useBookmarkActivity() {
       if (previousFeed) {
         queryClient.setQueryData<Activity[]>(
           ['feed'],
-          previousFeed.map(activity => {
+          previousFeed.map((activity) => {
             if (activity.id === activityId && activity.interactions) {
               const bookmarks = [...activity.interactions.bookmarks];
               if (isBookmarked) {
@@ -150,7 +160,11 @@ export function useAddComment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ activityId, userId, content }: {
+    mutationFn: async ({
+      activityId,
+      userId,
+      content,
+    }: {
       activityId: string;
       userId: string;
       content: string;
@@ -176,7 +190,7 @@ export function useAddComment() {
       if (previousFeed) {
         queryClient.setQueryData<Activity[]>(
           ['feed'],
-          previousFeed.map(activity => {
+          previousFeed.map((activity) => {
             if (activity.id === activityId && activity.interactions) {
               return {
                 ...activity,

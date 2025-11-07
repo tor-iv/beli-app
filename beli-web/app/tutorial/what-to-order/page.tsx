@@ -1,43 +1,44 @@
-'use client'
+'use client';
 
-import * as React from 'react'
-import { useRouter } from 'next/navigation'
-import { Users, Utensils, Sparkles } from 'lucide-react'
-import { WhatToOrderModal } from '@/components/modals/what-to-order-modal'
-import { TutorialOverlay } from '@/components/tutorial/tutorial-overlay'
-import { TutorialBanner } from '@/components/tutorial/tutorial-banner'
-import { useTutorialKeyboardNav } from '@/lib/hooks/use-tutorial-keyboard-nav'
-import { demoRestaurant } from '@/lib/demo-data'
+import { Users, Utensils, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import * as React from 'react';
+
+import { WhatToOrderModal } from '@/components/modals/what-to-order-modal';
+import { TutorialBanner } from '@/components/tutorial/tutorial-banner';
+import { TutorialOverlay } from '@/components/tutorial/tutorial-overlay';
+import { demoRestaurant } from '@/lib/demo-data';
+import { useTutorialKeyboardNav } from '@/lib/hooks/use-tutorial-keyboard-nav';
 
 export default function WhatToOrderTutorialPage() {
-  const router = useRouter()
-  const [showModal, setShowModal] = React.useState(false)
+  const router = useRouter();
+  const [showModal, setShowModal] = React.useState(false);
 
   const handleBack = React.useCallback(() => {
-    router.push('/tutorial/group-dinner')
-  }, [router])
+    router.push('/tutorial/group-dinner');
+  }, [router]);
 
   const handleNext = React.useCallback(() => {
-    router.push('/tutorial/tastemakers')
-  }, [router])
+    router.push('/tutorial/tastemakers');
+  }, [router]);
 
   const handleOpenModal = React.useCallback(() => {
-    setShowModal(true)
-  }, [])
+    setShowModal(true);
+  }, []);
 
   const handleCloseModal = React.useCallback(() => {
-    setShowModal(false)
-  }, [])
+    setShowModal(false);
+  }, []);
 
   // Keyboard navigation
   useTutorialKeyboardNav({
     onNext: handleNext,
     onBack: handleBack,
     onEscape: handleCloseModal,
-  })
+  });
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col pb-32 md:pb-4">
+    <div className="flex min-h-screen flex-col bg-gray-50 pb-32 md:pb-4">
       {/* Tutorial Banner */}
       <TutorialBanner
         featureName="What to Order"
@@ -45,20 +46,18 @@ export default function WhatToOrderTutorialPage() {
       />
 
       {/* Header */}
-      <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-6 md:py-8 max-w-4xl">
+      <div className="border-b bg-white">
+        <div className="container mx-auto max-w-4xl px-4 py-6 md:py-8">
           <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold mb-3 text-gray-900">
-              What to Order
-            </h1>
-            <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto mb-6">
+            <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl">What to Order</h1>
+            <p className="mx-auto mb-6 max-w-2xl text-base text-gray-600 md:text-lg">
               Get personalized menu recommendations based on your group's preferences and appetite.
             </p>
             <button
               onClick={handleOpenModal}
-              className="bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-3 rounded-xl transition-all inline-flex items-center gap-2"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-3 font-semibold text-white transition-all hover:bg-primary/90"
             >
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="h-5 w-5" />
               <span>Try It Now</span>
             </button>
           </div>
@@ -66,24 +65,22 @@ export default function WhatToOrderTutorialPage() {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8 max-w-4xl flex-1">
+      <div className="container mx-auto max-w-4xl flex-1 px-4 py-8">
         {/* How It Works Section */}
-        <div className="bg-white rounded-2xl shadow-card p-6 md:p-8 mb-8">
-          <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
-            How It Works
-          </h3>
+        <div className="mb-8 rounded-2xl bg-white p-6 shadow-card md:p-8">
+          <h3 className="mb-4 text-xl font-bold text-gray-900 md:text-2xl">How It Works</h3>
 
           <ul className="space-y-3 text-gray-600">
             <li className="flex items-start gap-3">
-              <Sparkles className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+              <Sparkles className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
               <span>Analyzes your group's past ratings and favorite dishes</span>
             </li>
             <li className="flex items-start gap-3">
-              <Users className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+              <Users className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
               <span>Adjusts portions based on party size and hunger level</span>
             </li>
             <li className="flex items-start gap-3">
-              <Utensils className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+              <Utensils className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
               <span>Balances variety across appetizers, mains, sides, and desserts</span>
             </li>
           </ul>
@@ -108,5 +105,5 @@ export default function WhatToOrderTutorialPage() {
         />
       )}
     </div>
-  )
+  );
 }

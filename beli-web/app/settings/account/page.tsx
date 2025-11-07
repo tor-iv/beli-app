@@ -1,6 +1,5 @@
-"use client"
+'use client';
 
-import * as React from "react"
 import {
   Mail,
   Phone,
@@ -12,39 +11,50 @@ import {
   PauseCircle,
   Trash2,
   ChevronLeft,
-} from "lucide-react"
-import { SettingsRow } from "@/components/settings/settings-row"
-import { useUserSettingsStore } from "@/lib/stores/user-settings-store"
-import Link from "next/link"
+} from 'lucide-react';
+import Link from 'next/link';
+import * as React from 'react';
+
+import { SettingsRow } from '@/components/settings/settings-row';
+import { useUserSettingsStore } from '@/lib/stores/user-settings-store';
+
 
 export default function AccountSettingsPage() {
-  const email = useUserSettingsStore((state) => state.email)
-  const phoneNumber = useUserSettingsStore((state) => state.phoneNumber)
-  const school = useUserSettingsStore((state) => state.school)
-  const company = useUserSettingsStore((state) => state.company)
+  const email = useUserSettingsStore((state) => state.email);
+  const phoneNumber = useUserSettingsStore((state) => state.phoneNumber);
+  const school = useUserSettingsStore((state) => state.school);
+  const company = useUserSettingsStore((state) => state.company);
 
   const handleDeactivate = () => {
-    if (confirm("Are you sure you want to deactivate your account? You can come back whenever you want.")) {
+    if (
+      confirm(
+        'Are you sure you want to deactivate your account? You can come back whenever you want.'
+      )
+    ) {
       // TODO: Implement deactivation
-      console.log("Account deactivated")
+      console.log('Account deactivated');
     }
-  }
+  };
 
   const handleDelete = () => {
-    if (confirm("This action is permanent and cannot be undone. All your data will be deleted. Are you sure you want to delete your account?")) {
+    if (
+      confirm(
+        'This action is permanent and cannot be undone. All your data will be deleted. Are you sure you want to delete your account?'
+      )
+    ) {
       // TODO: Implement deletion
-      console.log("Account deleted")
+      console.log('Account deleted');
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-2xl mx-auto px-4 py-4">
+      <div className="border-b border-gray-200 bg-white">
+        <div className="mx-auto max-w-2xl px-4 py-4">
           <div className="flex items-center gap-3">
             <Link href="/settings">
-              <ChevronLeft className="h-6 w-6 text-secondary hover:text-foreground transition-colors" />
+              <ChevronLeft className="h-6 w-6 text-secondary transition-colors hover:text-foreground" />
             </Link>
             <h1 className="text-2xl font-bold text-foreground">Manage account</h1>
           </div>
@@ -52,8 +62,8 @@ export default function AccountSettingsPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white border-b border-gray-200 shadow-sm">
+      <div className="mx-auto max-w-2xl">
+        <div className="border-b border-gray-200 bg-white shadow-sm">
           <SettingsRow
             type="navigation"
             icon={Mail}
@@ -109,11 +119,8 @@ export default function AccountSettingsPage() {
         </div>
 
         {/* Destructive actions */}
-        <div className="bg-white border-b border-gray-200 shadow-sm mt-8">
-          <button
-            onClick={handleDeactivate}
-            className="w-full"
-          >
+        <div className="mt-8 border-b border-gray-200 bg-white shadow-sm">
+          <button onClick={handleDeactivate} className="w-full">
             <SettingsRow
               type="info"
               icon={PauseCircle}
@@ -124,10 +131,7 @@ export default function AccountSettingsPage() {
             />
           </button>
 
-          <button
-            onClick={handleDelete}
-            className="w-full"
-          >
+          <button onClick={handleDelete} className="w-full">
             <SettingsRow
               type="info"
               icon={Trash2}
@@ -140,5 +144,5 @@ export default function AccountSettingsPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,11 +1,12 @@
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Restaurant } from '@/types';
+
+import type { Restaurant } from '@/types';
 
 interface RestaurantSocialProofProps {
   restaurant: Restaurant;
 }
 
-export function RestaurantSocialProof({ restaurant }: RestaurantSocialProofProps) {
+export const RestaurantSocialProof = ({ restaurant }: RestaurantSocialProofProps) => {
   const { friendsWantToTryCount = 0, friendAvatars = [] } = restaurant;
 
   // Don't render if no friends want to try
@@ -26,12 +27,9 @@ export function RestaurantSocialProof({ restaurant }: RestaurantSocialProofProps
       {displayAvatars.length > 0 && (
         <div className="flex -space-x-2">
           {displayAvatars.map((avatarUrl, index) => (
-            <Avatar
-              key={index}
-              className="w-8 h-8 border-2 border-background ring-2 ring-white"
-            >
+            <Avatar key={index} className="h-8 w-8 border-2 border-background ring-2 ring-white">
               <AvatarImage src={avatarUrl} alt={`Friend ${index + 1}`} />
-              <AvatarFallback className="text-xs bg-primary/10 text-primary">
+              <AvatarFallback className="bg-primary/10 text-xs text-primary">
                 F{index + 1}
               </AvatarFallback>
             </Avatar>

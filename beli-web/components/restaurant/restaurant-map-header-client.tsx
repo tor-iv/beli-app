@@ -1,10 +1,12 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
-import L from 'leaflet';
-import { Restaurant } from '@/types';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import L from 'leaflet';
 import { useRef } from 'react';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+
+import type { Restaurant } from '@/types';
+
 import 'leaflet/dist/leaflet.css';
 
 // Fix for default marker icons in Leaflet
@@ -20,9 +22,9 @@ if (typeof window !== 'undefined') {
 // Get color based on rating (matching native color system)
 function getRatingColor(rating: number): string {
   if (rating >= 8.5) return '#22C55E'; // Excellent (green)
-  if (rating >= 7.0) return '#84CC16';  // Good (light green)
-  if (rating >= 5.0) return '#F97316';  // Average (orange)
-  return '#EF4444';                     // Poor (red)
+  if (rating >= 7.0) return '#84CC16'; // Good (light green)
+  if (rating >= 5.0) return '#F97316'; // Average (orange)
+  return '#EF4444'; // Poor (red)
 }
 
 // Custom marker icon matching rating color
@@ -67,7 +69,7 @@ export default function RestaurantMapHeaderClient({ restaurant }: RestaurantMapH
 
   if (!restaurant.location?.coordinates) {
     return (
-      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+      <div className="flex h-full w-full items-center justify-center bg-gray-100">
         <p className="text-muted-foreground">Map location unavailable</p>
       </div>
     );
@@ -76,15 +78,11 @@ export default function RestaurantMapHeaderClient({ restaurant }: RestaurantMapH
   const { lat, lng } = restaurant.location.coordinates;
 
   return (
-    <motion.div
-      ref={containerRef}
-      className="relative z-0 w-full h-full"
-      style={{ y, opacity }}
-    >
+    <motion.div ref={containerRef} className="relative z-0 h-full w-full" style={{ y, opacity }}>
       <MapContainer
         center={[lat, lng]}
         zoom={16}
-        className="w-full h-full"
+        className="h-full w-full"
         zoomControl={false}
         scrollWheelZoom={false}
         dragging={false}
@@ -96,10 +94,7 @@ export default function RestaurantMapHeaderClient({ restaurant }: RestaurantMapH
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           subdomains="abcd"
         />
-        <Marker
-          position={[lat, lng]}
-          icon={createCustomIcon(restaurant.rating)}
-        />
+        <Marker position={[lat, lng]} icon={createCustomIcon(restaurant.rating)} />
       </MapContainer>
     </motion.div>
   );

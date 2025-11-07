@@ -1,24 +1,38 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
-import { CuisineBreakdown, CityBreakdown, CountryBreakdown } from '@/types';
+import { Instagram, Newspaper, BarChart3 } from 'lucide-react';
 import { notFound, useRouter, useParams } from 'next/navigation';
+import { useState, useMemo, useCallback } from 'react';
+
+import { AchievementBanner } from '@/components/profile/achievement-banner';
+import { DiningMap } from '@/components/profile/dining-map';
+import { ProfileActivityCard } from '@/components/profile/profile-activity-card';
+import { ProfileListRow } from '@/components/profile/profile-list-row';
+import { ProfileStatCard } from '@/components/profile/profile-stat-card';
+import {
+  TasteProfileCategoryTabs
+} from '@/components/profile/taste-profile-category-tabs';
+import { TasteProfileList } from '@/components/profile/taste-profile-list';
+import { TasteProfileSummaryCard } from '@/components/profile/taste-profile-summary-card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ProfileListRow } from '@/components/profile/profile-list-row';
-import { ProfileStatCard } from '@/components/profile/profile-stat-card';
-import { AchievementBanner } from '@/components/profile/achievement-banner';
-import { ProfileActivityCard } from '@/components/profile/profile-activity-card';
-import { TasteProfileSummaryCard } from '@/components/profile/taste-profile-summary-card';
-import { TasteProfileCategoryTabs, TasteProfileCategory } from '@/components/profile/taste-profile-category-tabs';
-import { TasteProfileList, SortOption } from '@/components/profile/taste-profile-list';
-import { DiningMap } from '@/components/profile/dining-map';
-import { useTasteProfile } from '@/lib/hooks/use-taste-profile';
-import { useUserByUsername, useCurrentUser, useUserReviews, useIsFollowing, useFollowUser, useUnfollowUser } from '@/lib/hooks/use-user';
 import { useRestaurantsByIds } from '@/lib/hooks/use-restaurants';
-import { Instagram, Newspaper, BarChart3 } from 'lucide-react';
+import { useTasteProfile } from '@/lib/hooks/use-taste-profile';
+import {
+  useUserByUsername,
+  useCurrentUser,
+  useUserReviews,
+  useIsFollowing,
+  useFollowUser,
+  useUnfollowUser,
+} from '@/lib/hooks/use-user';
 import { COLORS } from '@/lib/theme/colors';
+
+import type {
+  TasteProfileCategory} from '@/components/profile/taste-profile-category-tabs';
+import type { SortOption } from '@/components/profile/taste-profile-list';
+import type { CuisineBreakdown, CityBreakdown, CountryBreakdown } from '@/types';
 
 // Constants
 const TASTE_PROFILE_DAYS = 30;
@@ -52,10 +66,7 @@ export default function ProfilePage() {
   }, [user?.id, currentUser?.id]);
 
   // Load following status - hook is always called but enabled option handles gating
-  const { data: isFollowingData } = useIsFollowing(
-    currentUser?.id || '',
-    user?.id || '',
-  );
+  const { data: isFollowingData } = useIsFollowing(currentUser?.id || '', user?.id || '');
 
   // Follow/unfollow mutations using the new hooks
   const followMutation = useFollowUser();
@@ -63,7 +74,7 @@ export default function ProfilePage() {
 
   // Only load restaurants needed for reviews (not all 53!)
   const reviewRestaurantIds = useMemo(() => {
-    return reviews.slice(0, MAX_RECENT_REVIEWS).map(r => r.restaurantId);
+    return reviews.slice(0, MAX_RECENT_REVIEWS).map((r) => r.restaurantId);
   }, [reviews]);
 
   const { data: restaurants = [] } = useRestaurantsByIds(reviewRestaurantIds);
@@ -109,30 +120,33 @@ export default function ProfilePage() {
   // OPTIMIZED: Pre-compute review-restaurant pairs to avoid O(n²) lookup in render
   const reviewsWithRestaurants = useMemo(() => {
     // Create a Map for O(1) restaurant lookup instead of O(n) find()
-    const restaurantMap = new Map(restaurants.map(r => [r.id, r]));
+    const restaurantMap = new Map(restaurants.map((r) => [r.id, r]));
 
     return recentReviews
-      .map(review => ({
+      .map((review) => ({
         review,
-        restaurant: restaurantMap.get(review.restaurantId)
+        restaurant: restaurantMap.get(review.restaurantId),
       }))
-      .filter(item => item.restaurant !== undefined) as Array<{
-        review: typeof recentReviews[0];
-        restaurant: NonNullable<typeof restaurants[0]>;
-      }>;
+      .filter((item) => item.restaurant !== undefined) as Array<{
+      review: (typeof recentReviews)[0];
+      restaurant: NonNullable<(typeof restaurants)[0]>;
+    }>;
   }, [recentReviews, restaurants]);
 
   // Event handlers wrapped in useCallback for performance
   // IMPORTANT: These must be called BEFORE early returns to maintain consistent hook order
   const handleSortToggle = useCallback(() => {
-    setSortBy(prev => prev === 'count' ? 'avgScore' : 'count');
+    setSortBy((prev) => (prev === 'count' ? 'avgScore' : 'count'));
   }, []);
 
-  const handleItemPress = useCallback((item: CuisineBreakdown | CityBreakdown | CountryBreakdown) => {
-    // In a real app, this would navigate to a filtered restaurant list
-    // TODO: Navigate to filtered restaurant list based on selected item
-    router.push(`/search?filter=${JSON.stringify(item)}`);
-  }, [router]);
+  const handleItemPress = useCallback(
+    (item: CuisineBreakdown | CityBreakdown | CountryBreakdown) => {
+      // In a real app, this would navigate to a filtered restaurant list
+      // TODO: Navigate to filtered restaurant list based on selected item
+      router.push(`/search?filter=${JSON.stringify(item)}`);
+    },
+    [router]
+  );
 
   const handleShare = useCallback(() => {
     // In a real app, this would trigger native share functionality
@@ -165,8 +179,8 @@ export default function ProfilePage() {
   // Loading state - early return AFTER all hooks are called
   if (userLoading) {
     return (
-      <div className="container mx-auto px-4 py-6 max-w-3xl">
-        <div className="flex justify-center items-center min-h-[400px]">
+      <div className="container mx-auto max-w-3xl px-4 py-6">
+        <div className="flex min-h-[400px] items-center justify-center">
           <div className="text-gray-700">Loading...</div>
         </div>
       </div>
@@ -179,44 +193,44 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto max-w-3xl">
         {/* Header with Name */}
-        <div className="bg-white px-6 py-4 border-b border-gray-200">
+        <div className="border-b border-gray-200 bg-white px-6 py-4">
           <h1 className="text-3xl font-bold text-gray-900">{user.displayName}</h1>
         </div>
 
         {/* Profile Info Section */}
-        <div className="bg-white px-6 pb-8 border-b border-gray-200">
+        <div className="border-b border-gray-200 bg-white px-6 pb-8">
           <div className="flex flex-col items-center">
             {/* Avatar */}
             <div className="mt-6">
-              <Avatar className="w-24 h-24">
+              <Avatar className="h-24 w-24">
                 <AvatarImage src={user.avatar} alt={user.displayName} />
                 <AvatarFallback className="text-2xl">{user.displayName[0]}</AvatarFallback>
               </Avatar>
             </div>
 
             {/* Username and Badge */}
-            <div className="flex items-center gap-2 mt-4">
+            <div className="mt-4 flex items-center gap-2">
               <span className="text-lg font-semibold text-gray-900">@{user.username}</span>
-              <span className="bg-primary text-white text-xs font-bold px-1.5 py-0.5 rounded">
+              <span className="rounded bg-primary px-1.5 py-0.5 text-xs font-bold text-white">
                 {SUPER_CLUB_BADGE}
               </span>
             </div>
-            <p className="text-base text-gray-700 mt-1">
+            <p className="mt-1 text-base text-gray-700">
               Member since {formatMemberSince(user.memberSince)}
             </p>
 
             {/* Bio */}
             {user.bio && (
-              <p className="text-base text-gray-900 text-center mt-3 leading-6 max-w-md">
+              <p className="mt-3 max-w-md text-center text-base leading-6 text-gray-900">
                 {user.bio}
               </p>
             )}
 
             {/* Action Buttons */}
-            <div className="flex gap-3 mt-4 w-full max-w-md">
+            <div className="mt-4 flex w-full max-w-md gap-3">
               {isCurrentUser ? (
                 <>
                   <Button variant="outline" className="flex-1">
@@ -229,12 +243,16 @@ export default function ProfilePage() {
               ) : (
                 <>
                   <Button
-                    variant={isFollowingData ? "outline" : "default"}
+                    variant={isFollowingData ? 'outline' : 'default'}
                     className="flex-1"
                     onClick={handleFollowToggle}
                     disabled={followMutation.isPending || unfollowMutation.isPending}
                   >
-                    {(followMutation.isPending || unfollowMutation.isPending) ? 'Loading...' : isFollowingData ? 'Following' : 'Follow'}
+                    {followMutation.isPending || unfollowMutation.isPending
+                      ? 'Loading...'
+                      : isFollowingData
+                        ? 'Following'
+                        : 'Follow'}
                   </Button>
                   <Button variant="outline" className="flex-1">
                     Share profile
@@ -244,30 +262,30 @@ export default function ProfilePage() {
             </div>
 
             {/* Instagram Link */}
-            <button className="mt-3 w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors">
-              <Instagram className="w-6 h-6 text-gray-900" />
+            <button className="mt-3 flex h-12 w-12 items-center justify-center rounded-full border border-gray-200 transition-colors hover:bg-gray-50">
+              <Instagram className="h-6 w-6 text-gray-900" />
             </button>
 
             {/* Stats Row */}
-            <div className="flex justify-around w-full max-w-md mt-8">
+            <div className="mt-8 flex w-full max-w-md justify-around">
               <div className="text-center">
                 <div className="text-xl font-bold text-gray-900">{user.stats.followers}</div>
-                <div className="text-sm text-gray-700 mt-1">Followers</div>
+                <div className="mt-1 text-sm text-gray-700">Followers</div>
               </div>
               <div className="text-center">
                 <div className="text-xl font-bold text-gray-900">{user.stats.following}</div>
-                <div className="text-sm text-gray-700 mt-1">Following</div>
+                <div className="mt-1 text-sm text-gray-700">Following</div>
               </div>
               <div className="text-center">
                 <div className="text-xl font-bold text-gray-900">#{user.stats.rank}</div>
-                <div className="text-sm text-gray-700 mt-1">Rank on Beli</div>
+                <div className="mt-1 text-sm text-gray-700">Rank on Beli</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* List Rows */}
-        <div className="bg-white mt-3">
+        <div className="mt-3 bg-white">
           <ProfileListRow
             icon="check"
             label="Been"
@@ -291,7 +309,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Stat Cards */}
-        <div className="flex gap-3 px-4 mt-4">
+        <div className="mt-4 flex gap-3 px-4">
           <ProfileStatCard
             icon="trophy"
             label="Rank on Beli"
@@ -307,12 +325,15 @@ export default function ProfilePage() {
         </div>
 
         {/* Achievement Banner */}
-        <div className="px-4 mt-4">
+        <div className="mt-4 px-4">
           <AchievementBanner
             emoji="🎉"
             text="Congrats! You reached your 2025 goal!"
             progress={ACHIEVEMENT_PROGRESS_COMPLETE}
-            daysLeft={Math.ceil((new Date(new Date().getFullYear(), 11, 31).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} // Days remaining in current year
+            daysLeft={Math.ceil(
+              (new Date(new Date().getFullYear(), 11, 31).getTime() - Date.now()) /
+                (1000 * 60 * 60 * 24)
+            )} // Days remaining in current year
             onSetNewGoal={handleSetNewGoal}
           />
         </div>
@@ -320,13 +341,13 @@ export default function ProfilePage() {
         {/* Tabs */}
         <div className="mt-4">
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'activity' | 'taste')}>
-            <TabsList className="w-full bg-white rounded-none border-b border-gray-200">
+            <TabsList className="w-full rounded-none border-b border-gray-200 bg-white">
               <TabsTrigger value="activity" className="flex-1 gap-2">
-                <Newspaper className="w-4 h-4" />
+                <Newspaper className="h-4 w-4" />
                 Recent Activity
               </TabsTrigger>
               <TabsTrigger value="taste" className="flex-1 gap-2">
-                <BarChart3 className="w-4 h-4" />
+                <BarChart3 className="h-4 w-4" />
                 Taste Profile
               </TabsTrigger>
             </TabsList>
@@ -358,7 +379,7 @@ export default function ProfilePage() {
                   <p className="text-base text-gray-700">Loading taste profile...</p>
                 </div>
               ) : tasteProfile ? (
-                <div className="py-6 space-y-6">
+                <div className="space-y-6 py-6">
                   {/* Summary Card */}
                   <div className="px-6">
                     <TasteProfileSummaryCard
@@ -393,8 +414,8 @@ export default function ProfilePage() {
                         tasteCategory === 'cuisines'
                           ? tasteProfile.totalCuisines
                           : tasteCategory === 'cities'
-                          ? tasteProfile.totalCities
-                          : tasteProfile.totalCountries
+                            ? tasteProfile.totalCities
+                            : tasteProfile.totalCountries
                       }
                       sortBy={sortBy}
                       onSortPress={handleSortToggle}

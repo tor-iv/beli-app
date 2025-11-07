@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { UserService } from '@/lib/services';
 
 export function useUsers() {

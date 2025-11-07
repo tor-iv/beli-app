@@ -1,13 +1,15 @@
-import { useReducer, Reducer } from 'react';
+import { useReducer } from 'react';
+
 import type { User, GroupDinnerMatch, ListCategory } from '@/types';
+import type { Reducer } from 'react';
 
 // Phase-based state machine
 export type GroupDinnerPhase =
-  | 'loading'           // Initial load
+  | 'loading' // Initial load
   | 'category-selection' // Selecting restaurant category
-  | 'swiping'           // Active swiping phase
-  | 'selection'         // Choosing from 3 saved restaurants
-  | 'confirmation';     // Final confirmation
+  | 'swiping' // Active swiping phase
+  | 'selection' // Choosing from 3 saved restaurants
+  | 'confirmation'; // Final confirmation
 
 // State interface
 export interface GroupDinnerState {

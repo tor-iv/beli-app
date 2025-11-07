@@ -1,4 +1,4 @@
-@import "leaflet/dist/leaflet.css";
+@import 'leaflet/dist/leaflet.css';
 
 @tailwind base;
 @tailwind components;
@@ -20,7 +20,9 @@
 body {
   background: rgb(var(--background));
   color: rgb(var(--foreground));
-  font-feature-settings: "rlig" 1, "calt" 1;
+  font-feature-settings:
+    'rlig' 1,
+    'calt' 1;
 }
 
 /* Custom rating bubble - matches native design */
@@ -34,24 +36,24 @@ body {
   height: 44px;
   font-size: 14px;
   background-color: white;
-  border: 1.5px solid #D9D9DE;
+  border: 1.5px solid #d9d9de;
 }
 
 /* Rating color variants - text color only (border is always #D9D9DE) */
 .rating-excellent {
-  color: #22C55E;
+  color: #22c55e;
 }
 
 .rating-good {
-  color: #84CC16;
+  color: #84cc16;
 }
 
 .rating-average {
-  color: #F59E0B;
+  color: #f59e0b;
 }
 
 .rating-poor {
-  color: #EF4444;
+  color: #ef4444;
 }
 
 /* Content-first card style */

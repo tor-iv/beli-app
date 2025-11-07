@@ -15,12 +15,7 @@ interface ButtonRowProps {
   singleSelect?: boolean;
 }
 
-export function ButtonRow({
-  items,
-  selectedItem,
-  onSelect,
-  singleSelect = false,
-}: ButtonRowProps) {
+export const ButtonRow = ({ items, selectedItem, onSelect, singleSelect = false }: ButtonRowProps) => {
   // Type guard to check if items are threshold objects
   const isThresholdItems = (
     items: readonly string[] | readonly { value: number | null; label: string }[]

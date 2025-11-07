@@ -1,9 +1,11 @@
 'use client';
 
-import { useMemo } from 'react';
 import { Share2 } from 'lucide-react';
-import { DiningLocation } from '@/types';
+import { useMemo } from 'react';
+
 import { positionDotsOnMap } from '@/lib/utils/mapProjection';
+
+import type { DiningLocation } from '@/types';
 
 interface DiningMapProps {
   locations: DiningLocation[];
@@ -12,12 +14,7 @@ interface DiningMapProps {
   onShare?: () => void;
 }
 
-export function DiningMap({
-  locations,
-  totalCities,
-  totalRestaurants,
-  onShare,
-}: DiningMapProps) {
+export const DiningMap = ({ locations, totalCities, totalRestaurants, onShare }: DiningMapProps) => {
   // Format plural text
   const cityText = totalCities === 1 ? 'city' : 'cities';
   const restaurantText = totalRestaurants === 1 ? 'restaurant' : 'restaurants';
@@ -28,41 +25,41 @@ export function DiningMap({
   }, [locations]);
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden shadow-sm">
-      <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
+    <div className="overflow-hidden rounded-lg bg-white shadow-sm">
+      <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Your Dining Map</h3>
-          <p className="text-sm text-gray-800 mt-0.5">
+          <p className="mt-0.5 text-sm text-gray-800">
             {totalCities} {cityText} • {totalRestaurants} {restaurantText}
           </p>
         </div>
         {onShare && (
           <button
             onClick={onShare}
-            className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+            className="rounded-lg p-2 transition-colors hover:bg-gray-50"
             type="button"
             aria-label="Share dining map"
           >
-            <Share2 className="w-5 h-5 text-gray-800" />
+            <Share2 className="h-5 w-5 text-gray-800" />
           </button>
         )}
       </div>
 
       {/* Map with Dots */}
       <div className="relative bg-white p-8">
-        <div className="relative w-full h-48">
+        <div className="relative h-48 w-full">
           {/* World Map Background */}
           <img
             src="/images/World_Map_Grayscale.png"
             alt="World map showing dining locations"
-            className="w-full h-full object-contain"
+            className="h-full w-full object-contain"
           />
 
           {/* City Dots Overlay */}
           {positionedLocations.map((location, index) => (
             <div
               key={`${location.city}-${index}`}
-              className="absolute w-2.5 h-2.5 -ml-1.5 -mt-1.5 rounded-full bg-teal-600 border-2 border-white shadow-md"
+              className="absolute -ml-1.5 -mt-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-teal-600 shadow-md"
               style={{
                 left: `${location.x}%`,
                 top: `${location.y}%`,

@@ -7,10 +7,13 @@
  * - Rank index maintenance
  */
 
-import { delay } from '../base/BaseService';
-import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
 import { mockRestaurants } from '@/data/mock/restaurants';
-import { Restaurant, UserRestaurantRelation, ListCategory, RankedRestaurant } from '@/types';
+import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
+
+import { delay } from '../base/BaseService';
+
+import type { Restaurant, UserRestaurantRelation, ListCategory, RankedRestaurant } from '@/types';
+
 
 export class RankingService {
   /**
@@ -21,12 +24,15 @@ export class RankingService {
    * @param category - List category (currently all go to 'restaurants')
    * @returns Ranked restaurants with user ratings attached
    */
-  static async getRankedRestaurants(userId: string, category: ListCategory): Promise<RankedRestaurant[]> {
+  static async getRankedRestaurants(
+    userId: string,
+    category: ListCategory
+  ): Promise<RankedRestaurant[]> {
     await delay();
 
     // Get all restaurants in the 'been' list for this user
     const relations = mockUserRestaurantRelations.filter(
-      relation => relation.userId === userId && relation.status === 'been'
+      (relation) => relation.userId === userId && relation.status === 'been'
     );
 
     // Filter by category (for now, all restaurants go into 'restaurants' category)
@@ -34,23 +40,30 @@ export class RankingService {
 
     // Get full restaurant objects with their rank indices and user ratings
     const restaurantsWithRanks = relations
-      .map(relation => {
-        const restaurant = mockRestaurants.find(r => r.id === relation.restaurantId);
-        return restaurant ? {
-          restaurant,
-          rankIndex: relation.rankIndex ?? 999999,
-          userRating: relation.rating
-        } : null;
+      .map((relation) => {
+        const restaurant = mockRestaurants.find((r) => r.id === relation.restaurantId);
+        return restaurant
+          ? {
+              restaurant,
+              rankIndex: relation.rankIndex ?? 999999,
+              userRating: relation.rating,
+            }
+          : null;
       })
-      .filter((item): item is { restaurant: Restaurant; rankIndex: number; userRating: number | undefined } => item !== null);
+      .filter(
+        (
+          item
+        ): item is { restaurant: Restaurant; rankIndex: number; userRating: number | undefined } =>
+          item !== null
+      );
 
     // Sort by rank index (lower index = higher rank)
     restaurantsWithRanks.sort((a, b) => a.rankIndex - b.rankIndex);
 
     // Attach userRating to restaurant objects
-    return restaurantsWithRanks.map(item => ({
+    return restaurantsWithRanks.map((item) => ({
       ...item.restaurant,
-      userRating: item.userRating
+      userRating: item.userRating,
     }));
   }
 
@@ -124,11 +137,11 @@ export class RankingService {
 
     // Find all relations for this user in the 'been' status
     const relations = mockUserRestaurantRelations.filter(
-      relation => relation.userId === userId && relation.status === 'been'
+      (relation) => relation.userId === userId && relation.status === 'been'
     );
 
     // Increment rank index for all items at or after the insertion point
-    relations.forEach(relation => {
+    relations.forEach((relation) => {
       if (relation.rankIndex !== undefined && relation.rankIndex >= fromIndex) {
         relation.rankIndex += 1;
       }

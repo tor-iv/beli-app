@@ -1,8 +1,10 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { Utensils, Globe, Phone, Navigation, Calendar } from 'lucide-react';
-import { Restaurant } from '@/types';
+
+import { Button } from '@/components/ui/button';
+
+import type { Restaurant } from '@/types';
 
 interface RestaurantActionButtonsProps {
   restaurant: Restaurant;
@@ -10,11 +12,11 @@ interface RestaurantActionButtonsProps {
   onReserve?: () => void;
 }
 
-export function RestaurantActionButtons({
+export const RestaurantActionButtons = ({
   restaurant,
   onWhatToOrder,
   onReserve,
-}: RestaurantActionButtonsProps) {
+}: RestaurantActionButtonsProps) => {
   const hasMenu = restaurant.menu && restaurant.menu.length > 0;
   const hasWebsite = !!restaurant.website;
   const hasPhone = !!restaurant.phone;
@@ -62,7 +64,7 @@ export function RestaurantActionButtons({
       {/* Reserve Now */}
       <Button
         variant="outline"
-        className="flex flex-col items-center justify-center h-20 gap-1"
+        className="flex h-20 flex-col items-center justify-center gap-1"
         onClick={onReserve}
       >
         <Calendar className="h-5 w-5" />
@@ -72,7 +74,7 @@ export function RestaurantActionButtons({
       {/* What to Order */}
       <Button
         variant="outline"
-        className="flex flex-col items-center justify-center h-20 gap-1"
+        className="flex h-20 flex-col items-center justify-center gap-1"
         disabled={!hasMenu}
         onClick={onWhatToOrder}
       >
@@ -83,7 +85,7 @@ export function RestaurantActionButtons({
       {/* Website */}
       <Button
         variant="outline"
-        className="flex flex-col items-center justify-center h-20 gap-1"
+        className="flex h-20 flex-col items-center justify-center gap-1"
         disabled={!hasWebsite}
         onClick={handleWebsite}
       >
@@ -94,7 +96,7 @@ export function RestaurantActionButtons({
       {/* Call */}
       <Button
         variant="outline"
-        className="flex flex-col items-center justify-center h-20 gap-1"
+        className="flex h-20 flex-col items-center justify-center gap-1"
         disabled={!hasPhone}
         onClick={handleCall}
       >
@@ -105,7 +107,7 @@ export function RestaurantActionButtons({
       {/* Directions */}
       <Button
         variant="outline"
-        className="flex flex-col items-center justify-center h-20 gap-1"
+        className="flex h-20 flex-col items-center justify-center gap-1"
         disabled={!hasLocation}
         onClick={handleDirections}
       >

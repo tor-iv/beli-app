@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Restaurant } from '@/types';
+
+import type { Restaurant } from '@/types';
 
 /**
  * Creates an IntersectionObserver to track visible restaurants
@@ -43,7 +44,11 @@ function createRestaurantObserver(
       // Add buffer before and after visible items
       const allIndexes = new Set<number>();
       visibleIndexes.forEach((index) => {
-        for (let i = Math.max(0, index - bufferSize); i <= Math.min(restaurants.length - 1, index + bufferSize); i++) {
+        for (
+          let i = Math.max(0, index - bufferSize);
+          i <= Math.min(restaurants.length - 1, index + bufferSize);
+          i++
+        ) {
           allIndexes.add(i);
         }
       });

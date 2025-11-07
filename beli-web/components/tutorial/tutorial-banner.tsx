@@ -1,49 +1,47 @@
-'use client'
+'use client';
 
-import { useState, memo } from 'react'
-import { X, GraduationCap } from 'lucide-react'
+import { X, GraduationCap } from 'lucide-react';
+import { useState, memo } from 'react';
 
 interface TutorialBannerProps {
-  featureName: string
-  description?: string
+  featureName: string;
+  description?: string;
 }
 
-export const TutorialBanner = memo(function TutorialBanner({
+export const TutorialBanner = memo(({
   featureName,
-  description
-}: TutorialBannerProps) {
-  const [isVisible, setIsVisible] = useState(true)
+  description,
+}: TutorialBannerProps) => {
+  const [isVisible, setIsVisible] = useState(true);
 
-  if (!isVisible) return null
+  if (!isVisible) return null;
 
   return (
-    <div className="bg-primary/10 border-b border-primary/20">
+    <div className="border-b border-primary/20 bg-primary/10">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0">
-              <GraduationCap className="w-5 h-5 text-primary" />
+              <GraduationCap className="h-5 w-5 text-primary" />
             </div>
             <div>
               <div className="text-sm font-semibold text-gray-900">
                 Tutorial Mode: {featureName}
               </div>
               {description && (
-                <div className="text-xs text-gray-600 hidden md:block">
-                  {description}
-                </div>
+                <div className="hidden text-xs text-gray-600 md:block">{description}</div>
               )}
             </div>
           </div>
           <button
             onClick={() => setIsVisible(false)}
-            className="flex-shrink-0 p-1 hover:bg-primary/20 rounded-lg transition-colors"
+            className="flex-shrink-0 rounded-lg p-1 transition-colors hover:bg-primary/20"
             aria-label="Dismiss banner"
           >
-            <X className="w-5 h-5 text-gray-600" />
+            <X className="h-5 w-5 text-gray-600" />
           </button>
         </div>
       </div>
     </div>
-  )
-})
+  );
+});

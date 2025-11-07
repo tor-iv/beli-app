@@ -1,8 +1,9 @@
 'use client';
 
+import { IoClose } from 'react-icons/io5';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { IoClose } from 'react-icons/io5';
 
 interface FilterPillProps {
   label: string;
@@ -13,23 +14,20 @@ interface FilterPillProps {
   variant?: 'default' | 'outline';
 }
 
-export function FilterPill({
+export const FilterPill = ({
   label,
   count,
   active = false,
   onClick,
   onRemove,
   variant = 'outline',
-}: FilterPillProps) {
+}: FilterPillProps) => {
   return (
     <Button
       variant={active ? 'default' : variant}
       size="sm"
       onClick={onClick}
-      className={`
-        h-8 gap-1.5 whitespace-nowrap rounded-full px-3 text-sm font-medium
-        ${active ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''}
-      `}
+      className={`h-8 gap-1.5 whitespace-nowrap rounded-full px-3 text-sm font-medium ${active ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''} `}
     >
       <span>{label}</span>
       {count !== undefined && count > 0 && (

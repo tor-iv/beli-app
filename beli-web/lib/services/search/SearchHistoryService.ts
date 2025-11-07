@@ -7,10 +7,13 @@
  * - Clearing search history
  */
 
-import { delay } from '../base/BaseService';
-import { mockRestaurants } from '@/data/mock/restaurants';
 import { mockRecentSearches } from '@/data/mock/recentSearches';
-import { RecentSearch } from '@/types';
+import { mockRestaurants } from '@/data/mock/restaurants';
+
+import { delay } from '../base/BaseService';
+
+import type { RecentSearch } from '@/types';
+
 
 export class SearchHistoryService {
   /**
@@ -29,7 +32,7 @@ export class SearchHistoryService {
    */
   static async addRecentSearch(restaurantId: string): Promise<void> {
     await delay();
-    const restaurant = mockRestaurants.find(r => r.id === restaurantId);
+    const restaurant = mockRestaurants.find((r) => r.id === restaurantId);
     if (restaurant) {
       const newSearch: RecentSearch = {
         id: `recent-${Date.now()}`,
@@ -50,7 +53,7 @@ export class SearchHistoryService {
    */
   static async clearRecentSearch(searchId: string): Promise<void> {
     await delay();
-    const index = mockRecentSearches.findIndex(s => s.id === searchId);
+    const index = mockRecentSearches.findIndex((s) => s.id === searchId);
     if (index !== -1) {
       mockRecentSearches.splice(index, 1);
     }

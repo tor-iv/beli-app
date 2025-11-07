@@ -1,10 +1,12 @@
 'use client';
 
+import L from 'leaflet';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import { Restaurant } from '@/types';
+
 import { cn } from '@/lib/utils';
+
+import type { Restaurant } from '@/types';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for default marker icons in Next.js
@@ -65,7 +67,7 @@ function createCustomIcon(rating: number, isSelected: boolean): L.DivIcon {
 }
 
 // Component to handle map bounds updates
-function MapBoundsUpdater({ restaurants }: { restaurants: Restaurant[] }) {
+const MapBoundsUpdater = ({ restaurants }: { restaurants: Restaurant[] }) => {
   const map = useMap();
 
   useEffect(() => {
@@ -95,21 +97,19 @@ function MapBoundsUpdater({ restaurants }: { restaurants: Restaurant[] }) {
   return null;
 }
 
-export function RestaurantMap({
+export const RestaurantMap = ({
   restaurants,
   selectedRestaurant,
   onRestaurantSelect,
   visibleRestaurants,
   className,
-}: RestaurantMapProps) {
+}: RestaurantMapProps) => {
   const [mapCenter, setMapCenter] = useState<[number, number]>([40.728334, -73.998045]);
   const [mapZoom, setMapZoom] = useState(13);
 
   // Use visible restaurants if provided, otherwise all restaurants
   const displayRestaurants = useMemo(() => {
-    return visibleRestaurants && visibleRestaurants.length > 0
-      ? visibleRestaurants
-      : restaurants;
+    return visibleRestaurants && visibleRestaurants.length > 0 ? visibleRestaurants : restaurants;
   }, [visibleRestaurants, restaurants]);
 
   // Filter restaurants with valid coordinates
@@ -134,18 +134,20 @@ export function RestaurantMap({
 
   if (restaurantsWithCoords.length === 0) {
     return (
-      <div className={cn('flex items-center justify-center h-full bg-gray-50 text-muted', className)}>
+      <div
+        className={cn('flex h-full items-center justify-center bg-gray-50 text-muted', className)}
+      >
         <p>No restaurant locations available to display on map</p>
       </div>
     );
   }
 
   return (
-    <div className={cn('w-full h-full relative', className)}>
+    <div className={cn('relative h-full w-full', className)}>
       <MapContainer
         center={mapCenter}
         zoom={mapZoom}
-        className="w-full h-full"
+        className="h-full w-full"
         zoomControl={true}
         scrollWheelZoom={true}
       >
@@ -173,19 +175,20 @@ export function RestaurantMap({
             >
               <Popup className="custom-popup">
                 <div className="min-w-[180px]">
-                  <div className="font-semibold text-base mb-1 text-gray-900">
+                  <div className="mb-1 text-base font-semibold text-gray-900">
                     {restaurant.name}
                   </div>
-                  <div className="text-sm text-gray-800 mb-1">
+                  <div className="mb-1 text-sm text-gray-800">
                     {restaurant.location.neighborhood}
                   </div>
-                  <div className="text-sm text-gray-800">
-                    {restaurant.cuisine.join(', ')}
-                  </div>
-                  <div className="flex items-center gap-2 mt-2 text-sm">
+                  <div className="text-sm text-gray-800">{restaurant.cuisine.join(', ')}</div>
+                  <div className="mt-2 flex items-center gap-2 text-sm">
                     <span className="text-gray-800">{restaurant.priceRange}</span>
                     <span className="text-gray-800">•</span>
-                    <span className="font-semibold" style={{ color: getRatingColor(restaurant.rating) }}>
+                    <span
+                      className="font-semibold"
+                      style={{ color: getRatingColor(restaurant.rating) }}
+                    >
                       {restaurant.rating.toFixed(1)}
                     </span>
                   </div>

@@ -16,12 +16,12 @@ interface CheckboxListProps {
   height?: string;
 }
 
-export function CheckboxList({
+export const CheckboxList = ({
   items,
   selectedItems,
   onToggle,
   height = 'h-48',
-}: CheckboxListProps) {
+}: CheckboxListProps) => {
   return (
     <ScrollArea className={height}>
       <div className="space-y-2 pr-4">

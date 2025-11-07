@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
-import { Restaurant } from '@/types';
-import { ListFilters } from '@/lib/stores/list-filters';
+
 import { applyAllFilters, sortRestaurants } from '@/lib/utils/restaurant-filters';
+
+import type { ListFilters } from '@/lib/stores/list-filters';
+import type { Restaurant } from '@/types';
 
 /**
  * Hook that applies all filters and sorting to a restaurant list

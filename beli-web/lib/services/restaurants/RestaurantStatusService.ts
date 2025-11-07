@@ -8,9 +8,12 @@
  * - Filtering restaurants with status information
  */
 
-import { delay } from '../base/BaseService';
 import { mockRestaurants } from '@/data/mock/restaurants';
-import { Restaurant } from '@/types';
+
+import { delay } from '../base/BaseService';
+
+import type { Restaurant } from '@/types';
+
 
 export class RestaurantStatusService {
   /**
@@ -24,13 +27,15 @@ export class RestaurantStatusService {
     }
 
     // Parse hours like "7:30 AM - 12:00 AM" or "11:00 AM - 11:00 PM"
-    const match = hoursString.match(/(\d{1,2}):(\d{2})\s*(AM|PM)\s*-\s*(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+    const match = hoursString.match(
+      /(\d{1,2}):(\d{2})\s*(AM|PM)\s*-\s*(\d{1,2}):(\d{2})\s*(AM|PM)/i
+    );
     if (!match) return null;
 
     const [, openHour, openMin, openAmPm, closeHour, closeMin, closeAmPm] = match;
 
-    let openTime = parseInt(openHour) + (parseInt(openMin) / 60);
-    let closeTime = parseInt(closeHour) + (parseInt(closeMin) / 60);
+    let openTime = parseInt(openHour) + parseInt(openMin) / 60;
+    let closeTime = parseInt(closeHour) + parseInt(closeMin) / 60;
 
     if (openAmPm.toUpperCase() === 'PM' && parseInt(openHour) !== 12) {
       openTime += 12;
@@ -63,9 +68,17 @@ export class RestaurantStatusService {
   static isRestaurantOpen(restaurant: Restaurant, currentTime?: Date): boolean {
     if (!restaurant.hours) return false;
     const now = currentTime || new Date();
-    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
+    const dayNames = [
+      'sunday',
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+    ] as const;
     const currentDay = dayNames[now.getDay()];
-    const currentHour = now.getHours() + (now.getMinutes() / 60);
+    const currentHour = now.getHours() + now.getMinutes() / 60;
 
     const todayHours = restaurant.hours[currentDay];
     const parsedHours = this.parseHours(todayHours);
@@ -74,7 +87,7 @@ export class RestaurantStatusService {
 
     // Handle overnight restaurants
     if (parsedHours.close > 24) {
-      return currentHour >= parsedHours.open || currentHour <= (parsedHours.close - 24);
+      return currentHour >= parsedHours.open || currentHour <= parsedHours.close - 24;
     }
 
     return currentHour >= parsedHours.open && currentHour <= parsedHours.close;
@@ -89,7 +102,15 @@ export class RestaurantStatusService {
   static getClosingTime(restaurant: Restaurant, currentTime?: Date): string | null {
     if (!restaurant.hours) return null;
     const now = currentTime || new Date();
-    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
+    const dayNames = [
+      'sunday',
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+    ] as const;
     const currentDay = dayNames[now.getDay()];
 
     const todayHours = restaurant.hours[currentDay];
@@ -127,10 +148,10 @@ export class RestaurantStatusService {
   ): Promise<Restaurant[]> {
     await delay();
 
-    let restaurants = mockRestaurants.filter(r => restaurantIds.includes(r.id));
+    let restaurants = mockRestaurants.filter((r) => restaurantIds.includes(r.id));
 
     // Add status information
-    restaurants = restaurants.map(restaurant => ({
+    restaurants = restaurants.map((restaurant) => ({
       ...restaurant,
       isOpen: this.isRestaurantOpen(restaurant),
       closingTime: this.getClosingTime(restaurant),
@@ -139,11 +160,11 @@ export class RestaurantStatusService {
 
     // Apply filters
     if (filters?.openNow) {
-      restaurants = restaurants.filter(r => r.isOpen);
+      restaurants = restaurants.filter((r) => r.isOpen);
     }
 
     if (filters?.acceptsReservations) {
-      restaurants = restaurants.filter(r => r.acceptsReservations);
+      restaurants = restaurants.filter((r) => r.acceptsReservations);
     }
 
     // Apply sorting

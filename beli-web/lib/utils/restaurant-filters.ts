@@ -1,5 +1,5 @@
-import { Restaurant } from '@/types';
-import { ListFilters } from '@/lib/stores/list-filters';
+import type { ListFilters } from '@/lib/stores/list-filters';
+import type { Restaurant } from '@/types';
 
 /**
  * Individual filter functions for restaurants
@@ -10,107 +10,129 @@ import { ListFilters } from '@/lib/stores/list-filters';
 /**
  * Filter by category (restaurants, bars, bakeries, etc.)
  */
-export const applyCategoryFilter = (category: ListFilters['category']) => (r: Restaurant): boolean => {
-  if (category === 'all') return true;
-  const restaurantCategory = (r.category?.toLowerCase() || 'restaurants');
-  return restaurantCategory === category;
-};
+export const applyCategoryFilter =
+  (category: ListFilters['category']) =>
+  (r: Restaurant): boolean => {
+    if (category === 'all') return true;
+    const restaurantCategory = r.category?.toLowerCase() || 'restaurants';
+    return restaurantCategory === category;
+  };
 
 /**
  * Filter by city
  */
-export const applyCityFilter = (cities: string[]) => (r: Restaurant): boolean => {
-  if (cities.length === 0) return true;
-  const city = r.location?.city || '';
-  return cities.includes(city);
-};
+export const applyCityFilter =
+  (cities: string[]) =>
+  (r: Restaurant): boolean => {
+    if (cities.length === 0) return true;
+    const city = r.location?.city || '';
+    return cities.includes(city);
+  };
 
 /**
  * Filter by cuisine type
  */
-export const applyCuisineFilter = (cuisines: string[]) => (r: Restaurant): boolean => {
-  if (cuisines.length === 0) return true;
-  // Restaurant has array of cuisines, match if any overlap
-  return r.cuisine.some((c) => cuisines.includes(c));
-};
+export const applyCuisineFilter =
+  (cuisines: string[]) =>
+  (r: Restaurant): boolean => {
+    if (cuisines.length === 0) return true;
+    // Restaurant has array of cuisines, match if any overlap
+    return r.cuisine.some((c) => cuisines.includes(c));
+  };
 
 /**
  * Filter by price range
  */
-export const applyPriceFilter = (prices: ('$' | '$$' | '$$$' | '$$$$')[]) => (r: Restaurant): boolean => {
-  if (prices.length === 0) return true;
-  return prices.includes(r.priceRange as '$' | '$$' | '$$$' | '$$$$');
-};
+export const applyPriceFilter =
+  (prices: ('$' | '$$' | '$$$' | '$$$$')[]) =>
+  (r: Restaurant): boolean => {
+    if (prices.length === 0) return true;
+    return prices.includes(r.priceRange as '$' | '$$' | '$$$' | '$$$$');
+  };
 
 /**
  * Filter by tags (chef-driven, date night, etc.)
  */
-export const applyTagFilter = (tags: string[]) => (r: Restaurant): boolean => {
-  if (tags.length === 0) return true;
-  const restaurantTags = r.tags || [];
-  return tags.some((tag) => restaurantTags.includes(tag));
-};
+export const applyTagFilter =
+  (tags: string[]) =>
+  (r: Restaurant): boolean => {
+    if (tags.length === 0) return true;
+    const restaurantTags = r.tags || [];
+    return tags.some((tag) => restaurantTags.includes(tag));
+  };
 
 /**
  * Filter by "good for" options (birthdays, business dinners, etc.)
  */
-export const applyGoodForFilter = (goodFor: string[]) => (r: Restaurant): boolean => {
-  if (goodFor.length === 0) return true;
-  const restaurantGoodFor = r.goodFor || [];
-  return goodFor.some((option) => restaurantGoodFor.includes(option));
-};
+export const applyGoodForFilter =
+  (goodFor: string[]) =>
+  (r: Restaurant): boolean => {
+    if (goodFor.length === 0) return true;
+    const restaurantGoodFor = r.goodFor || [];
+    return goodFor.some((option) => restaurantGoodFor.includes(option));
+  };
 
 /**
  * Filter by minimum score threshold
  */
-export const applyMinScoreFilter = (minScore: number | null) => (r: Restaurant): boolean => {
-  if (minScore === null) return true;
-  return r.rating >= minScore;
-};
+export const applyMinScoreFilter =
+  (minScore: number | null) =>
+  (r: Restaurant): boolean => {
+    if (minScore === null) return true;
+    return r.rating >= minScore;
+  };
 
 /**
  * Filter by minimum number of friends who've been
  */
-export const applyMinFriendsFilter = (minFriends: number | null) => (r: Restaurant): boolean => {
-  if (minFriends === null) return true;
-  const friendsCount = r.scores?.friendScore || 0;
-  return friendsCount >= minFriends;
-};
+export const applyMinFriendsFilter =
+  (minFriends: number | null) =>
+  (r: Restaurant): boolean => {
+    if (minFriends === null) return true;
+    const friendsCount = r.scores?.friendScore || 0;
+    return friendsCount >= minFriends;
+  };
 
 /**
  * Filter by open now status
  */
-export const applyOpenNowFilter = (openNow: boolean) => (r: Restaurant): boolean => {
-  if (!openNow) return true;
-  return r.isOpen === true;
-};
+export const applyOpenNowFilter =
+  (openNow: boolean) =>
+  (r: Restaurant): boolean => {
+    if (!openNow) return true;
+    return r.isOpen === true;
+  };
 
 /**
  * Filter by accepts reservations
  */
-export const applyReservationsFilter = (acceptsReservations: boolean) => (r: Restaurant): boolean => {
-  if (!acceptsReservations) return true;
-  return r.acceptsReservations === true;
-};
+export const applyReservationsFilter =
+  (acceptsReservations: boolean) =>
+  (r: Restaurant): boolean => {
+    if (!acceptsReservations) return true;
+    return r.acceptsReservations === true;
+  };
 
 /**
  * Filter by search query (matches name, cuisine, or neighborhood)
  */
-export const applySearchFilter = (searchQuery: string) => (r: Restaurant): boolean => {
-  if (!searchQuery || searchQuery.trim() === '') return true;
-  const query = searchQuery.toLowerCase();
+export const applySearchFilter =
+  (searchQuery: string) =>
+  (r: Restaurant): boolean => {
+    if (!searchQuery || searchQuery.trim() === '') return true;
+    const query = searchQuery.toLowerCase();
 
-  // Search in name
-  if (r.name.toLowerCase().includes(query)) return true;
+    // Search in name
+    if (r.name.toLowerCase().includes(query)) return true;
 
-  // Search in cuisines
-  if (r.cuisine.some((c) => c.toLowerCase().includes(query))) return true;
+    // Search in cuisines
+    if (r.cuisine.some((c) => c.toLowerCase().includes(query))) return true;
 
-  // Search in neighborhood
-  if (r.location?.neighborhood?.toLowerCase().includes(query)) return true;
+    // Search in neighborhood
+    if (r.location?.neighborhood?.toLowerCase().includes(query)) return true;
 
-  return false;
-};
+    return false;
+  };
 
 /**
  * Apply all filters to a restaurant list
@@ -128,10 +150,7 @@ export const applySearchFilter = (searchQuery: string) => (r: Restaurant): boole
  *   openNow: true
  * });
  */
-export function applyAllFilters(
-  restaurants: Restaurant[],
-  filters: ListFilters
-): Restaurant[] {
+export function applyAllFilters(restaurants: Restaurant[], filters: ListFilters): Restaurant[] {
   return restaurants
     .filter(applyCategoryFilter(filters.category))
     .filter(applyCityFilter(filters.cities))

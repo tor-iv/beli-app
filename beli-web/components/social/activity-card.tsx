@@ -1,10 +1,12 @@
-import { Activity } from '@/types';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { RatingBubble } from '@/components/rating/rating-bubble';
 import { Heart, MessageCircle, Share2, Bookmark, PlusCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+
+import { RatingBubble } from '@/components/rating/rating-bubble';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+
+import type { Activity } from '@/types';
 
 interface ActivityCardProps {
   activity: Activity;
@@ -32,15 +34,15 @@ function formatTimeAgo(timestamp: Date | string): string {
   return `${weeks}w ago`;
 }
 
-export function ActivityCard({
+export const ActivityCard = ({
   activity,
   currentUserId,
   onLike,
   onComment,
   onShare,
   onBookmark,
-  onAddPress
-}: ActivityCardProps) {
+  onAddPress,
+}: ActivityCardProps) => {
   const isLiked = currentUserId && activity.interactions?.likes?.includes(currentUserId);
   const isBookmarked = currentUserId && activity.interactions?.bookmarks?.includes(currentUserId);
 
@@ -49,7 +51,7 @@ export function ActivityCard({
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <Avatar className="w-10 h-10">
+            <Avatar className="h-10 w-10">
               <AvatarImage src={activity.user.avatar} alt={activity.user.displayName} />
               <AvatarFallback>{activity.user.displayName[0]}</AvatarFallback>
             </Avatar>
@@ -60,12 +62,8 @@ export function ActivityCard({
               >
                 {activity.user.displayName}
               </Link>
-              <p className="text-sm text-muted">
-                visited {activity.restaurant.name}
-              </p>
-              <p className="text-xs text-muted">
-                {formatTimeAgo(activity.timestamp)}
-              </p>
+              <p className="text-sm text-muted">visited {activity.restaurant.name}</p>
+              <p className="text-xs text-muted">{formatTimeAgo(activity.timestamp)}</p>
             </div>
           </div>
 
@@ -74,42 +72,35 @@ export function ActivityCard({
       </CardHeader>
 
       <CardContent>
-        <Link
-          href={`/restaurant/${activity.restaurant.id}`}
-          className="block mb-3"
-        >
-          <h3 className="font-semibold hover:underline">
-            {activity.restaurant.name}
-          </h3>
+        <Link href={`/restaurant/${activity.restaurant.id}`} className="mb-3 block">
+          <h3 className="font-semibold hover:underline">{activity.restaurant.name}</h3>
           <p className="text-sm text-muted">
             {activity.restaurant.cuisine.join(', ')} • {activity.restaurant.priceRange}
           </p>
         </Link>
 
-        {activity.comment && (
-          <p className="text-sm mb-3">{activity.comment}</p>
-        )}
+        {activity.comment && <p className="mb-3 text-sm">{activity.comment}</p>}
 
         {activity.photos && activity.photos.length > 0 && (
-          <div className="grid grid-cols-2 gap-2 mb-3">
+          <div className="mb-3 grid grid-cols-2 gap-2">
             {activity.photos.slice(0, 4).map((photo, i) => (
               <img
                 key={i}
                 src={photo}
                 alt=""
-                className="rounded-lg w-full aspect-square object-cover"
+                className="aspect-square w-full rounded-lg object-cover"
               />
             ))}
           </div>
         )}
 
         {/* Social Actions */}
-        <div className="flex items-center justify-between mt-3 pt-3 border-t">
+        <div className="mt-3 flex items-center justify-between border-t pt-3">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 px-2 gap-1 hover:bg-transparent"
+              className="h-8 gap-1 px-2 hover:bg-transparent"
               onClick={(e) => {
                 e.preventDefault();
                 onLike?.();
@@ -123,7 +114,7 @@ export function ActivityCard({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 px-2 gap-1 hover:bg-transparent"
+              className="h-8 gap-1 px-2 hover:bg-transparent"
               onClick={(e) => {
                 e.preventDefault();
                 onComment?.();
@@ -135,7 +126,7 @@ export function ActivityCard({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 px-2 gap-1 hover:bg-transparent"
+              className="h-8 gap-1 px-2 hover:bg-transparent"
               onClick={(e) => {
                 e.preventDefault();
                 onShare?.();
@@ -149,7 +140,7 @@ export function ActivityCard({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 px-2 gap-1 hover:bg-transparent"
+              className="h-8 gap-1 px-2 hover:bg-transparent"
               onClick={(e) => {
                 e.preventDefault();
                 onAddPress?.();
@@ -161,7 +152,7 @@ export function ActivityCard({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 px-2 gap-1 hover:bg-transparent"
+              className="h-8 gap-1 px-2 hover:bg-transparent"
               onClick={(e) => {
                 e.preventDefault();
                 onBookmark?.();

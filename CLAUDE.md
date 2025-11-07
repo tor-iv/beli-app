@@ -87,8 +87,9 @@ This is a monorepo structure:
 - **Framework**: Next.js 16 with App Router
 - **Navigation**: Next.js file-based routing
 - **State Management**: Zustand + React Query (TanStack Query)
-- **Data Layer**: MockDataService (copied from mobile, adapted for web)
+- **Data Layer**: 20 modular domain services (`lib/services/`)
 - **UI**: shadcn/ui component library + Tailwind CSS
+- **Linting**: ESLint with Airbnb-style config + Prettier
 - **Deployment**: Vercel with automatic CI/CD
 
 ### Component Organization
@@ -151,24 +152,51 @@ Uses Tailwind CSS with custom configuration in [tailwind.config.ts](beli-web/tai
 
 ### Data Layer Architecture
 
-**MockDataService** serves as the complete backend replacement for both platforms:
+**Web:** The data layer has been refactored into modular domain services organized in [beli-web/lib/services/](beli-web/lib/services/).
 
-**Mobile:** [beli-native/src/data/mockDataService.ts](beli-native/src/data/mockDataService.ts)
-**Web:** [beli-web/lib/mockDataService.ts](beli-web/lib/mockDataService.ts)
+**Mobile:** Still uses monolithic [beli-native/src/data/mockDataService.ts](beli-native/src/data/mockDataService.ts).
+
+#### Web Service Architecture (20 Domain Services)
+
+Services are organized into 5 dependency phases:
+
+**Phase 1 - Independent Services:**
+- NotificationService, SearchHistoryService, LeaderboardService, ReviewService, ListService
+
+**Phase 2 - Foundation Services:**
+- UserService, SocialService, RestaurantService, RestaurantStatusService
+
+**Phase 3 - Relationship & Feed:**
+- UserRestaurantService, FeedService, FeedInteractionService
+
+**Phase 4 - Tastemaker, Reservation & Menu:**
+- TastemakerService, TastemakerPostService, ReservationService, MenuService
+
+**Phase 5 - Complex Features:**
+- TasteProfileService, RankingService, GroupDinnerService
 
 Key characteristics:
-- All methods return Promises with simulated network delay (150ms)
-- Provides full CRUD operations for users, restaurants, reviews, lists
-- Includes social features (activity feed, following, leaderboard)
-- Mock data organized in `data/mock/` directory for each platform
-- Includes Tastemaker data (experts, posts, badges)
-- Group dinner matching and "What to Order" recommendation logic
+- All services are static classes with async methods
+- Network delay simulation: 50ms (configurable in BaseService)
+- Mock data remains in `data/mock/` directory
+- Services share common utilities via BaseService (caching, delay)
+- Each service focuses on a single domain
 
-**Important**: When adding features that need data:
-1. Check if MockDataService already has the method
-2. If not, add new mock data to `data/mock/` (mobile or web)
-3. Add new service method to MockDataService
-4. Import and use the service method in components
+**Importing services:**
+```typescript
+import { RestaurantService, UserService, ListService } from '@/lib/services';
+```
+
+**Web data patterns:**
+React Query hooks wrap domain services for optimal caching:
+```typescript
+import { useRestaurants } from '@/lib/hooks/use-restaurants';
+
+const { data: restaurants, isLoading, error } = useRestaurants();
+
+// Or call services directly:
+const restaurants = await RestaurantService.getAllRestaurants();
+```
 
 **Mobile data patterns:**
 ```typescript
@@ -182,14 +210,6 @@ useEffect(() => {
   };
   loadData();
 }, []);
-```
-
-**Web data patterns:**
-React Query hooks from [lib/hooks/](beli-web/lib/hooks/) wrap MockDataService for better caching:
-```typescript
-import { useRestaurants } from '@/lib/hooks/use-restaurants';
-
-const { data: restaurants, isLoading, error } = useRestaurants();
 ```
 
 Available hooks:
@@ -313,7 +333,7 @@ All components and functions are fully typed with TypeScript strict mode enabled
 - List picker modal and mobile tabs (new files in beli-web/components/lists/)
 
 ### Not Yet Implemented
-- Real backend integration (currently using MockDataService)
+- Real backend integration (currently using mock data with domain services on web, MockDataService on mobile)
 - Authentication flow
 - Push notifications
 - Photo upload functionality

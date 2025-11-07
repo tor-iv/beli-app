@@ -1,26 +1,30 @@
 'use client';
 
-import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Skeleton } from '@/components/ui/skeleton';
-import { MobileTabs, DEFAULT_MOBILE_TABS, type MobileTabId } from '@/components/lists/MobileTabs';
-import { ListPickerModal } from '@/components/lists/ListPickerModal';
-import { RestaurantMasterDetail } from '@/components/lists/RestaurantMasterDetail';
-import { useListFilters } from '@/lib/stores/list-filters';
-import { useListCounts } from '@/lib/hooks/use-list-counts';
-import { useListsReducer, type ListType } from '@/lib/hooks/use-lists-reducer';
-import { useRestaurantListData } from '@/lib/hooks/use-restaurant-list-data';
-import { useFilteredRestaurants } from '@/lib/hooks/use-filtered-restaurants';
-import { useVisibleRestaurants } from '@/lib/hooks/use-visible-restaurants';
-import { ViewType, getViewTitle, getRestaurantCountLabel } from '@/lib/utils/list-view-utils';
-import { Button } from '@/components/ui/button';
+import { Suspense } from 'react';
 import { IoShareSocial, IoChevronDown, IoCheckmark } from 'react-icons/io5';
+
+import { ListPickerModal } from '@/components/lists/ListPickerModal';
+import { MobileTabs, DEFAULT_MOBILE_TABS, type MobileTabId } from '@/components/lists/MobileTabs';
+import { RestaurantMasterDetail } from '@/components/lists/RestaurantMasterDetail';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useFilteredRestaurants } from '@/lib/hooks/use-filtered-restaurants';
+import { useListCounts } from '@/lib/hooks/use-list-counts';
+import { useListsReducer, type ListType } from '@/lib/hooks/use-lists-reducer';
+import { useRestaurantListData } from '@/lib/hooks/use-restaurant-list-data';
+import { useVisibleRestaurants } from '@/lib/hooks/use-visible-restaurants';
+import { useListFilters } from '@/lib/stores/list-filters';
+import { getViewTitle, getRestaurantCountLabel } from '@/lib/utils/list-view-utils';
+
+import type { ViewType} from '@/lib/utils/list-view-utils';
+
 
 /**
  * Lists page - Restaurant list management with filtering, sorting, and views
@@ -34,7 +38,7 @@ import {
  * - Master/detail layout on desktop
  */
 
-function ListsContent() {
+const ListsContent = () => {
   const searchParams = useSearchParams();
   const viewParam = searchParams.get('view') as ViewType;
   const tabParam = searchParams.get('tab') as ListType | null;
@@ -75,7 +79,7 @@ function ListsContent() {
   const countLabel = getRestaurantCountLabel(filteredRestaurants.length);
 
   // Handler: Select restaurant for detail view
-  const handleSelectRestaurant = (restaurant: typeof filteredRestaurants[0]) => {
+  const handleSelectRestaurant = (restaurant: (typeof filteredRestaurants)[0]) => {
     dispatch({ type: 'SELECT_RESTAURANT', restaurant });
   };
 
@@ -114,7 +118,7 @@ function ListsContent() {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-6">
-        <Skeleton className="h-10 w-48 mb-6" />
+        <Skeleton className="mb-6 h-10 w-48" />
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
             <Skeleton key={i} className="h-24 w-full" />
@@ -128,7 +132,7 @@ function ListsContent() {
     <div className="container mx-auto px-4 py-6">
       {/* Header Section */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">{viewTitle}</h1>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
@@ -147,7 +151,9 @@ function ListsContent() {
                   <IoCheckmark className="mr-2" />
                   Switch List
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleViewChange(rightPanelView === 'detail' ? 'map' : 'detail')}>
+                <DropdownMenuItem
+                  onClick={() => handleViewChange(rightPanelView === 'detail' ? 'map' : 'detail')}
+                >
                   Toggle View
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -156,15 +162,19 @@ function ListsContent() {
         </div>
 
         {/* Count and Filter Summary */}
-        <p className="text-sm text-muted-foreground mb-4">
+        <p className="mb-4 text-sm text-muted-foreground">
           {countLabel}
           {filters.getActiveFilterCount() > 0 && (
-            <span> • {filters.getActiveFilterCount()} active filter{filters.getActiveFilterCount() > 1 ? 's' : ''}</span>
+            <span>
+              {' '}
+              • {filters.getActiveFilterCount()} active filter
+              {filters.getActiveFilterCount() > 1 ? 's' : ''}
+            </span>
           )}
         </p>
 
         {/* Mobile Tabs */}
-        <div className="md:hidden mb-4">
+        <div className="mb-4 md:hidden">
           <MobileTabs
             tabs={DEFAULT_MOBILE_TABS}
             activeTab={displayedTab}
@@ -173,21 +183,21 @@ function ListsContent() {
         </div>
 
         {/* Filter/Search/Sort Controls */}
-        <div className="flex flex-col md:flex-row gap-4 mb-4">
+        <div className="mb-4 flex flex-col gap-4 md:flex-row">
           <div className="flex-1">
             <input
               type="text"
               value={filters.searchQuery}
               onChange={(e) => filters.setSearchQuery(e.target.value)}
               placeholder="Search restaurants..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2"
             />
           </div>
           <div className="flex gap-2">
             <select
               value={filters.category}
               onChange={(e) => filters.setCategory(e.target.value as any)}
-              className="px-4 py-2 border border-gray-300 rounded-lg"
+              className="rounded-lg border border-gray-300 px-4 py-2"
             >
               <option value="all">All Categories</option>
               <option value="restaurants">Restaurants</option>
@@ -236,7 +246,13 @@ function ListsContent() {
  */
 export default function ListsPage() {
   return (
-    <Suspense fallback={<div className="container mx-auto px-4 py-6"><p>Loading...</p></div>}>
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-6">
+          <p>Loading...</p>
+        </div>
+      }
+    >
       <ListsContent />
     </Suspense>
   );

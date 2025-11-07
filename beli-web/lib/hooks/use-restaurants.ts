@@ -1,6 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+
 import { RestaurantService } from '@/lib/services';
-import { Restaurant } from '@/types';
+
+import type { Restaurant } from '@/types';
+import type { UseQueryOptions } from '@tanstack/react-query';
 
 export function useRestaurants() {
   return useQuery({

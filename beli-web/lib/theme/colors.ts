@@ -10,20 +10,20 @@ export const COLORS = {
 
   // Rating Colors (for score bubbles and indicators)
   rating: {
-    excellent: '#10B981',  // green-500 - for ratings 8.0+
-    good: '#84CC16',       // lime-500 - for ratings 6.0-7.9
-    average: '#F59E0B',    // amber-500 - for ratings 4.0-5.9
-    poor: '#EF4444',       // red-500 - for ratings below 4.0
+    excellent: '#10B981', // green-500 - for ratings 8.0+
+    good: '#84CC16', // lime-500 - for ratings 6.0-7.9
+    average: '#F59E0B', // amber-500 - for ratings 4.0-5.9
+    poor: '#EF4444', // red-500 - for ratings below 4.0
   },
 
   // Accent Colors
   accent: {
-    streak: '#FF6B35',     // Orange for streak indicators
+    streak: '#FF6B35', // Orange for streak indicators
   },
 
   // UI Colors
   ui: {
-    border: '#D9D9DE',     // Light gray for borders
+    border: '#D9D9DE', // Light gray for borders
   },
 } as const;
 

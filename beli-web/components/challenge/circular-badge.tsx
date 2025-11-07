@@ -1,19 +1,20 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from 'react';
+
+import { cn } from '@/lib/utils';
 
 interface CircularBadgeProps {
-  year: number
-  size?: number
-  className?: string
+  year: number;
+  size?: number;
+  className?: string;
 }
 
-export function CircularBadge({ year, size = 160, className }: CircularBadgeProps) {
-  const outerSize = size
-  const innerSize = size * 0.85
+export const CircularBadge = ({ year, size = 160, className }: CircularBadgeProps) => {
+  const outerSize = size;
+  const innerSize = size * 0.85;
 
   return (
     <div
-      className={cn("relative flex items-center justify-center", className)}
+      className={cn('relative flex items-center justify-center', className)}
       style={{ width: outerSize, height: outerSize }}
     >
       {/* Outer ring */}
@@ -24,16 +25,14 @@ export function CircularBadge({ year, size = 160, className }: CircularBadgeProp
 
       {/* Inner circle */}
       <div
-        className="absolute rounded-full bg-white shadow-lg flex items-center justify-center"
+        className="absolute flex items-center justify-center rounded-full bg-white shadow-lg"
         style={{
           width: innerSize,
           height: innerSize,
         }}
       >
-        <span className="text-5xl font-bold text-primary">
-          {year}
-        </span>
+        <span className="text-5xl font-bold text-primary">{year}</span>
       </div>
     </div>
-  )
+  );
 }

@@ -1,9 +1,12 @@
 'use client';
 
-import { Restaurant } from '@/types';
+import { IoLocationOutline } from 'react-icons/io5';
+
 import { RatingBubble } from '@/components/rating/rating-bubble';
 import { cn } from '@/lib/utils';
-import { IoLocationOutline } from 'react-icons/io5';
+
+import type { Restaurant } from '@/types';
+
 
 interface RestaurantListItemCompactProps {
   restaurant: Restaurant;
@@ -13,37 +16,33 @@ interface RestaurantListItemCompactProps {
   'data-restaurant-id'?: string;
 }
 
-export function RestaurantListItemCompact({
+export const RestaurantListItemCompact = ({
   restaurant,
   isSelected = false,
   onClick,
   rank,
   'data-restaurant-id': dataRestaurantId,
-}: RestaurantListItemCompactProps) {
+}: RestaurantListItemCompactProps) => {
   return (
     <button
       onClick={onClick}
       data-restaurant-id={dataRestaurantId}
       className={cn(
-        'w-full text-left p-4 rounded-lg transition-all',
-        'hover:bg-gray-50 cursor-pointer',
+        'w-full rounded-lg p-4 text-left transition-all',
+        'cursor-pointer hover:bg-gray-50',
         'border border-transparent',
-        isSelected && 'bg-primary/5 border-primary shadow-sm'
+        isSelected && 'border-primary bg-primary/5 shadow-sm'
       )}
     >
       <div className="flex items-start gap-3">
         {/* Rank if provided */}
-        {rank && (
-          <div className="text-lg font-bold text-muted min-w-[2rem]">
-            #{rank}
-          </div>
-        )}
+        {rank && <div className="min-w-[2rem] text-lg font-bold text-muted">#{rank}</div>}
 
         {/* Main content */}
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-base mb-1 truncate">{restaurant.name}</h3>
-          <div className="flex items-center gap-2 text-sm text-muted mb-2">
-            <IoLocationOutline className="w-3.5 h-3.5 flex-shrink-0" />
+        <div className="min-w-0 flex-1">
+          <h3 className="mb-1 truncate text-base font-semibold">{restaurant.name}</h3>
+          <div className="mb-2 flex items-center gap-2 text-sm text-muted">
+            <IoLocationOutline className="h-3.5 w-3.5 flex-shrink-0" />
             <span className="truncate">{restaurant.location.neighborhood}</span>
             <span>•</span>
             <span>{restaurant.cuisine[0]}</span>
@@ -51,9 +50,7 @@ export function RestaurantListItemCompact({
 
           {/* Tags or distance */}
           <div className="flex items-center gap-2 text-xs">
-            {restaurant.distance && (
-              <span className="text-muted">{restaurant.distance} mi</span>
-            )}
+            {restaurant.distance && <span className="text-muted">{restaurant.distance} mi</span>}
             {restaurant.priceRange && (
               <>
                 <span className="text-muted">•</span>

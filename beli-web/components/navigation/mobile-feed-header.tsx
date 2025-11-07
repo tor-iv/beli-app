@@ -1,36 +1,38 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { Menu, Bell, Calendar, Utensils, Search } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { IconButton } from "@/components/ui/icon-button"
-import { HamburgerMenu } from "./hamburger-menu"
+import { Menu, Bell, Calendar, Utensils, Search } from 'lucide-react';
+import * as React from 'react';
+
+import { IconButton } from '@/components/ui/icon-button';
+import { cn } from '@/lib/utils';
+
+import { HamburgerMenu } from './hamburger-menu';
 
 interface MobileFeedHeaderProps {
-  unreadNotificationCount?: number
-  onNotificationsClick?: () => void
-  onReservationsClick?: () => void
-  onGroupDinnerClick?: () => void
-  onSearchClick?: () => void
-  className?: string
+  unreadNotificationCount?: number;
+  onNotificationsClick?: () => void;
+  onReservationsClick?: () => void;
+  onGroupDinnerClick?: () => void;
+  onSearchClick?: () => void;
+  className?: string;
 }
 
-export function MobileFeedHeader({
+export const MobileFeedHeader = ({
   unreadNotificationCount = 0,
   onNotificationsClick,
   onReservationsClick,
   onGroupDinnerClick,
   onSearchClick,
   className,
-}: MobileFeedHeaderProps) {
+}: MobileFeedHeaderProps) => {
   return (
-    <div className={cn("md:hidden bg-white", className)}>
+    <div className={cn('bg-white md:hidden', className)}>
       {/* Top Header */}
       <div className="flex items-center justify-between px-4 py-3">
         {/* Logo */}
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold text-foreground">beli</h1>
-          <span className="bg-teal-50 text-primary text-[11px] font-semibold px-1.5 py-0.5 rounded">
+          <span className="rounded bg-teal-50 px-1.5 py-0.5 text-[11px] font-semibold text-primary">
             SC
           </span>
         </div>
@@ -46,7 +48,7 @@ export function MobileFeedHeader({
             >
               <Calendar className="h-6 w-6 text-foreground" />
             </IconButton>
-            <span className="absolute top-0.5 right-0.5 bg-primary text-white text-[10px] font-semibold rounded-full h-4 w-4 flex items-center justify-center">
+            <span className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-white">
               1
             </span>
           </div>
@@ -70,7 +72,7 @@ export function MobileFeedHeader({
               <Bell className="h-6 w-6 text-foreground" />
             </IconButton>
             {unreadNotificationCount > 0 && (
-              <span className="absolute top-0.5 right-0.5 bg-primary text-white text-[10px] font-semibold rounded-full h-4 min-w-[16px] px-1 flex items-center justify-center">
+              <span className="absolute right-0.5 top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-white">
                 {unreadNotificationCount}
               </span>
             )}
@@ -90,12 +92,12 @@ export function MobileFeedHeader({
       <div className="px-4 pb-3">
         <button
           onClick={onSearchClick}
-          className="w-full flex items-center bg-white rounded-lg shadow-button border border-gray-300 px-3 py-2.5 text-left"
+          className="flex w-full items-center rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-left shadow-button"
         >
-          <Search className="h-5 w-5 text-gray-600 mr-2 flex-shrink-0" />
-          <span className="text-base text-tertiary">Search a restaurant, member, etc.</span>
+          <Search className="mr-2 h-5 w-5 flex-shrink-0 text-gray-600" />
+          <span className="text-tertiary text-base">Search a restaurant, member, etc.</span>
         </button>
       </div>
     </div>
-  )
+  );
 }

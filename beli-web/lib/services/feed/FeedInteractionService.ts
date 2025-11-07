@@ -7,9 +7,12 @@
  * - Adding comments to activities
  */
 
-import { delay } from '../base/BaseService';
 import { mockActivities } from '@/data/mock/activities';
-import { ActivityComment } from '@/types';
+
+import { delay } from '../base/BaseService';
+
+import type { ActivityComment } from '@/types';
+
 
 export class FeedInteractionService {
   /**
@@ -22,7 +25,7 @@ export class FeedInteractionService {
   static async likeActivity(activityId: string, userId: string): Promise<void> {
     await delay();
 
-    const activity = mockActivities.find(a => a.id === activityId);
+    const activity = mockActivities.find((a) => a.id === activityId);
     if (activity && activity.interactions) {
       const likes = activity.interactions.likes;
       if (!likes.includes(userId)) {
@@ -41,7 +44,7 @@ export class FeedInteractionService {
   static async unlikeActivity(activityId: string, userId: string): Promise<void> {
     await delay();
 
-    const activity = mockActivities.find(a => a.id === activityId);
+    const activity = mockActivities.find((a) => a.id === activityId);
     if (activity && activity.interactions) {
       const likes = activity.interactions.likes;
       const index = likes.indexOf(userId);
@@ -61,7 +64,7 @@ export class FeedInteractionService {
   static async bookmarkActivity(activityId: string, userId: string): Promise<void> {
     await delay();
 
-    const activity = mockActivities.find(a => a.id === activityId);
+    const activity = mockActivities.find((a) => a.id === activityId);
     if (activity && activity.interactions) {
       const bookmarks = activity.interactions.bookmarks;
       if (!bookmarks.includes(userId)) {
@@ -80,7 +83,7 @@ export class FeedInteractionService {
   static async unbookmarkActivity(activityId: string, userId: string): Promise<void> {
     await delay();
 
-    const activity = mockActivities.find(a => a.id === activityId);
+    const activity = mockActivities.find((a) => a.id === activityId);
     if (activity && activity.interactions) {
       const bookmarks = activity.interactions.bookmarks;
       const index = bookmarks.indexOf(userId);
@@ -107,7 +110,7 @@ export class FeedInteractionService {
   ): Promise<ActivityComment> {
     await delay();
 
-    const activity = mockActivities.find(a => a.id === activityId);
+    const activity = mockActivities.find((a) => a.id === activityId);
     if (!activity || !activity.interactions) {
       throw new Error('Activity not found');
     }

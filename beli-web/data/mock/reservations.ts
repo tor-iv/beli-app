@@ -1,6 +1,8 @@
-import { Reservation, ReservationPriorityLevel } from '@/types';
-import { mockUsers, currentUser } from './users';
+
 import { mockRestaurants } from './restaurants';
+import { mockUsers, currentUser } from './users';
+
+import type { Reservation, ReservationPriorityLevel } from '@/types';
 
 // Helper function to get future dates
 const getFutureDate = (daysFromNow: number, hour: number, minute: number = 0): Date => {
@@ -240,27 +242,29 @@ export const mockPriorityLevels: ReservationPriorityLevel[] = [
 
 // Helper function to get user's priority level
 export const getUserPriorityLevel = (userId: string): ReservationPriorityLevel => {
-  return mockPriorityLevels.find(p => p.userId === userId) || {
-    userId,
-    level: 'Bronze',
-    invitesSent: 0,
-    reservationsShared: 0,
-    nextLevelProgress: 0,
-    nextLevel: 'Silver',
-  };
+  return (
+    mockPriorityLevels.find((p) => p.userId === userId) || {
+      userId,
+      level: 'Bronze',
+      invitesSent: 0,
+      reservationsShared: 0,
+      nextLevelProgress: 0,
+      nextLevel: 'Silver',
+    }
+  );
 };
 
 // Helper functions to filter reservations
 export const getAvailableReservations = (): Reservation[] => {
-  return mockReservations.filter(r => r.status === 'available');
+  return mockReservations.filter((r) => r.status === 'available');
 };
 
 export const getClaimedReservationsByUser = (userId: string): Reservation[] => {
-  return mockReservations.filter(r => r.status === 'claimed' && r.claimedBy === userId);
+  return mockReservations.filter((r) => r.status === 'claimed' && r.claimedBy === userId);
 };
 
 export const getSharedReservationsByUser = (userId: string): Reservation[] => {
-  return mockReservations.filter(r => r.status === 'shared' && r.userId === userId);
+  return mockReservations.filter((r) => r.status === 'shared' && r.userId === userId);
 };
 
 export const getReservationReminders = (userId: string): Reservation[] => {
@@ -268,10 +272,11 @@ export const getReservationReminders = (userId: string): Reservation[] => {
   const threeDaysFromNow = new Date();
   threeDaysFromNow.setDate(now.getDate() + 3);
 
-  return mockReservations.filter(r =>
-    (r.userId === userId || r.claimedBy === userId) &&
-    r.dateTime >= now &&
-    r.dateTime <= threeDaysFromNow &&
-    r.status !== 'cancelled'
+  return mockReservations.filter(
+    (r) =>
+      (r.userId === userId || r.claimedBy === userId) &&
+      r.dateTime >= now &&
+      r.dateTime <= threeDaysFromNow &&
+      r.status !== 'cancelled'
   );
 };

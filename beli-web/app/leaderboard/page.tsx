@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { useLeaderboard } from '@/lib/hooks/use-leaderboard';
+import { useState, useEffect, useMemo } from 'react';
+
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useLeaderboard } from '@/lib/hooks/use-leaderboard';
+
 import type { User } from '@/types';
 
 type TabType = 'Been' | 'Influence' | 'Notes' | 'Photos';
@@ -27,7 +29,7 @@ export default function LeaderboardPage() {
     if (!allUsersData) return [];
 
     // Sort based on selected tab
-    let sortedUsers = [...allUsersData];
+    const sortedUsers = [...allUsersData];
     switch (selectedTab) {
       case 'Been':
         sortedUsers.sort((a, b) => b.stats.beenCount - a.stats.beenCount);
@@ -75,7 +77,7 @@ export default function LeaderboardPage() {
 
     // Apply city filter
     if (cityFilter !== 'All Cities') {
-      filtered = filtered.filter(user => user.location.city === cityFilter);
+      filtered = filtered.filter((user) => user.location.city === cityFilter);
     }
 
     // Apply member filter
@@ -91,7 +93,7 @@ export default function LeaderboardPage() {
   }, [allUsers, cityFilter, memberFilter]);
 
   const uniqueCities = useMemo(() => {
-    const cities = new Set(allUsers.map(user => user.location.city));
+    const cities = new Set(allUsers.map((user) => user.location.city));
     return ['All Cities', ...Array.from(cities)];
   }, [allUsers]);
 
@@ -114,8 +116,8 @@ export default function LeaderboardPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-6 max-w-2xl">
-        <div className="flex items-center justify-center h-64">
+      <div className="container mx-auto max-w-2xl px-4 py-6">
+        <div className="flex h-64 items-center justify-center">
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -123,16 +125,16 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-2xl">
+    <div className="container mx-auto max-w-2xl px-4 py-6">
       {/* Tab Selector */}
-      <div className="flex bg-gray-200 rounded-lg p-[2.5px] mt-1.5 mb-2.5">
+      <div className="mb-2.5 mt-1.5 flex rounded-lg bg-gray-200 p-[2.5px]">
         {(['Been', 'Influence', 'Notes', 'Photos'] as TabType[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setSelectedTab(tab)}
-            className={`flex-1 py-2 px-2.5 rounded-md text-[13px] font-medium transition-all ${
+            className={`flex-1 rounded-md px-2.5 py-2 text-[13px] font-medium transition-all ${
               selectedTab === tab
-                ? 'bg-white text-gray-900 font-semibold shadow-sm'
+                ? 'bg-white font-semibold text-gray-900 shadow-sm'
                 : 'text-gray-800'
             }`}
           >
@@ -142,10 +144,10 @@ export default function LeaderboardPage() {
       </div>
 
       {/* Subtitle */}
-      <p className="text-[13px] text-gray-800 mb-2">{getSubtitleText()}</p>
+      <p className="mb-2 text-[13px] text-gray-800">{getSubtitleText()}</p>
 
       {/* Filters */}
-      <div className="flex gap-2 mb-4">
+      <div className="mb-4 flex gap-2">
         {/* Member Filter */}
         <div className="relative">
           <button
@@ -153,13 +155,13 @@ export default function LeaderboardPage() {
               setShowMemberDropdown(!showMemberDropdown);
               setShowCityDropdown(false);
             }}
-            className="flex items-center py-[7px] px-[13px] rounded-[17px] border-[1.3px] border-gray-900 bg-white text-[13px] font-semibold text-gray-900"
+            className="flex items-center rounded-[17px] border-[1.3px] border-gray-900 bg-white px-[13px] py-[7px] text-[13px] font-semibold text-gray-900"
           >
             {memberFilter}
             <span className="ml-1.5 text-[8px]">▼</span>
           </button>
           {showMemberDropdown && (
-            <div className="absolute top-9 left-0 bg-white rounded-lg border border-gray-200 min-w-[140px] shadow-lg z-50">
+            <div className="absolute left-0 top-9 z-50 min-w-[140px] rounded-lg border border-gray-200 bg-white shadow-lg">
               {memberOptions.map((option) => (
                 <button
                   key={option}
@@ -167,8 +169,8 @@ export default function LeaderboardPage() {
                     setMemberFilter(option);
                     setShowMemberDropdown(false);
                   }}
-                  className={`w-full text-left py-2.5 px-3.5 text-[13px] border-b border-gray-100 last:border-b-0 hover:bg-gray-50 ${
-                    option === memberFilter ? 'text-[#0B7B7F] font-semibold' : 'text-gray-800'
+                  className={`w-full border-b border-gray-100 px-3.5 py-2.5 text-left text-[13px] last:border-b-0 hover:bg-gray-50 ${
+                    option === memberFilter ? 'font-semibold text-[#0B7B7F]' : 'text-gray-800'
                   }`}
                 >
                   {option}
@@ -185,13 +187,13 @@ export default function LeaderboardPage() {
               setShowCityDropdown(!showCityDropdown);
               setShowMemberDropdown(false);
             }}
-            className="flex items-center py-[7px] px-[13px] rounded-[17px] border-[1.3px] border-gray-900 bg-white text-[13px] font-semibold text-gray-900"
+            className="flex items-center rounded-[17px] border-[1.3px] border-gray-900 bg-white px-[13px] py-[7px] text-[13px] font-semibold text-gray-900"
           >
             {cityFilter}
             <span className="ml-1.5 text-[8px]">▼</span>
           </button>
           {showCityDropdown && (
-            <div className="absolute top-9 left-0 bg-white rounded-lg border border-gray-200 min-w-[140px] shadow-lg z-50">
+            <div className="absolute left-0 top-9 z-50 min-w-[140px] rounded-lg border border-gray-200 bg-white shadow-lg">
               {uniqueCities.map((city) => (
                 <button
                   key={city}
@@ -199,8 +201,8 @@ export default function LeaderboardPage() {
                     setCityFilter(city);
                     setShowCityDropdown(false);
                   }}
-                  className={`w-full text-left py-2.5 px-3.5 text-[13px] border-b border-gray-100 last:border-b-0 hover:bg-gray-50 ${
-                    city === cityFilter ? 'text-[#0B7B7F] font-semibold' : 'text-gray-800'
+                  className={`w-full border-b border-gray-100 px-3.5 py-2.5 text-left text-[13px] last:border-b-0 hover:bg-gray-50 ${
+                    city === cityFilter ? 'font-semibold text-[#0B7B7F]' : 'text-gray-800'
                   }`}
                 >
                   {city}
@@ -217,21 +219,25 @@ export default function LeaderboardPage() {
           <Link
             key={user.id}
             href={`/profile/${user.username}`}
-            className="flex items-center py-[10px] border-b border-[#E5E5EA] hover:bg-gray-50 -mx-4 px-4 transition-colors"
+            className="-mx-4 flex items-center border-b border-[#E5E5EA] px-4 py-[10px] transition-colors hover:bg-gray-50"
           >
             {/* Rank */}
-            <span className="text-sm font-normal text-gray-800 w-6 mr-2">{user.rank}</span>
+            <span className="mr-2 w-6 text-sm font-normal text-gray-800">{user.rank}</span>
 
             {/* Avatar */}
-            <Avatar className="w-10 h-10">
+            <Avatar className="h-10 w-10">
               <AvatarImage src={user.avatar} alt={user.displayName} />
               <AvatarFallback>{user.displayName[0]}</AvatarFallback>
             </Avatar>
 
             {/* User Info */}
-            <div className="flex-1 ml-2">
-              <p className="text-sm font-normal text-gray-800 mb-[2px] leading-tight">@{user.username}</p>
-              <p className="text-xs font-normal text-[#22C55E] leading-tight">+{user.matchPercentage}% Match</p>
+            <div className="ml-2 flex-1">
+              <p className="mb-[2px] text-sm font-normal leading-tight text-gray-800">
+                @{user.username}
+              </p>
+              <p className="text-xs font-normal leading-tight text-[#22C55E]">
+                +{user.matchPercentage}% Match
+              </p>
             </div>
 
             {/* Score */}

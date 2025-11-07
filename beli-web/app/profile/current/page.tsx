@@ -1,9 +1,10 @@
 import { redirect } from 'next/navigation';
-import { MockDataService } from '@/lib/mockDataService';
+
+import { UserService } from '@/lib/services';
 
 export default async function CurrentProfilePage() {
   // Fetch the current user
-  const currentUser = await MockDataService.getCurrentUser();
+  const currentUser = await UserService.getCurrentUser();
 
   // If no current user, redirect to home or login
   if (!currentUser) {

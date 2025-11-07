@@ -83,7 +83,8 @@ export const useListFilters = create<ListFiltersStore>((set, get) => ({
 
   setCuisines: (cuisines) => set({ cuisines }),
   addCuisine: (cuisine) => set((state) => ({ cuisines: [...state.cuisines, cuisine] })),
-  removeCuisine: (cuisine) => set((state) => ({ cuisines: state.cuisines.filter((c) => c !== cuisine) })),
+  removeCuisine: (cuisine) =>
+    set((state) => ({ cuisines: state.cuisines.filter((c) => c !== cuisine) })),
 
   setPrices: (prices) => set({ prices }),
   togglePrice: (price) =>

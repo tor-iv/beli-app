@@ -6,8 +6,11 @@
  * - Adding new reviews
  */
 
+import { mockReviews } from '@/data/mock/reviews';
+
 import { delay } from '../base/BaseService';
-import { mockReviews, Review } from '@/data/mock/reviews';
+
+import type { Review } from '@/data/mock/reviews';
 
 export class ReviewService {
   /**
@@ -17,7 +20,7 @@ export class ReviewService {
    */
   static async getRestaurantReviews(restaurantId: string): Promise<Review[]> {
     await delay();
-    return mockReviews.filter(review => review.restaurantId === restaurantId);
+    return mockReviews.filter((review) => review.restaurantId === restaurantId);
   }
 
   /**
@@ -27,7 +30,7 @@ export class ReviewService {
    */
   static async getUserReviews(userId: string): Promise<Review[]> {
     await delay();
-    return mockReviews.filter(review => review.userId === userId);
+    return mockReviews.filter((review) => review.userId === userId);
   }
 
   /**
@@ -35,7 +38,9 @@ export class ReviewService {
    * @param review - Review data (without id, createdAt, helpfulCount)
    * @returns The created review with generated fields
    */
-  static async addReview(review: Omit<Review, 'id' | 'createdAt' | 'helpfulCount'>): Promise<Review> {
+  static async addReview(
+    review: Omit<Review, 'id' | 'createdAt' | 'helpfulCount'>
+  ): Promise<Review> {
     await delay();
 
     const newReview: Review = {

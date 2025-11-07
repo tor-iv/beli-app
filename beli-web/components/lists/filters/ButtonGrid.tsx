@@ -16,12 +16,7 @@ interface ButtonGridProps {
   gridCols?: number;
 }
 
-export function ButtonGrid({
-  items,
-  selectedItems,
-  onToggle,
-  gridCols = 2,
-}: ButtonGridProps) {
+export const ButtonGrid = ({ items, selectedItems, onToggle, gridCols = 2 }: ButtonGridProps) => {
   const gridClass = cn(
     'grid gap-2',
     gridCols === 2 && 'grid-cols-2',

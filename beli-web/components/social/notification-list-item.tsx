@@ -1,17 +1,19 @@
 'use client';
 
-import { Notification } from '@/types';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { formatDistanceToNow } from 'date-fns';
 import { Flame } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { formatDistanceToNow } from 'date-fns';
+
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+
+import type { Notification } from '@/types';
 
 interface NotificationListItemProps {
   notification: Notification;
   onPress: (notification: Notification) => void;
 }
 
-export function NotificationListItem({ notification, onPress }: NotificationListItemProps) {
+export const NotificationListItem = ({ notification, onPress }: NotificationListItemProps) => {
   const router = useRouter();
 
   const handleClick = () => {
@@ -30,7 +32,8 @@ export function NotificationListItem({ notification, onPress }: NotificationList
 
   // Render notification text with inline formatting
   const renderNotificationText = () => {
-    const { type, actorUser, targetRestaurant, commentText, streakCount, actionDescription } = notification;
+    const { type, actorUser, targetRestaurant, commentText, streakCount, actionDescription } =
+      notification;
 
     if (type === 'streak') {
       return (
@@ -81,28 +84,29 @@ export function NotificationListItem({ notification, onPress }: NotificationList
   return (
     <button
       onClick={handleClick}
-      className="w-full min-h-[80px] px-4 py-4 bg-white hover:bg-[#FAFAFA] active:bg-[#FAFAFA] flex items-start gap-3 text-left transition-colors"
+      className="flex min-h-[80px] w-full items-start gap-3 bg-white px-4 py-4 text-left transition-colors hover:bg-[#FAFAFA] active:bg-[#FAFAFA]"
     >
       {/* Avatar or Streak Icon */}
-      <div className="flex-shrink-0 w-12 h-12">
+      <div className="h-12 w-12 flex-shrink-0">
         {notification.type === 'streak' ? (
-          <div className="w-12 h-12 rounded-full bg-[#FAFAFA] flex items-center justify-center">
-            <Flame className="w-6 h-6 text-[#8E8E93]" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FAFAFA]">
+            <Flame className="h-6 w-6 text-[#8E8E93]" />
           </div>
         ) : (
-          <Avatar className="w-12 h-12">
-            <AvatarImage src={notification.actorUser?.avatar} alt={notification.actorUser?.displayName} />
+          <Avatar className="h-12 w-12">
+            <AvatarImage
+              src={notification.actorUser?.avatar}
+              alt={notification.actorUser?.displayName}
+            />
             <AvatarFallback>{notification.actorUser?.displayName?.[0]}</AvatarFallback>
           </Avatar>
         )}
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         {renderNotificationText()}
-        <p className="text-[13px] text-[#8E8E93] mt-1">
-          {getTimestamp(notification.timestamp)}
-        </p>
+        <p className="mt-1 text-[13px] text-[#8E8E93]">{getTimestamp(notification.timestamp)}</p>
       </div>
     </button>
   );

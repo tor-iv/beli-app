@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import MockDataService from '@/lib/mockDataService';
+
+import { RankingService } from '@/lib/services';
+
 import type { Restaurant, ListCategory, RankingResult } from '@/types';
 
 // Query hook to fetch ranked restaurants
@@ -8,7 +10,7 @@ export function useRankedRestaurants(userId: string | undefined, category: ListC
     queryKey: ['ranked-restaurants', userId, category],
     queryFn: () => {
       if (!userId) throw new Error('User ID is required');
-      return MockDataService.getRankedRestaurants(userId, category);
+      return RankingService.getRankedRestaurants(userId, category);
     },
     enabled: !!userId,
   });
@@ -35,7 +37,7 @@ export function useAddRankedRestaurant() {
         companions?: string[];
       };
     }) => {
-      return MockDataService.insertRankedRestaurant(
+      return RankingService.insertRankedRestaurant(
         userId,
         restaurantId,
         result.category,

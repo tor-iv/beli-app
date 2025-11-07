@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { Activity } from '@/types';
+
+import type { Activity } from '@/types';
 
 /**
  * Feed filter options

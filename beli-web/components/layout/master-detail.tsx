@@ -1,7 +1,10 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
+
 import { cn } from '@/lib/utils';
+
+import type { ReactNode} from 'react';
 
 interface MasterDetailProps<T> {
   items: T[];
@@ -31,7 +34,7 @@ export function MasterDetail<T>({
   const selectedItem = selectedIndex !== null ? items[selectedIndex] : null;
 
   return (
-    <div className={cn('grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-4 h-full', className)}>
+    <div className={cn('grid h-full grid-cols-1 gap-4 md:grid-cols-[2fr_3fr]', className)}>
       {/* Master list */}
       <div className={cn('overflow-auto', masterClassName)}>
         <div className="space-y-2">
@@ -44,11 +47,11 @@ export function MasterDetail<T>({
       </div>
 
       {/* Detail pane */}
-      <div className={cn('hidden md:block overflow-auto sticky top-0', detailClassName)}>
+      <div className={cn('sticky top-0 hidden overflow-auto md:block', detailClassName)}>
         {selectedItem ? (
           renderDetail(selectedItem)
         ) : (
-          <div className="flex items-center justify-center h-full text-muted">
+          <div className="flex h-full items-center justify-center text-muted">
             <p>{emptyDetailMessage}</p>
           </div>
         )}

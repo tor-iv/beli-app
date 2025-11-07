@@ -1,27 +1,30 @@
 'use client';
 
-import { MockDataService } from '@/lib/mockDataService';
 import { notFound, useParams } from 'next/navigation';
-import { RestaurantMapHeader } from '@/components/restaurant/restaurant-map-header';
-import { RestaurantNavOverlay } from '@/components/restaurant/restaurant-nav-overlay';
-import { RestaurantHeader } from '@/components/restaurant/restaurant-header';
-import { RestaurantMetadataInline } from '@/components/restaurant/restaurant-metadata-inline';
-import { RestaurantActionButtons } from '@/components/restaurant/restaurant-action-buttons';
-import { RestaurantTagsList } from '@/components/restaurant/restaurant-tags-list';
-import { RestaurantSocialProof } from '@/components/restaurant/restaurant-social-proof';
-import { PopularDishGallery } from '@/components/restaurant/popular-dish-gallery';
-import { RestaurantScoreCard } from '@/components/restaurant/restaurant-score-card';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { WhatToOrderModal } from '@/components/modals/what-to-order-modal';
+import { useState, useEffect } from 'react';
+
 import { AddRestaurantModal } from '@/components/modals/add-restaurant-modal';
 import { RankingResultModal } from '@/components/modals/ranking-result-modal';
 import { ReserveModal } from '@/components/modals/reserve-modal';
+import { WhatToOrderModal } from '@/components/modals/what-to-order-modal';
+import { PopularDishGallery } from '@/components/restaurant/popular-dish-gallery';
+import { RestaurantActionButtons } from '@/components/restaurant/restaurant-action-buttons';
+import { RestaurantHeader } from '@/components/restaurant/restaurant-header';
+import { RestaurantMapHeader } from '@/components/restaurant/restaurant-map-header';
+import { RestaurantMetadataInline } from '@/components/restaurant/restaurant-metadata-inline';
+import { RestaurantNavOverlay } from '@/components/restaurant/restaurant-nav-overlay';
 import { RestaurantPageSkeleton } from '@/components/restaurant/restaurant-page-skeleton';
-import { useState, useEffect } from 'react';
+import { RestaurantScoreCard } from '@/components/restaurant/restaurant-score-card';
+import { RestaurantSocialProof } from '@/components/restaurant/restaurant-social-proof';
+import { RestaurantTagsList } from '@/components/restaurant/restaurant-tags-list';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { useAddRankedRestaurant } from '@/lib/hooks';
-import { Restaurant, User, RankingResult } from '@/types';
+import { RestaurantService, UserService } from '@/lib/services';
+
 import type { RestaurantSubmissionData } from '@/components/modals/add-restaurant-modal';
+import type { Restaurant, User, RankingResult } from '@/types';
+
 
 export default function RestaurantPage() {
   const params = useParams();
@@ -44,8 +47,8 @@ export default function RestaurantPage() {
     const fetchRestaurant = async () => {
       setIsLoading(true);
       const [restaurantData, userData] = await Promise.all([
-        MockDataService.getRestaurantById(id),
-        MockDataService.getCurrentUser(),
+        RestaurantService.getRestaurantById(id),
+        UserService.getCurrentUser(),
       ]);
       setRestaurant(restaurantData);
       setCurrentUser(userData);
@@ -99,17 +102,17 @@ export default function RestaurantPage() {
       </div>
 
       {/* Navigation Overlay - Fixed at top */}
-      <div className="fixed top-0 left-0 right-0 z-40 p-4 pointer-events-none">
+      <div className="pointer-events-none fixed left-0 right-0 top-0 z-40 p-4">
         <div className="pointer-events-auto">
           <RestaurantNavOverlay restaurant={restaurant} />
         </div>
       </div>
 
       {/* Main Content Card with Overlap */}
-      <div className="relative -mt-16 z-10">
-        <Card className="rounded-t-3xl shadow-xl border-0">
+      <div className="relative z-10 -mt-16">
+        <Card className="rounded-t-3xl border-0 shadow-xl">
           <CardContent className="p-0">
-            <div className="max-w-4xl mx-auto px-4 md:px-6 py-6">
+            <div className="mx-auto max-w-4xl px-4 py-6 md:px-6">
               {/* Restaurant Header with Actions */}
               <RestaurantHeader
                 restaurant={restaurant}
@@ -141,18 +144,16 @@ export default function RestaurantPage() {
               {restaurant.scores && (
                 <div className="my-6">
                   {/* Section Header with SC Badge */}
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-lg">Scores</h3>
-                      <Badge className="bg-primary text-white text-xs px-2 py-0.5">SC</Badge>
+                      <h3 className="text-lg font-semibold">Scores</h3>
+                      <Badge className="bg-primary px-2 py-0.5 text-xs text-white">SC</Badge>
                     </div>
-                    <button className="text-sm text-primary hover:underline">
-                      See all scores
-                    </button>
+                    <button className="text-sm text-primary hover:underline">See all scores</button>
                   </div>
 
                   {/* Horizontal Scrolling Score Cards */}
-                  <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+                  <div className="scrollbar-hide flex gap-4 overflow-x-auto pb-2">
                     {restaurant.scores.recScore !== undefined && (
                       <RestaurantScoreCard
                         title="Rec Score"
@@ -200,8 +201,8 @@ export default function RestaurantPage() {
               {/* Reviews Placeholder */}
               <Card className="beli-card my-6">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold mb-4">Recent Reviews</h3>
-                  <p className="text-muted-foreground text-sm">
+                  <h3 className="mb-4 font-semibold">Recent Reviews</h3>
+                  <p className="text-sm text-muted-foreground">
                     No reviews yet. Be the first to review!
                   </p>
                 </CardContent>

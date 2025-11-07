@@ -1,25 +1,28 @@
-'use client'
+'use client';
 
-import { useListProgress } from '@/lib/hooks'
-import { FeaturedListRow } from './featured-list-row'
-import { List } from '@/types'
+import { useListProgress } from '@/lib/hooks';
+
+import { FeaturedListRow } from './featured-list-row';
+
+import type { List } from '@/types';
+
 
 interface FeaturedListRowWithProgressProps {
-  list: List
-  userId: string
-  isLast?: boolean
+  list: List;
+  userId: string;
+  isLast?: boolean;
 }
 
-export function FeaturedListRowWithProgress({
+export const FeaturedListRowWithProgress = ({
   list,
   userId,
   isLast = false,
-}: FeaturedListRowWithProgressProps) {
-  const { data: progress } = useListProgress(userId, list.id)
+}: FeaturedListRowWithProgressProps) => {
+  const { data: progress } = useListProgress(userId, list.id);
 
   const progressText = progress
     ? `You've been to ${progress.visited} of ${progress.total}`
-    : `0 of ${list.restaurants.length} restaurants`
+    : `0 of ${list.restaurants.length} restaurants`;
 
   return (
     <FeaturedListRow
@@ -30,5 +33,5 @@ export function FeaturedListRowWithProgress({
       progressText={progressText}
       isLast={isLast}
     />
-  )
+  );
 }

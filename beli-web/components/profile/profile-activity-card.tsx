@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
-import Image from 'next/image';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Utensils, MapPin, RefreshCw } from 'lucide-react';
+import Image from 'next/image';
+import React from 'react';
+
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { getRatingColor, COLORS } from '@/lib/theme/colors';
 
 interface ProfileActivityCardProps {
@@ -20,7 +21,7 @@ interface ProfileActivityCardProps {
   onPress?: () => void;
 }
 
-export const ProfileActivityCard = React.memo(function ProfileActivityCard({
+export const ProfileActivityCard = React.memo(({
   userAvatar,
   userName,
   action,
@@ -32,35 +33,34 @@ export const ProfileActivityCard = React.memo(function ProfileActivityCard({
   image,
   notes,
   onPress,
-}: ProfileActivityCardProps) {
-
+}: ProfileActivityCardProps) => {
   return (
     <button
       onClick={onPress}
-      className="w-full bg-white px-6 py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors text-left"
+      className="w-full border-b border-gray-200 bg-white px-6 py-4 text-left transition-colors hover:bg-gray-50"
       type="button"
       aria-label={`View details for ${restaurantName}`}
     >
-      <div className="flex items-start gap-3 mb-3">
-        <Avatar className="w-12 h-12">
+      <div className="mb-3 flex items-start gap-3">
+        <Avatar className="h-12 w-12">
           <AvatarImage src={userAvatar} alt={userName} />
           <AvatarFallback>{userName[0]}</AvatarFallback>
         </Avatar>
 
         <div className="flex-1">
-          <p className="text-base text-gray-900 leading-5">
+          <p className="text-base leading-5 text-gray-900">
             <span className="font-semibold">{userName}</span> {action}{' '}
             <span className="font-semibold">{restaurantName}</span>
           </p>
           {cuisine && location && (
-            <p className="text-sm text-gray-700 mt-0.5 flex items-center gap-1">
-              <Utensils className="w-3 h-3" />
+            <p className="mt-0.5 flex items-center gap-1 text-sm text-gray-700">
+              <Utensils className="h-3 w-3" />
               {cuisine} · {location}
             </p>
           )}
           {visitCount !== undefined && (
-            <p className="text-sm text-gray-700 flex items-center gap-1">
-              <RefreshCw className="w-3 h-3" />
+            <p className="flex items-center gap-1 text-sm text-gray-700">
+              <RefreshCw className="h-3 w-3" />
               {visitCount} visit{visitCount !== 1 ? 's' : ''}
             </p>
           )}
@@ -68,13 +68,10 @@ export const ProfileActivityCard = React.memo(function ProfileActivityCard({
 
         {rating !== undefined && (
           <div
-            className="w-[52px] h-[52px] rounded-full flex items-center justify-center border-2"
+            className="flex h-[52px] w-[52px] items-center justify-center rounded-full border-2"
             style={{ borderColor: COLORS.ui.border }}
           >
-            <span
-              className="text-xl font-bold"
-              style={{ color: getRatingColor(rating) }}
-            >
+            <span className="text-xl font-bold" style={{ color: getRatingColor(rating) }}>
               {rating.toFixed(1)}
             </span>
           </div>
@@ -82,19 +79,12 @@ export const ProfileActivityCard = React.memo(function ProfileActivityCard({
       </div>
 
       {image && (
-        <div className="relative w-full h-[200px] rounded-lg overflow-hidden mb-2">
-          <Image
-            src={image}
-            alt={restaurantName}
-            fill
-            className="object-cover"
-          />
+        <div className="relative mb-2 h-[200px] w-full overflow-hidden rounded-lg">
+          <Image src={image} alt={restaurantName} fill className="object-cover" />
         </div>
       )}
 
-      {notes && (
-        <p className="text-base text-gray-900 leading-6">Notes: {notes}</p>
-      )}
+      {notes && <p className="text-base leading-6 text-gray-900">Notes: {notes}</p>}
     </button>
   );
 });

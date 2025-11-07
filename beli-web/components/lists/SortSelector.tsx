@@ -1,6 +1,8 @@
 'use client';
 
-import { useListFilters } from '@/lib/stores/list-filters';
+import { IoSwapVertical, IoTrendingDown, IoTrendingUp, IoCheckmark } from 'react-icons/io5';
+
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,8 +10,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { IoSwapVertical, IoTrendingDown, IoTrendingUp, IoCheckmark } from 'react-icons/io5';
+import { useListFilters } from '@/lib/stores/list-filters';
+
 
 const SORT_OPTIONS = [
   { value: 'rating', label: 'Rating', icon: IoTrendingDown },
@@ -17,7 +19,7 @@ const SORT_OPTIONS = [
   { value: 'friends', label: 'Friends', icon: IoTrendingDown },
 ] as const;
 
-export function SortSelector() {
+export const SortSelector = () => {
   const { sortBy, sortDirection, setSortBy, setSortDirection } = useListFilters();
 
   const currentSort = SORT_OPTIONS.find((opt) => opt.value === sortBy);

@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { LeaderboardService } from '@/lib/services';
 
 export function useLeaderboard() {

@@ -1,4 +1,4 @@
-import { UserRestaurantRelation } from '@/types';
+import type { UserRestaurantRelation } from '@/types';
 
 export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
   // Tor Cox (user 1) relations
@@ -92,7 +92,8 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
     userId: '1',
     restaurantId: '200', // Death & Co
     status: 'want_to_try',
-    notes: 'Heard this is one of the best cocktail bars in the city. Need to try their Old-Fashioned.',
+    notes:
+      'Heard this is one of the best cocktail bars in the city. Need to try their Old-Fashioned.',
     createdAt: new Date('2024-02-08'),
     tags: ['Cocktails', 'Date Night'],
   },
@@ -108,7 +109,8 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
     userId: '1',
     restaurantId: '202', // Employees Only
     status: 'want_to_try',
-    notes: 'Award-winning cocktail bar. Their signature Amelia cocktail is supposed to be incredible.',
+    notes:
+      'Award-winning cocktail bar. Their signature Amelia cocktail is supposed to be incredible.',
     createdAt: new Date('2024-02-06'),
     tags: ['Cocktails', 'West Village'],
   },
@@ -116,7 +118,7 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
     userId: '1',
     restaurantId: '210', // Dominique Ansel Bakery
     status: 'want_to_try',
-    notes: 'Need to try the famous Cronut! Heard it\'s worth the hype.',
+    notes: "Need to try the famous Cronut! Heard it's worth the hype.",
     createdAt: new Date('2024-02-06'),
     tags: ['Pastry', 'Iconic'],
   },
@@ -359,7 +361,7 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
     restaurantId: '14', // Locanda Verde
     status: 'been',
     rating: 8.7,
-    notes: 'Finally, authentic Italian in NYC. The sheep\'s milk ricotta transported me home.',
+    notes: "Finally, authentic Italian in NYC. The sheep's milk ricotta transported me home.",
     visitDate: new Date('2024-01-13'),
     createdAt: new Date('2024-01-13'),
     tags: ['Authentic', 'Italian', 'Ricotta'],
@@ -379,7 +381,7 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
     restaurantId: '22', // Al di La Trattoria
     status: 'been',
     rating: 8.6,
-    notes: 'Hidden gem in Park Slope. Feels like eating at nonna\'s house.',
+    notes: "Hidden gem in Park Slope. Feels like eating at nonna's house.",
     visitDate: new Date('2024-01-04'),
     createdAt: new Date('2024-01-04'),
     tags: ['Hidden Gem', 'Nonna', 'Cozy'],
@@ -391,7 +393,7 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
     restaurantId: '11', // Halal Guys
     status: 'been',
     rating: 7.8,
-    notes: 'Classic street food. Can\'t beat the price and portion size.',
+    notes: "Classic street food. Can't beat the price and portion size.",
     visitDate: new Date('2024-01-15'),
     createdAt: new Date('2024-01-15'),
     tags: ['Cheap', 'Large Portions', 'Street Food'],
@@ -605,7 +607,7 @@ export const mockUserRestaurantRelations: UserRestaurantRelation[] = [
     userId: '1',
     restaurantId: '14', // Locanda Verde
     status: 'want_to_try',
-    notes: 'Andrew Carmellini\'s Italian - must try.',
+    notes: "Andrew Carmellini's Italian - must try.",
     createdAt: new Date('2024-02-14'),
     tags: ['Italian', 'Brunch'],
   },

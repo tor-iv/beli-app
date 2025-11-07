@@ -1,6 +1,8 @@
-import { FeedItem } from '@/types';
-import { mockUsers } from './users';
+
 import { mockRestaurants } from './restaurants';
+import { mockUsers } from './users';
+
+import type { FeedItem } from '@/types';
 
 export interface Activity extends FeedItem {
   interactions?: {
@@ -21,8 +23,8 @@ export const mockActivities: Activity[] = [
   // New activities that match the target design
   {
     id: 'ryan_san_marzano',
-    restaurant: mockRestaurants.find(r => r.id === '31')!, // San Marzano
-    user: mockUsers.find(u => u.displayName === 'Ryan Tanaka')!,
+    restaurant: mockRestaurants.find((r) => r.id === '31')!, // San Marzano
+    user: mockUsers.find((u) => u.displayName === 'Ryan Tanaka')!,
     rating: 9.7,
     comment: 'It was so good and so cheap',
     photos: [],
@@ -37,8 +39,8 @@ export const mockActivities: Activity[] = [
   },
   {
     id: 'jack_bookmark_jua',
-    restaurant: mockRestaurants.find(r => r.id === '32')!, // Jua
-    user: mockUsers.find(u => u.id === '21')!, // Jack user
+    restaurant: mockRestaurants.find((r) => r.id === '32')!, // Jua
+    user: mockUsers.find((u) => u.id === '21')!, // Jack user
     rating: 0, // No rating for bookmark
     comment: '',
     photos: [],
@@ -53,14 +55,14 @@ export const mockActivities: Activity[] = [
   },
   {
     id: 'jack_omars_lucas',
-    restaurant: mockRestaurants.find(r => r.id === '33')!, // Omar's Mediterranean Cuisine
-    user: mockUsers.find(u => u.id === '21')!, // Jack user
-    companions: [mockUsers.find(u => u.id === '22')!], // Lucas Jerez
+    restaurant: mockRestaurants.find((r) => r.id === '33')!, // Omar's Mediterranean Cuisine
+    user: mockUsers.find((u) => u.id === '21')!, // Jack user
+    companions: [mockUsers.find((u) => u.id === '22')!], // Lucas Jerez
     rating: 7.3,
-    comment: 'Ok I\'ve always kinda been an Omar\'s hater but I gotta hand it to them this place...',
+    comment: "Ok I've always kinda been an Omar's hater but I gotta hand it to them this place...",
     photos: [
       'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400',
-      'https://images.unsplash.com/photo-1551782450-17144efb9c50?w=400'
+      'https://images.unsplash.com/photo-1551782450-17144efb9c50?w=400',
     ],
     tags: ['Mediterranean', 'Changed Opinion'],
     timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
@@ -73,10 +75,11 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '1',
-    restaurant: mockRestaurants.find(r => r.id === '2')!, // Prince Street Pizza
-    user: mockUsers.find(u => u.id === '5')!, // Alex Johnson
+    restaurant: mockRestaurants.find((r) => r.id === '2')!, // Prince Street Pizza
+    user: mockUsers.find((u) => u.id === '5')!, // Alex Johnson
     rating: 9.2,
-    comment: 'Finally tried the legendary pepperoni slice! The cheese-to-sauce ratio is absolutely perfect 🍕',
+    comment:
+      'Finally tried the legendary pepperoni slice! The cheese-to-sauce ratio is absolutely perfect 🍕',
     photos: ['https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400'],
     tags: ['Best Pizza', 'Pepperoni', 'Perfect'],
     timestamp: new Date('2024-01-15T14:30:00'),
@@ -102,8 +105,8 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '2',
-    restaurant: mockRestaurants.find(r => r.id === '10')!, // Le Bernardin
-    user: mockUsers.find(u => u.id === '4')!, // Emma Rodriguez
+    restaurant: mockRestaurants.find((r) => r.id === '10')!, // Le Bernardin
+    user: mockUsers.find((u) => u.id === '4')!, // Emma Rodriguez
     rating: 9.5,
     comment: 'An absolutely transcendent dining experience. Every course was flawless ⭐',
     photos: [
@@ -128,8 +131,8 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '3',
-    restaurant: mockRestaurants.find(r => r.id === '27')!, // Blue Hill
-    user: mockUsers.find(u => u.id === '2')!, // Sarah Kim
+    restaurant: mockRestaurants.find((r) => r.id === '27')!, // Blue Hill
+    user: mockUsers.find((u) => u.id === '2')!, // Sarah Kim
     rating: 9.5,
     comment: 'This is how vegetables should be treated! Every dish was a work of art 🎨🌱',
     photos: ['https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400'],
@@ -157,8 +160,8 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '4',
-    restaurant: mockRestaurants.find(r => r.id === '6')!, // Momofuku Noodle Bar
-    user: mockUsers.find(u => u.id === '3')!, // Mike Chen
+    restaurant: mockRestaurants.find((r) => r.id === '6')!, // Momofuku Noodle Bar
+    user: mockUsers.find((u) => u.id === '3')!, // Mike Chen
     rating: 8.9,
     comment: 'Finally found a ramen place that understands spice! The pork buns are legendary 🍜🔥',
     photos: ['https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=400'],
@@ -180,8 +183,8 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '5',
-    restaurant: mockRestaurants.find(r => r.id === '19')!, // Peter Luger
-    user: mockUsers.find(u => u.id === '9')!, // Carlos Martinez
+    restaurant: mockRestaurants.find((r) => r.id === '19')!, // Peter Luger
+    user: mockUsers.find((u) => u.id === '9')!, // Carlos Martinez
     rating: 9.0,
     comment: 'The porterhouse steak was incredible! This is how beef should be cooked 🥩',
     photos: ['https://images.unsplash.com/photo-1558030006-450675393462?w=400'],
@@ -203,10 +206,11 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '6',
-    restaurant: mockRestaurants.find(r => r.id === '12')!, // Eleven Madison Park
-    user: mockUsers.find(u => u.id === '1')!, // Tor Cox
+    restaurant: mockRestaurants.find((r) => r.id === '12')!, // Eleven Madison Park
+    user: mockUsers.find((u) => u.id === '1')!, // Tor Cox
     rating: 0,
-    comment: 'Finally got a reservation! The plant-based tasting menu sounds incredible. Can\'t wait! 🌱✨',
+    comment:
+      "Finally got a reservation! The plant-based tasting menu sounds incredible. Can't wait! 🌱✨",
     photos: [],
     tags: ['Want to Try', 'Plant-Based', 'Tasting Menu'],
     timestamp: new Date('2024-01-14T16:20:00'),
@@ -217,7 +221,7 @@ export const mockActivities: Activity[] = [
         {
           id: 'c8',
           userId: '2',
-          content: 'You\'re going to love it! The innovation is incredible',
+          content: "You're going to love it! The innovation is incredible",
           timestamp: new Date('2024-01-14T16:35:00'),
         },
         {
@@ -232,8 +236,8 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '7',
-    restaurant: mockRestaurants.find(r => r.id === '23')!, // Taverna Kyclades
-    user: mockUsers.find(u => u.id === '15')!, // Nina Kowalski
+    restaurant: mockRestaurants.find((r) => r.id === '23')!, // Taverna Kyclades
+    user: mockUsers.find((u) => u.id === '15')!, // Nina Kowalski
     rating: 8.7,
     comment: 'Worth the trip to Astoria! The grilled octopus was perfect - tender and charred 🐙',
     photos: ['https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400'],
@@ -255,8 +259,8 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '8',
-    restaurant: mockRestaurants.find(r => r.id === '24')!, // Ivan Ramen
-    user: mockUsers.find(u => u.id === '11')!, // Ryan Tanaka
+    restaurant: mockRestaurants.find((r) => r.id === '24')!, // Ivan Ramen
+    user: mockUsers.find((u) => u.id === '11')!, // Ryan Tanaka
     rating: 8.8,
     comment: 'Finally, authentic ramen in NYC! The triple pork has incredible depth 🍜🙌',
     photos: ['https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=400'],
@@ -278,10 +282,10 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '9',
-    restaurant: mockRestaurants.find(r => r.id === '14')!, // Locanda Verde
-    user: mockUsers.find(u => u.id === '6')!, // Lucia Rossi
+    restaurant: mockRestaurants.find((r) => r.id === '14')!, // Locanda Verde
+    user: mockUsers.find((u) => u.id === '6')!, // Lucia Rossi
     rating: 8.7,
-    comment: 'Nonna would approve! The sheep\'s milk ricotta transported me back to Tuscany 🇮🇹',
+    comment: "Nonna would approve! The sheep's milk ricotta transported me back to Tuscany 🇮🇹",
     photos: ['https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400'],
     tags: ['Authentic Italian', 'Ricotta', 'Tuscany'],
     timestamp: new Date('2024-01-13T19:30:00'),
@@ -294,8 +298,8 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '10',
-    restaurant: mockRestaurants.find(r => r.id === '1')!, // Balthazar
-    user: mockUsers.find(u => u.id === '13')!, // Jamie Foster
+    restaurant: mockRestaurants.find((r) => r.id === '1')!, // Balthazar
+    user: mockUsers.find((u) => u.id === '13')!, // Jamie Foster
     rating: 8.6,
     comment: 'Perfect brunch spot! The French toast was decadent and mimosas were strong 🥞🥂',
     photos: ['https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400'],
@@ -317,10 +321,10 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '11',
-    restaurant: mockRestaurants.find(r => r.id === '20')!, // L'industrie Pizzeria
-    user: mockUsers.find(u => u.id === '1')!, // Tor Cox
+    restaurant: mockRestaurants.find((r) => r.id === '20')!, // L'industrie Pizzeria
+    user: mockUsers.find((u) => u.id === '1')!, // Tor Cox
     rating: 0,
-    comment: 'Need to try that Instagram famous burrata slice everyone\'s talking about! 📸🍕',
+    comment: "Need to try that Instagram famous burrata slice everyone's talking about! 📸🍕",
     photos: [],
     tags: ['Want to Try', 'Instagram Famous', 'Burrata'],
     timestamp: new Date('2024-01-13T10:20:00'),
@@ -331,7 +335,7 @@ export const mockActivities: Activity[] = [
         {
           id: 'c13',
           userId: '5',
-          content: 'It\'s actually as good as it looks! Square slices are the way to go',
+          content: "It's actually as good as it looks! Square slices are the way to go",
           timestamp: new Date('2024-01-13T10:35:00'),
         },
       ],
@@ -340,8 +344,8 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '12',
-    restaurant: mockRestaurants.find(r => r.id === '4')!, // Minetta Tavern
-    user: mockUsers.find(u => u.id === '18')!, // Marcus Williams
+    restaurant: mockRestaurants.find((r) => r.id === '4')!, // Minetta Tavern
+    user: mockUsers.find((u) => u.id === '18')!, // Marcus Williams
     rating: 9.0,
     comment: 'The Black Label Burger is the best burger in NYC. Period. 🍔👑',
     photos: ['https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400'],
@@ -363,8 +367,8 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '13',
-    restaurant: mockRestaurants.find(r => r.id === '5')!, // Katz's Delicatessen
-    user: mockUsers.find(u => u.id === '7')!, // David Park
+    restaurant: mockRestaurants.find((r) => r.id === '5')!, // Katz's Delicatessen
+    user: mockUsers.find((u) => u.id === '7')!, // David Park
     rating: 8.1,
     comment: 'Tourist trap but the pastrami sandwich is actually worth it! Cash only though 💰',
     photos: ['https://images.unsplash.com/photo-1551782450-17144efb9c50?w=400'],
@@ -379,10 +383,11 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '14',
-    restaurant: mockRestaurants.find(r => r.id === '15')!, // Daniel
-    user: mockUsers.find(u => u.id === '10')!, // Maya Patel
+    restaurant: mockRestaurants.find((r) => r.id === '15')!, // Daniel
+    user: mockUsers.find((u) => u.id === '10')!, // Maya Patel
     rating: 9.4,
-    comment: 'The chocolate soufflé was worth the 20-minute wait! Light as air but intensely chocolatey 🍫☁️',
+    comment:
+      'The chocolate soufflé was worth the 20-minute wait! Light as air but intensely chocolatey 🍫☁️',
     photos: ['https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400'],
     tags: ['Dessert', 'Chocolate Soufflé', 'Worth the Wait'],
     timestamp: new Date('2024-01-12T11:30:00'),
@@ -402,8 +407,8 @@ export const mockActivities: Activity[] = [
   },
   {
     id: '15',
-    restaurant: mockRestaurants.find(r => r.id === '11')!, // Halal Guys
-    user: mockUsers.find(u => u.id === '7')!, // David Park
+    restaurant: mockRestaurants.find((r) => r.id === '11')!, // Halal Guys
+    user: mockUsers.find((u) => u.id === '7')!, // David Park
     rating: 7.8,
     comment: 'Perfect late night food! The white sauce is addictive and portions are huge 🌙',
     photos: ['https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400'],
@@ -420,15 +425,15 @@ export const mockActivities: Activity[] = [
 
 // Trending restaurants based on recent activity
 export const trendingRestaurants = [
-  mockRestaurants.find(r => r.id === '2')!, // Prince Street Pizza
-  mockRestaurants.find(r => r.id === '27')!, // Blue Hill
-  mockRestaurants.find(r => r.id === '20')!, // L'industrie Pizzeria
-  mockRestaurants.find(r => r.id === '24')!, // Ivan Ramen
-  mockRestaurants.find(r => r.id === '4')!, // Minetta Tavern
+  mockRestaurants.find((r) => r.id === '2')!, // Prince Street Pizza
+  mockRestaurants.find((r) => r.id === '27')!, // Blue Hill
+  mockRestaurants.find((r) => r.id === '20')!, // L'industrie Pizzeria
+  mockRestaurants.find((r) => r.id === '24')!, // Ivan Ramen
+  mockRestaurants.find((r) => r.id === '4')!, // Minetta Tavern
 ];
 
 // Recent check-ins for quick access
 export const recentCheckIns = mockActivities
-  .filter(activity => activity.type === 'visit')
+  .filter((activity) => activity.type === 'visit')
   .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
   .slice(0, 10);

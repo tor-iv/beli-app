@@ -1,20 +1,25 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
-import { TastemakerPost } from '@/types';
+
 import { TastemakerPostCard } from '@/components/tastemakers/tastemaker-post-card';
+import { Card, CardContent } from '@/components/ui/card';
+
+import type { TastemakerPost } from '@/types';
 
 interface TastemakerPicksWidgetProps {
   featuredPost?: TastemakerPost;
   recentPosts?: TastemakerPost[];
 }
 
-export function TastemakerPicksWidget({ featuredPost, recentPosts = [] }: TastemakerPicksWidgetProps) {
+export const TastemakerPicksWidget = ({
+  featuredPost,
+  recentPosts = [],
+}: TastemakerPicksWidgetProps) => {
   return (
     <Card className="beli-card">
       <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <h3 className="font-semibold">Tastemaker Picks</h3>
           <Link href="/tastemakers" className="text-sm text-primary hover:underline">
             View all
@@ -37,7 +42,7 @@ export function TastemakerPicksWidget({ featuredPost, recentPosts = [] }: Tastem
           {/* Call to action */}
           <Link
             href="/tastemakers"
-            className="block text-center py-3 text-sm font-medium text-primary hover:bg-gray-50 rounded-lg transition-colors"
+            className="block rounded-lg py-3 text-center text-sm font-medium text-primary transition-colors hover:bg-gray-50"
           >
             Discover more from tastemakers →
           </Link>

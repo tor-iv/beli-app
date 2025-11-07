@@ -7,9 +7,12 @@
  * - Friend relationships for group features
  */
 
-import { delay, followingRelationships } from '../base/BaseService';
 import { mockUsers } from '@/data/mock/users';
-import { User } from '@/types';
+
+import { delay, followingRelationships } from '../base/BaseService';
+
+import type { User } from '@/types';
+
 
 export class SocialService {
   /**
@@ -44,8 +47,8 @@ export class SocialService {
     userFollowing.add(targetUserId);
 
     // Update follower/following counts
-    const user = mockUsers.find(u => u.id === userId);
-    const targetUser = mockUsers.find(u => u.id === targetUserId);
+    const user = mockUsers.find((u) => u.id === userId);
+    const targetUser = mockUsers.find((u) => u.id === targetUserId);
 
     if (user && user.stats) {
       user.stats.following = (user.stats.following || 0) + 1;
@@ -69,8 +72,8 @@ export class SocialService {
       userFollowing.delete(targetUserId);
 
       // Update follower/following counts
-      const user = mockUsers.find(u => u.id === userId);
-      const targetUser = mockUsers.find(u => u.id === targetUserId);
+      const user = mockUsers.find((u) => u.id === userId);
+      const targetUser = mockUsers.find((u) => u.id === targetUserId);
 
       if (user && user.stats) {
         user.stats.following = Math.max(0, (user.stats.following || 0) - 1);
@@ -93,7 +96,7 @@ export class SocialService {
     // Find all users who follow this user
     for (const [followerId, following] of followingRelationships.entries()) {
       if (following.has(userId)) {
-        const follower = mockUsers.find(u => u.id === followerId);
+        const follower = mockUsers.find((u) => u.id === followerId);
         if (follower) {
           followers.push(follower);
         }
@@ -113,7 +116,7 @@ export class SocialService {
     const following = followingRelationships.get(userId);
     if (!following) return [];
 
-    return mockUsers.filter(u => following.has(u.id));
+    return mockUsers.filter((u) => following.has(u.id));
   }
 
   /**
@@ -126,7 +129,7 @@ export class SocialService {
     await delay();
     // Return users who the current user is following (simplified)
     // In a real app, this would be a proper friends/following relationship
-    return mockUsers.filter(u => u.id !== userId).slice(0, 10);
+    return mockUsers.filter((u) => u.id !== userId).slice(0, 10);
   }
 
   /**
@@ -139,6 +142,6 @@ export class SocialService {
     await delay();
     // For now, return a subset of friends
     // In a real app, this would track who you've actually dined with
-    return mockUsers.filter(u => u.id !== userId).slice(0, 5);
+    return mockUsers.filter((u) => u.id !== userId).slice(0, 5);
   }
 }

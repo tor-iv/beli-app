@@ -6,9 +6,12 @@
  * - Tastemaker discovery and search
  */
 
-import { delay } from '../base/BaseService';
 import { mockTastemakers } from '@/data/mock/tastemakers';
-import { User } from '@/types';
+
+import { delay } from '../base/BaseService';
+
+import type { User } from '@/types';
+
 
 export class TastemakerService {
   /**
@@ -18,8 +21,8 @@ export class TastemakerService {
    */
   static async getTastemakers(limit?: number): Promise<User[]> {
     await delay();
-    const tastemakers = mockTastemakers.sort((a, b) =>
-      (b.stats.followers || 0) - (a.stats.followers || 0)
+    const tastemakers = mockTastemakers.sort(
+      (a, b) => (b.stats.followers || 0) - (a.stats.followers || 0)
     );
     return limit ? tastemakers.slice(0, limit) : tastemakers;
   }
@@ -31,6 +34,6 @@ export class TastemakerService {
    */
   static async getTastemakerByUsername(username: string): Promise<User | null> {
     await delay();
-    return mockTastemakers.find(tm => tm.username === username) || null;
+    return mockTastemakers.find((tm) => tm.username === username) || null;
   }
 }

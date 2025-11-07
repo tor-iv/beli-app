@@ -1,69 +1,64 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import Image from "next/image"
-import { CheckCircle, Clock, Users } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import type { GroupDinnerMatch } from "@/types"
+import { CheckCircle, Clock, Users } from 'lucide-react';
+import Image from 'next/image';
+import * as React from 'react';
+
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+
+import type { GroupDinnerMatch } from '@/types';
 
 interface SelectionScreenProps {
-  savedRestaurants: GroupDinnerMatch[]
-  onSelectRestaurant: (match: GroupDinnerMatch) => void
-  onStartOver: () => void
-  onBack: () => void
-  onViewDetails: (restaurantId: string) => void
+  savedRestaurants: GroupDinnerMatch[];
+  onSelectRestaurant: (match: GroupDinnerMatch) => void;
+  onStartOver: () => void;
+  onBack: () => void;
+  onViewDetails: (restaurantId: string) => void;
 }
 
 interface RestaurantOptionCardProps {
-  match: GroupDinnerMatch
-  optionNumber: number
-  onChoose: () => void
-  onViewDetails: () => void
+  match: GroupDinnerMatch;
+  optionNumber: number;
+  onChoose: () => void;
+  onViewDetails: () => void;
 }
 
-function RestaurantOptionCard({
+const RestaurantOptionCard = ({
   match,
   optionNumber,
   onChoose,
   onViewDetails,
-}: RestaurantOptionCardProps) {
-  const { restaurant, matchReasons, availability } = match
+}: RestaurantOptionCardProps) => {
+  const { restaurant, matchReasons, availability } = match;
 
   const getRatingColor = (rating: number) => {
-    if (rating >= 8.0) return "text-green-600"
-    if (rating >= 7.0) return "text-lime-500"
-    if (rating >= 5.0) return "text-orange-500"
-    return "text-red-500"
-  }
+    if (rating >= 8.0) return 'text-green-600';
+    if (rating >= 7.0) return 'text-lime-500';
+    if (rating >= 5.0) return 'text-orange-500';
+    return 'text-red-500';
+  };
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-cardElevated">
+    <div className="overflow-hidden rounded-2xl bg-white shadow-cardElevated">
       {/* Option Badge */}
-      <div className="bg-primary text-white text-sm font-semibold px-3 py-1.5">
+      <div className="bg-primary px-3 py-1.5 text-sm font-semibold text-white">
         Option {optionNumber}
       </div>
 
       {/* Restaurant Image */}
       <div className="relative h-[200px]">
-        <Image
-          src={restaurant.images[0]}
-          alt={restaurant.name}
-          fill
-          className="object-cover"
-        />
+        <Image src={restaurant.images[0]} alt={restaurant.name} fill className="object-cover" />
       </div>
 
       {/* Restaurant Info */}
       <div className="p-4">
         {/* Name */}
-        <h3 className="text-xl font-bold text-foreground mb-1 line-clamp-1">
-          {restaurant.name}
-        </h3>
+        <h3 className="mb-1 line-clamp-1 text-xl font-bold text-foreground">{restaurant.name}</h3>
 
         {/* Meta Row */}
-        <div className="flex items-center text-sm text-gray-700 mb-2">
-          <span>{restaurant.cuisine.join(", ")}</span>
+        <div className="mb-2 flex items-center text-sm text-gray-700">
+          <span>{restaurant.cuisine.join(', ')}</span>
           <span className="mx-1">•</span>
           <span>{restaurant.priceRange}</span>
           {restaurant.distance !== undefined && (
@@ -75,37 +70,33 @@ function RestaurantOptionCard({
         </div>
 
         {/* Rating */}
-        <div className="flex items-center mb-3">
-          <div className="h-11 w-11 flex items-center justify-center rounded-full bg-white border-[1.5px] border-gray-300 mr-2">
-            <span className={cn("text-lg font-bold", getRatingColor(restaurant.rating))}>
+        <div className="mb-3 flex items-center">
+          <div className="mr-2 flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-gray-300 bg-white">
+            <span className={cn('text-lg font-bold', getRatingColor(restaurant.rating))}>
               {restaurant.rating.toFixed(1)}
             </span>
           </div>
           {restaurant.ratingCount && (
-            <span className="text-xs text-muted">
-              ({restaurant.ratingCount} reviews)
-            </span>
+            <span className="text-xs text-muted">({restaurant.ratingCount} reviews)</span>
           )}
         </div>
 
         {/* Match Highlights */}
-        <div className="bg-primary/8 rounded-lg p-3 mb-3">
+        <div className="bg-primary/8 mb-3 rounded-lg p-3">
           <div className="space-y-1.5">
             {/* Show first 2 match reasons */}
             {matchReasons.slice(0, 2).map((reason, index) => (
               <div key={index} className="flex items-start gap-2">
-                <span className="text-sm font-bold text-primary leading-[18px] mr-1">•</span>
-                <span className="text-sm text-foreground leading-[18px] flex-1">
-                  {reason}
-                </span>
+                <span className="mr-1 text-sm font-bold leading-[18px] text-primary">•</span>
+                <span className="flex-1 text-sm leading-[18px] text-foreground">{reason}</span>
               </div>
             ))}
 
             {/* Availability */}
             {availability && (
               <div className="flex items-center gap-2 pt-1">
-                <Clock className="h-4 w-4 text-primary flex-shrink-0" />
-                <span className="text-sm text-foreground leading-[18px]">
+                <Clock className="h-4 w-4 flex-shrink-0 text-primary" />
+                <span className="text-sm leading-[18px] text-foreground">
                   Available {availability.timeSlot}
                 </span>
               </div>
@@ -114,36 +105,36 @@ function RestaurantOptionCard({
         </div>
 
         {/* Choose Button */}
-        <Button onClick={onChoose} className="w-full mb-2">
+        <Button onClick={onChoose} className="mb-2 w-full">
           Choose This One
         </Button>
 
         {/* View Details Link */}
         <button
           onClick={onViewDetails}
-          className="w-full text-sm font-medium text-primary hover:underline py-2"
+          className="w-full py-2 text-sm font-medium text-primary hover:underline"
         >
           View full details
         </button>
       </div>
     </div>
-  )
+  );
 }
 
-export function SelectionScreen({
+export const SelectionScreen = ({
   savedRestaurants,
   onSelectRestaurant,
   onStartOver,
   onBack,
   onViewDetails,
-}: SelectionScreenProps) {
+}: SelectionScreenProps) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Fixed Header */}
-      <div className="bg-white px-4 py-6 border-b sticky top-0 z-10">
-        <CheckCircle className="h-12 w-12 text-primary mx-auto mb-3" />
-        <h1 className="text-2xl font-bold text-center">Choose Your Spot!</h1>
-        <p className="text-base text-muted text-center mt-2">
+      <div className="sticky top-0 z-10 border-b bg-white px-4 py-6">
+        <CheckCircle className="mx-auto mb-3 h-12 w-12 text-primary" />
+        <h1 className="text-center text-2xl font-bold">Choose Your Spot!</h1>
+        <p className="mt-2 text-center text-base text-muted">
           You've saved {savedRestaurants.length} great options
         </p>
       </div>
@@ -162,15 +153,11 @@ export function SelectionScreen({
       </div>
 
       {/* Fixed Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 safe-area-bottom">
-        <Button
-          variant="outline"
-          onClick={onStartOver}
-          className="w-full"
-        >
+      <div className="safe-area-bottom fixed bottom-0 left-0 right-0 border-t bg-white p-4">
+        <Button variant="outline" onClick={onStartOver} className="w-full">
           Start Over & Keep Swiping
         </Button>
       </div>
     </div>
-  )
+  );
 }

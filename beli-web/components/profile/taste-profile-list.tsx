@@ -1,8 +1,10 @@
 'use client';
 
 import { ArrowUpDown, ChevronRight } from 'lucide-react';
-import { CuisineBreakdown, CityBreakdown, CountryBreakdown } from '@/types';
+
 import { RatingBubble } from '@/components/rating/rating-bubble';
+
+import type { CuisineBreakdown, CityBreakdown, CountryBreakdown } from '@/types';
 
 export type SortOption = 'count' | 'avgScore';
 
@@ -14,13 +16,13 @@ interface TasteProfileListProps {
   onItemPress: (item: CuisineBreakdown | CityBreakdown | CountryBreakdown) => void;
 }
 
-export function TasteProfileList({
+export const TasteProfileList = ({
   data,
   totalCount,
   sortBy,
   onSortPress,
   onItemPress,
-}: TasteProfileListProps) {
+}: TasteProfileListProps) => {
   const getSortLabel = () => {
     return sortBy === 'count' ? 'Sort: Count' : 'Sort: Avg. Score';
   };
@@ -38,19 +40,19 @@ export function TasteProfileList({
   };
 
   return (
-    <div className="bg-white mt-4 rounded-lg shadow-sm">
+    <div className="mt-4 rounded-lg bg-white shadow-sm">
       {/* Header */}
-      <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
+      <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
         <p className="text-base font-medium text-gray-800">
           {totalCount} {totalCount === 1 ? 'Item' : 'Items'}
         </p>
         <button
           onClick={onSortPress}
-          className="flex items-center gap-2 py-1 px-3 rounded-md border border-gray-200 hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1 transition-colors hover:bg-gray-50"
           type="button"
           aria-label={`Change sort to ${sortBy === 'count' ? 'average score' : 'count'}`}
         >
-          <ArrowUpDown className="w-4 h-4 text-gray-800" />
+          <ArrowUpDown className="h-4 w-4 text-gray-800" />
           <span className="text-sm text-gray-800">{getSortLabel()}</span>
         </button>
       </div>
@@ -64,18 +66,18 @@ export function TasteProfileList({
             <button
               key={getUniqueKey(item)}
               onClick={() => onItemPress(item)}
-              className="w-full flex justify-between items-center py-4 px-6 hover:bg-gray-50 transition-colors group"
+              className="group flex w-full items-center justify-between px-6 py-4 transition-colors hover:bg-gray-50"
               type="button"
               aria-label={`View restaurants for ${name}`}
             >
               <div className="flex-1 text-left">
-                <p className="text-base font-semibold text-gray-900 mb-1">{name}</p>
+                <p className="mb-1 text-base font-semibold text-gray-900">{name}</p>
                 <p className="text-sm text-gray-800">{item.count} places</p>
               </div>
 
               <div className="flex items-center gap-4">
                 <RatingBubble rating={item.avgScore} />
-                <ChevronRight className="w-5 h-5 text-gray-800 group-hover:text-gray-800 transition-colors" />
+                <ChevronRight className="h-5 w-5 text-gray-800 transition-colors group-hover:text-gray-800" />
               </div>
             </button>
           );

@@ -26,8 +26,8 @@ export const SPACING = {
 
 // Breakpoints for responsive design
 export const BREAKPOINTS = {
-  mobile: 640,   // sm
-  tablet: 768,   // md
+  mobile: 640, // sm
+  tablet: 768, // md
   desktop: 1024, // lg
-  wide: 1280,    // xl
+  wide: 1280, // xl
 } as const;

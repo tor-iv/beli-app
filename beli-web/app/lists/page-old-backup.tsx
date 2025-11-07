@@ -1,53 +1,57 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
-import { useLists } from '@/lib/hooks/use-lists';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RestaurantCard } from '@/components/restaurant/restaurant-card';
-import { RestaurantListItemCompact } from '@/components/restaurant/restaurant-list-item-compact';
-import { RestaurantDetailPreview } from '@/components/restaurant/restaurant-detail-preview';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  useRestaurants,
-  useTrendingRestaurants,
-  useNearbyRecommendations,
-  useFriendRecommendations,
-} from '@/lib/hooks/use-restaurants';
-import {
-  useReservableRestaurants,
-} from '@/lib/hooks/use-special-lists';
-import { Restaurant } from '@/types';
-import { ViewToggle } from '@/components/ui/view-toggle';
-import { FilterBar } from '@/components/lists/FilterBar';
-import { ListSearch } from '@/components/lists/ListSearch';
-import { SortSelector } from '@/components/lists/SortSelector';
-import { CategoryDropdown } from '@/components/lists/CategoryDropdown';
-import { MobileTabs, DEFAULT_MOBILE_TABS, type MobileTabId } from '@/components/lists/MobileTabs';
-import { ListPickerModal, type ListOptionId } from '@/components/lists/ListPickerModal';
-import { RestaurantListItemMobile } from '@/components/restaurant/restaurant-list-item-mobile';
-import { useListFilters } from '@/lib/stores/list-filters';
-import { useListCounts } from '@/lib/hooks/use-list-counts';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect, useRef, Suspense, useMemo } from 'react';
 import { IoShareSocial, IoChevronDown, IoCheckmark } from 'react-icons/io5';
+
+import { CategoryDropdown } from '@/components/lists/CategoryDropdown';
+import { FilterBar } from '@/components/lists/FilterBar';
+import { ListPickerModal, type ListOptionId } from '@/components/lists/ListPickerModal';
+import { ListSearch } from '@/components/lists/ListSearch';
+import { MobileTabs, DEFAULT_MOBILE_TABS, type MobileTabId } from '@/components/lists/MobileTabs';
+import { SortSelector } from '@/components/lists/SortSelector';
+import { RestaurantCard } from '@/components/restaurant/restaurant-card';
+import { RestaurantDetailPreview } from '@/components/restaurant/restaurant-detail-preview';
+import { RestaurantListItemCompact } from '@/components/restaurant/restaurant-list-item-compact';
+import { RestaurantListItemMobile } from '@/components/restaurant/restaurant-list-item-mobile';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import dynamic from 'next/dynamic';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ViewToggle } from '@/components/ui/view-toggle';
+import { useListCounts } from '@/lib/hooks/use-list-counts';
+import { useLists } from '@/lib/hooks/use-lists';
 import { useListsReducer, type ListType } from '@/lib/hooks/use-lists-reducer';
+import {
+  useRestaurants,
+  useTrendingRestaurants,
+  useNearbyRecommendations,
+  useFriendRecommendations,
+} from '@/lib/hooks/use-restaurants';
+import { useReservableRestaurants } from '@/lib/hooks/use-special-lists';
+import { useListFilters } from '@/lib/stores/list-filters';
+
+import type { Restaurant } from '@/types';
+
 
 // Dynamically import map component (client-side only)
 const RestaurantMap = dynamic(
-  () => import('@/components/map/restaurant-map').then(mod => mod.RestaurantMap),
-  { ssr: false, loading: () => <div className="flex items-center justify-center h-full">Loading map...</div> }
+  () => import('@/components/map/restaurant-map').then((mod) => mod.RestaurantMap),
+  {
+    ssr: false,
+    loading: () => <div className="flex h-full items-center justify-center">Loading map...</div>,
+  }
 );
 
 type ViewType = 'reserve' | 'nearby' | 'trending' | 'friends' | null;
 
-function ListsContent() {
+const ListsContent = () => {
   const searchParams = useSearchParams();
   const viewParam = searchParams.get('view') as ViewType;
   const tabParam = searchParams.get('tab') as ListType | null;
@@ -64,18 +68,30 @@ function ListsContent() {
   const { data: listCounts } = useListCounts();
 
   // React Query hooks for special restaurant lists (conditional based on view/tab)
-  const { data: reservableRestaurants, isLoading: isLoadingReservable } = useReservableRestaurants(20, {
-    enabled: viewParam === 'reserve',
-  });
-  const { data: nearbyRestaurants, isLoading: isLoadingNearby } = useNearbyRecommendations('current-user', 2.0, 20, {
-    enabled: viewParam === 'nearby' || activeTab === 'recs_for_you',
-  });
+  const { data: reservableRestaurants, isLoading: isLoadingReservable } = useReservableRestaurants(
+    20,
+    {
+      enabled: viewParam === 'reserve',
+    }
+  );
+  const { data: nearbyRestaurants, isLoading: isLoadingNearby } = useNearbyRecommendations(
+    'current-user',
+    2.0,
+    20,
+    {
+      enabled: viewParam === 'nearby' || activeTab === 'recs_for_you',
+    }
+  );
   const { data: trendingRestaurants, isLoading: isLoadingTrending } = useTrendingRestaurants({
     enabled: viewParam === 'trending' || activeTab === 'trending',
   });
-  const { data: friendRestaurants, isLoading: isLoadingFriends } = useFriendRecommendations('current-user', 20, {
-    enabled: viewParam === 'friends' || activeTab === 'recs_from_friends',
-  });
+  const { data: friendRestaurants, isLoading: isLoadingFriends } = useFriendRecommendations(
+    'current-user',
+    20,
+    {
+      enabled: viewParam === 'friends' || activeTab === 'recs_from_friends',
+    }
+  );
 
   // Get filters from store
   const filters = useListFilters();
@@ -148,11 +164,12 @@ function ListsContent() {
   ]);
 
   // Filter lists by type
-  const filteredLists = lists?.filter(list => list.listType === activeTab) || [];
+  const filteredLists = lists?.filter((list) => list.listType === activeTab) || [];
 
   // Get ALL restaurants for the current lists or from view
-  const restaurantIds = new Set(filteredLists.flatMap(list => list.restaurants));
-  const baseRestaurants = viewConfig.restaurants || allRestaurants?.filter(r => restaurantIds.has(r.id)) || [];
+  const restaurantIds = new Set(filteredLists.flatMap((list) => list.restaurants));
+  const baseRestaurants =
+    viewConfig.restaurants || allRestaurants?.filter((r) => restaurantIds.has(r.id)) || [];
 
   // Apply filters and sorting (memoized for performance)
   const restaurantsData = useMemo(() => {
@@ -160,7 +177,7 @@ function ListsContent() {
 
     // Apply category filter
     if (filters.category !== 'all') {
-      filtered = filtered.filter(r => {
+      filtered = filtered.filter((r) => {
         const category = r.category?.toLowerCase() || 'restaurants';
         return category === filters.category;
       });
@@ -168,7 +185,7 @@ function ListsContent() {
 
     // Apply city filter
     if (filters.cities.length > 0) {
-      filtered = filtered.filter(r => {
+      filtered = filtered.filter((r) => {
         const city = r.location?.city || '';
         return filters.cities.includes(city);
       });
@@ -176,43 +193,43 @@ function ListsContent() {
 
     // Apply cuisine filter
     if (filters.cuisines.length > 0) {
-      filtered = filtered.filter(r => {
+      filtered = filtered.filter((r) => {
         // cuisine is string[], so check if any of the restaurant's cuisines match
-        return r.cuisine.some(c => filters.cuisines.includes(c));
+        return r.cuisine.some((c) => filters.cuisines.includes(c));
       });
     }
 
     // Apply price filter
     if (filters.prices.length > 0) {
-      filtered = filtered.filter(r => {
+      filtered = filtered.filter((r) => {
         return filters.prices.includes(r.priceRange as any);
       });
     }
 
     // Apply tags filter
     if (filters.tags.length > 0) {
-      filtered = filtered.filter(r => {
+      filtered = filtered.filter((r) => {
         const restaurantTags = r.tags || [];
-        return filters.tags.some(tag => restaurantTags.includes(tag));
+        return filters.tags.some((tag) => restaurantTags.includes(tag));
       });
     }
 
     // Apply good for filter
     if (filters.goodFor.length > 0) {
-      filtered = filtered.filter(r => {
+      filtered = filtered.filter((r) => {
         const restaurantGoodFor = r.goodFor || [];
-        return filters.goodFor.some(option => restaurantGoodFor.includes(option));
+        return filters.goodFor.some((option) => restaurantGoodFor.includes(option));
       });
     }
 
     // Apply minimum score filter
     if (filters.minScore !== null) {
-      filtered = filtered.filter(r => r.rating >= filters.minScore!);
+      filtered = filtered.filter((r) => r.rating >= filters.minScore!);
     }
 
     // Apply minimum friends filter
     if (filters.minFriends !== null) {
-      filtered = filtered.filter(r => {
+      filtered = filtered.filter((r) => {
         const friendCount = r.friendsWantToTryCount || 0;
         return friendCount >= filters.minFriends!;
       });
@@ -222,7 +239,7 @@ function ListsContent() {
     if (filters.openNow) {
       const now = new Date();
       const currentHour = now.getHours();
-      filtered = filtered.filter(r => {
+      filtered = filtered.filter((r) => {
         // Simple logic: assume open if 7am-11pm (can be enhanced with real hours)
         return currentHour >= 7 && currentHour < 23;
       });
@@ -230,15 +247,15 @@ function ListsContent() {
 
     // Apply accepts reservations filter
     if (filters.acceptsReservations) {
-      filtered = filtered.filter(r => r.acceptsReservations === true);
+      filtered = filtered.filter((r) => r.acceptsReservations === true);
     }
 
     // Apply search query
     if (filters.searchQuery.trim()) {
       const query = filters.searchQuery.toLowerCase();
-      filtered = filtered.filter(r => {
+      filtered = filtered.filter((r) => {
         const name = r.name.toLowerCase();
-        const cuisines = r.cuisine.map(c => c.toLowerCase()).join(' ');
+        const cuisines = r.cuisine.map((c) => c.toLowerCase()).join(' ');
         const neighborhood = r.location?.neighborhood?.toLowerCase() || '';
         return name.includes(query) || cuisines.includes(query) || neighborhood.includes(query);
       });
@@ -298,20 +315,13 @@ function ListsContent() {
 
           if (visible.length === 0) return;
 
-          const visibleRestaurantData = restaurantsData.filter((r) =>
-            visible.includes(r.id)
-          );
+          const visibleRestaurantData = restaurantsData.filter((r) => visible.includes(r.id));
 
           // Add buffer: include 5 items above and below
-          const firstIndex = Math.max(
-            0,
-            restaurantsData.indexOf(visibleRestaurantData[0]) - 5
-          );
+          const firstIndex = Math.max(0, restaurantsData.indexOf(visibleRestaurantData[0]) - 5);
           const lastIndex = Math.min(
             restaurantsData.length,
-            restaurantsData.indexOf(
-              visibleRestaurantData[visibleRestaurantData.length - 1]
-            ) + 5
+            restaurantsData.indexOf(visibleRestaurantData[visibleRestaurantData.length - 1]) + 5
           );
 
           setVisibleRestaurants(restaurantsData.slice(firstIndex, lastIndex));
@@ -393,18 +403,16 @@ function ListsContent() {
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">{getViewTitle(viewParam)}</h1>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleShare}
-              className="gap-2"
-            >
+            <Button variant="outline" size="sm" onClick={handleShare} className="gap-2">
               <IoShareSocial className="h-4 w-4" />
               <span className="hidden sm:inline">Share</span>
             </Button>
             {/* Show view toggle on desktop only */}
             <div className="hidden md:block">
-              <ViewToggle view={rightPanelView} onViewChange={(view) => dispatch({ type: 'TOGGLE_VIEW', view })} />
+              <ViewToggle
+                view={rightPanelView}
+                onViewChange={(view) => dispatch({ type: 'TOGGLE_VIEW', view })}
+              />
             </div>
           </div>
         </div>
@@ -416,7 +424,7 @@ function ListsContent() {
 
         {/* Search and Sort Row */}
         <div className="flex items-center gap-3">
-          <div className="flex-1 min-w-[200px]">
+          <div className="min-w-[200px] flex-1">
             <ListSearch />
           </div>
           <SortSelector />
@@ -437,9 +445,13 @@ function ListsContent() {
 
           {/* Desktop Tabs */}
           <div className="hidden md:block">
-            <div className="flex items-center gap-2 mb-4">
-              <Tabs value={activeTab} onValueChange={(v) => dispatch({ type: 'SET_TAB', tab: v as ListType })} className="flex-1">
-                <TabsList className="w-full grid grid-cols-4">
+            <div className="mb-4 flex items-center gap-2">
+              <Tabs
+                value={activeTab}
+                onValueChange={(v) => dispatch({ type: 'SET_TAB', tab: v as ListType })}
+                className="flex-1"
+              >
+                <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="been">Been</TabsTrigger>
                   <TabsTrigger value="want_to_try">Want to Try</TabsTrigger>
                   <TabsTrigger value="recs">Recs</TabsTrigger>
@@ -450,11 +462,7 @@ function ListsContent() {
               {/* More Lists Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-9 gap-2 whitespace-nowrap"
-                  >
+                  <Button variant="outline" size="sm" className="h-9 gap-2 whitespace-nowrap">
                     <span>More Lists</span>
                     <IoChevronDown className="h-4 w-4" />
                   </Button>
@@ -483,9 +491,7 @@ function ListsContent() {
                     className="flex items-center justify-between"
                   >
                     <span>Trending</span>
-                    {activeTab === 'trending' && (
-                      <IoCheckmark className="h-4 w-4 text-primary" />
-                    )}
+                    {activeTab === 'trending' && <IoCheckmark className="h-4 w-4 text-primary" />}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -508,7 +514,7 @@ function ListsContent() {
 
           {/* Restaurant content - shown for both mobile and desktop */}
           {listsLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <Skeleton key={i} className="h-48 w-full" />
               ))}
@@ -527,9 +533,9 @@ function ListsContent() {
               </div>
 
               {/* Desktop: Master/Detail layout */}
-              <div className="hidden md:grid md:grid-cols-[2fr_3fr] gap-6">
+              <div className="hidden gap-6 md:grid md:grid-cols-[2fr_3fr]">
                 {/* Master: Single unified list of all restaurants */}
-                <div className="space-y-1 overflow-auto max-h-[calc(100vh-200px)]">
+                <div className="max-h-[calc(100vh-200px)] space-y-1 overflow-auto">
                   {restaurantsData.map((restaurant, index) => (
                     <RestaurantListItemCompact
                       key={restaurant.id}
@@ -547,21 +553,23 @@ function ListsContent() {
                   {rightPanelView === 'detail' ? (
                     // Detail view (existing)
                     selectedRestaurant ? (
-                      <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <div className="rounded-lg border border-gray-200 bg-white p-6">
                         <RestaurantDetailPreview restaurant={selectedRestaurant} />
                       </div>
                     ) : (
-                      <div className="flex items-center justify-center h-64 text-muted bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                      <div className="flex h-64 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 text-muted">
                         <p>Select a restaurant to view details</p>
                       </div>
                     )
                   ) : (
                     // Map view (new)
-                    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden h-[calc(100vh-250px)]">
+                    <div className="h-[calc(100vh-250px)] overflow-hidden rounded-lg border border-gray-200 bg-white">
                       <RestaurantMap
                         restaurants={restaurantsData}
                         selectedRestaurant={selectedRestaurant}
-                        onRestaurantSelect={(restaurant) => dispatch({ type: 'SELECT_RESTAURANT', restaurant })}
+                        onRestaurantSelect={(restaurant) =>
+                          dispatch({ type: 'SELECT_RESTAURANT', restaurant })
+                        }
                         visibleRestaurants={visibleRestaurants}
                       />
                     </div>
@@ -570,7 +578,7 @@ function ListsContent() {
               </div>
             </>
           ) : (
-            <div className="text-center py-12 text-muted">
+            <div className="py-12 text-center text-muted">
               <p>No {activeTab.replace('_', ' ')} lists yet</p>
             </div>
           )}
@@ -581,7 +589,7 @@ function ListsContent() {
       {viewParam && (
         <div>
           {viewConfig.isLoading || !viewConfig.restaurants ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <Skeleton key={i} className="h-48 w-full" />
               ))}
@@ -600,9 +608,9 @@ function ListsContent() {
               </div>
 
               {/* Desktop: Master/Detail layout */}
-              <div className="hidden md:grid md:grid-cols-[2fr_3fr] gap-6">
+              <div className="hidden gap-6 md:grid md:grid-cols-[2fr_3fr]">
                 {/* Master: List of restaurants */}
-                <div className="space-y-1 overflow-auto max-h-[calc(100vh-200px)]">
+                <div className="max-h-[calc(100vh-200px)] space-y-1 overflow-auto">
                   {viewConfig.restaurants.map((restaurant, index) => (
                     <RestaurantListItemCompact
                       key={restaurant.id}
@@ -620,21 +628,23 @@ function ListsContent() {
                   {rightPanelView === 'detail' ? (
                     // Detail view (existing)
                     selectedRestaurant ? (
-                      <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <div className="rounded-lg border border-gray-200 bg-white p-6">
                         <RestaurantDetailPreview restaurant={selectedRestaurant} />
                       </div>
                     ) : (
-                      <div className="flex items-center justify-center h-64 text-muted bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                      <div className="flex h-64 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 text-muted">
                         <p>Select a restaurant to view details</p>
                       </div>
                     )
                   ) : (
                     // Map view (new)
-                    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden h-[calc(100vh-250px)]">
+                    <div className="h-[calc(100vh-250px)] overflow-hidden rounded-lg border border-gray-200 bg-white">
                       <RestaurantMap
                         restaurants={viewConfig.restaurants}
                         selectedRestaurant={selectedRestaurant}
-                        onRestaurantSelect={(restaurant) => dispatch({ type: 'SELECT_RESTAURANT', restaurant })}
+                        onRestaurantSelect={(restaurant) =>
+                          dispatch({ type: 'SELECT_RESTAURANT', restaurant })
+                        }
                         visibleRestaurants={visibleRestaurants}
                       />
                     </div>
@@ -643,7 +653,7 @@ function ListsContent() {
               </div>
             </>
           ) : (
-            <div className="text-center py-12 text-muted">
+            <div className="py-12 text-center text-muted">
               <p>No restaurants found</p>
             </div>
           )}
@@ -655,18 +665,20 @@ function ListsContent() {
 
 export default function ListsPage() {
   return (
-    <Suspense fallback={
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Your Lists</h1>
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-6">
+          <div className="mb-6 flex items-center justify-between">
+            <h1 className="text-2xl font-bold">Your Lists</h1>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} className="h-48 w-full" />
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} className="h-48 w-full" />
-          ))}
-        </div>
-      </div>
-    }>
+      }
+    >
       <ListsContent />
     </Suspense>
   );

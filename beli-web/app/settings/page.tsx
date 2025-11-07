@@ -1,27 +1,22 @@
-import * as React from "react"
-import {
-  User,
-  Bell,
-  Shield,
-  Smartphone,
-  HelpCircle,
-  LogOut,
-} from "lucide-react"
-import { SettingsCard } from "@/components/settings/settings-card"
-import Link from "next/link"
+import { User, Bell, Shield, Smartphone, HelpCircle, LogOut } from 'lucide-react';
+import Link from 'next/link';
+import * as React from 'react';
+
+import { SettingsCard } from '@/components/settings/settings-card';
+
 
 export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-2xl mx-auto px-4 py-4">
+      <div className="border-b border-gray-200 bg-white">
+        <div className="mx-auto max-w-2xl px-4 py-4">
           <h1 className="text-2xl font-bold text-foreground">Settings</h1>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      <div className="mx-auto max-w-2xl px-4 py-6">
         <div className="space-y-4">
           {/* Your account */}
           <SettingsCard
@@ -75,24 +70,22 @@ export default function SettingsPage() {
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-gray-200 my-8" />
+        <div className="my-8 h-px bg-gray-200" />
 
         {/* Logout */}
         <Link href="/logout">
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
+          <div className="cursor-pointer rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
             <div className="flex items-center gap-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-50">
                 <LogOut className="h-6 w-6 text-red-500" />
               </div>
               <div className="flex-1">
-                <h3 className="text-[17px] font-semibold text-red-500">
-                  Log out
-                </h3>
+                <h3 className="text-[17px] font-semibold text-red-500">Log out</h3>
               </div>
             </div>
           </div>
         </Link>
       </div>
     </div>
-  )
+  );
 }

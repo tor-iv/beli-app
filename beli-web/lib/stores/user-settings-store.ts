@@ -1,77 +1,77 @@
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export interface NotificationSettings {
-  follows: boolean
-  bookmarks: boolean
-  likes: boolean
-  comments: boolean
-  contactJoins: boolean
-  featuredLists: boolean
-  restaurantNews: boolean
-  sharedReservations: boolean // required
-  weeklyRankReminders: boolean
-  streakReminders: boolean
-  orderReminders: boolean
-  rankReminders: boolean
+  follows: boolean;
+  bookmarks: boolean;
+  likes: boolean;
+  comments: boolean;
+  contactJoins: boolean;
+  featuredLists: boolean;
+  restaurantNews: boolean;
+  sharedReservations: boolean; // required
+  weeklyRankReminders: boolean;
+  streakReminders: boolean;
+  orderReminders: boolean;
+  rankReminders: boolean;
 }
 
 export interface CookiePreferences {
-  analytics: boolean
-  marketing: boolean
-  functional: boolean
+  analytics: boolean;
+  marketing: boolean;
+  functional: boolean;
 }
 
 export interface UserSettingsState {
   // Account
-  email: string
-  phoneNumber: string
-  school?: string
-  company?: string
-  homeCity: string
+  email: string;
+  phoneNumber: string;
+  school?: string;
+  company?: string;
+  homeCity: string;
 
   // App Settings
-  vibrationsDisabled: boolean
-  distanceUnit: 'Miles' | 'Kilometers'
+  vibrationsDisabled: boolean;
+  distanceUnit: 'Miles' | 'Kilometers';
 
   // Notifications
-  notifications: NotificationSettings
+  notifications: NotificationSettings;
 
   // Privacy
-  isPublicAccount: boolean
-  blockedUsers: string[]
-  mutedUsers: string[]
-  cookiePreferences: CookiePreferences
+  isPublicAccount: boolean;
+  blockedUsers: string[];
+  mutedUsers: string[];
+  cookiePreferences: CookiePreferences;
 
   // Preferences
-  dietaryRestrictions: string[]
-  dislikedCuisines: string[]
+  dietaryRestrictions: string[];
+  dislikedCuisines: string[];
 
   // Feature Flags
-  hasJoinedSchool: boolean
-  hasSetGoal: boolean
-  invitesRemaining: number
+  hasJoinedSchool: boolean;
+  hasSetGoal: boolean;
+  invitesRemaining: number;
 
   // Actions
-  setEmail: (email: string) => void
-  setPhoneNumber: (phoneNumber: string) => void
-  setSchool: (school: string | undefined) => void
-  setCompany: (company: string | undefined) => void
-  setHomeCity: (homeCity: string) => void
-  setVibrationsDisabled: (disabled: boolean) => void
-  setDistanceUnit: (unit: 'Miles' | 'Kilometers') => void
-  setNotification: (key: keyof NotificationSettings, value: boolean) => void
-  setIsPublicAccount: (isPublic: boolean) => void
-  blockUser: (userId: string) => void
-  unblockUser: (userId: string) => void
-  muteUser: (userId: string) => void
-  unmuteUser: (userId: string) => void
-  setCookiePreference: (key: keyof CookiePreferences, value: boolean) => void
-  setDietaryRestrictions: (restrictions: string[]) => void
-  toggleDietaryRestriction: (restriction: string) => void
-  setDislikedCuisines: (cuisines: string[]) => void
-  toggleDislikedCuisine: (cuisine: string) => void
-  resetToDefaults: () => void
+  setEmail: (email: string) => void;
+  setPhoneNumber: (phoneNumber: string) => void;
+  setSchool: (school: string | undefined) => void;
+  setCompany: (company: string | undefined) => void;
+  setHomeCity: (homeCity: string) => void;
+  setVibrationsDisabled: (disabled: boolean) => void;
+  setDistanceUnit: (unit: 'Miles' | 'Kilometers') => void;
+  setNotification: (key: keyof NotificationSettings, value: boolean) => void;
+  setIsPublicAccount: (isPublic: boolean) => void;
+  blockUser: (userId: string) => void;
+  unblockUser: (userId: string) => void;
+  muteUser: (userId: string) => void;
+  unmuteUser: (userId: string) => void;
+  setCookiePreference: (key: keyof CookiePreferences, value: boolean) => void;
+  setDietaryRestrictions: (restrictions: string[]) => void;
+  toggleDietaryRestriction: (restriction: string) => void;
+  setDislikedCuisines: (cuisines: string[]) => void;
+  toggleDislikedCuisine: (cuisine: string) => void;
+  resetToDefaults: () => void;
 }
 
 const defaultState = {
@@ -109,7 +109,7 @@ const defaultState = {
   hasJoinedSchool: false,
   hasSetGoal: false,
   invitesRemaining: 3,
-}
+};
 
 export const useUserSettingsStore = create<UserSettingsState>()(
   persist(
@@ -163,29 +163,28 @@ export const useUserSettingsStore = create<UserSettingsState>()(
           },
         })),
 
-      setDietaryRestrictions: (restrictions) =>
-        set({ dietaryRestrictions: restrictions }),
+      setDietaryRestrictions: (restrictions) => set({ dietaryRestrictions: restrictions }),
 
       toggleDietaryRestriction: (restriction) =>
         set((state) => {
-          const exists = state.dietaryRestrictions.includes(restriction)
+          const exists = state.dietaryRestrictions.includes(restriction);
           return {
             dietaryRestrictions: exists
               ? state.dietaryRestrictions.filter((r) => r !== restriction)
               : [...state.dietaryRestrictions, restriction],
-          }
+          };
         }),
 
       setDislikedCuisines: (cuisines) => set({ dislikedCuisines: cuisines }),
 
       toggleDislikedCuisine: (cuisine) =>
         set((state) => {
-          const exists = state.dislikedCuisines.includes(cuisine)
+          const exists = state.dislikedCuisines.includes(cuisine);
           return {
             dislikedCuisines: exists
               ? state.dislikedCuisines.filter((c) => c !== cuisine)
               : [...state.dislikedCuisines, cuisine],
-          }
+          };
         }),
 
       resetToDefaults: () => set(defaultState),
@@ -195,4 +194,4 @@ export const useUserSettingsStore = create<UserSettingsState>()(
       storage: createJSONStorage(() => localStorage),
     }
   )
-)
+);

@@ -1,21 +1,23 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { ArrowLeft, Share2, MoreVertical } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Restaurant } from '@/types';
+
+import type { Restaurant } from '@/types';
 
 interface RestaurantNavOverlayProps {
   restaurant: Restaurant;
 }
 
-export function RestaurantNavOverlay({ restaurant }: RestaurantNavOverlayProps) {
+export const RestaurantNavOverlay = ({ restaurant }: RestaurantNavOverlayProps) => {
   const router = useRouter();
 
   const handleShare = async () => {
@@ -47,7 +49,7 @@ export function RestaurantNavOverlay({ restaurant }: RestaurantNavOverlayProps) 
         variant="ghost"
         size="icon"
         onClick={() => router.back()}
-        className="h-11 w-11 rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:bg-white"
+        className="h-11 w-11 rounded-full bg-white/90 shadow-md backdrop-blur-sm hover:bg-white"
       >
         <ArrowLeft className="h-5 w-5" />
       </Button>
@@ -58,7 +60,7 @@ export function RestaurantNavOverlay({ restaurant }: RestaurantNavOverlayProps) 
           variant="ghost"
           size="icon"
           onClick={handleShare}
-          className="h-11 w-11 rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:bg-white"
+          className="h-11 w-11 rounded-full bg-white/90 shadow-md backdrop-blur-sm hover:bg-white"
         >
           <Share2 className="h-5 w-5" />
         </Button>
@@ -68,7 +70,7 @@ export function RestaurantNavOverlay({ restaurant }: RestaurantNavOverlayProps) 
             <Button
               variant="ghost"
               size="icon"
-              className="h-11 w-11 rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:bg-white"
+              className="h-11 w-11 rounded-full bg-white/90 shadow-md backdrop-blur-sm hover:bg-white"
             >
               <MoreVertical className="h-5 w-5" />
             </Button>

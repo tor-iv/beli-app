@@ -1,7 +1,10 @@
-import { Restaurant } from '@/types';
 import { RestaurantListItemMobile } from '@/components/restaurant/restaurant-list-item-mobile';
-import { MasterList } from './MasterList';
+
+
 import { DetailPanel } from './DetailPanel';
+import { MasterList } from './MasterList';
+
+import type { Restaurant } from '@/types';
 
 /**
  * Reusable master/detail layout for restaurant lists
@@ -26,18 +29,18 @@ interface RestaurantMasterDetailProps {
   onViewChange?: (view: 'detail' | 'map') => void;
 }
 
-export function RestaurantMasterDetail({
+export const RestaurantMasterDetail = ({
   restaurants,
   selectedRestaurant,
   onSelectRestaurant,
   rightPanelView,
   visibleRestaurants = [],
   onViewChange,
-}: RestaurantMasterDetailProps) {
+}: RestaurantMasterDetailProps) => {
   return (
     <>
       {/* Mobile View: Simple scrollable list */}
-      <div className="md:hidden space-y-3">
+      <div className="space-y-3 md:hidden">
         {restaurants.map((restaurant, index) => (
           <div key={restaurant.id} data-restaurant-id={restaurant.id}>
             <RestaurantListItemMobile restaurant={restaurant} rank={index + 1} />
@@ -46,7 +49,7 @@ export function RestaurantMasterDetail({
       </div>
 
       {/* Desktop View: Master/Detail layout */}
-      <div className="hidden md:grid md:grid-cols-[2fr_3fr] gap-6">
+      <div className="hidden gap-6 md:grid md:grid-cols-[2fr_3fr]">
         {/* Left Panel: Master list */}
         <MasterList
           restaurants={restaurants}

@@ -1,62 +1,59 @@
-import * as React from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { Heart, CheckCircle2, Users, ArrowRight } from "lucide-react"
-import { cn } from "@/lib/utils"
-import type { GroupDinnerMatch } from "@/types"
+import { Heart, CheckCircle2, Users, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import * as React from 'react';
+
+import { cn } from '@/lib/utils';
+
+import type { GroupDinnerMatch } from '@/types';
 
 interface GroupDinnerCardProps {
-  match: GroupDinnerMatch
-  onViewDetails?: () => void
-  savedCount?: number
-  className?: string
+  match: GroupDinnerMatch;
+  onViewDetails?: () => void;
+  savedCount?: number;
+  className?: string;
 }
 
-export function GroupDinnerCard({
+export const GroupDinnerCard = ({
   match,
   onViewDetails,
   savedCount = 0,
   className,
-}: GroupDinnerCardProps) {
-  const { restaurant, onListsCount, matchReasons, availability } = match
+}: GroupDinnerCardProps) => {
+  const { restaurant, onListsCount, matchReasons, availability } = match;
 
   // Determine rating color
   const getRatingColor = (rating: number) => {
-    if (rating >= 8.0) return "text-green-600" // Excellent
-    if (rating >= 7.0) return "text-lime-500" // Good
-    if (rating >= 5.0) return "text-orange-500" // Average
-    return "text-red-500" // Poor
-  }
+    if (rating >= 8.0) return 'text-green-600'; // Excellent
+    if (rating >= 7.0) return 'text-lime-500'; // Good
+    if (rating >= 5.0) return 'text-orange-500'; // Average
+    return 'text-red-500'; // Poor
+  };
 
   return (
-    <div className={cn("w-full bg-white rounded-2xl shadow-modal overflow-hidden", className)}>
+    <div className={cn('w-full overflow-hidden rounded-2xl bg-white shadow-modal', className)}>
       {/* Restaurant Image */}
-      <div className="relative w-full h-[280px]">
-        <Image
-          src={restaurant.images[0]}
-          alt={restaurant.name}
-          fill
-          className="object-cover"
-        />
+      <div className="relative h-[280px] w-full">
+        <Image src={restaurant.images[0]} alt={restaurant.name} fill className="object-cover" />
 
         {/* Saved Counter Badge */}
         {savedCount > 0 && (
           <div
             className={cn(
-              "absolute top-3 left-3 flex items-center gap-1.5 px-2 py-1 rounded-lg shadow-card",
-              savedCount >= 3 ? "bg-green-600" : "bg-primary"
+              'absolute left-3 top-3 flex items-center gap-1.5 rounded-lg px-2 py-1 shadow-card',
+              savedCount >= 3 ? 'bg-green-600' : 'bg-primary'
             )}
           >
-            <Heart className="h-4 w-4 text-white fill-white" />
-            <span className="text-sm font-bold text-white leading-[18px]">{savedCount}</span>
+            <Heart className="h-4 w-4 fill-white text-white" />
+            <span className="text-sm font-bold leading-[18px] text-white">{savedCount}</span>
           </div>
         )}
 
         {/* Availability Badge */}
         {availability && (
-          <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-white px-2 py-1 rounded-lg shadow-card">
+          <div className="absolute right-3 top-3 flex items-center gap-1.5 rounded-lg bg-white px-2 py-1 shadow-card">
             <CheckCircle2 className="h-4 w-4 text-green-600" />
-            <span className="text-[13px] font-semibold text-green-600 leading-[17px]">
+            <span className="text-[13px] font-semibold leading-[17px] text-green-600">
               Available {availability.timeSlot}
             </span>
           </div>
@@ -66,13 +63,11 @@ export function GroupDinnerCard({
       {/* Restaurant Info */}
       <div className="p-4">
         {/* Name */}
-        <h3 className="text-2xl font-bold text-foreground mb-1 line-clamp-1">
-          {restaurant.name}
-        </h3>
+        <h3 className="mb-1 line-clamp-1 text-2xl font-bold text-foreground">{restaurant.name}</h3>
 
         {/* Meta Row */}
-        <div className="flex items-center text-[15px] text-muted mb-2">
-          <span>{restaurant.cuisine.join(", ")}</span>
+        <div className="mb-2 flex items-center text-[15px] text-muted">
+          <span>{restaurant.cuisine.join(', ')}</span>
           <span className="mx-1">•</span>
           <span>{restaurant.priceRange}</span>
           {restaurant.distance !== undefined && (
@@ -84,26 +79,24 @@ export function GroupDinnerCard({
         </div>
 
         {/* Rating */}
-        <div className="flex items-center mb-4">
-          <div className="h-11 w-11 flex items-center justify-center rounded-full bg-white border-[1.5px] border-gray-300 mr-2">
-            <span className={cn("text-lg font-bold", getRatingColor(restaurant.rating))}>
+        <div className="mb-4 flex items-center">
+          <div className="mr-2 flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-gray-300 bg-white">
+            <span className={cn('text-lg font-bold', getRatingColor(restaurant.rating))}>
               {restaurant.rating.toFixed(1)}
             </span>
           </div>
           {restaurant.ratingCount && (
-            <span className="text-[13px] text-muted">
-              ({restaurant.ratingCount} reviews)
-            </span>
+            <span className="text-[13px] text-muted">({restaurant.ratingCount} reviews)</span>
           )}
         </div>
 
         {/* Match Info */}
         <div className="bg-primary/8 rounded-lg p-3">
           {/* Header */}
-          <div className="flex items-center gap-1.5 mb-2">
+          <div className="mb-2 flex items-center gap-1.5">
             <Users className="h-[18px] w-[18px] text-primary" />
-            <span className="text-[15px] font-semibold text-primary leading-[21px]">
-              {onListsCount === 1 ? "Match Info" : `${onListsCount} people want this!`}
+            <span className="text-[15px] font-semibold leading-[21px] text-primary">
+              {onListsCount === 1 ? 'Match Info' : `${onListsCount} people want this!`}
             </span>
           </div>
 
@@ -111,10 +104,8 @@ export function GroupDinnerCard({
           <div className="space-y-1">
             {matchReasons.map((reason, index) => (
               <div key={index} className="flex items-start gap-2 pl-1">
-                <span className="text-[15px] font-bold text-primary leading-[21px] mr-1">•</span>
-                <span className="text-[15px] text-foreground leading-[21px] flex-1">
-                  {reason}
-                </span>
+                <span className="mr-1 text-[15px] font-bold leading-[21px] text-primary">•</span>
+                <span className="flex-1 text-[15px] leading-[21px] text-foreground">{reason}</span>
               </div>
             ))}
           </div>
@@ -124,7 +115,7 @@ export function GroupDinnerCard({
         {onViewDetails && (
           <button
             onClick={onViewDetails}
-            className="flex items-center justify-center gap-1.5 w-full mt-3 py-2 hover:bg-gray-50 rounded-lg transition-colors"
+            className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg py-2 transition-colors hover:bg-gray-50"
           >
             <span className="text-[15px] font-semibold text-primary">More Info</span>
             <ArrowRight className="h-4 w-4 text-primary" />
@@ -132,5 +123,5 @@ export function GroupDinnerCard({
         )}
       </div>
     </div>
-  )
+  );
 }

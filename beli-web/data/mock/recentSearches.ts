@@ -1,4 +1,4 @@
-import { RecentSearch } from '@/types';
+import type { RecentSearch } from '@/types';
 
 export const mockRecentSearches: RecentSearch[] = [
   {

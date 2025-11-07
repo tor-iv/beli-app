@@ -8,12 +8,15 @@
  * - Discovery features
  */
 
-import { delay } from '../base/BaseService';
+import { trendingRestaurants } from '@/data/mock/activities';
 import { mockRestaurants } from '@/data/mock/restaurants';
 import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
 import { mockUsers } from '@/data/mock/users';
-import { trendingRestaurants } from '@/data/mock/activities';
-import { Restaurant } from '@/types';
+
+import { delay } from '../base/BaseService';
+
+import type { Restaurant } from '@/types';
+
 
 export class RestaurantService {
   /**
@@ -32,7 +35,7 @@ export class RestaurantService {
    */
   static async getRestaurantById(restaurantId: string): Promise<Restaurant | null> {
     await delay();
-    return mockRestaurants.find(restaurant => restaurant.id === restaurantId) || null;
+    return mockRestaurants.find((restaurant) => restaurant.id === restaurantId) || null;
   }
 
   /**
@@ -43,19 +46,22 @@ export class RestaurantService {
    * @param filters - Optional filters (cuisine, price range, neighborhood, distance)
    * @returns Filtered restaurants
    */
-  static async searchRestaurants(query: string, filters?: {
-    cuisine?: string[];
-    priceRange?: string[];
-    neighborhood?: string;
-    maxDistance?: number;
-  }): Promise<Restaurant[]> {
+  static async searchRestaurants(
+    query: string,
+    filters?: {
+      cuisine?: string[];
+      priceRange?: string[];
+      neighborhood?: string;
+      maxDistance?: number;
+    }
+  ): Promise<Restaurant[]> {
     await delay();
     let filteredRestaurants = mockRestaurants;
 
     // Text search
     if (query.trim()) {
       const lowercaseQuery = query.trim().toLowerCase();
-      filteredRestaurants = filteredRestaurants.filter(restaurant => {
+      filteredRestaurants = filteredRestaurants.filter((restaurant) => {
         const textFields: string[] = [
           restaurant.name,
           restaurant.location.neighborhood,
@@ -68,37 +74,37 @@ export class RestaurantService {
           ...(restaurant.popularDishes ?? []),
         ];
 
-        return textFields.some(field =>
-          typeof field === 'string' && field.toLowerCase().includes(lowercaseQuery)
+        return textFields.some(
+          (field) => typeof field === 'string' && field.toLowerCase().includes(lowercaseQuery)
         );
       });
     }
 
     // Cuisine filter
     if (filters?.cuisine && filters.cuisine.length > 0) {
-      filteredRestaurants = filteredRestaurants.filter(restaurant =>
-        restaurant.cuisine.some(c => filters.cuisine!.includes(c))
+      filteredRestaurants = filteredRestaurants.filter((restaurant) =>
+        restaurant.cuisine.some((c) => filters.cuisine!.includes(c))
       );
     }
 
     // Price range filter
     if (filters?.priceRange && filters.priceRange.length > 0) {
-      filteredRestaurants = filteredRestaurants.filter(restaurant =>
+      filteredRestaurants = filteredRestaurants.filter((restaurant) =>
         filters.priceRange!.includes(restaurant.priceRange)
       );
     }
 
     // Neighborhood filter
     if (filters?.neighborhood) {
-      filteredRestaurants = filteredRestaurants.filter(restaurant =>
-        restaurant.location.neighborhood === filters.neighborhood
+      filteredRestaurants = filteredRestaurants.filter(
+        (restaurant) => restaurant.location.neighborhood === filters.neighborhood
       );
     }
 
     // Distance filter
     if (filters?.maxDistance) {
-      filteredRestaurants = filteredRestaurants.filter(restaurant =>
-        restaurant.distance && restaurant.distance <= filters.maxDistance!
+      filteredRestaurants = filteredRestaurants.filter(
+        (restaurant) => restaurant.distance && restaurant.distance <= filters.maxDistance!
       );
     }
 
@@ -113,7 +119,7 @@ export class RestaurantService {
   static async getRestaurantsByIds(restaurantIds: string[]): Promise<Restaurant[]> {
     await delay();
     const idSet = new Set(restaurantIds);
-    return mockRestaurants.filter(restaurant => idSet.has(restaurant.id));
+    return mockRestaurants.filter((restaurant) => idSet.has(restaurant.id));
   }
 
   /**
@@ -122,7 +128,7 @@ export class RestaurantService {
    * @returns Trending restaurants sorted by rating
    */
   static async getTrendingRestaurants(): Promise<Restaurant[]> {
-    const restaurantIds = trendingRestaurants.map(restaurant => restaurant.id);
+    const restaurantIds = trendingRestaurants.map((restaurant) => restaurant.id);
     if (restaurantIds.length === 0) {
       const randomSelection = await this.getRandomRestaurants(6);
       return randomSelection.sort((a, b) => (b.rating || 0) - (a.rating || 0));
@@ -155,17 +161,17 @@ export class RestaurantService {
   static async getRestaurantRecommendations(userId: string): Promise<Restaurant[]> {
     await delay();
 
-    const user = mockUsers.find(u => u.id === userId);
+    const user = mockUsers.find((u) => u.id === userId);
     if (!user) return [];
 
     const visitedIds = new Set(
       mockUserRestaurantRelations
-        .filter(relation => relation.userId === userId)
-        .map(relation => relation.restaurantId)
+        .filter((relation) => relation.userId === userId)
+        .map((relation) => relation.restaurantId)
     );
 
     const candidates = mockRestaurants
-      .filter(restaurant => !visitedIds.has(restaurant.id))
+      .filter((restaurant) => !visitedIds.has(restaurant.id))
       .sort((a, b) => (b.rating || 0) - (a.rating || 0))
       .slice(0, 12);
 
@@ -186,7 +192,7 @@ export class RestaurantService {
   static async getReservableRestaurants(limit: number = 10): Promise<Restaurant[]> {
     await delay();
     return mockRestaurants
-      .filter(r => r.acceptsReservations === true)
+      .filter((r) => r.acceptsReservations === true)
       .sort((a, b) => (b.rating || 0) - (a.rating || 0))
       .slice(0, limit);
   }
@@ -200,11 +206,15 @@ export class RestaurantService {
    * @param limit - Maximum number to return (default: 10)
    * @returns Nearby restaurants sorted by rating then distance
    */
-  static async getNearbyRecommendations(userId: string, maxDistance: number = 2.0, limit: number = 10): Promise<Restaurant[]> {
+  static async getNearbyRecommendations(
+    userId: string,
+    maxDistance: number = 2.0,
+    limit: number = 10
+  ): Promise<Restaurant[]> {
     await delay();
     // Get restaurants that are nearby (within maxDistance miles) and have good ratings
     return mockRestaurants
-      .filter(r => r.distance && r.distance <= maxDistance && r.rating >= 7.5)
+      .filter((r) => r.distance && r.distance <= maxDistance && r.rating >= 7.5)
       .sort((a, b) => {
         // Sort by rating descending, then by distance ascending
         const ratingDiff = (b.rating || 0) - (a.rating || 0);
@@ -227,7 +237,7 @@ export class RestaurantService {
     // For mock data, return highly-rated restaurants
     // In real app, would check friends' recommendations
     return mockRestaurants
-      .filter(r => r.rating >= 8.0)
+      .filter((r) => r.rating >= 8.0)
       .sort((a, b) => (b.rating || 0) - (a.rating || 0))
       .slice(0, limit);
   }

@@ -7,7 +7,7 @@ interface RatingBubbleProps {
   className?: string;
 }
 
-export function RatingBubble({ rating, size = 'md', className }: RatingBubbleProps) {
+export const RatingBubble = ({ rating, size = 'md', className }: RatingBubbleProps) => {
   const colorClass = getRatingColor(rating);
 
   // Match native sizes: small=32px/12px, medium=44px/14px, large=56px/18px
@@ -18,14 +18,7 @@ export function RatingBubble({ rating, size = 'md', className }: RatingBubblePro
   };
 
   return (
-    <div
-      className={cn(
-        'rating-bubble',
-        `rating-${colorClass}`,
-        sizeClasses[size],
-        className
-      )}
-    >
+    <div className={cn('rating-bubble', `rating-${colorClass}`, sizeClasses[size], className)}>
       {rating.toFixed(1)}
     </div>
   );

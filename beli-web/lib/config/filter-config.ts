@@ -1,12 +1,13 @@
-import { ListFilters } from '@/lib/stores/list-filters';
 import {
   CITIES,
   CUISINES,
-  TAGS,
+  FRIEND_THRESHOLDS,
   GOOD_FOR,
   SCORE_THRESHOLDS,
-  FRIEND_THRESHOLDS,
+  TAGS,
 } from '@/lib/stores/list-filters';
+
+import type { ListFilters } from '@/lib/stores/list-filters';
 
 /**
  * Filter section display types
@@ -84,7 +85,7 @@ export const FILTER_SECTIONS: FilterConfig[] = [
     type: 'button-row',
     items: ['$', '$$', '$$$', '$$$$'] as const,
     storeKey: 'prices',
-    getSelectedLabel: (f) => f.prices.length > 0 ? f.prices.join(', ') : '',
+    getSelectedLabel: (f) => (f.prices.length > 0 ? f.prices.join(', ') : ''),
   },
   {
     id: 'tags',
@@ -111,7 +112,7 @@ export const FILTER_SECTIONS: FilterConfig[] = [
     items: SCORE_THRESHOLDS,
     storeKey: 'minScore',
     singleSelect: true,
-    getSelectedLabel: (f) => f.minScore !== null ? `${f.minScore}+` : '',
+    getSelectedLabel: (f) => (f.minScore !== null ? `${f.minScore}+` : ''),
   },
   {
     id: 'friends',
@@ -120,7 +121,7 @@ export const FILTER_SECTIONS: FilterConfig[] = [
     items: FRIEND_THRESHOLDS,
     storeKey: 'minFriends',
     singleSelect: true,
-    getSelectedLabel: (f) => f.minFriends !== null ? `${f.minFriends}+` : '',
+    getSelectedLabel: (f) => (f.minFriends !== null ? `${f.minFriends}+` : ''),
   },
   {
     id: 'other',

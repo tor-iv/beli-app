@@ -1,6 +1,9 @@
-import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { ReviewService } from '@/lib/services';
-import { Review } from '@/types';
+
+import type { Review } from '@/types';
+import type { UseQueryOptions } from '@tanstack/react-query';
 
 /**
  * Hook for fetching all reviews for a specific restaurant

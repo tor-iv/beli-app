@@ -1,16 +1,17 @@
-'use client'
+'use client';
 
-import { useCallback } from 'react'
-import Link from 'next/link'
-import { Search, ArrowLeft } from 'lucide-react'
-import { useTastemakersTutorial } from '@/lib/hooks/use-tastemakers-tutorial'
-import { TastemakerPostCard } from '@/components/tastemakers/tastemaker-post-card'
-import { CategoryPills } from '@/components/tastemakers/category-pills'
-import { ContentModeToggle } from '@/components/tastemakers/content-mode-toggle'
-import { FeaturedListRowWithProgress } from '@/components/lists/featured-list-row-with-progress'
-import { FeaturedListCardWithProgress } from '@/components/lists/featured-list-card-with-progress'
-import { TutorialOverlay } from '@/components/tutorial/tutorial-overlay'
-import { TutorialBanner } from '@/components/tutorial/tutorial-banner'
+import { Search, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { useCallback } from 'react';
+
+import { FeaturedListCardWithProgress } from '@/components/lists/featured-list-card-with-progress';
+import { FeaturedListRowWithProgress } from '@/components/lists/featured-list-row-with-progress';
+import { CategoryPills } from '@/components/tastemakers/category-pills';
+import { ContentModeToggle } from '@/components/tastemakers/content-mode-toggle';
+import { TastemakerPostCard } from '@/components/tastemakers/tastemaker-post-card';
+import { TutorialBanner } from '@/components/tutorial/tutorial-banner';
+import { TutorialOverlay } from '@/components/tutorial/tutorial-overlay';
+import { useTastemakersTutorial } from '@/lib/hooks/use-tastemakers-tutorial';
 
 export default function TastemakersTutorialPage() {
   const {
@@ -27,11 +28,11 @@ export default function TastemakersTutorialPage() {
     setCategory,
     handleBack,
     handleNext,
-  } = useTastemakersTutorial()
+  } = useTastemakersTutorial();
 
   const handleSearchClick = useCallback(() => {
-    alert('Search coming soon!')
-  }, [])
+    alert('Search coming soon!');
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-32 md:pb-4">
@@ -42,14 +43,14 @@ export default function TastemakersTutorialPage() {
       />
 
       {/* Mobile Header */}
-      <div className="md:hidden bg-white border-b border-gray-200">
+      <div className="border-b border-gray-200 bg-white md:hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <button
             onClick={handleBack}
-            className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="-ml-2 rounded-lg p-2 transition-colors hover:bg-gray-100"
             aria-label="Go back"
           >
-            <ArrowLeft className="w-6 h-6 text-gray-900" />
+            <ArrowLeft className="h-6 w-6 text-gray-900" />
           </button>
           <h1 className="text-lg font-semibold text-gray-900">Tastemakers</h1>
           <div className="w-9" />
@@ -59,27 +60,26 @@ export default function TastemakersTutorialPage() {
         <div className="px-4 pb-2">
           <button
             onClick={handleSearchClick}
-            className="w-full bg-gray-100 rounded-xl flex items-center px-4 py-3"
+            className="flex w-full items-center rounded-xl bg-gray-100 px-4 py-3"
             aria-label="Search tastemakers and articles"
           >
-            <Search className="w-5 h-5 text-gray-800 mr-2" aria-hidden="true" />
+            <Search className="mr-2 h-5 w-5 text-gray-800" aria-hidden="true" />
             <span className="text-base text-gray-700">Search</span>
           </button>
         </div>
       </div>
 
       {/* Desktop Header */}
-      <div className="hidden md:block container mx-auto px-4 py-6">
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold mb-3">Tastemakers</h1>
-          <p className="text-lg text-muted max-w-2xl mx-auto mb-6">
+      <div className="container mx-auto hidden px-4 py-6 md:block">
+        <div className="mb-8 text-center">
+          <h1 className="mb-3 text-5xl font-bold">Tastemakers</h1>
+          <p className="mx-auto mb-6 max-w-2xl text-lg text-muted">
             {mode === 'lists'
               ? "Curated restaurant collections from NYC's top food experts"
-              : "Discover curated guides and insider tips from NYC's most influential food experts"
-            }
+              : "Discover curated guides and insider tips from NYC's most influential food experts"}
           </p>
 
-          <div className="max-w-md mx-auto">
+          <div className="mx-auto max-w-md">
             <ContentModeToggle mode={mode} onModeChange={setMode} />
           </div>
         </div>
@@ -96,24 +96,20 @@ export default function TastemakersTutorialPage() {
           // Lists Mode
           <div>
             {/* Desktop Grid */}
-            <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="hidden grid-cols-1 gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
               {featuredLists && featuredLists.length > 0 ? (
                 featuredLists.map((list) => (
-                  <FeaturedListCardWithProgress
-                    key={list.id}
-                    list={list}
-                    userId={user?.id || ''}
-                  />
+                  <FeaturedListCardWithProgress key={list.id} list={list} userId={user?.id || ''} />
                 ))
               ) : (
-                <div className="col-span-full text-center py-12 text-gray-700">
+                <div className="col-span-full py-12 text-center text-gray-700">
                   <p>No featured lists available</p>
                 </div>
               )}
             </div>
 
             {/* Mobile List */}
-            <div className="md:hidden bg-white">
+            <div className="bg-white md:hidden">
               {featuredLists?.map((list, index) => (
                 <FeaturedListRowWithProgress
                   key={list.id}
@@ -128,28 +124,28 @@ export default function TastemakersTutorialPage() {
           // Articles Mode
           <div>
             {/* Desktop Featured Hero */}
-            <div className="hidden md:block mb-12">
+            <div className="mb-12 hidden md:block">
               {heroPost && (
-                <div className="relative h-[500px] rounded-2xl overflow-hidden mb-8 group cursor-pointer shadow-xl hover:shadow-2xl transition-shadow">
+                <div className="group relative mb-8 h-[500px] cursor-pointer overflow-hidden rounded-2xl shadow-xl transition-shadow hover:shadow-2xl">
                   <Link href={`/tastemakers/posts/${heroPost.id}`} className="block h-full">
                     <div className="relative h-full">
                       <img
                         src={heroPost.coverImage}
                         alt={heroPost.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 text-white">
+                      <div className="absolute bottom-0 left-0 right-0 p-8 text-white md:p-12">
                         <div className="max-w-4xl">
-                          <div className="inline-flex items-center gap-2 bg-primary px-4 py-2 rounded-full text-sm font-bold mb-4">
+                          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-bold">
                             <span>⭐</span>
                             <span>Featured Article</span>
                           </div>
-                          <h2 className="text-4xl md:text-5xl font-bold mb-4 leading-tight drop-shadow-lg">
+                          <h2 className="mb-4 text-4xl font-bold leading-tight drop-shadow-lg md:text-5xl">
                             {heroPost.title}
                           </h2>
                           {heroPost.subtitle && (
-                            <p className="text-lg md:text-xl text-white/90 mb-6 drop-shadow">
+                            <p className="mb-6 text-lg text-white/90 drop-shadow md:text-xl">
                               {heroPost.subtitle}
                             </p>
                           )}
@@ -159,17 +155,21 @@ export default function TastemakersTutorialPage() {
                                 <img
                                   src={heroPost.user.avatar}
                                   alt={heroPost.user.displayName}
-                                  className="w-8 h-8 rounded-full"
+                                  className="h-8 w-8 rounded-full"
                                 />
-                                <span className="font-semibold">
-                                  {heroPost.user.displayName}
-                                </span>
+                                <span className="font-semibold">{heroPost.user.displayName}</span>
                               </div>
                             )}
-                            <span>{new Date(heroPost.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                            <span>
+                              {new Date(heroPost.publishedAt).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              })}
+                            </span>
                             <div className="flex gap-2">
                               {heroPost.tags.slice(0, 2).map((tag) => (
-                                <span key={tag} className="px-2 py-1 bg-white/20 rounded text-xs">
+                                <span key={tag} className="rounded bg-white/20 px-2 py-1 text-xs">
                                   {tag}
                                 </span>
                               ))}
@@ -184,41 +184,30 @@ export default function TastemakersTutorialPage() {
 
               {/* Desktop Other Featured Posts */}
               {otherFeaturedPosts.length > 0 && (
-                <div className="grid grid-cols-2 gap-6 mb-12">
+                <div className="mb-12 grid grid-cols-2 gap-6">
                   {otherFeaturedPosts.map((post) => (
-                    <TastemakerPostCard
-                      key={post.id}
-                      post={post}
-                      variant="default"
-                    />
+                    <TastemakerPostCard key={post.id} post={post} variant="default" />
                   ))}
                 </div>
               )}
 
               {/* Desktop More Articles Section */}
               <div className="mb-8">
-                <div className="flex items-center justify-between mb-6">
+                <div className="mb-6 flex items-center justify-between">
                   <h2 className="text-2xl font-bold">More Articles</h2>
                 </div>
 
                 {/* Category Pills */}
-                <CategoryPills
-                  selectedCategory={category}
-                  onCategorySelect={setCategory}
-                />
+                <CategoryPills selectedCategory={category} onCategorySelect={setCategory} />
 
                 {/* Articles Grid */}
-                <div className="grid grid-cols-2 gap-6 mt-6">
+                <div className="mt-6 grid grid-cols-2 gap-6">
                   {allPosts.length > 0 ? (
                     allPosts.map((post) => (
-                      <TastemakerPostCard
-                        key={post.id}
-                        post={post}
-                        variant="compact"
-                      />
+                      <TastemakerPostCard key={post.id} post={post} variant="compact" />
                     ))
                   ) : (
-                    <div className="col-span-2 text-center py-12 text-gray-700">
+                    <div className="col-span-2 py-12 text-center text-gray-700">
                       No articles available
                     </div>
                   )}
@@ -228,21 +217,14 @@ export default function TastemakersTutorialPage() {
 
             {/* Mobile Articles */}
             <div className="md:hidden">
-              <CategoryPills
-                selectedCategory={category}
-                onCategorySelect={setCategory}
-              />
-              <div className="px-4 pb-4 space-y-4">
+              <CategoryPills selectedCategory={category} onCategorySelect={setCategory} />
+              <div className="space-y-4 px-4 pb-4">
                 {filteredPosts && filteredPosts.length > 0 ? (
                   filteredPosts.map((post) => (
-                    <TastemakerPostCard
-                      key={post.id}
-                      post={post}
-                      variant="compact"
-                    />
+                    <TastemakerPostCard key={post.id} post={post} variant="compact" />
                   ))
                 ) : (
-                  <div className="text-center py-12 text-gray-700">
+                  <div className="py-12 text-center text-gray-700">
                     No articles found for this category
                   </div>
                 )}
@@ -261,5 +243,5 @@ export default function TastemakersTutorialPage() {
         onNext={handleNext}
       />
     </div>
-  )
+  );
 }

@@ -1,6 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { MockDataService } from '@/lib/mockDataService';
-import { Restaurant } from '@/types';
+import { useQuery } from '@tanstack/react-query';
+
+import { RestaurantService } from '@/lib/services';
+
+import type { Restaurant } from '@/types';
+import type { UseQueryOptions } from '@tanstack/react-query';
 
 /**
  * Hook for fetching reservable restaurants
@@ -13,7 +16,7 @@ export function useReservableRestaurants(
 ) {
   return useQuery({
     queryKey: ['restaurants', 'reservable', limit],
-    queryFn: () => MockDataService.getReservableRestaurants(limit),
+    queryFn: () => RestaurantService.getReservableRestaurants(limit),
     staleTime: 5 * 60 * 1000, // 5 minutes
     ...options,
   });

@@ -1,7 +1,9 @@
 'use client';
 
-import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+
+import type { ReactNode } from 'react';
+
 
 interface SidebarProps {
   children: ReactNode;
@@ -25,13 +27,13 @@ const widthClasses = {
   lg: 'md:w-96',
 };
 
-export function Sidebar({
+export const Sidebar = ({
   children,
   className,
   position = 'right',
   width = 'md',
   sticky = false,
-}: SidebarProps) {
+}: SidebarProps) => {
   return (
     <aside
       className={cn(
@@ -63,7 +65,7 @@ interface SidebarLayoutProps {
   hideSidebarOnMobile?: boolean;
 }
 
-export function SidebarLayout({
+export const SidebarLayout = ({
   main,
   sidebar,
   sidebarPosition = 'right',
@@ -73,16 +75,16 @@ export function SidebarLayout({
   mainClassName,
   sidebarClassName,
   hideSidebarOnMobile = true,
-}: SidebarLayoutProps) {
+}: SidebarLayoutProps) => {
   return (
     <div
       className={cn(
-        'flex flex-col md:flex-row gap-6',
+        'flex flex-col gap-6 md:flex-row',
         sidebarPosition === 'left' && 'md:flex-row-reverse',
         className
       )}
     >
-      <main className={cn('flex-1 min-w-0', mainClassName)}>{main}</main>
+      <main className={cn('min-w-0 flex-1', mainClassName)}>{main}</main>
       <div className={cn(hideSidebarOnMobile && 'hidden md:block')}>
         <Sidebar
           position={sidebarPosition}

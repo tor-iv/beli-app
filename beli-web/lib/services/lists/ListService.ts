@@ -7,10 +7,13 @@
  * - Tracking list progress
  */
 
-import { delay } from '../base/BaseService';
 import { mockLists, getUserListsByType, featuredLists } from '@/data/mock/lists';
 import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
-import { List, ListScope, ListCategory } from '@/types';
+
+import { delay } from '../base/BaseService';
+
+import type { List, ListScope, ListCategory } from '@/types';
+
 
 export class ListService {
   /**
@@ -20,7 +23,7 @@ export class ListService {
    */
   static async getUserLists(userId: string): Promise<List[]> {
     await delay();
-    return mockLists.filter(list => list.userId === userId);
+    return mockLists.filter((list) => list.userId === userId);
   }
 
   /**
@@ -30,7 +33,11 @@ export class ListService {
    * @param category - List category
    * @returns Filtered lists
    */
-  static async getUserListsByType(userId: string, type: ListScope, category: ListCategory): Promise<List[]> {
+  static async getUserListsByType(
+    userId: string,
+    type: ListScope,
+    category: ListCategory
+  ): Promise<List[]> {
     await delay();
     return getUserListsByType(userId, type, category);
   }
@@ -51,7 +58,7 @@ export class ListService {
    */
   static async getListById(listId: string): Promise<List | null> {
     await delay();
-    return mockLists.find(list => list.id === listId) || null;
+    return mockLists.find((list) => list.id === listId) || null;
   }
 
   /**
@@ -83,7 +90,7 @@ export class ListService {
   static async updateList(listId: string, updates: Partial<List>): Promise<List | null> {
     await delay();
 
-    const listIndex = mockLists.findIndex(list => list.id === listId);
+    const listIndex = mockLists.findIndex((list) => list.id === listId);
     if (listIndex === -1) {
       return null;
     }
@@ -104,7 +111,7 @@ export class ListService {
   static async deleteList(listId: string): Promise<void> {
     await delay();
 
-    const index = mockLists.findIndex(list => list.id === listId);
+    const index = mockLists.findIndex((list) => list.id === listId);
     if (index > -1) {
       mockLists.splice(index, 1);
     }
@@ -117,22 +124,27 @@ export class ListService {
    * @param listId - ID of the list
    * @returns Progress with visited and total counts
    */
-  static async getUserListProgress(userId: string, listId: string): Promise<{ visited: number; total: number }> {
+  static async getUserListProgress(
+    userId: string,
+    listId: string
+  ): Promise<{ visited: number; total: number }> {
     await delay();
 
-    const list = mockLists.find(l => l.id === listId);
+    const list = mockLists.find((l) => l.id === listId);
     if (!list) {
       return { visited: 0, total: 0 };
     }
 
     // Get user's been list to check which restaurants they've visited (direct access to avoid nested delay)
-    const userRelations = mockUserRestaurantRelations.filter(relation => relation.userId === userId);
+    const userRelations = mockUserRestaurantRelations.filter(
+      (relation) => relation.userId === userId
+    );
     const visitedRestaurantIds = userRelations
-      .filter(rel => rel.status === 'been')
-      .map(rel => rel.restaurantId);
+      .filter((rel) => rel.status === 'been')
+      .map((rel) => rel.restaurantId);
 
     // Count how many restaurants in the list the user has been to
-    const visited = list.restaurants.filter(restaurantId =>
+    const visited = list.restaurants.filter((restaurantId) =>
       visitedRestaurantIds.includes(restaurantId)
     ).length;
 

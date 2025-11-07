@@ -1,10 +1,12 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Restaurant } from '@/types';
+
 import { RestaurantDetailPreview } from '@/components/restaurant/restaurant-detail-preview';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+
+import type { Restaurant } from '@/types';
 
 // Dynamically import map component (client-side only)
 const RestaurantMap = dynamic(
@@ -12,7 +14,7 @@ const RestaurantMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex h-full items-center justify-center">
         <p>Loading map...</p>
       </div>
     ),
@@ -39,19 +41,19 @@ interface DetailPanelProps {
   onRestaurantSelect?: (restaurant: Restaurant) => void;
 }
 
-export function DetailPanel({
+export const DetailPanel = ({
   view,
   selectedRestaurant,
   allRestaurants,
   visibleRestaurants,
   onViewChange,
   onRestaurantSelect,
-}: DetailPanelProps) {
+}: DetailPanelProps) => {
   // Detail view
   if (view === 'detail') {
     if (!selectedRestaurant) {
       return (
-        <div className="h-[calc(100vh-200px)] flex items-center justify-center">
+        <div className="flex h-[calc(100vh-200px)] items-center justify-center">
           <EmptyState
             title="No restaurant selected"
             description="Select a restaurant from the list to see details"
@@ -76,9 +78,9 @@ export function DetailPanel({
 
   // Map view
   return (
-    <div className="h-[calc(100vh-200px)] relative">
+    <div className="relative h-[calc(100vh-200px)]">
       {onViewChange && (
-        <div className="absolute top-4 right-4 z-10">
+        <div className="absolute right-4 top-4 z-10">
           <Button variant="outline" size="sm" onClick={() => onViewChange('detail')}>
             Show Detail View
           </Button>

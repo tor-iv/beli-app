@@ -7,11 +7,20 @@
  * - Performance-optimized with single-loop aggregation
  */
 
-import { delay } from '../base/BaseService';
-import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
 import { mockRestaurants } from '@/data/mock/restaurants';
+import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
 import { mockUsers } from '@/data/mock/users';
-import { TasteProfileStats, CuisineBreakdown, CityBreakdown, CountryBreakdown, DiningLocation } from '@/types';
+
+import { delay } from '../base/BaseService';
+
+import type {
+  TasteProfileStats,
+  CuisineBreakdown,
+  CityBreakdown,
+  CountryBreakdown,
+  DiningLocation,
+} from '@/types';
+
 
 export class TasteProfileService {
   /**
@@ -28,7 +37,7 @@ export class TasteProfileService {
 
     // Get all user's "been" restaurants - use Set for O(1) lookup
     const userRelations = mockUserRestaurantRelations.filter(
-      rel => rel.userId === userId && rel.status === 'been'
+      (rel) => rel.userId === userId && rel.status === 'been'
     );
 
     // Early return if no data
@@ -51,38 +60,47 @@ export class TasteProfileService {
       };
     }
 
-    const restaurantIdsSet = new Set(userRelations.map(rel => rel.restaurantId));
-    const restaurants = mockRestaurants.filter(r => restaurantIdsSet.has(r.id));
+    const restaurantIdsSet = new Set(userRelations.map((rel) => rel.restaurantId));
+    const restaurants = mockRestaurants.filter((r) => restaurantIdsSet.has(r.id));
 
     // Calculate last N days stats
     const daysAgo = new Date();
     daysAgo.setDate(daysAgo.getDate() - days);
 
     const recentRelations = userRelations.filter(
-      rel => rel.visitDate && new Date(rel.visitDate) >= daysAgo
+      (rel) => rel.visitDate && new Date(rel.visitDate) >= daysAgo
     );
 
-    const recentRestaurantIdsSet = new Set(recentRelations.map(rel => rel.restaurantId));
-    const recentRestaurants = mockRestaurants.filter(r => recentRestaurantIdsSet.has(r.id));
+    const recentRestaurantIdsSet = new Set(recentRelations.map((rel) => rel.restaurantId));
+    const recentRestaurants = mockRestaurants.filter((r) => recentRestaurantIdsSet.has(r.id));
 
-    const recentCuisines = new Set(recentRestaurants.flatMap(r => r.cuisine));
+    const recentCuisines = new Set(recentRestaurants.flatMap((r) => r.cuisine));
 
-    const user = mockUsers.find(u => u.id === userId);
+    const user = mockUsers.find((u) => u.id === userId);
     const primaryLocation = user?.location.city || 'Unknown';
 
     // OPTIMIZED: Calculate all breakdowns in a single loop
-    const cuisineMap = new Map<string, { count: number; totalScore: number; restaurantIds: string[] }>();
-    const cityMap = new Map<string, { count: number; totalScore: number; restaurantIds: string[]; state?: string }>();
-    const countryMap = new Map<string, { count: number; totalScore: number; restaurantIds: string[] }>();
+    const cuisineMap = new Map<
+      string,
+      { count: number; totalScore: number; restaurantIds: string[] }
+    >();
+    const cityMap = new Map<
+      string,
+      { count: number; totalScore: number; restaurantIds: string[]; state?: string }
+    >();
+    const countryMap = new Map<
+      string,
+      { count: number; totalScore: number; restaurantIds: string[] }
+    >();
     const cityLocationMap = new Map<string, DiningLocation>();
 
     // Single loop through restaurants - major performance improvement
-    restaurants.forEach(restaurant => {
+    restaurants.forEach((restaurant) => {
       const restaurantId = restaurant.id;
       const rating = restaurant.rating;
 
       // Process cuisines - push instead of spread
-      restaurant.cuisine.forEach(cuisine => {
+      restaurant.cuisine.forEach((cuisine) => {
         let cuisineData = cuisineMap.get(cuisine);
         if (!cuisineData) {
           cuisineData = { count: 0, totalScore: 0, restaurantIds: [] };
@@ -133,12 +151,14 @@ export class TasteProfileService {
     });
 
     // Convert maps to arrays (only once at the end)
-    const cuisineBreakdown: CuisineBreakdown[] = Array.from(cuisineMap.entries()).map(([cuisine, data]) => ({
-      cuisine,
-      count: data.count,
-      avgScore: parseFloat((data.totalScore / data.count).toFixed(1)),
-      restaurantIds: data.restaurantIds,
-    }));
+    const cuisineBreakdown: CuisineBreakdown[] = Array.from(cuisineMap.entries()).map(
+      ([cuisine, data]) => ({
+        cuisine,
+        count: data.count,
+        avgScore: parseFloat((data.totalScore / data.count).toFixed(1)),
+        restaurantIds: data.restaurantIds,
+      })
+    );
 
     const cityBreakdown: CityBreakdown[] = Array.from(cityMap.entries()).map(([city, data]) => ({
       city: city.split(',')[0].trim(),
@@ -148,12 +168,14 @@ export class TasteProfileService {
       restaurantIds: data.restaurantIds,
     }));
 
-    const countryBreakdown: CountryBreakdown[] = Array.from(countryMap.entries()).map(([country, data]) => ({
-      country,
-      count: data.count,
-      avgScore: parseFloat((data.totalScore / data.count).toFixed(1)),
-      restaurantIds: data.restaurantIds,
-    }));
+    const countryBreakdown: CountryBreakdown[] = Array.from(countryMap.entries()).map(
+      ([country, data]) => ({
+        country,
+        count: data.count,
+        avgScore: parseFloat((data.totalScore / data.count).toFixed(1)),
+        restaurantIds: data.restaurantIds,
+      })
+    );
 
     const diningLocations: DiningLocation[] = Array.from(cityLocationMap.values());
 

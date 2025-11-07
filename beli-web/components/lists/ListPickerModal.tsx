@@ -1,13 +1,6 @@
 'use client';
 
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
-import { cn } from '@/lib/utils';
-import {
   IoCheckmarkCircle,
   IoBookmark,
   IoHeart,
@@ -15,6 +8,10 @@ import {
   IoPeopleCircle,
   IoTrendingUp,
 } from 'react-icons/io5';
+
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
+
 import type { LucideIcon } from 'lucide-react';
 
 export type ListOptionId =
@@ -46,20 +43,20 @@ interface ListPickerModalProps {
   };
 }
 
-export function ListPickerModal({
+export const ListPickerModal = ({
   open,
   onOpenChange,
   selectedList,
   onSelectList,
   listCounts,
-}: ListPickerModalProps) {
+}: ListPickerModalProps) => {
   const listOptions: ListOption[] = [
     {
       id: 'been',
       label: 'Been',
       description: listCounts?.been
         ? `${listCounts.been} restaurant${listCounts.been !== 1 ? 's' : ''}`
-        : 'Places you\'ve visited',
+        : "Places you've visited",
       Icon: IoCheckmarkCircle,
     },
     {
@@ -110,7 +107,7 @@ export function ListPickerModal({
           <SheetTitle className="text-lg font-semibold">Lists</SheetTitle>
         </SheetHeader>
 
-        <div className="grid grid-cols-2 gap-3 overflow-y-auto max-h-[calc(70vh-80px)]">
+        <div className="grid max-h-[calc(70vh-80px)] grid-cols-2 gap-3 overflow-y-auto">
           {listOptions.map((option) => {
             const isSelected = selectedList === option.id;
             const Icon = option.Icon;
@@ -120,33 +117,23 @@ export function ListPickerModal({
                 key={option.id}
                 onClick={() => handleSelect(option.id)}
                 className={cn(
-                  'flex flex-col items-start p-4 rounded-xl border transition-all active:scale-95',
+                  'flex flex-col items-start rounded-xl border p-4 transition-all active:scale-95',
                   'min-h-[90px] text-left',
                   isSelected
-                    ? 'bg-primary border-primary text-white shadow-md'
-                    : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                    ? 'border-primary bg-primary text-white shadow-md'
+                    : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
                 )}
               >
-                <Icon
-                  className={cn(
-                    'h-5 w-5 mb-2',
-                    isSelected ? 'text-white' : 'text-gray-700'
-                  )}
-                />
+                <Icon className={cn('mb-2 h-5 w-5', isSelected ? 'text-white' : 'text-gray-700')} />
                 <span
                   className={cn(
-                    'font-semibold text-base mb-0.5',
+                    'mb-0.5 text-base font-semibold',
                     isSelected ? 'text-white' : 'text-gray-900'
                   )}
                 >
                   {option.label}
                 </span>
-                <span
-                  className={cn(
-                    'text-sm',
-                    isSelected ? 'text-white/80' : 'text-gray-700'
-                  )}
-                >
+                <span className={cn('text-sm', isSelected ? 'text-white/80' : 'text-gray-700')}>
                   {option.description}
                 </span>
               </button>

@@ -7,9 +7,12 @@
  * - Getting unread counts
  */
 
-import { delay } from '../base/BaseService';
 import { mockNotifications } from '@/data/mock/notifications';
-import { Notification } from '@/types';
+
+import { delay } from '../base/BaseService';
+
+import type { Notification } from '@/types';
+
 
 export class NotificationService {
   /**
@@ -28,7 +31,7 @@ export class NotificationService {
    */
   static async markNotificationAsRead(notificationId: string): Promise<void> {
     await delay();
-    const notification = mockNotifications.find(n => n.id === notificationId);
+    const notification = mockNotifications.find((n) => n.id === notificationId);
     if (notification) {
       notification.isRead = true;
     }
@@ -39,7 +42,7 @@ export class NotificationService {
    */
   static async markAllNotificationsAsRead(): Promise<void> {
     await delay();
-    mockNotifications.forEach(n => (n.isRead = true));
+    mockNotifications.forEach((n) => (n.isRead = true));
   }
 
   /**
@@ -48,6 +51,6 @@ export class NotificationService {
    */
   static async getUnreadNotificationCount(): Promise<number> {
     await delay();
-    return mockNotifications.filter(n => !n.isRead).length;
+    return mockNotifications.filter((n) => !n.isRead).length;
   }
 }

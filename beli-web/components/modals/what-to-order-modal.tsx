@@ -1,13 +1,15 @@
 'use client';
 
+import { Minus, Plus, Shuffle, Share2, Check, Loader2 } from 'lucide-react';
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Restaurant, OrderSuggestion, HungerLevel, MealTime } from '@/types';
-import { MockDataService } from '@/lib/mockDataService';
-import { Minus, Plus, Shuffle, Share2, Check, Loader2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { MenuService } from '@/lib/services';
+
+import type { Restaurant, OrderSuggestion, HungerLevel, MealTime } from '@/types';
 
 interface WhatToOrderModalProps {
   open: boolean;
@@ -34,12 +36,30 @@ const HUNGER_LEVELS: Array<{
   description: string;
   color: string;
 }> = [
-  { value: 'light', icon: '🥗', label: 'Light Bites', description: 'Just a taste', color: '#34C759' },
-  { value: 'moderate', icon: '🍝', label: 'Moderately Hungry', description: 'Regular meal', color: '#FF9500' },
-  { value: 'very-hungry', icon: '🍖', label: 'Very Hungry', description: 'Bring it all', color: '#FF3B30' },
+  {
+    value: 'light',
+    icon: '🥗',
+    label: 'Light Bites',
+    description: 'Just a taste',
+    color: '#34C759',
+  },
+  {
+    value: 'moderate',
+    icon: '🍝',
+    label: 'Moderately Hungry',
+    description: 'Regular meal',
+    color: '#FF9500',
+  },
+  {
+    value: 'very-hungry',
+    icon: '🍖',
+    label: 'Very Hungry',
+    description: 'Bring it all',
+    color: '#FF3B30',
+  },
 ];
 
-export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrderModalProps) {
+export const WhatToOrderModal = ({ open, onOpenChange, restaurant }: WhatToOrderModalProps) => {
   const [step, setStep] = useState<Step>('setup');
   const [partySize, setPartySize] = useState(2);
   const [hungerLevel, setHungerLevel] = useState<HungerLevel>('moderate');
@@ -58,7 +78,7 @@ export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrder
     setLoading(true);
     try {
       const detectedMealTime = getMealTimeFromHour();
-      const result = await MockDataService.generateOrderSuggestion(
+      const result = await MenuService.generateOrderSuggestion(
         restaurant.id,
         partySize,
         hungerLevel,
@@ -76,7 +96,7 @@ export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrder
   const handleShuffle = async () => {
     try {
       const detectedMealTime = getMealTimeFromHour();
-      const result = await MockDataService.generateOrderSuggestion(
+      const result = await MenuService.generateOrderSuggestion(
         restaurant.id,
         partySize,
         hungerLevel,
@@ -92,7 +112,7 @@ export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrder
     if (!suggestion) return;
 
     const itemsList = suggestion.items
-      .map(item => `${item.quantity}× ${item.name} - $${item.price * item.quantity}`)
+      .map((item) => `${item.quantity}× ${item.name} - $${item.price * item.quantity}`)
       .join('\n');
 
     const message = `Order for ${restaurant.name}\nParty of ${suggestion.partySize} • ${suggestion.hungerLevel.replace('-', ' ')}\n\n${itemsList}\n\nTotal: $${suggestion.totalPrice.toFixed(2)}\n\n${suggestion.estimatedSharability}\n\nSuggested by beli 🍽️`;
@@ -107,18 +127,16 @@ export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrder
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {step === 'setup' ? 'What Should We Order?' : 'Your Order'}
-          </DialogTitle>
+          <DialogTitle>{step === 'setup' ? 'What Should We Order?' : 'Your Order'}</DialogTitle>
         </DialogHeader>
 
         {step === 'setup' ? (
           <div className="space-y-6">
             {/* Party Size */}
             <div>
-              <h3 className="font-semibold mb-4">How many people?</h3>
+              <h3 className="mb-4 font-semibold">How many people?</h3>
               <div className="flex items-center justify-center gap-4">
                 <Button
                   variant="outline"
@@ -128,7 +146,7 @@ export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrder
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <div className="text-center min-w-[100px]">
+                <div className="min-w-[100px] text-center">
                   <div className="text-5xl font-bold">{partySize}</div>
                   <div className="text-sm text-muted-foreground">
                     {partySize === 1 ? 'person' : 'people'}
@@ -147,15 +165,13 @@ export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrder
 
             {/* Hunger Level */}
             <div>
-              <h3 className="font-semibold mb-4">How hungry are you?</h3>
+              <h3 className="mb-4 font-semibold">How hungry are you?</h3>
               <div className="space-y-3">
-                {HUNGER_LEVELS.map(level => (
+                {HUNGER_LEVELS.map((level) => (
                   <Card
                     key={level.value}
                     className={`cursor-pointer transition-all ${
-                      hungerLevel === level.value
-                        ? 'border-2 shadow-md'
-                        : 'hover:shadow-sm'
+                      hungerLevel === level.value ? 'border-2 shadow-md' : 'hover:shadow-sm'
                     }`}
                     style={{
                       borderColor: hungerLevel === level.value ? level.color : undefined,
@@ -177,7 +193,11 @@ export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrder
               </div>
             </div>
 
-            <Button onClick={handleGenerateSuggestions} disabled={loading} className="w-full bg-primary hover:bg-primary/90">
+            <Button
+              onClick={handleGenerateSuggestions}
+              disabled={loading}
+              className="w-full bg-primary hover:bg-primary/90"
+            >
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -193,7 +213,7 @@ export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrder
             {/* Summary Card */}
             <Card className="bg-gradient-to-br from-primary/5 to-primary/10">
               <CardContent className="p-6">
-                <div className="flex justify-between items-start mb-4">
+                <div className="mb-4 flex items-start justify-between">
                   <div>
                     <div className="text-4xl font-bold text-primary">
                       ${suggestion.totalPrice.toFixed(2)}
@@ -227,29 +247,31 @@ export function WhatToOrderModal({ open, onOpenChange, restaurant }: WhatToOrder
                       <img
                         src={item.imageUrl}
                         alt={item.name}
-                        className="w-32 h-32 object-cover rounded-l-lg"
+                        className="h-32 w-32 rounded-l-lg object-cover"
                       />
                       <div className="flex-1 py-3 pr-3">
-                        <div className="flex justify-between items-start mb-1">
+                        <div className="mb-1 flex items-start justify-between">
                           <h4 className="font-semibold">{item.name}</h4>
-                          {item.quantity > 1 && (
-                            <Badge variant="default">×{item.quantity}</Badge>
-                          )}
+                          {item.quantity > 1 && <Badge variant="default">×{item.quantity}</Badge>}
                         </div>
-                        <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+                        <p className="mb-2 line-clamp-2 text-sm text-muted-foreground">
                           {item.description}
                         </p>
-                        <div className="flex justify-between items-center">
+                        <div className="flex items-center justify-between">
                           <span className="font-semibold text-primary">
                             ${(item.price * item.quantity).toFixed(2)}
                           </span>
                           <div className="flex gap-1">
                             <Badge variant="outline" className="text-xs">
-                              {item.portionSize === 'shareable' ? '🍽️ Shareable' :
-                               item.portionSize.charAt(0).toUpperCase() + item.portionSize.slice(1)}
+                              {item.portionSize === 'shareable'
+                                ? '🍽️ Shareable'
+                                : item.portionSize.charAt(0).toUpperCase() +
+                                  item.portionSize.slice(1)}
                             </Badge>
                             {item.isVegetarian && (
-                              <Badge variant="outline" className="text-xs">🌱</Badge>
+                              <Badge variant="outline" className="text-xs">
+                                🌱
+                              </Badge>
                             )}
                           </div>
                         </div>

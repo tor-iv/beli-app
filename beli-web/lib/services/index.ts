@@ -64,4 +64,9 @@ export { RankingService } from './ranking/RankingService';
 export { GroupDinnerService } from './group-dinner/GroupDinnerService';
 
 // Base utilities (exported for advanced use cases)
-export { delay, SimpleCache, matchPercentageCache, followingRelationships } from './base/BaseService';
+export {
+  delay,
+  SimpleCache,
+  matchPercentageCache,
+  followingRelationships,
+} from './base/BaseService';

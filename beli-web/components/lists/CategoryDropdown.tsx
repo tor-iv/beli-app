@@ -1,25 +1,23 @@
 'use client';
 
 import { useState } from 'react';
-import { useListFilters, CATEGORIES } from '@/lib/stores/list-filters';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { IoChevronDown, IoCheckmark } from 'react-icons/io5';
+
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { IoChevronDown, IoCheckmark } from 'react-icons/io5';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
+import { useListFilters, CATEGORIES } from '@/lib/stores/list-filters';
+import { cn } from '@/lib/utils';
 
-export function CategoryDropdown() {
+
+
+export const CategoryDropdown = () => {
   const { category, setCategory } = useListFilters();
   const [isOpen, setIsOpen] = useState(false);
   const isDesktop = useMediaQuery('(min-width: 768px)');
@@ -42,10 +40,8 @@ export function CategoryDropdown() {
             className="h-auto p-0 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
           >
             <div className="flex items-center gap-2">
-              <span className="text-xl font-bold text-gray-900">
-                {selectedLabel}
-              </span>
-              <IoChevronDown className="h-4 w-4 text-gray-700 flex-shrink-0" />
+              <span className="text-xl font-bold text-gray-900">{selectedLabel}</span>
+              <IoChevronDown className="h-4 w-4 flex-shrink-0 text-gray-700" />
             </div>
           </Button>
         </DropdownMenuTrigger>
@@ -59,7 +55,7 @@ export function CategoryDropdown() {
                   key={cat.value}
                   onClick={() => handleSelect(cat.value)}
                   className={cn(
-                    'cursor-pointer justify-center font-semibold text-sm py-2',
+                    'cursor-pointer justify-center py-2 text-sm font-semibold',
                     isSelected && 'bg-primary text-white'
                   )}
                 >
@@ -82,12 +78,10 @@ export function CategoryDropdown() {
       {/* Trigger Button - Large Bold Text */}
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 py-2 active:opacity-70 transition-opacity"
+        className="flex items-center gap-2 py-2 transition-opacity active:opacity-70"
       >
-        <span className="text-[32px] font-bold text-gray-900 leading-none">
-          {selectedLabel}
-        </span>
-        <IoChevronDown className="h-5 w-5 text-gray-700 flex-shrink-0" />
+        <span className="text-[32px] font-bold leading-none text-gray-900">{selectedLabel}</span>
+        <IoChevronDown className="h-5 w-5 flex-shrink-0 text-gray-700" />
       </button>
 
       {/* Bottom Sheet Modal */}
@@ -107,11 +101,11 @@ export function CategoryDropdown() {
                   key={cat.value}
                   onClick={() => handleSelect(cat.value)}
                   className={cn(
-                    'py-3 px-4 rounded-lg border text-center transition-all active:scale-95',
-                    'font-semibold text-[15px]',
+                    'rounded-lg border px-4 py-3 text-center transition-all active:scale-95',
+                    'text-[15px] font-semibold',
                     isSelected
-                      ? 'bg-primary border-primary text-white'
-                      : 'bg-white border-gray-300 hover:border-gray-400'
+                      ? 'border-primary bg-primary text-white'
+                      : 'border-gray-300 bg-white hover:border-gray-400'
                   )}
                 >
                   {cat.label}

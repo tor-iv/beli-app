@@ -1,41 +1,31 @@
-'use client'
+'use client';
 
 interface ContentModeToggleProps {
-  mode: 'lists' | 'articles'
-  onModeChange: (mode: 'lists' | 'articles') => void
+  mode: 'lists' | 'articles';
+  onModeChange: (mode: 'lists' | 'articles') => void;
 }
 
-export function ContentModeToggle({ mode, onModeChange }: ContentModeToggleProps) {
+export const ContentModeToggle = ({ mode, onModeChange }: ContentModeToggleProps) => {
   return (
-    <div className="mx-4 my-4 flex rounded-lg overflow-hidden bg-white">
+    <div className="mx-4 my-4 flex overflow-hidden rounded-lg bg-white">
       <button
         onClick={() => onModeChange('lists')}
-        className={`
-          flex-1 py-3 px-4 text-base font-semibold text-center
-          transition-colors rounded-l-lg
-          ${
-            mode === 'lists'
-              ? 'bg-primary text-white'
-              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-          }
-        `}
+        className={`flex-1 rounded-l-lg px-4 py-3 text-center text-base font-semibold transition-colors ${
+          mode === 'lists' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+        } `}
       >
         Featured Lists
       </button>
       <button
         onClick={() => onModeChange('articles')}
-        className={`
-          flex-1 py-3 px-4 text-base font-semibold text-center
-          transition-colors rounded-r-lg
-          ${
-            mode === 'articles'
-              ? 'bg-primary text-white'
-              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-          }
-        `}
+        className={`flex-1 rounded-r-lg px-4 py-3 text-center text-base font-semibold transition-colors ${
+          mode === 'articles'
+            ? 'bg-primary text-white'
+            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+        } `}
       >
         Tastemaker Articles
       </button>
     </div>
-  )
+  );
 }

@@ -8,7 +8,6 @@
  * - Reservation reminders
  */
 
-import { delay } from '../base/BaseService';
 import {
   mockReservations,
   getUserPriorityLevel,
@@ -17,7 +16,11 @@ import {
   getSharedReservationsByUser,
   getReservationReminders,
 } from '@/data/mock/reservations';
-import { Reservation, ReservationPriorityLevel } from '@/types';
+
+import { delay } from '../base/BaseService';
+
+import type { Reservation, ReservationPriorityLevel } from '@/types';
+
 
 export class ReservationService {
   /**
@@ -32,7 +35,7 @@ export class ReservationService {
   ): Promise<Reservation[]> {
     await delay();
 
-    let reservations = mockReservations;
+    const reservations = mockReservations;
 
     if (filter === 'available') {
       return getAvailableReservations();
@@ -43,10 +46,8 @@ export class ReservationService {
     }
 
     // Return all user's reservations (owned, claimed, or shared)
-    return reservations.filter(r =>
-      r.userId === userId ||
-      r.claimedBy === userId ||
-      r.sharedWith?.includes(userId)
+    return reservations.filter(
+      (r) => r.userId === userId || r.claimedBy === userId || r.sharedWith?.includes(userId)
     );
   }
 
@@ -91,7 +92,7 @@ export class ReservationService {
   static async claimReservation(reservationId: string, userId: string): Promise<boolean> {
     await delay();
 
-    const reservation = mockReservations.find(r => r.id === reservationId);
+    const reservation = mockReservations.find((r) => r.id === reservationId);
     if (!reservation || reservation.status !== 'available') {
       return false;
     }
@@ -109,10 +110,13 @@ export class ReservationService {
    * @param recipientUserIds - Array of user IDs to share with
    * @returns True if successfully shared, false otherwise
    */
-  static async shareReservation(reservationId: string, recipientUserIds: string[]): Promise<boolean> {
+  static async shareReservation(
+    reservationId: string,
+    recipientUserIds: string[]
+  ): Promise<boolean> {
     await delay();
 
-    const reservation = mockReservations.find(r => r.id === reservationId);
+    const reservation = mockReservations.find((r) => r.id === reservationId);
     if (!reservation) {
       return false;
     }
@@ -132,7 +136,7 @@ export class ReservationService {
   static async cancelReservationShare(reservationId: string): Promise<boolean> {
     await delay();
 
-    const reservation = mockReservations.find(r => r.id === reservationId);
+    const reservation = mockReservations.find((r) => r.id === reservationId);
     if (!reservation) {
       return false;
     }
@@ -172,6 +176,6 @@ export class ReservationService {
    */
   static async getReservationById(reservationId: string): Promise<Reservation | null> {
     await delay();
-    return mockReservations.find(r => r.id === reservationId) || null;
+    return mockReservations.find((r) => r.id === reservationId) || null;
   }
 }

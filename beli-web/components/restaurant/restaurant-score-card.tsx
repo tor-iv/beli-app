@@ -1,5 +1,5 @@
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface RestaurantScoreCardProps {
   title: string;
@@ -9,13 +9,13 @@ interface RestaurantScoreCardProps {
   variant?: 'rec' | 'friend' | 'average';
 }
 
-export function RestaurantScoreCard({
+export const RestaurantScoreCard = ({
   title,
   description,
   score,
   sampleSize,
   variant = 'rec',
-}: RestaurantScoreCardProps) {
+}: RestaurantScoreCardProps) => {
   // Get color based on score (matching native color system)
   const getScoreColor = (scoreValue: number): string => {
     if (scoreValue >= 8.5) return '#22C55E'; // Excellent (green)
@@ -40,17 +40,17 @@ export function RestaurantScoreCard({
   const scoreColor = getScoreColor(score);
 
   return (
-    <Card className="flex-shrink-0 w-[240px] beli-card">
+    <Card className="beli-card w-[240px] flex-shrink-0">
       <CardContent className="p-6">
-        <h3 className="font-semibold mb-2 text-sm">{title}</h3>
-        <p className="text-xs text-muted mb-4">{description}</p>
+        <h3 className="mb-2 text-sm font-semibold">{title}</h3>
+        <p className="mb-4 text-xs text-muted">{description}</p>
 
         {/* Score Circle with Sample Size Badge */}
-        <div className="flex justify-center items-center mb-4">
+        <div className="mb-4 flex items-center justify-center">
           <div className="relative">
             {/* Circular Score Display */}
             <div
-              className="w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl"
+              className="flex h-14 w-14 items-center justify-center rounded-full text-xl font-bold"
               style={{
                 backgroundColor: `${scoreColor}15`,
                 color: scoreColor,
@@ -63,7 +63,7 @@ export function RestaurantScoreCard({
             {sampleSize && (
               <Badge
                 variant="secondary"
-                className="absolute -bottom-1 -right-1 bg-gray-800 text-white text-xs px-1.5 py-0.5 h-5 hover:bg-gray-800"
+                className="absolute -bottom-1 -right-1 h-5 bg-gray-800 px-1.5 py-0.5 text-xs text-white hover:bg-gray-800"
               >
                 {formatSampleSize(sampleSize)}
               </Badge>

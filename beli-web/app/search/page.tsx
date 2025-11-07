@@ -1,22 +1,29 @@
 'use client';
 
+import { Search, MapPin, X, Clock, Store, Users, Calendar, Heart, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
 import { useState, useEffect, useMemo } from 'react';
-import { Input } from '@/components/ui/input';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { EmptyState } from '@/components/ui/empty-state';
-import { MatchPercentageBadge } from '@/components/ui/match-percentage-badge';
-import { useSearchRestaurants } from '@/lib/hooks/use-restaurants';
-import { useSearchUsers, useUserMatchPercentage, useBatchMatchPercentages } from '@/lib/hooks/use-users';
-import { useUser } from '@/lib/hooks/use-user';
+
 import { RestaurantCard } from '@/components/restaurant/restaurant-card';
-import { RestaurantListItemCompact } from '@/components/restaurant/restaurant-list-item-compact';
 import { RestaurantDetailPreview } from '@/components/restaurant/restaurant-detail-preview';
+import { RestaurantListItemCompact } from '@/components/restaurant/restaurant-list-item-compact';
 import { UserCard } from '@/components/social/user-card';
 import { UserPreview } from '@/components/social/user-preview';
-import { Search, MapPin, X, Clock, Store, Users, Calendar, Heart, TrendingUp } from 'lucide-react';
-import { MockDataService } from '@/lib/mockDataService';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Input } from '@/components/ui/input';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { MatchPercentageBadge } from '@/components/ui/match-percentage-badge';
+import { useSearchRestaurants } from '@/lib/hooks/use-restaurants';
+import { useUser } from '@/lib/hooks/use-user';
+import {
+  useSearchUsers,
+  useUserMatchPercentage,
+  useBatchMatchPercentages,
+} from '@/lib/hooks/use-users';
+import { SearchHistoryService } from '@/lib/services';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
+
+
 import type { Restaurant, User, RecentSearch } from '@/types';
 
 type SearchTab = 'restaurants' | 'members';
@@ -28,54 +35,47 @@ const filterChips = [
 ];
 
 // Wrapper component to display user card with match percentage (percentage passed from parent)
-function UserCardWithMatch({ user, matchPercentage }: { user: User; matchPercentage?: number }) {
+const UserCardWithMatch = ({ user, matchPercentage }: { user: User; matchPercentage?: number }) => {
   return <UserCard user={user} matchPercentage={matchPercentage} />;
 }
 
 // Desktop user list item with match percentage (percentage passed from parent)
-function UserListItem({
+const UserListItem = ({
   user,
   matchPercentage,
   isSelected,
-  onClick
+  onClick,
 }: {
   user: User;
   matchPercentage?: number;
   isSelected: boolean;
   onClick: () => void;
-}) {
-
+}) => {
   return (
     <button
       onClick={onClick}
       className={cn(
-        'w-full text-left p-4 transition-all border-b border-gray-100',
-        'hover:bg-gray-50 cursor-pointer',
+        'w-full border-b border-gray-100 p-4 text-left transition-all',
+        'cursor-pointer hover:bg-gray-50',
         isSelected && 'bg-primary/5'
       )}
     >
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
+        <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-gray-200">
           {user.avatar && (
-            <img
-              src={user.avatar}
-              alt={user.displayName}
-              className="w-full h-full object-cover"
-            />
+            <img src={user.avatar} alt={user.displayName} className="h-full w-full object-cover" />
           )}
         </div>
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold truncate">{user.displayName}</h3>
+            <h3 className="truncate font-semibold">{user.displayName}</h3>
             {matchPercentage !== undefined && (
               <MatchPercentageBadge percentage={matchPercentage} variant="compact" />
             )}
           </div>
-          <p className="text-sm text-muted truncate">@{user.username}</p>
+          <p className="truncate text-sm text-muted">@{user.username}</p>
         </div>
-        <div className="text-sm text-muted flex-shrink-0">
-          {user.stats.beenCount} been
-        </div>
+        <div className="flex-shrink-0 text-sm text-muted">{user.stats.beenCount} been</div>
       </div>
     </button>
   );
@@ -95,12 +95,12 @@ export default function SearchPage() {
   const { data: userResults, isLoading: usersLoading } = useSearchUsers(query);
 
   // Batch fetch match percentages for all user results (avoids N+1 queries)
-  const userIds = useMemo(() => userResults?.map(u => u.id) || [], [userResults]);
+  const userIds = useMemo(() => userResults?.map((u) => u.id) || [], [userResults]);
   const { data: matchPercentages } = useBatchMatchPercentages(currentUser?.id || '1', userIds);
 
   useEffect(() => {
     // Load recent searches on mount
-    MockDataService.getRecentSearches().then(setRecentSearches);
+    SearchHistoryService.getRecentSearches().then(setRecentSearches);
   }, []);
 
   // Auto-select first result on desktop (combined effect for both tabs)
@@ -115,16 +115,14 @@ export default function SearchPage() {
   }, [restaurantResults, userResults, activeTab]);
 
   const handleClearRecent = async (searchId: string) => {
-    await MockDataService.clearRecentSearch(searchId);
-    const updated = await MockDataService.getRecentSearches();
+    await SearchHistoryService.clearRecentSearch(searchId);
+    const updated = await SearchHistoryService.getRecentSearches();
     setRecentSearches(updated);
   };
 
   const toggleFilter = (filterId: string) => {
-    setSelectedFilters(prev =>
-      prev.includes(filterId)
-        ? prev.filter(f => f !== filterId)
-        : [...prev, filterId]
+    setSelectedFilters((prev) =>
+      prev.includes(filterId) ? prev.filter((f) => f !== filterId) : [...prev, filterId]
     );
   };
 
@@ -133,27 +131,25 @@ export default function SearchPage() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto max-w-7xl">
         {/* Logo */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <Link href="/feed" className="flex items-center gap-2">
             <img src="/beli-logo.webp" alt="Beli" className="h-8" />
           </Link>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-8 mb-6 border-b">
+        <div className="mb-6 flex gap-8 border-b">
           <button
             onClick={() => setActiveTab('restaurants')}
             className={cn(
-              'pb-3 px-2 font-medium transition-colors relative',
-              activeTab === 'restaurants'
-                ? 'text-primary'
-                : 'text-muted hover:text-foreground'
+              'relative px-2 pb-3 font-medium transition-colors',
+              activeTab === 'restaurants' ? 'text-primary' : 'text-muted hover:text-foreground'
             )}
           >
             <div className="flex items-center gap-2">
-              <Store className="w-5 h-5" />
+              <Store className="h-5 w-5" />
               <span>Restaurants</span>
             </div>
             {activeTab === 'restaurants' && (
@@ -164,14 +160,12 @@ export default function SearchPage() {
           <button
             onClick={() => setActiveTab('members')}
             className={cn(
-              'pb-3 px-2 font-medium transition-colors relative',
-              activeTab === 'members'
-                ? 'text-primary'
-                : 'text-muted hover:text-foreground'
+              'relative px-2 pb-3 font-medium transition-colors',
+              activeTab === 'members' ? 'text-primary' : 'text-muted hover:text-foreground'
             )}
           >
             <div className="flex items-center gap-2">
-              <Users className="w-5 h-5" />
+              <Users className="h-5 w-5" />
               <span>Members</span>
             </div>
             {activeTab === 'members' && (
@@ -182,7 +176,7 @@ export default function SearchPage() {
 
         {/* Search Input */}
         <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
+          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
           <Input
             type="search"
             placeholder={
@@ -192,27 +186,27 @@ export default function SearchPage() {
             }
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="pl-10 h-12 text-base"
+            className="h-12 pl-10 text-base"
           />
         </div>
 
         {/* Location Input (only for restaurants) */}
         {activeTab === 'restaurants' && (
           <div className="relative mb-4">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
+            <MapPin className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
             <Input
               type="text"
               placeholder="Location"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="pl-10 pr-10 h-12 text-base"
+              className="h-12 pl-10 pr-10 text-base"
             />
             {location && location !== 'Current Location' && (
               <button
                 onClick={() => setLocation('Current Location')}
                 className="absolute right-3 top-1/2 -translate-y-1/2"
               >
-                <X className="w-5 h-5 text-muted hover:text-foreground" />
+                <X className="h-5 w-5 text-muted hover:text-foreground" />
               </button>
             )}
           </div>
@@ -220,7 +214,7 @@ export default function SearchPage() {
 
         {/* Filter Chips (only for restaurants) */}
         {activeTab === 'restaurants' && (
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+          <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
             {filterChips.map((chip) => {
               const IconComponent = chip.icon;
               return (
@@ -228,13 +222,13 @@ export default function SearchPage() {
                   key={chip.id}
                   onClick={() => toggleFilter(chip.id)}
                   className={cn(
-                    'flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors',
+                    'flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors',
                     selectedFilters.includes(chip.id)
                       ? 'bg-primary text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   )}
                 >
-                  <IconComponent className="w-4 h-4" />
+                  <IconComponent className="h-4 w-4" />
                   <span>{chip.label}</span>
                 </button>
               );
@@ -251,18 +245,18 @@ export default function SearchPage() {
 
         {!query && activeTab === 'restaurants' && recentSearches.length > 0 && (
           <div className="mb-6 max-w-4xl">
-            <h2 className="text-lg font-semibold mb-4">Recents</h2>
+            <h2 className="mb-4 text-lg font-semibold">Recents</h2>
             <div className="divide-y divide-gray-100">
               {recentSearches.map((search) => (
                 <div
                   key={search.id}
-                  className="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors"
+                  className="flex items-center justify-between p-3 transition-colors hover:bg-gray-50"
                 >
                   <Link
                     href={`/restaurant/${search.restaurantId}`}
-                    className="flex items-start gap-3 flex-1"
+                    className="flex flex-1 items-start gap-3"
                   >
-                    <Clock className="w-5 h-5 text-muted mt-0.5 flex-shrink-0" />
+                    <Clock className="mt-0.5 h-5 w-5 flex-shrink-0 text-muted" />
                     <div>
                       <h3 className="font-medium">{search.restaurantName}</h3>
                       <p className="text-sm text-muted">{search.location}</p>
@@ -270,9 +264,9 @@ export default function SearchPage() {
                   </Link>
                   <button
                     onClick={() => handleClearRecent(search.id)}
-                    className="p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+                    className="flex-shrink-0 rounded p-1 transition-colors hover:bg-gray-200"
                   >
-                    <X className="w-5 h-5 text-muted" />
+                    <X className="h-5 w-5 text-muted" />
                   </button>
                 </div>
               ))}
@@ -283,7 +277,7 @@ export default function SearchPage() {
         {query && results && results.length > 0 && (
           <>
             {/* Mobile: Grid layout */}
-            <div className="md:hidden grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:hidden">
               {activeTab === 'restaurants'
                 ? restaurantResults?.map((restaurant) => (
                     <RestaurantCard key={restaurant.id} restaurant={restaurant} />
@@ -298,9 +292,9 @@ export default function SearchPage() {
             </div>
 
             {/* Desktop: Master/Detail layout */}
-            <div className="hidden md:grid md:grid-cols-[2fr_3fr] gap-6">
+            <div className="hidden gap-6 md:grid md:grid-cols-[2fr_3fr]">
               {/* Master: List of results */}
-              <div className="border border-gray-200 rounded-lg overflow-hidden bg-white max-h-[calc(100vh-300px)] overflow-y-auto">
+              <div className="max-h-[calc(100vh-300px)] overflow-hidden overflow-y-auto rounded-lg border border-gray-200 bg-white">
                 {activeTab === 'restaurants'
                   ? restaurantResults?.map((restaurant) => (
                       <RestaurantListItemCompact
@@ -324,15 +318,15 @@ export default function SearchPage() {
               {/* Detail: Selected item preview */}
               <div className="sticky top-6 h-fit">
                 {activeTab === 'restaurants' && selectedRestaurant ? (
-                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <div className="rounded-lg border border-gray-200 bg-white p-6">
                     <RestaurantDetailPreview restaurant={selectedRestaurant} />
                   </div>
                 ) : activeTab === 'members' && selectedUser ? (
-                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <div className="rounded-lg border border-gray-200 bg-white p-6">
                     <UserPreview user={selectedUser} />
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center h-64 text-muted bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                  <div className="flex h-64 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 text-muted">
                     <p>Select an item to view details</p>
                   </div>
                 )}
@@ -343,7 +337,13 @@ export default function SearchPage() {
 
         {query && results?.length === 0 && !isLoading && (
           <EmptyState
-            icon={activeTab === 'restaurants' ? <Store className="w-16 h-16 text-muted" /> : <Users className="w-16 h-16 text-muted" />}
+            icon={
+              activeTab === 'restaurants' ? (
+                <Store className="h-16 w-16 text-muted" />
+              ) : (
+                <Users className="h-16 w-16 text-muted" />
+              )
+            }
             title={`No ${activeTab} found`}
             description={`No results for "${query}"`}
           />
@@ -351,7 +351,7 @@ export default function SearchPage() {
 
         {!query && activeTab === 'members' && (
           <EmptyState
-            icon={<Search className="w-16 h-16 text-muted" />}
+            icon={<Search className="h-16 w-16 text-muted" />}
             title="Search for members"
             description="Start typing to search for members by name or username"
           />
@@ -359,7 +359,7 @@ export default function SearchPage() {
 
         {!query && activeTab === 'restaurants' && recentSearches.length === 0 && (
           <EmptyState
-            icon={<Search className="w-16 h-16 text-muted" />}
+            icon={<Search className="h-16 w-16 text-muted" />}
             title="Search for restaurants"
             description="Start typing to search for restaurants, cuisines, or occasions"
           />

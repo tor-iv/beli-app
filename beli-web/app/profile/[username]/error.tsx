@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { AlertTriangle } from 'lucide-react';
+import { useEffect } from 'react';
+
+import { Button } from '@/components/ui/button';
 
 export default function Error({
   error,
@@ -17,32 +18,28 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="container mx-auto px-4 py-6 max-w-3xl">
-        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-              <AlertTriangle className="w-8 h-8 text-red-600" />
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto max-w-3xl px-4 py-6">
+        <div className="rounded-lg bg-white p-8 text-center shadow-sm">
+          <div className="mb-4 flex justify-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+              <AlertTriangle className="h-8 w-8 text-red-600" />
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Something went wrong!
-          </h2>
+          <h2 className="mb-2 text-2xl font-bold text-gray-900">Something went wrong!</h2>
 
-          <p className="text-base text-gray-700 mb-6">
+          <p className="mb-6 text-base text-gray-700">
             We encountered an error while loading this profile. Please try again.
           </p>
 
           {error.message && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
-              <p className="text-sm font-mono text-gray-800 break-words">
-                {error.message}
-              </p>
+            <div className="mb-6 rounded-lg bg-gray-50 p-4 text-left">
+              <p className="break-words font-mono text-sm text-gray-800">{error.message}</p>
             </div>
           )}
 
-          <div className="flex gap-3 justify-center">
+          <div className="flex justify-center gap-3">
             <Button onClick={reset} variant="default">
               Try again
             </Button>

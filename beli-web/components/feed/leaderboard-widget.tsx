@@ -1,9 +1,10 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
 import { IoTrophy } from 'react-icons/io5';
+
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface LeaderboardUser {
   id: string;
@@ -18,7 +19,7 @@ interface LeaderboardWidgetProps {
   users?: LeaderboardUser[];
 }
 
-export function LeaderboardWidget({ users }: LeaderboardWidgetProps) {
+export const LeaderboardWidget = ({ users }: LeaderboardWidgetProps) => {
   const defaultUsers: LeaderboardUser[] = users || [
     {
       id: '1',
@@ -49,7 +50,7 @@ export function LeaderboardWidget({ users }: LeaderboardWidgetProps) {
   return (
     <Card className="beli-card">
       <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <h3 className="font-semibold">Leaderboard</h3>
           <Link href="/leaderboard" className="text-sm text-primary hover:underline">
             View all
@@ -60,18 +61,18 @@ export function LeaderboardWidget({ users }: LeaderboardWidgetProps) {
             <Link
               key={user.id}
               href={`/profile/${user.username}`}
-              className="flex items-center gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors -mx-2"
+              className="-mx-2 flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-gray-50"
             >
-              <div className="text-lg font-bold text-primary w-6">#{user.rank}</div>
-              <Avatar className="w-10 h-10">
+              <div className="w-6 text-lg font-bold text-primary">#{user.rank}</div>
+              <Avatar className="h-10 w-10">
                 <AvatarImage src={user.avatar} alt={user.displayName} />
                 <AvatarFallback>{user.displayName[0]}</AvatarFallback>
               </Avatar>
-              <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm truncate">{user.displayName}</div>
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-medium">{user.displayName}</div>
                 <div className="text-xs text-muted">{user.beenCount} restaurants</div>
               </div>
-              {user.rank === 1 && <IoTrophy className="w-5 h-5 text-yellow-500" />}
+              {user.rank === 1 && <IoTrophy className="h-5 w-5 text-yellow-500" />}
             </Link>
           ))}
         </div>

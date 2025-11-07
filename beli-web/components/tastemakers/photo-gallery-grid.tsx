@@ -1,44 +1,45 @@
 'use client';
 
 import Image from 'next/image';
-import { Restaurant } from '@/types';
 import { useState } from 'react';
+
+import type { Restaurant } from '@/types';
 
 interface PhotoGalleryGridProps {
   restaurants: Restaurant[];
 }
 
-export function PhotoGalleryGrid({ restaurants }: PhotoGalleryGridProps) {
+export const PhotoGalleryGrid = ({ restaurants }: PhotoGalleryGridProps) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Get first 6 restaurants with images
-  const restaurantsWithImages = restaurants.filter(r => r.images?.[0]).slice(0, 6);
+  const restaurantsWithImages = restaurants.filter((r) => r.images?.[0]).slice(0, 6);
 
   if (restaurantsWithImages.length === 0) return null;
 
   return (
     <>
       <div className="mb-12">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
           {restaurantsWithImages.map((restaurant, index) => (
             <div
               key={restaurant.id}
-              className="relative aspect-square group cursor-pointer overflow-hidden rounded-xl"
+              className="group relative aspect-square cursor-pointer overflow-hidden rounded-xl"
               onClick={() => setSelectedImage(restaurant.images[0])}
             >
               <Image
                 src={restaurant.images[0]}
                 alt={restaurant.name}
                 fill
-                className="object-cover group-hover:scale-110 transition-transform duration-300"
+                className="object-cover transition-transform duration-300 group-hover:scale-110"
               />
               {/* Overlay with restaurant info */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <p className="text-white font-bold text-sm drop-shadow-lg">
+                  <p className="text-sm font-bold text-white drop-shadow-lg">
                     {index + 1}. {restaurant.name}
                   </p>
-                  <p className="text-white/90 text-xs mt-1 drop-shadow-md">
+                  <p className="mt-1 text-xs text-white/90 drop-shadow-md">
                     {restaurant.location.neighborhood}
                   </p>
                 </div>
@@ -51,18 +52,13 @@ export function PhotoGalleryGrid({ restaurants }: PhotoGalleryGridProps) {
       {/* Lightbox Modal */}
       {selectedImage && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
           onClick={() => setSelectedImage(null)}
         >
-          <div className="relative w-full max-w-5xl aspect-video">
-            <Image
-              src={selectedImage}
-              alt="Restaurant photo"
-              fill
-              className="object-contain"
-            />
+          <div className="relative aspect-video w-full max-w-5xl">
+            <Image src={selectedImage} alt="Restaurant photo" fill className="object-contain" />
             <button
-              className="absolute top-4 right-4 text-white bg-black/50 hover:bg-black/70 rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+              className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
               onClick={() => setSelectedImage(null)}
             >
               ✕

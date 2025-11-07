@@ -1,25 +1,23 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { X, Utensils, Wine, Cake, Coffee, IceCream } from "lucide-react"
-import {
-  BottomSheet,
-  BottomSheetContent,
-  BottomSheetTitle,
-} from "@/components/ui/bottom-sheet"
-import type { ListCategory } from "@/types"
+import { X, Utensils, Wine, Cake, Coffee, IceCream } from 'lucide-react';
+import * as React from 'react';
+
+import { BottomSheet, BottomSheetContent, BottomSheetTitle } from '@/components/ui/bottom-sheet';
+
+import type { ListCategory } from '@/types';
 
 interface CategorySelectionModalProps {
-  open: boolean
-  selectedCategory: ListCategory | null
-  onSelectCategory: (category: ListCategory) => void
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  selectedCategory: ListCategory | null;
+  onSelectCategory: (category: ListCategory) => void;
+  onOpenChange: (open: boolean) => void;
 }
 
 interface CategoryOption {
-  key: ListCategory
-  label: string
-  icon: React.ComponentType<{ className?: string }>
+  key: ListCategory;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
 }
 
 const CATEGORY_OPTIONS: CategoryOption[] = [
@@ -28,28 +26,28 @@ const CATEGORY_OPTIONS: CategoryOption[] = [
   { key: 'bakeries', label: 'Bakeries', icon: Cake },
   { key: 'coffee_tea', label: 'Coffee & Tea', icon: Coffee },
   { key: 'dessert', label: 'Dessert', icon: IceCream },
-]
+];
 
-export function CategorySelectionModal({
+export const CategorySelectionModal = ({
   open,
   selectedCategory,
   onSelectCategory,
   onOpenChange,
-}: CategorySelectionModalProps) {
+}: CategorySelectionModalProps) => {
   const handleSelectCategory = (category: ListCategory) => {
-    onSelectCategory(category)
-    onOpenChange(false)
-  }
+    onSelectCategory(category);
+    onOpenChange(false);
+  };
 
   return (
     <BottomSheet open={open} onOpenChange={onOpenChange}>
-      <BottomSheetContent className="p-0 md:max-w-md md:mx-auto">
+      <BottomSheetContent className="p-0 md:mx-auto md:max-w-md">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b">
+        <div className="flex items-center justify-between border-b px-4 py-3">
           <BottomSheetTitle className="text-xl font-bold">Choose a category</BottomSheetTitle>
           <button
             onClick={() => onOpenChange(false)}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="rounded-full p-2 transition-colors hover:bg-gray-100"
             aria-label="Close"
           >
             <X className="h-6 w-6" />
@@ -57,32 +55,32 @@ export function CategorySelectionModal({
         </div>
 
         {/* Category Options */}
-        <div className="p-4 space-y-3">
+        <div className="space-y-3 p-4">
           {CATEGORY_OPTIONS.map((option) => {
-            const isSelected = selectedCategory === option.key
-            const Icon = option.icon
+            const isSelected = selectedCategory === option.key;
+            const Icon = option.icon;
 
             return (
               <button
                 key={option.key}
                 onClick={() => handleSelectCategory(option.key)}
-                className={`
-                  w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
-                  ${isSelected
+                className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
+                  isSelected
                     ? 'bg-primary text-white'
-                    : 'bg-white border border-gray-200 hover:bg-gray-50'
-                  }
-                `}
+                    : 'border border-gray-200 bg-white hover:bg-gray-50'
+                } `}
               >
                 <Icon className={`h-6 w-6 ${isSelected ? 'text-white' : 'text-gray-700'}`} />
-                <span className={`text-base font-medium ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                <span
+                  className={`text-base font-medium ${isSelected ? 'text-white' : 'text-gray-900'}`}
+                >
                   {option.label}
                 </span>
               </button>
-            )
+            );
           })}
         </div>
       </BottomSheetContent>
     </BottomSheet>
-  )
+  );
 }

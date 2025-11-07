@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { ListService, UserRestaurantService } from '@/lib/services';
-import { MockDataService } from '@/lib/mockDataService'; // Still needed for updateList until Phase 4
-import { List } from '@/types';
+
+import type { List } from '@/types';
 
 export function useLists(userId?: string) {
   return useQuery({
@@ -26,12 +27,13 @@ export function useAddToList() {
         review?: string;
         visitDate?: string;
       };
-    }) => UserRestaurantService.addRestaurantToUserList(
-      params.userId,
-      params.restaurantId,
-      params.status,
-      params.data
-    ),
+    }) =>
+      UserRestaurantService.addRestaurantToUserList(
+        params.userId,
+        params.restaurantId,
+        params.status,
+        params.data
+      ),
     onSuccess: (_, variables) => {
       // Invalidate lists
       queryClient.invalidateQueries({
@@ -63,13 +65,8 @@ export function useRemoveFromList() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (params: {
-      userId: string;
-      restaurantId: string;
-    }) => UserRestaurantService.removeRestaurantFromUserList(
-      params.userId,
-      params.restaurantId
-    ),
+    mutationFn: (params: { userId: string; restaurantId: string }) =>
+      UserRestaurantService.removeRestaurantFromUserList(params.userId, params.restaurantId),
     onSuccess: (_, variables) => {
       // Invalidate lists
       queryClient.invalidateQueries({
@@ -101,10 +98,8 @@ export function useUpdateList() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (params: {
-      listId: string;
-      updates: Partial<List>;
-    }) => MockDataService.updateList(params.listId, params.updates),
+    mutationFn: (params: { listId: string; updates: Partial<List> }) =>
+      ListService.updateList(params.listId, params.updates),
     onSuccess: () => {
       // Invalidate all lists (we don't know which user owns it)
       queryClient.invalidateQueries({

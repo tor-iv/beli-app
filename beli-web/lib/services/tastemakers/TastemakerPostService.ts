@@ -7,11 +7,18 @@
  * - Featured and user-specific posts
  */
 
-import { delay } from '../base/BaseService';
-import { mockTastemakerPosts, getFeaturedPosts, getPostsByUserId } from '@/data/mock/tastemakerPosts';
-import { mockTastemakers } from '@/data/mock/tastemakers';
 import { mockRestaurants } from '@/data/mock/restaurants';
-import { TastemakerPost } from '@/types';
+import {
+  mockTastemakerPosts,
+  getFeaturedPosts,
+  getPostsByUserId,
+} from '@/data/mock/tastemakerPosts';
+import { mockTastemakers } from '@/data/mock/tastemakers';
+
+import { delay } from '../base/BaseService';
+
+import type { TastemakerPost } from '@/types';
+
 
 export class TastemakerPostService {
   /**
@@ -22,14 +29,12 @@ export class TastemakerPostService {
   static async getTastemakerPosts(limit?: number): Promise<TastemakerPost[]> {
     await delay();
     // Populate user data for each post
-    const postsWithUsers = mockTastemakerPosts.map(post => ({
+    const postsWithUsers = mockTastemakerPosts.map((post) => ({
       ...post,
-      user: mockTastemakers.find(tm => tm.id === post.userId),
+      user: mockTastemakers.find((tm) => tm.id === post.userId),
     }));
 
-    const sorted = postsWithUsers.sort((a, b) =>
-      b.publishedAt.getTime() - a.publishedAt.getTime()
-    );
+    const sorted = postsWithUsers.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
     return limit ? sorted.slice(0, limit) : sorted;
   }
 
@@ -42,14 +47,12 @@ export class TastemakerPostService {
    */
   static async getFeaturedTastemakerPosts(limit?: number): Promise<TastemakerPost[]> {
     await delay();
-    const featured = getFeaturedPosts().map(post => ({
+    const featured = getFeaturedPosts().map((post) => ({
       ...post,
-      user: mockTastemakers.find(tm => tm.id === post.userId),
+      user: mockTastemakers.find((tm) => tm.id === post.userId),
     }));
 
-    const sorted = featured.sort((a, b) =>
-      b.interactions.views - a.interactions.views
-    );
+    const sorted = featured.sort((a, b) => b.interactions.views - a.interactions.views);
     return limit ? sorted.slice(0, limit) : sorted;
   }
 
@@ -62,12 +65,12 @@ export class TastemakerPostService {
    */
   static async getTastemakerPostById(postId: string): Promise<TastemakerPost | null> {
     await delay();
-    const post = mockTastemakerPosts.find(p => p.id === postId);
+    const post = mockTastemakerPosts.find((p) => p.id === postId);
     if (!post) return null;
 
     // Populate user and restaurant data
-    const user = mockTastemakers.find(tm => tm.id === post.userId);
-    const restaurants = mockRestaurants.filter(r => post.restaurantIds.includes(r.id));
+    const user = mockTastemakers.find((tm) => tm.id === post.userId);
+    const restaurants = mockRestaurants.filter((r) => post.restaurantIds.includes(r.id));
 
     return {
       ...post,
@@ -84,14 +87,12 @@ export class TastemakerPostService {
    */
   static async getTastemakerPostsByUser(userId: string, limit?: number): Promise<TastemakerPost[]> {
     await delay();
-    const userPosts = getPostsByUserId(userId).map(post => ({
+    const userPosts = getPostsByUserId(userId).map((post) => ({
       ...post,
-      user: mockTastemakers.find(tm => tm.id === userId),
+      user: mockTastemakers.find((tm) => tm.id === userId),
     }));
 
-    const sorted = userPosts.sort((a, b) =>
-      b.publishedAt.getTime() - a.publishedAt.getTime()
-    );
+    const sorted = userPosts.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
     return limit ? sorted.slice(0, limit) : sorted;
   }
 
@@ -104,7 +105,7 @@ export class TastemakerPostService {
    */
   static async likeTastemakerPost(postId: string, userId: string): Promise<void> {
     await delay();
-    const post = mockTastemakerPosts.find(p => p.id === postId);
+    const post = mockTastemakerPosts.find((p) => p.id === postId);
     if (post && !post.interactions.likes.includes(userId)) {
       post.interactions.likes.push(userId);
     }
@@ -119,7 +120,7 @@ export class TastemakerPostService {
    */
   static async unlikeTastemakerPost(postId: string, userId: string): Promise<void> {
     await delay();
-    const post = mockTastemakerPosts.find(p => p.id === postId);
+    const post = mockTastemakerPosts.find((p) => p.id === postId);
     if (post) {
       const index = post.interactions.likes.indexOf(userId);
       if (index > -1) {
@@ -137,7 +138,7 @@ export class TastemakerPostService {
    */
   static async bookmarkTastemakerPost(postId: string, userId: string): Promise<void> {
     await delay();
-    const post = mockTastemakerPosts.find(p => p.id === postId);
+    const post = mockTastemakerPosts.find((p) => p.id === postId);
     if (post && !post.interactions.bookmarks.includes(userId)) {
       post.interactions.bookmarks.push(userId);
     }
@@ -152,7 +153,7 @@ export class TastemakerPostService {
    */
   static async unbookmarkTastemakerPost(postId: string, userId: string): Promise<void> {
     await delay();
-    const post = mockTastemakerPosts.find(p => p.id === postId);
+    const post = mockTastemakerPosts.find((p) => p.id === postId);
     if (post) {
       const index = post.interactions.bookmarks.indexOf(userId);
       if (index > -1) {
@@ -169,7 +170,7 @@ export class TastemakerPostService {
    */
   static async incrementPostViews(postId: string): Promise<void> {
     await delay();
-    const post = mockTastemakerPosts.find(p => p.id === postId);
+    const post = mockTastemakerPosts.find((p) => p.id === postId);
     if (post) {
       post.interactions.views += 1;
     }

@@ -6,9 +6,12 @@
  * - Generating personalized order suggestions based on party size, hunger level, dietary restrictions
  */
 
-import { delay } from '../base/BaseService';
 import { allMenuItems, restaurantMenus } from '@/data/mock/menuItems';
-import { MenuItem, OrderSuggestion, HungerLevel, MealTime } from '@/types';
+
+import { delay } from '../base/BaseService';
+
+import type { MenuItem, OrderSuggestion, HungerLevel, MealTime } from '@/types';
+
 
 export class MenuService {
   /**
@@ -22,7 +25,7 @@ export class MenuService {
     await delay();
 
     const menuItemIds = restaurantMenus[restaurantId] || [];
-    const menu = allMenuItems.filter(item => menuItemIds.includes(item.id));
+    const menu = allMenuItems.filter((item) => menuItemIds.includes(item.id));
 
     // Sort by category, then by popularity
     return menu.sort((a, b) => {
@@ -69,8 +72,8 @@ export class MenuService {
 
     // Calculate "hunger points" based on party size and hunger level
     const hungerMultiplier = {
-      'light': 0.8,
-      'moderate': 1.2,
+      light: 0.8,
+      moderate: 1.2,
       'very-hungry': 1.8,
     }[hungerLevel];
 
@@ -90,7 +93,7 @@ export class MenuService {
 
     // Filter by meal time
     if (mealTime !== 'any-time') {
-      availableMenu = availableMenu.filter(item => {
+      availableMenu = availableMenu.filter((item) => {
         if (!item.mealTime || item.mealTime.length === 0) {
           return true; // Include items without mealTime metadata
         }
@@ -100,7 +103,7 @@ export class MenuService {
 
     // Filter by dietary restrictions
     if (dietaryRestrictions && dietaryRestrictions.length > 0) {
-      availableMenu = availableMenu.filter(item => {
+      availableMenu = availableMenu.filter((item) => {
         if (dietaryRestrictions.includes('vegetarian') && !item.isVegetarian) {
           return false;
         }
@@ -112,11 +115,11 @@ export class MenuService {
     }
 
     // Separate items by category
-    const appetizers = availableMenu.filter(i => i.category === 'appetizer');
-    const entrees = availableMenu.filter(i => i.category === 'entree');
-    const sides = availableMenu.filter(i => i.category === 'side');
-    const desserts = availableMenu.filter(i => i.category === 'dessert');
-    const drinks = availableMenu.filter(i => i.category === 'drink');
+    const appetizers = availableMenu.filter((i) => i.category === 'appetizer');
+    const entrees = availableMenu.filter((i) => i.category === 'entree');
+    const sides = availableMenu.filter((i) => i.category === 'side');
+    const desserts = availableMenu.filter((i) => i.category === 'dessert');
+    const drinks = availableMenu.filter((i) => i.category === 'drink');
 
     // Build the order
     const selectedItems: Array<MenuItem & { quantity: number }> = [];
@@ -239,16 +242,17 @@ export class MenuService {
     }
 
     // Calculate total price
-    const totalPrice = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const totalPrice = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     // Add share-ability reasoning
-    const estimatedSharability = partySize === 1
-      ? 'Individual portions'
-      : partySize === 2
-      ? 'Easy to share between two'
-      : partySize <= 4
-      ? `Ideal for your group of ${partySize}`
-      : `Feast for ${partySize} people`;
+    const estimatedSharability =
+      partySize === 1
+        ? 'Individual portions'
+        : partySize === 2
+          ? 'Easy to share between two'
+          : partySize <= 4
+            ? `Ideal for your group of ${partySize}`
+            : `Feast for ${partySize} people`;
 
     // Add pricing reasoning
     const pricePerPerson = totalPrice / partySize;

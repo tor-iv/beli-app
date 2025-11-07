@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
-import { Restaurant } from '@/types';
+
+
+import { useLists } from './use-lists';
 import {
   useRestaurants,
   useTrendingRestaurants,
@@ -7,9 +9,10 @@ import {
   useFriendRecommendations,
 } from './use-restaurants';
 import { useReservableRestaurants } from './use-special-lists';
-import { useLists } from './use-lists';
-import { ViewType } from '@/lib/utils/list-view-utils';
-import { ListType } from './use-lists-reducer';
+
+import type { ListType } from './use-lists-reducer';
+import type { ViewType } from '@/lib/utils/list-view-utils';
+import type { Restaurant } from '@/types';
 
 /**
  * Data source type for restaurant lists
@@ -69,9 +72,12 @@ export function useRestaurantListData(
   }, [viewParam, activeTab]);
 
   // Fetch data from appropriate source (conditionally enabled)
-  const { data: reservableRestaurants, isLoading: loadingReservable } = useReservableRestaurants(20, {
-    enabled: dataSource === 'reservable',
-  });
+  const { data: reservableRestaurants, isLoading: loadingReservable } = useReservableRestaurants(
+    20,
+    {
+      enabled: dataSource === 'reservable',
+    }
+  );
   const { data: nearbyRestaurants, isLoading: loadingNearby } = useNearbyRecommendations(
     'current-user',
     2.0,

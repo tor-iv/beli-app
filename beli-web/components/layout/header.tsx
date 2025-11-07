@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
 import {
   IoDocument,
   IoDocumentOutline,
@@ -16,9 +15,11 @@ import {
   IoPersonCircle,
   IoPersonCircleOutline,
   IoNotifications,
-  IoNotificationsOutline
+  IoNotificationsOutline,
 } from 'react-icons/io5';
+
 import { useUnreadNotificationCount } from '@/lib/hooks/use-notifications';
+import { cn } from '@/lib/utils';
 
 const navigation = [
   { name: 'Feed', href: '/feed', icon: IoDocument, outlineIcon: IoDocumentOutline },
@@ -26,10 +27,15 @@ const navigation = [
   { name: 'Tastemakers', href: '/tastemakers', icon: IoStar, outlineIcon: IoStarOutline },
   { name: 'Search', href: '/search', icon: IoAdd, outlineIcon: IoAdd, isSpecial: true },
   { name: 'Leaderboard', href: '/leaderboard', icon: IoTrophy, outlineIcon: IoTrophyOutline },
-  { name: 'Profile', href: '/profile/tor_iv', icon: IoPersonCircle, outlineIcon: IoPersonCircleOutline },
+  {
+    name: 'Profile',
+    href: '/profile/tor_iv',
+    icon: IoPersonCircle,
+    outlineIcon: IoPersonCircleOutline,
+  },
 ];
 
-export function Header() {
+export const Header = () => {
   const pathname = usePathname();
   const { data: unreadCount } = useUnreadNotificationCount();
   const isNotificationsActive = pathname?.startsWith('/notifications');
@@ -42,13 +48,13 @@ export function Header() {
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <Link href="/feed" className="flex items-center space-x-2">
-              <div className="h-12 relative">
+              <div className="relative h-12">
                 <img src="/beli-logo.webp" alt="Beli" className="h-full object-contain" />
               </div>
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-6">
+            <nav className="hidden items-center space-x-6 md:flex">
               {navigation.map((item) => {
                 const isActive = pathname?.startsWith(item.href);
                 const Icon = isActive ? item.icon : item.outlineIcon;
@@ -62,7 +68,7 @@ export function Header() {
                       isActive ? 'text-primary' : 'text-muted'
                     )}
                   >
-                    <Icon className="w-5 h-5" />
+                    <Icon className="h-5 w-5" />
                     {item.name}
                   </Link>
                 );
@@ -77,12 +83,12 @@ export function Header() {
                 )}
               >
                 {isNotificationsActive ? (
-                  <IoNotifications className="w-5 h-5" />
+                  <IoNotifications className="h-5 w-5" />
                 ) : (
-                  <IoNotificationsOutline className="w-5 h-5" />
+                  <IoNotificationsOutline className="h-5 w-5" />
                 )}
                 {unreadCount && unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                  <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
                 )}
@@ -93,45 +99,49 @@ export function Header() {
       </header>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-50 shadow-[0_-2px_8px_rgba(0,0,0,0.1)]">
-        <div className="flex justify-around items-center py-2 px-2">
-          {navigation.filter(item => item.name !== 'Tastemakers').map((item) => {
-            const isActive = pathname?.startsWith(item.href);
-            const Icon = isActive ? item.icon : item.outlineIcon;
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white shadow-[0_-2px_8px_rgba(0,0,0,0.1)] md:hidden">
+        <div className="flex items-center justify-around px-2 py-2">
+          {navigation
+            .filter((item) => item.name !== 'Tastemakers')
+            .map((item) => {
+              const isActive = pathname?.startsWith(item.href);
+              const Icon = isActive ? item.icon : item.outlineIcon;
 
-            // Special circular button for search
-            if (item.isSpecial) {
+              // Special circular button for search
+              if (item.isSpecial) {
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="-mt-2 flex flex-col items-center justify-center"
+                  >
+                    <div
+                      className={cn(
+                        'flex h-10 w-10 items-center justify-center rounded-full bg-primary shadow-md',
+                        'transition-transform active:scale-95',
+                        isActive ? 'opacity-100' : 'opacity-75'
+                      )}
+                    >
+                      <Icon className="h-[22px] w-[22px] text-white" />
+                    </div>
+                  </Link>
+                );
+              }
+
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="flex flex-col items-center justify-center -mt-2"
+                  className={cn(
+                    'flex min-w-[60px] flex-col items-center gap-1 p-2',
+                    isActive ? 'text-primary' : 'text-muted'
+                  )}
                 >
-                  <div className={cn(
-                    'w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-md',
-                    'active:scale-95 transition-transform',
-                    isActive ? 'opacity-100' : 'opacity-75'
-                  )}>
-                    <Icon className="w-[22px] h-[22px] text-white" />
-                  </div>
+                  <Icon className="h-6 w-6" />
+                  <span className="text-[11px] font-medium">{item.name}</span>
                 </Link>
               );
-            }
-
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  'flex flex-col items-center gap-1 p-2 min-w-[60px]',
-                  isActive ? 'text-primary' : 'text-muted'
-                )}
-              >
-                <Icon className="w-6 h-6" />
-                <span className="text-[11px] font-medium">{item.name}</span>
-              </Link>
-            );
-          })}
+            })}
         </div>
       </nav>
     </>

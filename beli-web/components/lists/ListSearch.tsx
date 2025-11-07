@@ -1,16 +1,17 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { IoSearch, IoClose } from 'react-icons/io5';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useListFilters } from '@/lib/stores/list-filters';
 
 interface ListSearchProps {
   placeholder?: string;
 }
 
-export function ListSearch({ placeholder = 'Search restaurants...' }: ListSearchProps) {
+export const ListSearch = ({ placeholder = 'Search restaurants...' }: ListSearchProps) => {
   const { searchQuery, setSearchQuery } = useListFilters();
   const [localQuery, setLocalQuery] = useState(searchQuery);
 

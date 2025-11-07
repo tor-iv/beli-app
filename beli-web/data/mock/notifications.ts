@@ -1,4 +1,4 @@
-import { Notification } from '@/types';
+import type { Notification } from '@/types';
 
 // Helper to create dates in the past
 const daysAgo = (days: number): Date => {
@@ -145,7 +145,7 @@ export const mockNotifications: Notification[] = [
         city: 'New York',
         state: 'NY',
         neighborhood: 'West Village',
-        coordinates: { lat: 40.7290, lng: -74.0021 },
+        coordinates: { lat: 40.729, lng: -74.0021 },
       },
       hours: {
         monday: 'Closed',

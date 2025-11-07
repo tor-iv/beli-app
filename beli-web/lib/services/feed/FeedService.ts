@@ -6,9 +6,13 @@
  * - Creating new activity items
  */
 
+import { mockActivities } from '@/data/mock/activities';
+
 import { delay } from '../base/BaseService';
-import { mockActivities, Activity } from '@/data/mock/activities';
-import { FeedItem } from '@/types';
+
+import type { Activity } from '@/data/mock/activities';
+import type { FeedItem } from '@/types';
+
 
 export class FeedService {
   /**
@@ -23,14 +27,12 @@ export class FeedService {
     await delay();
 
     // If userId is provided, filter for that user's activity
-    let activities = userId
-      ? mockActivities.filter(activity => activity.user.id === userId)
+    const activities = userId
+      ? mockActivities.filter((activity) => activity.user.id === userId)
       : mockActivities;
 
     // Sort by timestamp (newest first) and limit results
-    return activities
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-      .slice(0, limit);
+    return activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, limit);
   }
 
   /**

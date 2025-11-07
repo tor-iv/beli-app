@@ -7,10 +7,13 @@
  * - Filtering restaurants by status (been/want-to-try/recommended)
  */
 
-import { delay } from '../base/BaseService';
-import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
 import { mockRestaurants } from '@/data/mock/restaurants';
-import { Restaurant, UserRestaurantRelation } from '@/types';
+import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
+
+import { delay } from '../base/BaseService';
+
+import type { Restaurant, UserRestaurantRelation } from '@/types';
+
 
 export class UserRestaurantService {
   /**
@@ -20,7 +23,7 @@ export class UserRestaurantService {
    */
   static async getUserRestaurantRelations(userId: string): Promise<UserRestaurantRelation[]> {
     await delay();
-    return mockUserRestaurantRelations.filter(relation => relation.userId === userId);
+    return mockUserRestaurantRelations.filter((relation) => relation.userId === userId);
   }
 
   /**
@@ -35,10 +38,10 @@ export class UserRestaurantService {
   ): Promise<Restaurant[]> {
     await delay();
     const relations = mockUserRestaurantRelations.filter(
-      relation => relation.userId === userId && relation.status === status
+      (relation) => relation.userId === userId && relation.status === status
     );
-    const restaurantIds = relations.map(relation => relation.restaurantId);
-    return mockRestaurants.filter(restaurant => restaurantIds.includes(restaurant.id));
+    const restaurantIds = relations.map((relation) => relation.restaurantId);
+    return mockRestaurants.filter((restaurant) => restaurantIds.includes(restaurant.id));
   }
 
   /**
@@ -93,7 +96,7 @@ export class UserRestaurantService {
 
     // In a real app, this would remove from the backend
     const index = mockUserRestaurantRelations.findIndex(
-      relation => relation.userId === userId && relation.restaurantId === restaurantId
+      (relation) => relation.userId === userId && relation.restaurantId === restaurantId
     );
     if (index > -1) {
       mockUserRestaurantRelations.splice(index, 1);
