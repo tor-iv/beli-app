@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -40,26 +40,16 @@ export default function GroupDinnerScreen() {
   const [selectedCategory, setSelectedCategory] = useState<ListCategory>('restaurants');
   const [showCategoryModal, setShowCategoryModal] = useState(true);
 
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  useEffect(() => {
-    if (currentUser && !showCategoryModal) {
-      loadMatches();
-    }
-  }, [currentUser, selectedParticipants, shuffleCount, selectedCategory, showCategoryModal]);
-
-  const loadUser = async () => {
+  const loadUser = useCallback(async () => {
     try {
       const user = await MockDataService.getCurrentUser();
       setCurrentUser(user);
     } catch (error) {
       console.error('Failed to load user:', error);
     }
-  };
+  }, []);
 
-  const loadMatches = async () => {
+  const loadMatches = useCallback(async () => {
     if (!currentUser) return;
 
     setLoading(true);
@@ -76,7 +66,17 @@ export default function GroupDinnerScreen() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser, selectedParticipants, selectedCategory]);
+
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
+
+  useEffect(() => {
+    if (currentUser && !showCategoryModal) {
+      loadMatches();
+    }
+  }, [currentUser, selectedParticipants, shuffleCount, selectedCategory, showCategoryModal, loadMatches]);
 
   const handleSelectCategory = (category: ListCategory) => {
     setSelectedCategory(category);

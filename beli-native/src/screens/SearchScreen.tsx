@@ -128,21 +128,22 @@ export default function SearchScreen() {
     const timeoutId = setTimeout(async () => {
       try {
         const results = await MockDataService.searchUsers(trimmedQuery);
+        if (isCancelled) return;
+
+        setFilteredMembers(results);
+
+        // Load match percentages for all results
+        const percentages: Record<string, number> = {};
+
+        // Process match percentages with cancellation checks
+        for (const user of results) {
+          if (isCancelled) return;
+          const match = await MockDataService.getUserMatchPercentage(user.id);
+          percentages[user.id] = match;
+        }
+
         if (!isCancelled) {
-          setFilteredMembers(results);
-
-          // Load match percentages for all results
-          const percentages: Record<string, number> = {};
-          await Promise.all(
-            results.map(async (user) => {
-              const match = await MockDataService.getUserMatchPercentage(user.id);
-              percentages[user.id] = match;
-            })
-          );
-
-          if (!isCancelled) {
-            setMemberMatchPercentages(percentages);
-          }
+          setMemberMatchPercentages(percentages);
         }
       } catch (error) {
         if (!isCancelled) {
