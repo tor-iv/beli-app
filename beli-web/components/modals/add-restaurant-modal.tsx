@@ -19,6 +19,7 @@ import { useRankedRestaurants } from "@/lib/hooks"
 import { InitialRatingStep, type RatingType, type ListTypeKey } from "./add-restaurant/initial-rating-step"
 import { RankingComparisonStep } from "./add-restaurant/ranking-comparison-step"
 import { RankingControls } from "./add-restaurant/ranking-controls"
+import { useAddRestaurantReducer } from "@/lib/hooks/use-add-restaurant-reducer"
 
 export interface RestaurantSubmissionData {
   rating: "liked" | "fine" | "disliked" | null
@@ -41,8 +42,6 @@ interface AddRestaurantModalProps {
   onRankingComplete?: (result: RankingResult, data: RestaurantSubmissionData) => void
 }
 
-type ModalMode = 'initial' | 'ranking'
-
 export function AddRestaurantModal({
   open,
   onOpenChange,
@@ -51,16 +50,9 @@ export function AddRestaurantModal({
   onSubmit,
   onRankingComplete,
 }: AddRestaurantModalProps) {
-  const [modalMode, setModalMode] = React.useState<ModalMode>("initial")
-  const [rating, setRating] = React.useState<RatingType | null>(null)
-  const [listType, setListType] = React.useState<ListTypeKey>("restaurants")
-  const [stealthMode, setStealthMode] = React.useState(false)
-
-  // Ranking state
-  const [rankingState, setRankingState] = React.useState<RankingState | null>(null)
-  const [currentComparison, setCurrentComparison] = React.useState<RankedRestaurant | null>(null)
-  const [loadingRanking, setLoadingRanking] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
+  // Use reducer for modal state management
+  const [state, dispatch] = useAddRestaurantReducer();
+  const { phase, rating, listType, stealthMode, rankingState, currentComparison, loading, error } = state;
 
   // Fetch ranked restaurants for the ranking flow
   const { data: rankedList } = useRankedRestaurants(userId, listType)
@@ -70,19 +62,12 @@ export function AddRestaurantModal({
     return open ? `${restaurant.id}-${Date.now()}` : 'closed'
   }, [open, restaurant.id])
 
-  // Reset state when modal closes (controlled by key)
+  // Reset state when modal closes
   React.useEffect(() => {
     if (!open) {
       // Small delay to allow closing animation
       const timer = setTimeout(() => {
-        setModalMode("initial")
-        setRating(null)
-        setListType("restaurants")
-        setStealthMode(false)
-        setRankingState(null)
-        setCurrentComparison(null)
-        setLoadingRanking(false)
-        setError(null)
+        dispatch({ type: 'RESET' });
       }, 300)
       return () => clearTimeout(timer)
     }
@@ -91,34 +76,38 @@ export function AddRestaurantModal({
   const startRankingFlow = async () => {
     if (!rating || !onRankingComplete) return
 
-    setLoadingRanking(true)
-    setError(null)
+    dispatch({ type: 'SET_LOADING', loading: true });
 
     try {
       // Use the ranked list from the query
       const list: RankedRestaurant[] = rankedList || []
 
       // Initialize ranking state
-      const state = initializeRanking(
+      const newRankingState = initializeRanking(
         restaurant.id,
         listType,
         list,
         rating as InitialSentiment
       )
 
-      setRankingState(state)
-
       // Get first comparison
-      const nextRestaurant = getNextComparison(state)
-      setCurrentComparison(nextRestaurant)
+      const firstComparison = getNextComparison(newRankingState)
 
-      // Switch to ranking mode
-      setModalMode("ranking")
+      // Ensure we have a valid comparison
+      if (!firstComparison) {
+        dispatch({ type: 'SET_ERROR', error: "No restaurants to compare" });
+        return;
+      }
+
+      // Switch to ranking mode with initialized state
+      dispatch({
+        type: 'START_RANKING',
+        rankingState: newRankingState,
+        firstComparison
+      });
     } catch (err) {
       console.error("Error initializing ranking:", err)
-      setError("Failed to start ranking flow. Please try again.")
-    } finally {
-      setLoadingRanking(false)
+      dispatch({ type: 'SET_ERROR', error: "Failed to start ranking flow. Please try again." });
     }
   }
 
@@ -127,7 +116,6 @@ export function AddRestaurantModal({
 
     // Process the comparison
     const newState = processComparison(rankingState, currentComparison, choice)
-    setRankingState(newState)
 
     // Check if complete
     if (newState.isComplete) {
@@ -137,14 +125,13 @@ export function AddRestaurantModal({
 
     // Get next comparison
     const nextRestaurant = getNextComparison(newState)
-    setCurrentComparison(nextRestaurant)
+    dispatch({ type: 'UPDATE_RANKING', rankingState: newState, nextComparison: nextRestaurant });
   }
 
   const handleSkip = () => {
     if (!rankingState || !currentComparison || rankingState.skipsRemaining <= 0) return
 
     const newState = processComparison(rankingState, currentComparison, "skip")
-    setRankingState(newState)
 
     if (newState.isComplete) {
       handleRankingComplete(newState)
@@ -152,7 +139,7 @@ export function AddRestaurantModal({
     }
 
     const nextRestaurant = getNextComparison(newState)
-    setCurrentComparison(nextRestaurant)
+    dispatch({ type: 'UPDATE_RANKING', rankingState: newState, nextComparison: nextRestaurant });
   }
 
   const handleTooTough = () => {
@@ -171,11 +158,10 @@ export function AddRestaurantModal({
     if (!rankingState || rankingState.comparisonHistory.length === 0) return
 
     const newState = undoLastComparison(rankingState)
-    setRankingState(newState)
 
     // Get the comparison restaurant again
     const nextRestaurant = getNextComparison(newState)
-    setCurrentComparison(nextRestaurant)
+    dispatch({ type: 'UPDATE_RANKING', rankingState: newState, nextComparison: nextRestaurant });
   }
 
   const handleRankingComplete = (state: RankingState) => {
@@ -249,22 +235,22 @@ export function AddRestaurantModal({
           )}
 
           {/* Initial Rating Step */}
-          {modalMode === "initial" && (
+          {phase === "initial" && (
             <InitialRatingStep
               restaurant={restaurant}
               rating={rating}
-              onRatingChange={setRating}
+              onRatingChange={(rating) => dispatch({ type: 'SET_RATING', rating })}
               listType={listType}
-              onListTypeChange={setListType}
+              onListTypeChange={(listType) => dispatch({ type: 'SET_LIST_TYPE', listType })}
               stealthMode={stealthMode}
-              onStealthModeChange={setStealthMode}
+              onStealthModeChange={() => dispatch({ type: 'TOGGLE_STEALTH_MODE' })}
               onSubmit={handleRankIt}
-              isLoading={loadingRanking}
+              isLoading={loading}
             />
           )}
 
           {/* Ranking Mode */}
-          {modalMode === "ranking" && rankingState && currentComparison && (
+          {phase === "ranking" && rankingState && currentComparison && (
             <>
               <RankingComparisonStep
                 targetRestaurant={restaurant}

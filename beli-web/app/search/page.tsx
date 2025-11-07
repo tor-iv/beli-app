@@ -104,18 +104,16 @@ export default function SearchPage() {
     MockDataService.getRecentSearches().then(setRecentSearches);
   }, []);
 
-  // Auto-select first result on desktop
+  // Auto-select first result on desktop (combined effect for both tabs)
   useEffect(() => {
     if (activeTab === 'restaurants' && restaurantResults && restaurantResults.length > 0) {
       setSelectedRestaurant(restaurantResults[0]);
-    }
-  }, [restaurantResults, activeTab]);
-
-  useEffect(() => {
-    if (activeTab === 'members' && userResults && userResults.length > 0) {
+      setSelectedUser(null); // Clear user selection when on restaurants tab
+    } else if (activeTab === 'members' && userResults && userResults.length > 0) {
       setSelectedUser(userResults[0]);
+      setSelectedRestaurant(null); // Clear restaurant selection when on members tab
     }
-  }, [userResults, activeTab]);
+  }, [restaurantResults, userResults, activeTab]);
 
   const handleClearRecent = async (searchId: string) => {
     await MockDataService.clearRecentSearch(searchId);

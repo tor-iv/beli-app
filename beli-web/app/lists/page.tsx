@@ -37,6 +37,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import dynamic from 'next/dynamic';
+import { useListsReducer, type ListType } from '@/lib/hooks/use-lists-reducer';
 
 // Dynamically import map component (client-side only)
 const RestaurantMap = dynamic(
@@ -44,21 +45,19 @@ const RestaurantMap = dynamic(
   { ssr: false, loading: () => <div className="flex items-center justify-center h-full">Loading map...</div> }
 );
 
-type ListType = 'been' | 'want_to_try' | 'recs' | 'playlists' | 'recs_for_you' | 'recs_from_friends' | 'trending';
 type ViewType = 'reserve' | 'nearby' | 'trending' | 'friends' | null;
-type RightPanelView = 'detail' | 'map';
 
 function ListsContent() {
   const searchParams = useSearchParams();
   const viewParam = searchParams.get('view') as ViewType;
   const tabParam = searchParams.get('tab') as ListType | null;
 
-  const [activeTab, setActiveTab] = useState<ListType>(tabParam || 'been');
-  const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
-  const [rightPanelView, setRightPanelView] = useState<RightPanelView>('detail');
+  // Use reducer for coordinated UI state
+  const [state, dispatch] = useListsReducer(tabParam || 'been');
+  const { activeTab, selectedRestaurant, rightPanelView, isListPickerOpen, isInMoreView } = state;
+
+  // Separate state for visible restaurants (managed by IntersectionObserver)
   const [visibleRestaurants, setVisibleRestaurants] = useState<Restaurant[]>([]);
-  const [isListPickerOpen, setIsListPickerOpen] = useState(false);
-  const [isInMoreView, setIsInMoreView] = useState(false);
 
   const { data: lists, isLoading: listsLoading } = useLists();
   const { data: allRestaurants } = useRestaurants();
@@ -87,76 +86,73 @@ function ListsContent() {
   // Sync activeTab with URL parameter
   useEffect(() => {
     if (tabParam) {
-      setActiveTab(tabParam);
+      dispatch({ type: 'SET_TAB', tab: tabParam });
     }
   }, [tabParam]);
 
-  // Compute viewRestaurants based on active view/tab using React Query data
-  const viewRestaurants = useMemo(() => {
+  // Combine view config (restaurants + loading state) into single memo
+  const viewConfig = useMemo(() => {
+    let restaurants: Restaurant[] | null = null;
+    let isLoading = false;
+
     // Priority 1: URL view parameter
     if (viewParam) {
       switch (viewParam) {
         case 'reserve':
-          return reservableRestaurants || null;
+          restaurants = reservableRestaurants || null;
+          isLoading = isLoadingReservable;
+          break;
         case 'nearby':
-          return nearbyRestaurants || null;
+          restaurants = nearbyRestaurants || null;
+          isLoading = isLoadingNearby;
+          break;
         case 'trending':
-          return trendingRestaurants || null;
+          restaurants = trendingRestaurants || null;
+          isLoading = isLoadingTrending;
+          break;
         case 'friends':
-          return friendRestaurants || null;
+          restaurants = friendRestaurants || null;
+          isLoading = isLoadingFriends;
+          break;
       }
     }
-
     // Priority 2: Special list tabs (when not in a view)
-    const specialLists: ListType[] = ['trending', 'recs_for_you', 'recs_from_friends'];
-    if (!viewParam && specialLists.includes(activeTab)) {
-      if (activeTab === 'trending') {
-        return trendingRestaurants || null;
-      } else if (activeTab === 'recs_for_you') {
-        return nearbyRestaurants || null;
-      } else if (activeTab === 'recs_from_friends') {
-        return friendRestaurants || null;
+    else {
+      const specialLists: ListType[] = ['trending', 'recs_for_you', 'recs_from_friends'];
+      if (specialLists.includes(activeTab)) {
+        if (activeTab === 'trending') {
+          restaurants = trendingRestaurants || null;
+          isLoading = isLoadingTrending;
+        } else if (activeTab === 'recs_for_you') {
+          restaurants = nearbyRestaurants || null;
+          isLoading = isLoadingNearby;
+        } else if (activeTab === 'recs_from_friends') {
+          restaurants = friendRestaurants || null;
+          isLoading = isLoadingFriends;
+        }
       }
     }
 
-    return null;
-  }, [viewParam, activeTab, reservableRestaurants, nearbyRestaurants, trendingRestaurants, friendRestaurants]);
-
-  // Compute loading state for view restaurants
-  const loadingView = useMemo(() => {
-    if (viewParam) {
-      switch (viewParam) {
-        case 'reserve':
-          return isLoadingReservable;
-        case 'nearby':
-          return isLoadingNearby;
-        case 'trending':
-          return isLoadingTrending;
-        case 'friends':
-          return isLoadingFriends;
-      }
-    }
-
-    const specialLists: ListType[] = ['trending', 'recs_for_you', 'recs_from_friends'];
-    if (!viewParam && specialLists.includes(activeTab)) {
-      if (activeTab === 'trending') {
-        return isLoadingTrending;
-      } else if (activeTab === 'recs_for_you') {
-        return isLoadingNearby;
-      } else if (activeTab === 'recs_from_friends') {
-        return isLoadingFriends;
-      }
-    }
-
-    return false;
-  }, [viewParam, activeTab, isLoadingReservable, isLoadingNearby, isLoadingTrending, isLoadingFriends]);
+    return { restaurants, isLoading };
+  }, [
+    viewParam,
+    activeTab,
+    reservableRestaurants,
+    nearbyRestaurants,
+    trendingRestaurants,
+    friendRestaurants,
+    isLoadingReservable,
+    isLoadingNearby,
+    isLoadingTrending,
+    isLoadingFriends,
+  ]);
 
   // Filter lists by type
   const filteredLists = lists?.filter(list => list.listType === activeTab) || [];
 
   // Get ALL restaurants for the current lists or from view
   const restaurantIds = new Set(filteredLists.flatMap(list => list.restaurants));
-  const baseRestaurants = viewRestaurants || allRestaurants?.filter(r => restaurantIds.has(r.id)) || [];
+  const baseRestaurants = viewConfig.restaurants || allRestaurants?.filter(r => restaurantIds.has(r.id)) || [];
 
   // Apply filters and sorting (memoized for performance)
   const restaurantsData = useMemo(() => {
@@ -277,55 +273,60 @@ function ListsContent() {
 
   // Auto-select first restaurant on desktop when data changes
   useEffect(() => {
-    if (!selectedRestaurant && restaurantsData.length > 0) {
-      setSelectedRestaurant(restaurantsData[0]);
+    if (restaurantsData.length > 0) {
+      dispatch({ type: 'AUTO_SELECT_FIRST', restaurant: restaurantsData[0] });
     }
-  }, [restaurantsData, selectedRestaurant]);
+  }, [restaurantsData]);
 
-  // Track visible restaurants in viewport for map
+  // Track visible restaurants in viewport for map (debounced for performance)
   useEffect(() => {
     if (rightPanelView !== 'map' || typeof window === 'undefined') return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible: string[] = [];
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const restaurantId = entry.target.getAttribute('data-restaurant-id');
-            if (restaurantId) {
-              visible.push(restaurantId);
+    // Debounce observer setup to avoid recreating on every filter change
+    const timeoutId = setTimeout(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const visible: string[] = [];
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const restaurantId = entry.target.getAttribute('data-restaurant-id');
+              if (restaurantId) {
+                visible.push(restaurantId);
+              }
             }
-          }
-        });
+          });
 
-        if (visible.length === 0) return;
+          if (visible.length === 0) return;
 
-        const visibleRestaurantData = restaurantsData.filter((r) =>
-          visible.includes(r.id)
-        );
+          const visibleRestaurantData = restaurantsData.filter((r) =>
+            visible.includes(r.id)
+          );
 
-        // Add buffer: include 5 items above and below
-        const firstIndex = Math.max(
-          0,
-          restaurantsData.indexOf(visibleRestaurantData[0]) - 5
-        );
-        const lastIndex = Math.min(
-          restaurantsData.length,
-          restaurantsData.indexOf(
-            visibleRestaurantData[visibleRestaurantData.length - 1]
-          ) + 5
-        );
+          // Add buffer: include 5 items above and below
+          const firstIndex = Math.max(
+            0,
+            restaurantsData.indexOf(visibleRestaurantData[0]) - 5
+          );
+          const lastIndex = Math.min(
+            restaurantsData.length,
+            restaurantsData.indexOf(
+              visibleRestaurantData[visibleRestaurantData.length - 1]
+            ) + 5
+          );
 
-        setVisibleRestaurants(restaurantsData.slice(firstIndex, lastIndex));
-      },
-      { threshold: 0.3, rootMargin: '100px' }
-    );
+          setVisibleRestaurants(restaurantsData.slice(firstIndex, lastIndex));
+        },
+        { threshold: 0.3, rootMargin: '100px' }
+      );
 
-    // Observe all restaurant list items
-    const elements = document.querySelectorAll('[data-restaurant-id]');
-    elements.forEach((el) => observer.observe(el));
+      // Observe all restaurant list items
+      const elements = document.querySelectorAll('[data-restaurant-id]');
+      elements.forEach((el) => observer.observe(el));
 
-    return () => observer.disconnect();
+      return () => observer.disconnect();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
   }, [rightPanelView, restaurantsData]);
 
   const getViewTitle = (view: ViewType): string => {
@@ -367,11 +368,10 @@ function ListsContent() {
   // Handle mobile tab change
   const handleMobileTabChange = (tabId: MobileTabId) => {
     if (tabId === 'more') {
-      setIsListPickerOpen(true);
+      dispatch({ type: 'TOGGLE_LIST_PICKER', open: true });
       return;
     }
-    setActiveTab(tabId as ListType);
-    setIsInMoreView(false);
+    dispatch({ type: 'SET_TAB', tab: tabId as ListType, inMoreView: false });
   };
 
   // Handle list selection from modal
@@ -379,11 +379,10 @@ function ListsContent() {
     const specialLists: ListOptionId[] = ['recs_for_you', 'recs_from_friends', 'trending'];
 
     if (specialLists.includes(listId)) {
-      setActiveTab(listId as ListType);
-      setIsInMoreView(true);
+      dispatch({ type: 'OPEN_MORE_LIST', tab: listId as ListType });
     } else {
-      setActiveTab(listId as ListType);
-      setIsInMoreView(false);
+      dispatch({ type: 'SET_TAB', tab: listId as ListType, inMoreView: false });
+      dispatch({ type: 'TOGGLE_LIST_PICKER', open: false });
     }
   };
 
@@ -405,7 +404,7 @@ function ListsContent() {
             </Button>
             {/* Show view toggle on desktop only */}
             <div className="hidden md:block">
-              <ViewToggle view={rightPanelView} onViewChange={setRightPanelView} />
+              <ViewToggle view={rightPanelView} onViewChange={(view) => dispatch({ type: 'TOGGLE_VIEW', view })} />
             </div>
           </div>
         </div>
@@ -439,7 +438,7 @@ function ListsContent() {
           {/* Desktop Tabs */}
           <div className="hidden md:block">
             <div className="flex items-center gap-2 mb-4">
-              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ListType)} className="flex-1">
+              <Tabs value={activeTab} onValueChange={(v) => dispatch({ type: 'SET_TAB', tab: v as ListType })} className="flex-1">
                 <TabsList className="w-full grid grid-cols-4">
                   <TabsTrigger value="been">Been</TabsTrigger>
                   <TabsTrigger value="want_to_try">Want to Try</TabsTrigger>
@@ -462,10 +461,7 @@ function ListsContent() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem
-                    onClick={() => {
-                      setActiveTab('recs_for_you');
-                      setIsInMoreView(true);
-                    }}
+                    onClick={() => dispatch({ type: 'OPEN_MORE_LIST', tab: 'recs_for_you' })}
                     className="flex items-center justify-between"
                   >
                     <span>Recs for You</span>
@@ -474,10 +470,7 @@ function ListsContent() {
                     )}
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => {
-                      setActiveTab('recs_from_friends');
-                      setIsInMoreView(true);
-                    }}
+                    onClick={() => dispatch({ type: 'OPEN_MORE_LIST', tab: 'recs_from_friends' })}
                     className="flex items-center justify-between"
                   >
                     <span>Recs from Friends</span>
@@ -486,10 +479,7 @@ function ListsContent() {
                     )}
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => {
-                      setActiveTab('trending');
-                      setIsInMoreView(true);
-                    }}
+                    onClick={() => dispatch({ type: 'OPEN_MORE_LIST', tab: 'trending' })}
                     className="flex items-center justify-between"
                   >
                     <span>Trending</span>
@@ -510,7 +500,7 @@ function ListsContent() {
           {/* List Picker Modal for Mobile */}
           <ListPickerModal
             open={isListPickerOpen}
-            onOpenChange={setIsListPickerOpen}
+            onOpenChange={(open) => dispatch({ type: 'TOGGLE_LIST_PICKER', open })}
             selectedList={activeTab as ListOptionId}
             onSelectList={handleListSelection}
             listCounts={listCounts}
@@ -546,7 +536,7 @@ function ListsContent() {
                       restaurant={restaurant}
                       rank={index + 1}
                       isSelected={selectedRestaurant?.id === restaurant.id}
-                      onClick={() => setSelectedRestaurant(restaurant)}
+                      onClick={() => dispatch({ type: 'SELECT_RESTAURANT', restaurant })}
                       data-restaurant-id={restaurant.id}
                     />
                   ))}
@@ -571,7 +561,7 @@ function ListsContent() {
                       <RestaurantMap
                         restaurants={restaurantsData}
                         selectedRestaurant={selectedRestaurant}
-                        onRestaurantSelect={setSelectedRestaurant}
+                        onRestaurantSelect={(restaurant) => dispatch({ type: 'SELECT_RESTAURANT', restaurant })}
                         visibleRestaurants={visibleRestaurants}
                       />
                     </div>
@@ -590,17 +580,17 @@ function ListsContent() {
       {/* View mode rendering */}
       {viewParam && (
         <div>
-          {loadingView || !viewRestaurants ? (
+          {viewConfig.isLoading || !viewConfig.restaurants ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <Skeleton key={i} className="h-48 w-full" />
               ))}
             </div>
-          ) : viewRestaurants.length > 0 ? (
+          ) : viewConfig.restaurants.length > 0 ? (
             <>
               {/* Mobile: Compact list items */}
               <div className="md:hidden">
-                {viewRestaurants.map((restaurant, index) => (
+                {viewConfig.restaurants.map((restaurant, index) => (
                   <RestaurantListItemMobile
                     key={restaurant.id}
                     restaurant={restaurant}
@@ -613,13 +603,13 @@ function ListsContent() {
               <div className="hidden md:grid md:grid-cols-[2fr_3fr] gap-6">
                 {/* Master: List of restaurants */}
                 <div className="space-y-1 overflow-auto max-h-[calc(100vh-200px)]">
-                  {viewRestaurants.map((restaurant, index) => (
+                  {viewConfig.restaurants.map((restaurant, index) => (
                     <RestaurantListItemCompact
                       key={restaurant.id}
                       restaurant={restaurant}
                       rank={index + 1}
                       isSelected={selectedRestaurant?.id === restaurant.id}
-                      onClick={() => setSelectedRestaurant(restaurant)}
+                      onClick={() => dispatch({ type: 'SELECT_RESTAURANT', restaurant })}
                       data-restaurant-id={restaurant.id}
                     />
                   ))}
@@ -642,9 +632,9 @@ function ListsContent() {
                     // Map view (new)
                     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden h-[calc(100vh-250px)]">
                       <RestaurantMap
-                        restaurants={viewRestaurants}
+                        restaurants={viewConfig.restaurants}
                         selectedRestaurant={selectedRestaurant}
-                        onRestaurantSelect={setSelectedRestaurant}
+                        onRestaurantSelect={(restaurant) => dispatch({ type: 'SELECT_RESTAURANT', restaurant })}
                         visibleRestaurants={visibleRestaurants}
                       />
                     </div>

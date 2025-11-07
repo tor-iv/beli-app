@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { MockDataService } from '@/lib/mockDataService';
 import { CuisineBreakdown, CityBreakdown, CountryBreakdown } from '@/types';
 import { notFound, useRouter, useParams } from 'next/navigation';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -16,9 +15,8 @@ import { TasteProfileCategoryTabs, TasteProfileCategory } from '@/components/pro
 import { TasteProfileList, SortOption } from '@/components/profile/taste-profile-list';
 import { DiningMap } from '@/components/profile/dining-map';
 import { useTasteProfile } from '@/lib/hooks/use-taste-profile';
-import { useUserByUsername, useCurrentUser, useUserReviews, useIsFollowing } from '@/lib/hooks/use-user';
+import { useUserByUsername, useCurrentUser, useUserReviews, useIsFollowing, useFollowUser, useUnfollowUser } from '@/lib/hooks/use-user';
 import { useRestaurantsByIds } from '@/lib/hooks/use-restaurants';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Instagram, Newspaper, BarChart3 } from 'lucide-react';
 import { COLORS } from '@/lib/theme/colors';
 
@@ -37,7 +35,6 @@ export default function ProfilePage() {
   const router = useRouter();
   const params = useParams();
   const username = params?.username as string;
-  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'activity' | 'taste'>('activity');
 
   // Taste profile state
@@ -54,11 +51,15 @@ export default function ProfilePage() {
     return user?.id === currentUser?.id;
   }, [user?.id, currentUser?.id]);
 
-  // Load following status only if not own profile
+  // Load following status - hook is always called but enabled option handles gating
   const { data: isFollowingData } = useIsFollowing(
     currentUser?.id || '',
     user?.id || '',
   );
+
+  // Follow/unfollow mutations using the new hooks
+  const followMutation = useFollowUser();
+  const unfollowMutation = useUnfollowUser();
 
   // Only load restaurants needed for reviews (not all 53!)
   const reviewRestaurantIds = useMemo(() => {
@@ -73,27 +74,6 @@ export default function ProfilePage() {
     TASTE_PROFILE_DAYS,
     activeTab === 'taste'
   );
-
-  // Follow/unfollow mutation
-  const followMutation = useMutation({
-    mutationFn: async ({ follow }: { follow: boolean }) => {
-      if (!currentUser || !user) return;
-      if (follow) {
-        await MockDataService.followUser(currentUser.id, user.id);
-      } else {
-        await MockDataService.unfollowUser(currentUser.id, user.id);
-      }
-    },
-    onSuccess: () => {
-      // Invalidate following query to reflect new state
-      queryClient.invalidateQueries({ queryKey: ['following', currentUser?.id, user?.id] });
-    },
-    onError: (error) => {
-      // Log error for debugging - in production, this would show a toast notification
-      console.error('Failed to update following status:', error);
-      // TODO: Show user-friendly error toast notification
-    },
-  });
 
   // OPTIMIZED: Memoized function to get current category data for taste profile
   const getCurrentCategoryData = useMemo(() => {
@@ -183,9 +163,14 @@ export default function ProfilePage() {
   }, [user]);
 
   const handleFollowToggle = useCallback(async () => {
-    if (!user) return;
-    followMutation.mutate({ follow: !isFollowingData });
-  }, [user, followMutation, isFollowingData]);
+    if (!currentUser || !user) return;
+
+    if (isFollowingData) {
+      unfollowMutation.mutate({ userId: currentUser.id, targetUserId: user.id });
+    } else {
+      followMutation.mutate({ userId: currentUser.id, targetUserId: user.id });
+    }
+  }, [currentUser, user, isFollowingData, followMutation, unfollowMutation]);
 
   const handleSetNewGoal = useCallback(() => {
     // TODO: Implement goal setting functionality
@@ -246,9 +231,9 @@ export default function ProfilePage() {
                     variant={isFollowingData ? "outline" : "default"}
                     className="flex-1"
                     onClick={handleFollowToggle}
-                    disabled={followMutation.isPending}
+                    disabled={followMutation.isPending || unfollowMutation.isPending}
                   >
-                    {followMutation.isPending ? 'Loading...' : isFollowingData ? 'Following' : 'Follow'}
+                    {(followMutation.isPending || unfollowMutation.isPending) ? 'Loading...' : isFollowingData ? 'Following' : 'Follow'}
                   </Button>
                   <Button variant="outline" className="flex-1">
                     Share profile

@@ -11,33 +11,42 @@ import { ParticipantSelector } from "@/components/group-dinner/participant-selec
 import { CategorySelectionModal } from "@/components/group-dinner/category-selection-modal"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import type { User, GroupDinnerMatch, ListCategory } from "@/types"
+import { useGroupDinnerReducer } from "@/lib/hooks/use-group-dinner-reducer"
 
 export default function GroupDinnerPage() {
   const router = useRouter()
 
-  // State
-  const [currentUser, setCurrentUser] = React.useState<User>()
-  const [selectedParticipants, setSelectedParticipants] = React.useState<User[]>([])
-  const [matches, setMatches] = React.useState<GroupDinnerMatch[]>([])
-  const [currentIndex, setCurrentIndex] = React.useState(0)
-  const [savedRestaurants, setSavedRestaurants] = React.useState<GroupDinnerMatch[]>([])
-  const [showSelectionScreen, setShowSelectionScreen] = React.useState(false)
-  const [selectedMatch, setSelectedMatch] = React.useState<GroupDinnerMatch>()
-  const [showConfirmationModal, setShowConfirmationModal] = React.useState(false)
-  const [showParticipantSelector, setShowParticipantSelector] = React.useState(false)
-  const [selectedCategory, setSelectedCategory] = React.useState<ListCategory>('restaurants')
-  const [showCategoryModal, setShowCategoryModal] = React.useState(true)
-  const [loading, setLoading] = React.useState(true)
+  // Use reducer for state machine
+  const [state, dispatch] = useGroupDinnerReducer();
+  const {
+    phase,
+    user: currentUser,
+    participants: selectedParticipants,
+    category: selectedCategory,
+    matches,
+    currentIndex,
+    savedMatches: savedRestaurants,
+    selectedMatch,
+    showParticipantSelector,
+    error
+  } = state;
+
+  // Derived state for modal visibility
+  const showCategoryModal = phase === 'category-selection';
+  const showSelectionScreen = phase === 'selection';
+  const showConfirmationModal = phase === 'confirmation';
+  const loading = phase === 'loading';
 
   // Load initial data
   React.useEffect(() => {
     const init = async () => {
       try {
         const user = await MockDataService.getCurrentUser()
-        setCurrentUser(user)
+        dispatch({ type: 'INIT_SUCCESS', user });
         // Don't load matches yet - wait for category selection
       } catch (error) {
         console.error("Failed to initialize:", error)
+        dispatch({ type: 'INIT_ERROR', error: 'Failed to load user' });
       }
     }
     init()
@@ -45,93 +54,77 @@ export default function GroupDinnerPage() {
 
   // Load matches when category is selected or participants change
   React.useEffect(() => {
-    if (currentUser && !showCategoryModal) {
+    if (currentUser && !showCategoryModal && phase === 'loading') {
       const participantIds = selectedParticipants.map(p => p.id)
       loadMatches(currentUser.id, participantIds, selectedCategory)
     }
-  }, [currentUser, selectedParticipants, selectedCategory, showCategoryModal])
+  }, [currentUser, selectedParticipants, selectedCategory, showCategoryModal, phase])
 
   // Load suggestions based on participants
   const loadMatches = async (userId: string, participantIds: string[], category?: ListCategory) => {
-    setLoading(true)
     try {
       const suggestions = await MockDataService.getGroupDinnerSuggestions(
         userId,
         participantIds.length > 0 ? participantIds : undefined,
         category
       )
-      setMatches(suggestions)
-      setCurrentIndex(0)
+      dispatch({ type: 'LOAD_MATCHES', matches: suggestions });
     } catch (error) {
       console.error("Failed to load matches:", error)
-    } finally {
-      setLoading(false)
+      dispatch({ type: 'INIT_ERROR', error: 'Failed to load matches' });
     }
   }
 
   // Handle swipe right (save)
   const handleSwipeRight = (match: GroupDinnerMatch) => {
-    if (savedRestaurants.length < 3) {
-      const newSaved = [...savedRestaurants, match]
-      setSavedRestaurants(newSaved)
-
-      if (newSaved.length === 3) {
-        setShowSelectionScreen(true)
-      }
-    }
-    setCurrentIndex((prev) => prev + 1)
+    dispatch({ type: 'SWIPE_RIGHT', match });
   }
 
   // Handle swipe left (pass)
   const handleSwipeLeft = (match: GroupDinnerMatch) => {
-    setCurrentIndex((prev) => prev + 1)
+    dispatch({ type: 'SWIPE_LEFT' });
   }
 
   // Handle restaurant selection from selection screen
   const handleSelectRestaurant = (match: GroupDinnerMatch) => {
-    setSelectedMatch(match)
-    setShowSelectionScreen(false)
-    setShowConfirmationModal(true)
+    dispatch({ type: 'SELECT_MATCH', match });
   }
 
   // Handle shuffle
   const handleShuffle = async () => {
     if (!currentUser) return
     const participantIds = selectedParticipants.map((p) => p.id)
-    await loadMatches(currentUser.id, participantIds, selectedCategory)
-    setSavedRestaurants([])
-    setShowSelectionScreen(false)
+    try {
+      const suggestions = await MockDataService.getGroupDinnerSuggestions(
+        currentUser.id,
+        participantIds.length > 0 ? participantIds : undefined,
+        selectedCategory
+      )
+      dispatch({ type: 'SHUFFLE', matches: suggestions });
+    } catch (error) {
+      console.error("Failed to shuffle:", error)
+    }
   }
 
   // Handle start over
   const handleStartOver = () => {
-    setSavedRestaurants([])
-    setShowSelectionScreen(false)
-    setCurrentIndex(0)
+    dispatch({ type: 'START_OVER' });
   }
 
   // Handle participant confirmation
   const handleParticipantsConfirm = async (participants: User[]) => {
-    setSelectedParticipants(participants)
-    setShowParticipantSelector(false)
-    if (currentUser) {
-      await loadMatches(currentUser.id, participants.map((p) => p.id), selectedCategory)
-    }
+    dispatch({ type: 'UPDATE_PARTICIPANTS', participants });
+    // Trigger matches reload via useEffect
   }
 
   // Handle keep swiping from confirmation
   const handleKeepSwiping = () => {
-    setShowConfirmationModal(false)
-    setSelectedMatch(undefined)
-    // User can continue swiping with remaining cards
+    dispatch({ type: 'KEEP_SWIPING' });
   }
 
   // Handle category selection
   const handleSelectCategory = (category: ListCategory) => {
-    setSelectedCategory(category)
-    setShowCategoryModal(false)
-    // Reset saved restaurants when changing category
-    setSavedRestaurants([])
+    dispatch({ type: 'SELECT_CATEGORY', category });
   }
 
   if (!currentUser) {
@@ -169,7 +162,7 @@ export default function GroupDinnerPage() {
       {/* Participant Section */}
       <div className="bg-white border-b p-4 flex-shrink-0">
         <button
-          onClick={() => setShowParticipantSelector(true)}
+          onClick={() => dispatch({ type: 'OPEN_PARTICIPANT_SELECTOR' })}
           className="w-full max-w-2xl mx-auto"
         >
           {selectedParticipants.length > 0 ? (
@@ -224,7 +217,7 @@ export default function GroupDinnerPage() {
             savedRestaurants={savedRestaurants}
             onSelectRestaurant={handleSelectRestaurant}
             onStartOver={handleStartOver}
-            onBack={() => setShowSelectionScreen(false)}
+            onBack={() => dispatch({ type: 'START_OVER' })}
             onViewDetails={(id) => router.push(`/restaurant/${id}`)}
           />
         ) : (
@@ -244,15 +237,15 @@ export default function GroupDinnerPage() {
         open={showParticipantSelector}
         selected={selectedParticipants}
         currentUser={currentUser}
-        onClose={() => setShowParticipantSelector(false)}
+        onClose={() => dispatch({ type: 'CLOSE_PARTICIPANT_SELECTOR' })}
         onConfirm={handleParticipantsConfirm}
       />
 
       <ConfirmationModal
         open={showConfirmationModal}
-        match={selectedMatch}
+        match={selectedMatch || undefined}
         participants={selectedParticipants}
-        onClose={() => setShowConfirmationModal(false)}
+        onClose={() => dispatch({ type: 'KEEP_SWIPING' })}
         onKeepSwiping={handleKeepSwiping}
       />
 
@@ -260,7 +253,9 @@ export default function GroupDinnerPage() {
         open={showCategoryModal}
         selectedCategory={selectedCategory}
         onSelectCategory={handleSelectCategory}
-        onOpenChange={setShowCategoryModal}
+        onOpenChange={(open) => {
+          if (!open) dispatch({ type: 'RESET' });
+        }}
       />
     </div>
   )
