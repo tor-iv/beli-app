@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { X, GraduationCap } from 'lucide-react'
 
 interface TutorialBannerProps {
@@ -8,7 +8,10 @@ interface TutorialBannerProps {
   description?: string
 }
 
-export function TutorialBanner({ featureName, description }: TutorialBannerProps) {
+export const TutorialBanner = memo(function TutorialBanner({
+  featureName,
+  description
+}: TutorialBannerProps) {
   const [isVisible, setIsVisible] = useState(true)
 
   if (!isVisible) return null
@@ -43,4 +46,4 @@ export function TutorialBanner({ featureName, description }: TutorialBannerProps
       </div>
     </div>
   )
-}
+})

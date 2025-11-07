@@ -1,3 +1,6 @@
+'use client'
+
+import { memo } from 'react'
 import { AlertCircle, RefreshCw } from 'lucide-react'
 
 interface ErrorStateProps {
@@ -6,7 +9,7 @@ interface ErrorStateProps {
   showRetry?: boolean
 }
 
-export function ErrorState({
+export const ErrorState = memo(function ErrorState({
   message = 'Something went wrong. Please try again.',
   onRetry,
   showRetry = true
@@ -38,4 +41,4 @@ export function ErrorState({
       </div>
     </div>
   )
-}
+})

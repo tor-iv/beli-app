@@ -1,12 +1,9 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useCallback } from 'react'
 import Link from 'next/link'
 import { Search, ArrowLeft } from 'lucide-react'
-import { useTastemakerPosts } from '@/lib/hooks/use-tastemaker-posts'
-import { useFeaturedLists } from '@/lib/hooks'
-import { useCurrentUser } from '@/lib/hooks/use-user'
+import { useTastemakersTutorial } from '@/lib/hooks/use-tastemakers-tutorial'
 import { TastemakerPostCard } from '@/components/tastemakers/tastemaker-post-card'
 import { CategoryPills } from '@/components/tastemakers/category-pills'
 import { ContentModeToggle } from '@/components/tastemakers/content-mode-toggle'
@@ -16,39 +13,25 @@ import { TutorialOverlay } from '@/components/tutorial/tutorial-overlay'
 import { TutorialBanner } from '@/components/tutorial/tutorial-banner'
 
 export default function TastemakersTutorialPage() {
-  const router = useRouter()
-  const [mode, setMode] = useState<'lists' | 'articles'>('articles')
-  const [category, setCategory] = useState('All')
+  const {
+    mode,
+    category,
+    user,
+    featuredLists,
+    featuredPosts,
+    allPosts,
+    filteredPosts,
+    heroPost,
+    otherFeaturedPosts,
+    setMode,
+    setCategory,
+    handleBack,
+    handleNext,
+  } = useTastemakersTutorial()
 
-  const { data: user } = useCurrentUser()
-  const { data: featuredLists } = useFeaturedLists()
-  const { data: allPostsData } = useTastemakerPosts()
-
-  const featuredPosts = useMemo(
-    () => allPostsData?.filter(p => p.isFeatured).slice(0, 3) || [],
-    [allPostsData]
-  )
-
-  const allPosts = useMemo(
-    () => allPostsData?.slice(0, 6) || [],
-    [allPostsData]
-  )
-
-  const filteredPosts = useMemo(
-    () => category === 'All' ? allPosts : allPosts.filter(p => p.tags.includes(category)),
-    [allPosts, category]
-  )
-
-  const heroPost = featuredPosts[0]
-  const otherFeaturedPosts = featuredPosts.slice(1)
-
-  const handleBack = () => {
-    router.push('/tutorial/what-to-order')
-  }
-
-  const handleNext = () => {
-    router.push('/feed')
-  }
+  const handleSearchClick = useCallback(() => {
+    alert('Search coming soon!')
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50 pb-32 md:pb-4">
@@ -75,7 +58,7 @@ export default function TastemakersTutorialPage() {
         {/* Mobile Search Bar */}
         <div className="px-4 pb-2">
           <button
-            onClick={() => alert('Search coming soon!')}
+            onClick={handleSearchClick}
             className="w-full bg-gray-100 rounded-xl flex items-center px-4 py-3"
             aria-label="Search tastemakers and articles"
           >

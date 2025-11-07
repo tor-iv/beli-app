@@ -14,6 +14,7 @@ import { ErrorState } from "@/components/tutorial/error-state"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { useGroupDinnerState } from "@/lib/hooks/use-group-dinner-state"
 import { useModalState } from "@/lib/hooks/use-modal-state"
+import { useTutorialKeyboardNav } from "@/lib/hooks/use-tutorial-keyboard-nav"
 import type { User, GroupDinnerMatch, ListCategory } from "@/types"
 
 export default function GroupDinnerTutorialPage() {
@@ -121,6 +122,27 @@ export default function GroupDinnerTutorialPage() {
   const handleNext = React.useCallback(() => {
     router.push('/tutorial/what-to-order')
   }, [router])
+
+  const handleViewDetails = React.useCallback((id: string) => {
+    router.push(`/restaurant/${id}`)
+  }, [router])
+
+  // Keyboard navigation
+  useTutorialKeyboardNav({
+    onNext: handleNext,
+    onBack: handleBack,
+    onEscape: React.useCallback(() => {
+      if (modals.showConfirmationModal) {
+        closeConfirmationModal()
+      } else if (modals.showSelectionScreen) {
+        closeSelectionScreen()
+      } else if (modals.showParticipantSelector) {
+        closeParticipantSelector()
+      } else if (modals.showCategoryModal) {
+        closeCategoryModal()
+      }
+    }, [modals, closeConfirmationModal, closeSelectionScreen, closeParticipantSelector, closeCategoryModal]),
+  })
 
   // Loading state
   if (loading && !currentUser) {
@@ -259,7 +281,7 @@ export default function GroupDinnerTutorialPage() {
             onSelectRestaurant={handleSelectRestaurant}
             onStartOver={handleStartOver}
             onBack={closeSelectionScreen}
-            onViewDetails={(id) => router.push(`/restaurant/${id}`)}
+            onViewDetails={handleViewDetails}
           />
         ) : (
           <RestaurantSwiper

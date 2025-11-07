@@ -6,6 +6,7 @@ import { Users, Utensils, Sparkles } from 'lucide-react'
 import { WhatToOrderModal } from '@/components/modals/what-to-order-modal'
 import { TutorialOverlay } from '@/components/tutorial/tutorial-overlay'
 import { TutorialBanner } from '@/components/tutorial/tutorial-banner'
+import { useTutorialKeyboardNav } from '@/lib/hooks/use-tutorial-keyboard-nav'
 import { demoRestaurant } from '@/lib/demo-data'
 
 export default function WhatToOrderTutorialPage() {
@@ -23,6 +24,17 @@ export default function WhatToOrderTutorialPage() {
   const handleOpenModal = React.useCallback(() => {
     setShowModal(true)
   }, [])
+
+  const handleCloseModal = React.useCallback(() => {
+    setShowModal(false)
+  }, [])
+
+  // Keyboard navigation
+  useTutorialKeyboardNav({
+    onNext: handleNext,
+    onBack: handleBack,
+    onEscape: handleCloseModal,
+  })
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pb-32 md:pb-4">

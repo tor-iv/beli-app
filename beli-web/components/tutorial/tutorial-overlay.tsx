@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronLeft, ArrowRight } from 'lucide-react'
 
@@ -12,7 +13,7 @@ interface TutorialOverlayProps {
   backDisabled?: boolean
 }
 
-export function TutorialOverlay({
+export const TutorialOverlay = memo(function TutorialOverlay({
   currentStep,
   totalSteps,
   featureName,
@@ -20,24 +21,37 @@ export function TutorialOverlay({
   onNext,
   backDisabled = false,
 }: TutorialOverlayProps) {
+  const progressPercentage = (currentStep / totalSteps) * 100
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 md:top-4 md:right-4 md:left-auto md:bottom-auto z-50">
+    <div
+      className="fixed bottom-0 left-0 right-0 md:top-4 md:right-4 md:left-auto md:bottom-auto z-50"
+      role="region"
+      aria-label="Tutorial navigation"
+    >
       <div className="bg-white/95 backdrop-blur-md border border-gray-200 shadow-2xl md:rounded-2xl p-4 md:p-6 md:w-[400px]">
         {/* Progress Indicator */}
         <div className="flex items-center justify-between mb-4">
           <div className="text-sm font-semibold text-gray-900">
             Tutorial: {featureName}
           </div>
-          <div className="text-sm font-semibold text-primary">
+          <div className="text-sm font-semibold text-primary" aria-live="polite">
             {currentStep} of {totalSteps}
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full h-2 bg-gray-200 rounded-full mb-6">
+        <div
+          className="w-full h-2 bg-gray-200 rounded-full mb-6"
+          role="progressbar"
+          aria-valuenow={currentStep}
+          aria-valuemin={1}
+          aria-valuemax={totalSteps}
+          aria-label={`Tutorial progress: step ${currentStep} of ${totalSteps}`}
+        >
           <div
             className="h-full bg-primary rounded-full transition-all duration-300"
-            style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+            style={{ width: `${progressPercentage}%` }}
           />
         </div>
 
@@ -77,4 +91,4 @@ export function TutorialOverlay({
       </div>
     </div>
   )
-}
+})
