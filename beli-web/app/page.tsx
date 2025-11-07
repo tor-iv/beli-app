@@ -9,6 +9,23 @@ export default function ResumePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto max-w-4xl px-4 py-6 md:py-12">
+        {/* Beli Project Banner */}
+        <div className="mb-6 rounded-2xl bg-gradient-to-br from-primary to-primary/90 p-6 text-white shadow-card md:p-8">
+          <h2 className="mb-3 text-3xl font-bold">beli Web Clone</h2>
+          <p className="mb-4 text-white/90">
+            Built to demonstrate my interest in joining the beli team and showcase full-stack development skills.
+            Features include Tastemakers (NYC food experts with badges), Group Dinner AI matching, What to Order recommendations,
+            social feeds, and leaderboards. Built with React Native + Next.js + TypeScript.
+          </p>
+          <button
+            onClick={() => router.push('/tutorial/group-dinner')}
+            className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-2 text-sm font-semibold text-primary transition-transform hover:scale-105"
+          >
+            <span>Try Interactive Demo</span>
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </button>
+        </div>
+
         {/* Header - Profile Style */}
         <div className="mb-6 rounded-2xl bg-white p-6 text-center shadow-card md:p-8">
           <h1 className="mb-3 text-4xl font-bold text-gray-900 md:text-5xl">Victor Cox IV</h1>
@@ -61,17 +78,6 @@ export default function ResumePage() {
             <strong>Note:</strong> Ratings are playful self-assessments inspired by Beli's
             restaurant review system—not actual performance metrics!
           </p>
-        </div>
-
-        {/* CTA Button */}
-        <div className="mb-8">
-          <button
-            onClick={() => router.push('/tutorial/group-dinner')}
-            className="group flex w-full items-center justify-center gap-3 rounded-2xl bg-primary px-8 py-4 text-lg font-bold text-white shadow-lg transition-all duration-200 hover:bg-primary/90 hover:shadow-xl"
-          >
-            <span>Start Interactive Demo</span>
-            <ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" />
-          </button>
         </div>
 
         {/* Experience Section */}
@@ -366,4 +372,4 @@ const SkillBadge = ({
       <div className="text-xs font-semibold text-gray-900">{name}</div>
     </div>
   );
-}
+};
