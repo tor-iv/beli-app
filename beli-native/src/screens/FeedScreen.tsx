@@ -128,11 +128,11 @@ export default function FeedScreen() {
     loadCurrentUser();
   }, []);
 
-  // Reapply filters when filter settings change
+  // Reapply filters when filter settings change or activities update
   useEffect(() => {
     const filtered = applyFilters(activities);
     setFilteredActivities(filtered);
-  }, [feedFilters]);
+  }, [feedFilters, activities]);
 
   // Refresh notification count when screen gains focus
   useFocusEffect(

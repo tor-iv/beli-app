@@ -3,7 +3,6 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Utensils } from "lucide-react"
-import { MockDataService } from "@/lib/mockDataService"
 import { ActivityCard } from "@/components/social/activity-card"
 import { RestaurantToggleWidget } from "@/components/profile/restaurant-toggle-widget"
 import { ThreeColumnLayout } from "@/components/layout/three-column"
@@ -15,61 +14,60 @@ import { CommentsModal } from "@/components/modals/comments-modal"
 import { ShareModal } from "@/components/modals/share-modal"
 import { AddRestaurantModal } from "@/components/modals/add-restaurant-modal"
 import { RankingResultModal } from "@/components/modals/ranking-result-modal"
-import { useAddRankedRestaurant, useUnreadNotificationCount } from "@/lib/hooks"
-import type { Activity, List, User, Restaurant, RankingResult } from "@/types"
+import {
+  useAddRankedRestaurant,
+  useUnreadNotificationCount,
+  useFeed,
+  useFeaturedLists,
+  useCurrentUser
+} from "@/lib/hooks"
+import type { Activity, Restaurant, RankingResult } from "@/types"
 import type { RestaurantSubmissionData } from "@/components/modals/add-restaurant-modal"
+
+// Modal state type for managing all modals
+type ModalState =
+  | { type: 'comments'; activity: Activity }
+  | { type: 'share'; activity: Activity }
+  | { type: 'add'; restaurant: Restaurant }
+  | { type: 'result'; restaurant: Restaurant; result: RankingResult; data: RestaurantSubmissionData }
+  | { type: null }
 
 export default function FeedPage() {
   const router = useRouter()
-  const [feed, setFeed] = React.useState<Activity[]>([])
-  const [featuredLists, setFeaturedLists] = React.useState<List[]>([])
-  const [loading, setLoading] = React.useState(true)
+
+  // React Query hooks for data fetching
+  const { data: feed = [], isLoading: feedLoading } = useFeed()
+  const { data: featuredLists = [], isLoading: listsLoading } = useFeaturedLists()
+  const { data: currentUser } = useCurrentUser()
+  const { data: unreadCount = 0 } = useUnreadNotificationCount()
+  const addRankedRestaurantMutation = useAddRankedRestaurant()
+
+  // Combined modal state (reduces from 8 state variables to 1)
+  const [modalState, setModalState] = React.useState<ModalState>({ type: null })
+
+  // Filter state
   const [showFiltersModal, setShowFiltersModal] = React.useState(false)
   const [filters, setFilters] = React.useState<FeedFilters>({
     rankingsOnly: false,
     topRatedOnly: false,
     restaurantsOnly: false,
   })
-  const [currentUser, setCurrentUser] = React.useState<User | null>(null)
-  const [selectedActivity, setSelectedActivity] = React.useState<Activity | null>(null)
-  const [showCommentsModal, setShowCommentsModal] = React.useState(false)
-  const [showShareModal, setShowShareModal] = React.useState(false)
 
-  // Ranking state
-  const [selectedRestaurant, setSelectedRestaurant] = React.useState<Restaurant | null>(null)
-  const [showAddModal, setShowAddModal] = React.useState(false)
-  const [showResultModal, setShowResultModal] = React.useState(false)
-  const [rankingResult, setRankingResult] = React.useState<RankingResult | null>(null)
-  const [rankingData, setRankingData] = React.useState<RestaurantSubmissionData | null>(null)
+  // Local feed state for optimistic updates
+  const [localFeed, setLocalFeed] = React.useState<Activity[]>([])
 
-  const addRankedRestaurantMutation = useAddRankedRestaurant()
-  const { data: unreadCount = 0 } = useUnreadNotificationCount()
-
+  // Sync feed data to local state for optimistic updates
   React.useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [feedData, listsData, userData] = await Promise.all([
-          MockDataService.getActivityFeed(),
-          MockDataService.getFeaturedLists(),
-          MockDataService.getCurrentUser(),
-        ])
-        setFeed(feedData as Activity[])
-        setFeaturedLists(listsData)
-        setCurrentUser(userData)
-      } catch (error) {
-        console.error("Failed to load feed data:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadData()
-  }, [])
+    setLocalFeed(feed)
+  }, [feed])
 
-  // Interaction handlers
-  const handleLike = (activityId: string) => {
+  const loading = feedLoading || listsLoading
+
+  // Interaction handlers with useCallback for performance
+  const handleLike = React.useCallback((activityId: string) => {
     if (!currentUser) return
 
-    setFeed((prevFeed) =>
+    setLocalFeed((prevFeed) =>
       prevFeed.map((activity) => {
         if (activity.id === activityId) {
           const likes = activity.interactions?.likes || []
@@ -78,7 +76,6 @@ export default function FeedPage() {
           return {
             ...activity,
             interactions: {
-              ...activity.interactions,
               likes: isLiked
                 ? likes.filter((id) => id !== currentUser.id)
                 : [...likes, currentUser.id],
@@ -90,22 +87,20 @@ export default function FeedPage() {
         return activity
       })
     )
-  }
+  }, [currentUser])
 
-  const handleComment = (activity: Activity) => {
-    setSelectedActivity(activity)
-    setShowCommentsModal(true)
-  }
+  const handleComment = React.useCallback((activity: Activity) => {
+    setModalState({ type: 'comments', activity })
+  }, [])
 
-  const handleShare = (activity: Activity) => {
-    setSelectedActivity(activity)
-    setShowShareModal(true)
-  }
+  const handleShare = React.useCallback((activity: Activity) => {
+    setModalState({ type: 'share', activity })
+  }, [])
 
-  const handleBookmark = (activityId: string) => {
+  const handleBookmark = React.useCallback((activityId: string) => {
     if (!currentUser) return
 
-    setFeed((prevFeed) =>
+    setLocalFeed((prevFeed) =>
       prevFeed.map((activity) => {
         if (activity.id === activityId) {
           const bookmarks = activity.interactions?.bookmarks || []
@@ -114,33 +109,33 @@ export default function FeedPage() {
           return {
             ...activity,
             interactions: {
-              ...activity.interactions,
+              likes: activity.interactions?.likes || [],
+              comments: activity.interactions?.comments || [],
               bookmarks: isBookmarked
                 ? bookmarks.filter((id) => id !== currentUser.id)
                 : [...bookmarks, currentUser.id],
-              likes: activity.interactions?.likes || [],
-              comments: activity.interactions?.comments || [],
             },
           }
         }
         return activity
       })
     )
-  }
+  }, [currentUser])
 
-  const handleAddPress = (restaurant: Restaurant) => {
-    setSelectedRestaurant(restaurant)
-    setShowAddModal(true)
-  }
+  const handleAddPress = React.useCallback((restaurant: Restaurant) => {
+    setModalState({ type: 'add', restaurant })
+  }, [])
 
-  const handleRankingComplete = async (result: RankingResult, data: RestaurantSubmissionData) => {
-    if (!currentUser || !selectedRestaurant) return
+  const handleRankingComplete = React.useCallback(async (result: RankingResult, data: RestaurantSubmissionData) => {
+    if (!currentUser || modalState.type !== 'add') return
+
+    const restaurant = modalState.restaurant
 
     try {
       // Save to MockDataService
       await addRankedRestaurantMutation.mutateAsync({
         userId: currentUser.id,
-        restaurantId: selectedRestaurant.id,
+        restaurantId: restaurant.id,
         result,
         data: {
           notes: data.notes || undefined,
@@ -150,29 +145,23 @@ export default function FeedPage() {
         },
       })
 
-      // Store result for the result modal
-      setRankingResult(result)
-      setRankingData(data)
-
-      // Close add modal and show result modal
-      setShowAddModal(false)
-      setShowResultModal(true)
+      // Show result modal
+      setModalState({ type: 'result', restaurant, result, data })
     } catch (error) {
       console.error('Error saving ranking:', error)
     }
-  }
+  }, [currentUser, modalState, addRankedRestaurantMutation])
 
-  const handleResultDone = () => {
-    setShowResultModal(false)
-    setRankingResult(null)
-    setRankingData(null)
-    setSelectedRestaurant(null)
-  }
+  const handleResultDone = React.useCallback(() => {
+    setModalState({ type: null })
+  }, [])
 
-  const handleAddComment = (content: string) => {
-    if (!selectedActivity || !currentUser) return
+  const handleAddComment = React.useCallback((content: string) => {
+    if (modalState.type !== 'comments' || !currentUser) return
 
-    setFeed((prevFeed) =>
+    const selectedActivity = modalState.activity
+
+    setLocalFeed((prevFeed) =>
       prevFeed.map((activity) => {
         if (activity.id === selectedActivity.id) {
           const newComment = {
@@ -185,21 +174,20 @@ export default function FeedPage() {
           return {
             ...activity,
             interactions: {
-              ...activity.interactions,
-              comments: [...(activity.interactions?.comments || []), newComment],
               likes: activity.interactions?.likes || [],
               bookmarks: activity.interactions?.bookmarks || [],
+              comments: [...(activity.interactions?.comments || []), newComment],
             },
           }
         }
         return activity
       })
     )
-  }
+  }, [modalState, currentUser])
 
   // Apply filters to feed
   const filteredFeed = React.useMemo(() => {
-    return feed.filter((item) => {
+    return localFeed.filter((item) => {
       // Rankings only filter
       if (filters.rankingsOnly && item.type !== "review") {
         return false
@@ -218,11 +206,11 @@ export default function FeedPage() {
       }
       return true
     })
-  }, [feed, filters])
+  }, [localFeed, filters])
 
-  const handleApplyFilters = (newFilters: FeedFilters) => {
+  const handleApplyFilters = React.useCallback((newFilters: FeedFilters) => {
     setFilters(newFilters)
-  }
+  }, [])
 
   const hasActiveFilters =
     filters.rankingsOnly || filters.topRatedOnly || filters.restaurantsOnly
@@ -321,7 +309,7 @@ export default function FeedPage() {
               <div className="max-w-2xl mx-auto">
                 <h1 className="text-2xl font-bold mb-6">Your Feed</h1>
                 <div className="space-y-4">
-                  {feed.map((item) => (
+                  {filteredFeed.map((item) => (
                     <ActivityCard
                       key={item.id}
                       activity={item}
@@ -351,47 +339,47 @@ export default function FeedPage() {
       />
 
       {/* Comments Modal */}
-      {selectedActivity && (
+      {modalState.type === 'comments' && (
         <CommentsModal
-          open={showCommentsModal}
-          onOpenChange={setShowCommentsModal}
-          activity={selectedActivity}
+          open={true}
+          onOpenChange={(open) => !open && setModalState({ type: null })}
+          activity={modalState.activity}
           currentUser={currentUser || undefined}
           onAddComment={handleAddComment}
         />
       )}
 
       {/* Share Modal */}
-      {selectedActivity && (
+      {modalState.type === 'share' && (
         <ShareModal
-          open={showShareModal}
-          onOpenChange={setShowShareModal}
-          restaurant={selectedActivity.restaurant}
-          user={selectedActivity.user}
+          open={true}
+          onOpenChange={(open) => !open && setModalState({ type: null })}
+          restaurant={modalState.activity.restaurant}
+          user={modalState.activity.user}
         />
       )}
 
       {/* Add Restaurant Modal */}
-      {selectedRestaurant && currentUser && (
+      {modalState.type === 'add' && currentUser && (
         <AddRestaurantModal
-          open={showAddModal}
-          onOpenChange={setShowAddModal}
-          restaurant={selectedRestaurant}
+          open={true}
+          onOpenChange={(open) => !open && setModalState({ type: null })}
+          restaurant={modalState.restaurant}
           userId={currentUser.id}
           onRankingComplete={handleRankingComplete}
         />
       )}
 
       {/* Ranking Result Modal */}
-      {rankingResult && selectedRestaurant && currentUser && (
+      {modalState.type === 'result' && currentUser && (
         <RankingResultModal
-          open={showResultModal}
-          onOpenChange={setShowResultModal}
-          restaurant={selectedRestaurant}
+          open={true}
+          onOpenChange={(open) => !open && setModalState({ type: null })}
+          restaurant={modalState.restaurant}
           user={currentUser}
-          result={rankingResult}
-          notes={rankingData?.notes}
-          photos={rankingData?.photos}
+          result={modalState.result}
+          notes={modalState.data.notes}
+          photos={modalState.data.photos}
           visitCount={1}
           onDone={handleResultDone}
         />
