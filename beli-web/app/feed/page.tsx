@@ -2,38 +2,31 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Utensils } from "lucide-react"
 import { ActivityCard } from "@/components/social/activity-card"
-import { RestaurantToggleWidget } from "@/components/profile/restaurant-toggle-widget"
 import { ThreeColumnLayout } from "@/components/layout/three-column"
 import { MobileFeedHeader } from "@/components/navigation/mobile-feed-header"
 import { ActionButtons } from "@/components/feed/action-buttons"
 import { FeaturedListsSection } from "@/components/feed/featured-lists-section"
+import { DesktopFeedSidebar } from "@/components/feed/DesktopFeedSidebar"
 import { FeedFiltersModal, type FeedFilters } from "@/components/modals/feed-filters-modal"
 import { CommentsModal } from "@/components/modals/comments-modal"
 import { ShareModal } from "@/components/modals/share-modal"
 import { AddRestaurantModal } from "@/components/modals/add-restaurant-modal"
 import { RankingResultModal } from "@/components/modals/ranking-result-modal"
 import {
-  useAddRankedRestaurant,
   useUnreadNotificationCount,
   useFeed,
   useFeaturedLists,
   useCurrentUser,
-  useLikeActivity,
-  useBookmarkActivity,
-  useAddComment
 } from "@/lib/hooks"
-import type { Activity, Restaurant, RankingResult } from "@/types"
-import type { RestaurantSubmissionData } from "@/components/modals/add-restaurant-modal"
+import { useFeedFilters } from "@/lib/hooks/use-feed-filters"
+import { useFeedModals } from "@/lib/hooks/use-feed-modals"
 
-// Modal state type for managing all modals
-type ModalState =
-  | { type: 'comments'; activity: Activity }
-  | { type: 'share'; activity: Activity }
-  | { type: 'add'; restaurant: Restaurant }
-  | { type: 'result'; restaurant: Restaurant; result: RankingResult; data: RestaurantSubmissionData }
-  | { type: null }
+/**
+ * Feed page - Social activity feed with restaurant discoveries
+ * Displays activity from followed users, with filtering and interaction capabilities
+ * Refactored for reduced complexity and better separation of concerns
+ */
 
 export default function FeedPage() {
   const router = useRouter()
@@ -44,14 +37,8 @@ export default function FeedPage() {
   const { data: currentUser } = useCurrentUser()
   const { data: unreadCount = 0 } = useUnreadNotificationCount()
 
-  // React Query mutation hooks
-  const addRankedRestaurantMutation = useAddRankedRestaurant()
-  const likeMutation = useLikeActivity()
-  const bookmarkMutation = useBookmarkActivity()
-  const addCommentMutation = useAddComment()
-
-  // Combined modal state (reduces from 8 state variables to 1)
-  const [modalState, setModalState] = React.useState<ModalState>({ type: null })
+  // Modal state and handlers (extracted to custom hook)
+  const { modalState, setModalState, handlers } = useFeedModals(currentUser, feed)
 
   // Filter state
   const [showFiltersModal, setShowFiltersModal] = React.useState(false)
@@ -63,106 +50,8 @@ export default function FeedPage() {
 
   const loading = feedLoading || listsLoading
 
-  // Interaction handlers with useCallback for performance
-  const handleLike = React.useCallback((activityId: string) => {
-    if (!currentUser) return
-
-    // Find current like status
-    const activity = feed.find(a => a.id === activityId)
-    const isLiked = activity?.interactions?.likes.includes(currentUser.id) || false
-
-    // Trigger mutation with optimistic update
-    likeMutation.mutate({ activityId, userId: currentUser.id, isLiked })
-  }, [currentUser, feed, likeMutation])
-
-  const handleComment = React.useCallback((activity: Activity) => {
-    setModalState({ type: 'comments', activity })
-  }, [])
-
-  const handleShare = React.useCallback((activity: Activity) => {
-    setModalState({ type: 'share', activity })
-  }, [])
-
-  const handleBookmark = React.useCallback((activityId: string) => {
-    if (!currentUser) return
-
-    // Find current bookmark status
-    const activity = feed.find(a => a.id === activityId)
-    const isBookmarked = activity?.interactions?.bookmarks.includes(currentUser.id) || false
-
-    // Trigger mutation with optimistic update
-    bookmarkMutation.mutate({ activityId, userId: currentUser.id, isBookmarked })
-  }, [currentUser, feed, bookmarkMutation])
-
-  const handleAddPress = React.useCallback((restaurant: Restaurant) => {
-    setModalState({ type: 'add', restaurant })
-  }, [])
-
-  const handleRankingComplete = React.useCallback(async (result: RankingResult, data: RestaurantSubmissionData) => {
-    if (!currentUser || modalState.type !== 'add') return
-
-    const restaurant = modalState.restaurant
-
-    try {
-      // Save to MockDataService
-      await addRankedRestaurantMutation.mutateAsync({
-        userId: currentUser.id,
-        restaurantId: restaurant.id,
-        result,
-        data: {
-          notes: data.notes || undefined,
-          photos: data.photos && data.photos.length > 0 ? data.photos : undefined,
-          tags: data.labels && data.labels.length > 0 ? data.labels : undefined,
-          companions: data.companions && data.companions.length > 0 ? data.companions : undefined,
-        },
-      })
-
-      // Show result modal
-      setModalState({ type: 'result', restaurant, result, data })
-    } catch (error) {
-      console.error('Error saving ranking:', error)
-    }
-  }, [currentUser, modalState, addRankedRestaurantMutation])
-
-  const handleResultDone = React.useCallback(() => {
-    setModalState({ type: null })
-  }, [])
-
-  const handleAddComment = React.useCallback((content: string) => {
-    if (modalState.type !== 'comments' || !currentUser) return
-
-    const activityId = modalState.activity.id
-
-    // Trigger mutation with optimistic update
-    addCommentMutation.mutate({
-      activityId,
-      userId: currentUser.id,
-      content
-    })
-  }, [modalState, currentUser, addCommentMutation])
-
-  // Apply filters to feed
-  const filteredFeed = React.useMemo(() => {
-    return feed.filter((item) => {
-      // Rankings only filter
-      if (filters.rankingsOnly && item.type !== "review") {
-        return false
-      }
-      // Top rated only filter
-      if (filters.topRatedOnly && item.type === "review") {
-        const rating = item.rating
-        if (!rating || rating < 9.0) {
-          return false
-        }
-      }
-      // Restaurants only filter
-      if (filters.restaurantsOnly && item.type === "review") {
-        // TODO: Check if restaurant is actually a restaurant (not bar/bakery)
-        // For now, we'll keep all reviews
-      }
-      return true
-    })
-  }, [feed, filters])
+  // Apply filters to feed (extracted to custom hook)
+  const filteredFeed = useFeedFilters(feed, filters)
 
   const handleApplyFilters = React.useCallback((newFilters: FeedFilters) => {
     setFilters(newFilters)
@@ -231,11 +120,11 @@ export default function FeedPage() {
                 key={item.id}
                 activity={item}
                 currentUserId={currentUser?.id}
-                onLike={() => handleLike(item.id)}
-                onComment={() => handleComment(item)}
-                onShare={() => handleShare(item)}
-                onBookmark={() => handleBookmark(item.id)}
-                onAddPress={() => handleAddPress(item.restaurant)}
+                onLike={() => handlers.handleLike(item.id)}
+                onComment={() => handlers.handleComment(item)}
+                onShare={() => handlers.handleShare(item)}
+                onBookmark={() => handlers.handleBookmark(item.id)}
+                onAddPress={() => handlers.handleAddPress(item.restaurant)}
               />
             ))}
           </div>
@@ -244,23 +133,7 @@ export default function FeedPage() {
         {/* Desktop: Two column layout with sticky sidebar */}
         <div className="hidden lg:block">
           <ThreeColumnLayout
-            left={
-              <div className="space-y-4">
-                {/* Eat Now Button */}
-                <button
-                  onClick={() => router.push("/group-dinner")}
-                  className="w-full bg-white rounded-lg shadow-card p-4 hover:shadow-card-hover transition-all duration-200 flex items-center justify-center gap-3 group"
-                  aria-label="Eat Now - Find restaurants for your group"
-                >
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <Utensils className="h-6 w-6 text-primary" />
-                  </div>
-                  <span className="text-lg font-semibold text-gray-900">Eat Now</span>
-                </button>
-
-                <RestaurantToggleWidget defaultView="reserve" />
-              </div>
-            }
+            left={<DesktopFeedSidebar />}
             center={
               <div className="max-w-2xl mx-auto">
                 <h1 className="text-2xl font-bold mb-6">Your Feed</h1>
@@ -270,11 +143,11 @@ export default function FeedPage() {
                       key={item.id}
                       activity={item}
                       currentUserId={currentUser?.id}
-                      onLike={() => handleLike(item.id)}
-                      onComment={() => handleComment(item)}
-                      onShare={() => handleShare(item)}
-                      onBookmark={() => handleBookmark(item.id)}
-                      onAddPress={() => handleAddPress(item.restaurant)}
+                      onLike={() => handlers.handleLike(item.id)}
+                      onComment={() => handlers.handleComment(item)}
+                      onShare={() => handlers.handleShare(item)}
+                      onBookmark={() => handlers.handleBookmark(item.id)}
+                      onAddPress={() => handlers.handleAddPress(item.restaurant)}
                     />
                   ))}
                 </div>
@@ -301,7 +174,7 @@ export default function FeedPage() {
           onOpenChange={(open) => !open && setModalState({ type: null })}
           activity={modalState.activity}
           currentUser={currentUser || undefined}
-          onAddComment={handleAddComment}
+          onAddComment={handlers.handleAddComment}
         />
       )}
 
@@ -322,7 +195,7 @@ export default function FeedPage() {
           onOpenChange={(open) => !open && setModalState({ type: null })}
           restaurant={modalState.restaurant}
           userId={currentUser.id}
-          onRankingComplete={handleRankingComplete}
+          onRankingComplete={handlers.handleRankingComplete}
         />
       )}
 
@@ -337,7 +210,7 @@ export default function FeedPage() {
           notes={modalState.data.notes}
           photos={modalState.data.photos}
           visitCount={1}
-          onDone={handleResultDone}
+          onDone={handlers.handleResultDone}
         />
       )}
     </div>

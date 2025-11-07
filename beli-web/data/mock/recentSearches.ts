@@ -1,10 +1,4 @@
-export interface RecentSearch {
-  id: string;
-  restaurantId: string;
-  restaurantName: string;
-  location: string;
-  timestamp: Date;
-}
+import { RecentSearch } from '@/types';
 
 export const mockRecentSearches: RecentSearch[] = [
   {

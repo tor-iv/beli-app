@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
-import { MockDataService } from '@/lib/mockDataService';
+import { ReviewService } from '@/lib/services';
 import { Review } from '@/types';
 
 /**
@@ -13,7 +13,7 @@ export function useRestaurantReviews(
 ) {
   return useQuery({
     queryKey: ['reviews', 'restaurant', restaurantId],
-    queryFn: () => MockDataService.getRestaurantReviews(restaurantId),
+    queryFn: () => ReviewService.getRestaurantReviews(restaurantId),
     staleTime: 2 * 60 * 1000, // 2 minutes
     ...options,
   });
@@ -30,7 +30,7 @@ export function useUserReviews(
 ) {
   return useQuery({
     queryKey: ['reviews', 'user', userId],
-    queryFn: () => MockDataService.getUserReviews(userId),
+    queryFn: () => ReviewService.getUserReviews(userId),
     staleTime: 2 * 60 * 1000,
     ...options,
   });
@@ -43,7 +43,7 @@ export function useAddReview() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (review: any) => MockDataService.addReview(review),
+    mutationFn: (review: any) => ReviewService.addReview(review),
     onSuccess: (newReview) => {
       // Invalidate restaurant reviews
       queryClient.invalidateQueries({

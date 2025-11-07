@@ -434,3 +434,12 @@ export interface RankingResult {
   percentile: number;       // 0-100
   comparisonsCount: number;
 }
+
+// Search types
+export interface RecentSearch {
+  id: string;
+  restaurantId: string;
+  restaurantName: string;
+  location: string;
+  timestamp: Date;
+}

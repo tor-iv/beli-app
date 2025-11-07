@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { MockDataService } from '@/lib/mockDataService';
+import { FeedInteractionService } from '@/lib/services';
 import { Activity, ActivityComment } from '@/types';
 
 /**
@@ -16,9 +16,9 @@ export function useLikeActivity() {
       isLiked: boolean;
     }) => {
       if (isLiked) {
-        await MockDataService.unlikeActivity(activityId, userId);
+        await FeedInteractionService.unlikeActivity(activityId, userId);
       } else {
-        await MockDataService.likeActivity(activityId, userId);
+        await FeedInteractionService.likeActivity(activityId, userId);
       }
     },
     onMutate: async ({ activityId, userId, isLiked }) => {
@@ -86,9 +86,9 @@ export function useBookmarkActivity() {
       isBookmarked: boolean;
     }) => {
       if (isBookmarked) {
-        await MockDataService.unbookmarkActivity(activityId, userId);
+        await FeedInteractionService.unbookmarkActivity(activityId, userId);
       } else {
-        await MockDataService.bookmarkActivity(activityId, userId);
+        await FeedInteractionService.bookmarkActivity(activityId, userId);
       }
     },
     onMutate: async ({ activityId, userId, isBookmarked }) => {
@@ -155,7 +155,7 @@ export function useAddComment() {
       userId: string;
       content: string;
     }) => {
-      return MockDataService.addCommentToActivity(activityId, userId, content);
+      return FeedInteractionService.addCommentToActivity(activityId, userId, content);
     },
     onMutate: async ({ activityId, userId, content }) => {
       // Cancel any outgoing refetches to prevent race conditions

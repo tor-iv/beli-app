@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { MockDataService } from '@/lib/mockDataService';
+import { UserService } from '@/lib/services';
 
 export function useUsers() {
   return useQuery({
     queryKey: ['users'],
-    queryFn: () => MockDataService.searchUsers(''),
+    queryFn: () => UserService.searchUsers(''),
     staleTime: 10 * 60 * 1000, // 10 minutes - user list doesn't change often
   });
 }
@@ -12,7 +12,7 @@ export function useUsers() {
 export function useUser(userId: string) {
   return useQuery({
     queryKey: ['user', userId],
-    queryFn: () => MockDataService.getUserById(userId),
+    queryFn: () => UserService.getUserById(userId),
     enabled: !!userId,
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
@@ -21,7 +21,7 @@ export function useUser(userId: string) {
 export function useSearchUsers(query: string) {
   return useQuery({
     queryKey: ['users', 'search', query],
-    queryFn: () => MockDataService.searchUsers(query),
+    queryFn: () => UserService.searchUsers(query),
     enabled: query.length > 0,
   });
 }
@@ -29,7 +29,7 @@ export function useSearchUsers(query: string) {
 export function useUserMatchPercentage(currentUserId: string, targetUserId: string) {
   return useQuery({
     queryKey: ['user-match', currentUserId, targetUserId],
-    queryFn: () => MockDataService.getUserMatchPercentage(currentUserId, targetUserId),
+    queryFn: () => UserService.getUserMatchPercentage(currentUserId, targetUserId),
     enabled: !!currentUserId && !!targetUserId,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
@@ -38,7 +38,7 @@ export function useUserMatchPercentage(currentUserId: string, targetUserId: stri
 export function useBatchMatchPercentages(currentUserId: string, targetUserIds: string[]) {
   return useQuery({
     queryKey: ['user-match-batch', currentUserId, targetUserIds.sort().join(',')],
-    queryFn: () => MockDataService.getBatchMatchPercentages(currentUserId, targetUserIds),
+    queryFn: () => UserService.getBatchMatchPercentages(currentUserId, targetUserIds),
     enabled: !!currentUserId && targetUserIds.length > 0,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });

@@ -1,11 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MockDataService } from '@/lib/mockDataService';
+import { ListService, UserRestaurantService } from '@/lib/services';
+import { MockDataService } from '@/lib/mockDataService'; // Still needed for updateList until Phase 4
 import { List } from '@/types';
 
 export function useLists(userId?: string) {
   return useQuery({
     queryKey: ['lists', userId],
-    queryFn: () => MockDataService.getUserLists(userId || '1'),
+    queryFn: () => ListService.getUserLists(userId || '1'),
   });
 }
 
@@ -25,7 +26,7 @@ export function useAddToList() {
         review?: string;
         visitDate?: string;
       };
-    }) => MockDataService.addRestaurantToUserList(
+    }) => UserRestaurantService.addRestaurantToUserList(
       params.userId,
       params.restaurantId,
       params.status,
@@ -65,7 +66,7 @@ export function useRemoveFromList() {
     mutationFn: (params: {
       userId: string;
       restaurantId: string;
-    }) => MockDataService.removeRestaurantFromUserList(
+    }) => UserRestaurantService.removeRestaurantFromUserList(
       params.userId,
       params.restaurantId
     ),

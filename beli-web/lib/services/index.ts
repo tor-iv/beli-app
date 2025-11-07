@@ -10,6 +10,28 @@
  * - LeaderboardService
  * - ReviewService
  * - ListService
+ *
+ * Phase 2 Services (Foundation services):
+ * - UserService
+ * - SocialService
+ * - RestaurantService
+ * - RestaurantStatusService
+ *
+ * Phase 3 Services (Relationship & Feed):
+ * - UserRestaurantService
+ * - FeedService
+ * - FeedInteractionService
+ *
+ * Phase 4 Services (Tastemaker, Reservation & Menu):
+ * - TastemakerService
+ * - TastemakerPostService
+ * - ReservationService
+ * - MenuService
+ *
+ * Phase 5 Services (Taste Profile, Ranking & Group Dinner):
+ * - TasteProfileService
+ * - RankingService
+ * - GroupDinnerService
  */
 
 // Phase 1: Independent Services
@@ -19,11 +41,27 @@ export { LeaderboardService } from './leaderboard/LeaderboardService';
 export { ReviewService } from './reviews/ReviewService';
 export { ListService } from './lists/ListService';
 
+// Phase 2: Foundation Services
+export { UserService } from './users/UserService';
+export { SocialService } from './users/SocialService';
+export { RestaurantService } from './restaurants/RestaurantService';
+export { RestaurantStatusService } from './restaurants/RestaurantStatusService';
+
+// Phase 3: Relationship & Feed Services
+export { UserRestaurantService } from './user-restaurant/UserRestaurantService';
+export { FeedService } from './feed/FeedService';
+export { FeedInteractionService } from './feed/FeedInteractionService';
+
+// Phase 4: Tastemaker, Reservation & Menu Services
+export { TastemakerService } from './tastemakers/TastemakerService';
+export { TastemakerPostService } from './tastemakers/TastemakerPostService';
+export { ReservationService } from './reservations/ReservationService';
+export { MenuService } from './menu/MenuService';
+
+// Phase 5: Taste Profile, Ranking & Group Dinner Services
+export { TasteProfileService } from './taste-profile/TasteProfileService';
+export { RankingService } from './ranking/RankingService';
+export { GroupDinnerService } from './group-dinner/GroupDinnerService';
+
 // Base utilities (exported for advanced use cases)
 export { delay, SimpleCache, matchPercentageCache, followingRelationships } from './base/BaseService';
-
-// Future phases will add:
-// Phase 2: UserService, RestaurantService, RestaurantStatusService
-// Phase 3: SocialService, UserRestaurantService, FeedService
-// Phase 4: RestaurantDiscoveryService, TastemakerService, ReservationService, MenuService
-// Phase 5: TasteProfileService, RankingService, GroupDinnerService

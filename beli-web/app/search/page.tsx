@@ -15,10 +15,9 @@ import { UserCard } from '@/components/social/user-card';
 import { UserPreview } from '@/components/social/user-preview';
 import { Search, MapPin, X, Clock, Store, Users, Calendar, Heart, TrendingUp } from 'lucide-react';
 import { MockDataService } from '@/lib/mockDataService';
-import { RecentSearch } from '@/data/mock/recentSearches';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import type { Restaurant, User } from '@/types';
+import type { Restaurant, User, RecentSearch } from '@/types';
 
 type SearchTab = 'restaurants' | 'members';
 

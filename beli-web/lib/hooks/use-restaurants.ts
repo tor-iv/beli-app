@@ -1,11 +1,11 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { MockDataService } from '@/lib/mockDataService';
+import { RestaurantService } from '@/lib/services';
 import { Restaurant } from '@/types';
 
 export function useRestaurants() {
   return useQuery({
     queryKey: ['restaurants'],
-    queryFn: () => MockDataService.getAllRestaurants(),
+    queryFn: () => RestaurantService.getAllRestaurants(),
     staleTime: 10 * 60 * 1000, // 10 minutes - restaurants don't change often
   });
 }
@@ -13,7 +13,7 @@ export function useRestaurants() {
 export function useRestaurant(id: string) {
   return useQuery({
     queryKey: ['restaurant', id],
-    queryFn: () => MockDataService.getRestaurantById(id),
+    queryFn: () => RestaurantService.getRestaurantById(id),
     enabled: !!id,
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
@@ -22,7 +22,7 @@ export function useRestaurant(id: string) {
 export function useRestaurantsByIds(ids: string[]) {
   return useQuery({
     queryKey: ['restaurants', 'byIds', [...ids].sort().join(',')], // Fix: Create copy before sorting to avoid mutation
-    queryFn: () => MockDataService.getRestaurantsByIds(ids),
+    queryFn: () => RestaurantService.getRestaurantsByIds(ids),
     enabled: ids.length > 0,
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
@@ -31,7 +31,7 @@ export function useRestaurantsByIds(ids: string[]) {
 export function useSearchRestaurants(query: string, filters?: any) {
   return useQuery({
     queryKey: ['restaurants', 'search', query, filters],
-    queryFn: () => MockDataService.searchRestaurants(query, filters),
+    queryFn: () => RestaurantService.searchRestaurants(query, filters),
     enabled: query.length > 0,
   });
 }
@@ -44,7 +44,7 @@ export function useTrendingRestaurants(
 ) {
   return useQuery({
     queryKey: ['restaurants', 'trending'],
-    queryFn: () => MockDataService.getTrendingRestaurants(),
+    queryFn: () => RestaurantService.getTrendingRestaurants(),
     staleTime: 5 * 60 * 1000, // 5 minutes - trending updates fairly frequently
     ...options,
   });
@@ -61,7 +61,7 @@ export function useNearbyRecommendations(
 ) {
   return useQuery({
     queryKey: ['restaurants', 'nearby', userId, radiusMiles, limit],
-    queryFn: () => MockDataService.getNearbyRecommendations(userId, radiusMiles, limit),
+    queryFn: () => RestaurantService.getNearbyRecommendations(userId, radiusMiles, limit),
     staleTime: 5 * 60 * 1000, // 5 minutes
     ...options,
   });
@@ -77,7 +77,7 @@ export function useFriendRecommendations(
 ) {
   return useQuery({
     queryKey: ['restaurants', 'friend-recs', userId, limit],
-    queryFn: () => MockDataService.getFriendRecommendations(userId, limit),
+    queryFn: () => RestaurantService.getFriendRecommendations(userId, limit),
     staleTime: 5 * 60 * 1000, // 5 minutes
     ...options,
   });

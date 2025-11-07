@@ -1,4 +1,4 @@
-import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification, TastemakerPost, Reservation, ReservationPriorityLevel, MenuItem, OrderSuggestion, HungerLevel, MealTime, ActivityComment } from '@/types';
+import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification, TastemakerPost, Reservation, ReservationPriorityLevel, MenuItem, OrderSuggestion, HungerLevel, MealTime, ActivityComment, RecentSearch } from '@/types';
 import { mockUsers, currentUser } from '@/data/mock/users';
 import { mockRestaurants } from '@/data/mock/restaurants';
 import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
@@ -6,7 +6,7 @@ import { mockReviews, Review } from '@/data/mock/reviews';
 import { mockActivities, trendingRestaurants, recentCheckIns, Activity } from '@/data/mock/activities';
 import { mockLists, getUserListsByType, featuredLists } from '@/data/mock/lists';
 import { mockNotifications } from '@/data/mock/notifications';
-import { mockRecentSearches, RecentSearch } from '@/data/mock/recentSearches';
+import { mockRecentSearches } from '@/data/mock/recentSearches';
 import { mockTastemakers } from '@/data/mock/tastemakers';
 import { mockTastemakerPosts, getFeaturedPosts, getPostsByUserId } from '@/data/mock/tastemakerPosts';
 import { mockReservations, getUserPriorityLevel, getAvailableReservations, getClaimedReservationsByUser, getSharedReservationsByUser, getReservationReminders } from '@/data/mock/reservations';

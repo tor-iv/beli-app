@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MockDataService } from '@/lib/mockDataService';
+import { NotificationService } from '@/lib/services';
 import { Notification } from '@/types';
 
 /**
@@ -8,7 +8,7 @@ import { Notification } from '@/types';
 export function useNotifications() {
   return useQuery({
     queryKey: ['notifications'],
-    queryFn: () => MockDataService.getNotifications(),
+    queryFn: () => NotificationService.getNotifications(),
     refetchInterval: 30000, // Refresh every 30 seconds
     staleTime: 30000, // Consider data stale after 30 seconds (matches refetchInterval)
   });
@@ -20,7 +20,7 @@ export function useNotifications() {
 export function useUnreadNotificationCount() {
   return useQuery({
     queryKey: ['notifications', 'unread-count'],
-    queryFn: () => MockDataService.getUnreadNotificationCount(),
+    queryFn: () => NotificationService.getUnreadNotificationCount(),
     refetchInterval: 30000, // Refresh every 30 seconds
     staleTime: 30000, // Consider data stale after 30 seconds (matches refetchInterval)
   });
@@ -34,7 +34,7 @@ export function useMarkNotificationAsRead() {
 
   return useMutation({
     mutationFn: (notificationId: string) =>
-      MockDataService.markNotificationAsRead(notificationId),
+      NotificationService.markNotificationAsRead(notificationId),
     onMutate: async (notificationId) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['notifications'] });
@@ -76,7 +76,7 @@ export function useMarkAllNotificationsAsRead() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => MockDataService.markAllNotificationsAsRead(),
+    mutationFn: () => NotificationService.markAllNotificationsAsRead(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['notifications', 'unread-count'] });

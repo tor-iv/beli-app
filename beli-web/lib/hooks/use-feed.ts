@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { MockDataService } from '@/lib/mockDataService';
+import { FeedService } from '@/lib/services';
 
 export function useFeed(userId?: string) {
   return useQuery({
     queryKey: ['feed', userId],
-    queryFn: () => MockDataService.getActivityFeed(userId),
+    queryFn: () => FeedService.getActivityFeed(userId),
     staleTime: 2 * 60 * 1000, // 2 minutes - feed updates frequently but not instantly
   });
 }

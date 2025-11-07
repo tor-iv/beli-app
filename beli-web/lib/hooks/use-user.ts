@@ -1,17 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MockDataService } from '@/lib/mockDataService';
+import { UserService, SocialService, ReviewService } from '@/lib/services';
 
 export function useCurrentUser() {
   return useQuery({
     queryKey: ['user', 'current'],
-    queryFn: () => MockDataService.getCurrentUser(),
+    queryFn: () => UserService.getCurrentUser(),
   });
 }
 
 export function useUser(userId: string) {
   return useQuery({
     queryKey: ['user', userId],
-    queryFn: () => MockDataService.getUserById(userId),
+    queryFn: () => UserService.getUserById(userId),
     enabled: !!userId,
   });
 }
@@ -19,7 +19,7 @@ export function useUser(userId: string) {
 export function useUserByUsername(username: string) {
   return useQuery({
     queryKey: ['user', 'username', username],
-    queryFn: () => MockDataService.getUserByUsername(username),
+    queryFn: () => UserService.getUserByUsername(username),
     enabled: !!username,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -28,7 +28,7 @@ export function useUserByUsername(username: string) {
 export function useUserReviews(userId: string) {
   return useQuery({
     queryKey: ['reviews', 'user', userId],
-    queryFn: () => MockDataService.getUserReviews(userId),
+    queryFn: () => ReviewService.getUserReviews(userId),
     enabled: !!userId,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
@@ -37,7 +37,7 @@ export function useUserReviews(userId: string) {
 export function useIsFollowing(userId: string, targetUserId: string) {
   return useQuery({
     queryKey: ['following', userId, targetUserId],
-    queryFn: () => MockDataService.isFollowing(userId, targetUserId),
+    queryFn: () => SocialService.isFollowing(userId, targetUserId),
     enabled: !!userId && !!targetUserId,
     staleTime: 1 * 60 * 1000, // 1 minute
   });
@@ -51,7 +51,7 @@ export function useFollowUser() {
 
   return useMutation({
     mutationFn: (params: { userId: string; targetUserId: string }) =>
-      MockDataService.followUser(params.userId, params.targetUserId),
+      SocialService.followUser(params.userId, params.targetUserId),
     onSuccess: (_, variables) => {
       // Invalidate following status
       queryClient.invalidateQueries({
@@ -82,7 +82,7 @@ export function useUnfollowUser() {
 
   return useMutation({
     mutationFn: (params: { userId: string; targetUserId: string }) =>
-      MockDataService.unfollowUser(params.userId, params.targetUserId),
+      SocialService.unfollowUser(params.userId, params.targetUserId),
     onSuccess: (_, variables) => {
       // Invalidate following status
       queryClient.invalidateQueries({
