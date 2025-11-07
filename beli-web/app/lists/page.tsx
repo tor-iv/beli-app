@@ -8,9 +8,16 @@ import { RestaurantCard } from '@/components/restaurant/restaurant-card';
 import { RestaurantListItemCompact } from '@/components/restaurant/restaurant-list-item-compact';
 import { RestaurantDetailPreview } from '@/components/restaurant/restaurant-detail-preview';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useRestaurants } from '@/lib/hooks/use-restaurants';
+import {
+  useRestaurants,
+  useTrendingRestaurants,
+  useNearbyRecommendations,
+  useFriendRecommendations,
+} from '@/lib/hooks/use-restaurants';
+import {
+  useReservableRestaurants,
+} from '@/lib/hooks/use-special-lists';
 import { Restaurant } from '@/types';
-import { MockDataService } from '@/lib/mockDataService';
 import { ViewToggle } from '@/components/ui/view-toggle';
 import { FilterBar } from '@/components/lists/FilterBar';
 import { ListSearch } from '@/components/lists/ListSearch';
@@ -48,8 +55,6 @@ function ListsContent() {
 
   const [activeTab, setActiveTab] = useState<ListType>(tabParam || 'been');
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
-  const [viewRestaurants, setViewRestaurants] = useState<Restaurant[] | null>(null);
-  const [loadingView, setLoadingView] = useState(false);
   const [rightPanelView, setRightPanelView] = useState<RightPanelView>('detail');
   const [visibleRestaurants, setVisibleRestaurants] = useState<Restaurant[]>([]);
   const [isListPickerOpen, setIsListPickerOpen] = useState(false);
@@ -58,6 +63,20 @@ function ListsContent() {
   const { data: lists, isLoading: listsLoading } = useLists();
   const { data: allRestaurants } = useRestaurants();
   const { data: listCounts } = useListCounts();
+
+  // React Query hooks for special restaurant lists (conditional based on view/tab)
+  const { data: reservableRestaurants, isLoading: isLoadingReservable } = useReservableRestaurants(20, {
+    enabled: viewParam === 'reserve',
+  });
+  const { data: nearbyRestaurants, isLoading: isLoadingNearby } = useNearbyRecommendations('current-user', 2.0, 20, {
+    enabled: viewParam === 'nearby' || activeTab === 'recs_for_you',
+  });
+  const { data: trendingRestaurants, isLoading: isLoadingTrending } = useTrendingRestaurants({
+    enabled: viewParam === 'trending' || activeTab === 'trending',
+  });
+  const { data: friendRestaurants, isLoading: isLoadingFriends } = useFriendRecommendations('current-user', 20, {
+    enabled: viewParam === 'friends' || activeTab === 'recs_from_friends',
+  });
 
   // Get filters from store
   const filters = useListFilters();
@@ -72,79 +91,65 @@ function ListsContent() {
     }
   }, [tabParam]);
 
-  // Load restaurants based on view parameter
-  useEffect(() => {
-    const loadViewRestaurants = async () => {
-      if (!viewParam) {
-        setViewRestaurants(null);
-        return;
+  // Compute viewRestaurants based on active view/tab using React Query data
+  const viewRestaurants = useMemo(() => {
+    // Priority 1: URL view parameter
+    if (viewParam) {
+      switch (viewParam) {
+        case 'reserve':
+          return reservableRestaurants || null;
+        case 'nearby':
+          return nearbyRestaurants || null;
+        case 'trending':
+          return trendingRestaurants || null;
+        case 'friends':
+          return friendRestaurants || null;
       }
+    }
 
-      setLoadingView(true);
-      try {
-        let data: Restaurant[] = [];
-
-        switch (viewParam) {
-          case 'reserve':
-            data = await MockDataService.getReservableRestaurants(20);
-            break;
-          case 'nearby':
-            data = await MockDataService.getNearbyRecommendations('current-user', 2.0, 20);
-            break;
-          case 'trending':
-            data = await MockDataService.getTrendingRestaurants();
-            break;
-          case 'friends':
-            data = await MockDataService.getFriendRecommendations('current-user', 20);
-            break;
-        }
-
-        setViewRestaurants(data);
-      } catch (error) {
-        console.error('Error loading view restaurants:', error);
-      } finally {
-        setLoadingView(false);
+    // Priority 2: Special list tabs (when not in a view)
+    const specialLists: ListType[] = ['trending', 'recs_for_you', 'recs_from_friends'];
+    if (!viewParam && specialLists.includes(activeTab)) {
+      if (activeTab === 'trending') {
+        return trendingRestaurants || null;
+      } else if (activeTab === 'recs_for_you') {
+        return nearbyRestaurants || null;
+      } else if (activeTab === 'recs_from_friends') {
+        return friendRestaurants || null;
       }
-    };
+    }
 
-    loadViewRestaurants();
-  }, [viewParam]);
+    return null;
+  }, [viewParam, activeTab, reservableRestaurants, nearbyRestaurants, trendingRestaurants, friendRestaurants]);
 
-  // Load data for special list types (trending, recs_for_you, recs_from_friends)
-  useEffect(() => {
-    const loadSpecialListData = async () => {
-      // Only load if not in a view and we're on a special list
-      const specialLists: ListType[] = ['trending', 'recs_for_you', 'recs_from_friends'];
-      if (viewParam || !specialLists.includes(activeTab)) {
-        // Clear special list data when switching to regular lists
-        if (['been', 'want_to_try', 'recs', 'playlists'].includes(activeTab) && viewRestaurants) {
-          setViewRestaurants(null);
-        }
-        return;
+  // Compute loading state for view restaurants
+  const loadingView = useMemo(() => {
+    if (viewParam) {
+      switch (viewParam) {
+        case 'reserve':
+          return isLoadingReservable;
+        case 'nearby':
+          return isLoadingNearby;
+        case 'trending':
+          return isLoadingTrending;
+        case 'friends':
+          return isLoadingFriends;
       }
+    }
 
-      setLoadingView(true);
-      try {
-        let specialRestaurants: Restaurant[] = [];
-
-        if (activeTab === 'trending') {
-          specialRestaurants = await MockDataService.getTrendingRestaurants();
-        } else if (activeTab === 'recs_for_you') {
-          specialRestaurants = await MockDataService.getNearbyRecommendations('current-user', 2.0, 20);
-        } else if (activeTab === 'recs_from_friends') {
-          specialRestaurants = await MockDataService.getFriendRecommendations('current-user', 20);
-        }
-
-        setViewRestaurants(specialRestaurants);
-      } catch (error) {
-        console.error('Failed to load special list data:', error);
-      } finally {
-        setLoadingView(false);
+    const specialLists: ListType[] = ['trending', 'recs_for_you', 'recs_from_friends'];
+    if (!viewParam && specialLists.includes(activeTab)) {
+      if (activeTab === 'trending') {
+        return isLoadingTrending;
+      } else if (activeTab === 'recs_for_you') {
+        return isLoadingNearby;
+      } else if (activeTab === 'recs_from_friends') {
+        return isLoadingFriends;
       }
-    };
+    }
 
-    loadSpecialListData();
-  }, [activeTab, viewParam, viewRestaurants]);
+    return false;
+  }, [viewParam, activeTab, isLoadingReservable, isLoadingNearby, isLoadingTrending, isLoadingFriends]);
 
   // Filter lists by type
   const filteredLists = lists?.filter(list => list.listType === activeTab) || [];

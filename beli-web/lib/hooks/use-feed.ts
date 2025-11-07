@@ -8,3 +8,6 @@ export function useFeed(userId?: string) {
     staleTime: 2 * 60 * 1000, // 2 minutes - feed updates frequently but not instantly
   });
 }
+
+// Note: useLikeActivity, useBookmarkActivity, and useAddComment are already
+// defined in use-feed-interactions.ts with optimistic updates. Use those instead.
