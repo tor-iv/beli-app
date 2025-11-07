@@ -1,8 +1,10 @@
 'use client';
 
+import React from 'react';
 import Image from 'next/image';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Utensils, MapPin, RefreshCw } from 'lucide-react';
+import { getRatingColor, COLORS } from '@/lib/theme/colors';
 
 interface ProfileActivityCardProps {
   userAvatar: string;
@@ -18,7 +20,7 @@ interface ProfileActivityCardProps {
   onPress?: () => void;
 }
 
-export function ProfileActivityCard({
+export const ProfileActivityCard = React.memo(function ProfileActivityCard({
   userAvatar,
   userName,
   action,
@@ -31,17 +33,13 @@ export function ProfileActivityCard({
   notes,
   onPress,
 }: ProfileActivityCardProps) {
-  const getRatingColor = (rating: number) => {
-    if (rating >= 8) return '#10B981'; // green-500
-    if (rating >= 6) return '#84CC16'; // lime-500
-    if (rating >= 4) return '#F59E0B'; // amber-500
-    return '#EF4444'; // red-500
-  };
 
   return (
     <button
       onClick={onPress}
       className="w-full bg-white px-6 py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors text-left"
+      type="button"
+      aria-label={`View details for ${restaurantName}`}
     >
       <div className="flex items-start gap-3 mb-3">
         <Avatar className="w-12 h-12">
@@ -70,8 +68,8 @@ export function ProfileActivityCard({
 
         {rating !== undefined && (
           <div
-            className="w-[52px] h-[52px] rounded-full flex items-center justify-center border-2 border-gray-300"
-            style={{ borderColor: '#D9D9DE' }}
+            className="w-[52px] h-[52px] rounded-full flex items-center justify-center border-2"
+            style={{ borderColor: COLORS.ui.border }}
           >
             <span
               className="text-xl font-bold"
@@ -99,4 +97,4 @@ export function ProfileActivityCard({
       )}
     </button>
   );
-}
+});

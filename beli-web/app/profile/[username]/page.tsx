@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { MockDataService } from '@/lib/mockDataService';
 import { CuisineBreakdown, CityBreakdown, CountryBreakdown } from '@/types';
 import { notFound, useRouter, useParams } from 'next/navigation';
@@ -20,6 +20,18 @@ import { useUserByUsername, useCurrentUser, useUserReviews, useIsFollowing } fro
 import { useRestaurantsByIds } from '@/lib/hooks/use-restaurants';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Instagram, Newspaper, BarChart3 } from 'lucide-react';
+import { COLORS } from '@/lib/theme/colors';
+
+// Constants
+const TASTE_PROFILE_DAYS = 30;
+const MAX_RECENT_REVIEWS = 5;
+const ACHIEVEMENT_PROGRESS_COMPLETE = 1; // 100% completion
+const SUPER_CLUB_BADGE = 'SC'; // "Super Club" membership badge
+
+// Pure functions outside component scope
+const formatMemberSince = (date: Date) => {
+  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+};
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -50,7 +62,7 @@ export default function ProfilePage() {
 
   // Only load restaurants needed for reviews (not all 53!)
   const reviewRestaurantIds = useMemo(() => {
-    return reviews.slice(0, 5).map(r => r.restaurantId);
+    return reviews.slice(0, MAX_RECENT_REVIEWS).map(r => r.restaurantId);
   }, [reviews]);
 
   const { data: restaurants = [] } = useRestaurantsByIds(reviewRestaurantIds);
@@ -58,7 +70,7 @@ export default function ProfilePage() {
   // Load taste profile data only when taste tab is active
   const { data: tasteProfile, isLoading: tasteProfileLoading } = useTasteProfile(
     user?.id || '',
-    30,
+    TASTE_PROFILE_DAYS,
     activeTab === 'taste'
   );
 
@@ -73,8 +85,13 @@ export default function ProfilePage() {
       }
     },
     onSuccess: () => {
-      // Invalidate following query
+      // Invalidate following query to reflect new state
       queryClient.invalidateQueries({ queryKey: ['following', currentUser?.id, user?.id] });
+    },
+    onError: (error) => {
+      // Log error for debugging - in production, this would show a toast notification
+      console.error('Failed to update following status:', error);
+      // TODO: Show user-friendly error toast notification
     },
   });
 
@@ -107,7 +124,23 @@ export default function ProfilePage() {
   }, [tasteProfile, tasteCategory, sortBy]);
 
   // Recent reviews for display (first 5)
-  const recentReviews = useMemo(() => reviews.slice(0, 5), [reviews]);
+  const recentReviews = useMemo(() => reviews.slice(0, MAX_RECENT_REVIEWS), [reviews]);
+
+  // OPTIMIZED: Pre-compute review-restaurant pairs to avoid O(n²) lookup in render
+  const reviewsWithRestaurants = useMemo(() => {
+    // Create a Map for O(1) restaurant lookup instead of O(n) find()
+    const restaurantMap = new Map(restaurants.map(r => [r.id, r]));
+
+    return recentReviews
+      .map(review => ({
+        review,
+        restaurant: restaurantMap.get(review.restaurantId)
+      }))
+      .filter(item => item.restaurant !== undefined) as Array<{
+        review: typeof recentReviews[0];
+        restaurant: NonNullable<typeof restaurants[0]>;
+      }>;
+  }, [recentReviews, restaurants]);
 
   // Loading state
   if (userLoading) {
@@ -125,28 +158,39 @@ export default function ProfilePage() {
     notFound();
   }
 
-  const formatMemberSince = (date: Date) => {
-    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  };
-
-  const handleSortToggle = () => {
+  // Event handlers wrapped in useCallback for performance
+  const handleSortToggle = useCallback(() => {
     setSortBy(prev => prev === 'count' ? 'avgScore' : 'count');
-  };
+  }, []);
 
-  const handleItemPress = (item: CuisineBreakdown | CityBreakdown | CountryBreakdown) => {
+  const handleItemPress = useCallback((item: CuisineBreakdown | CityBreakdown | CountryBreakdown) => {
     // In a real app, this would navigate to a filtered restaurant list
-    console.log('Item pressed:', item);
-  };
+    // TODO: Navigate to filtered restaurant list based on selected item
+    router.push(`/search?filter=${JSON.stringify(item)}`);
+  }, [router]);
 
-  const handleShare = () => {
-    // In a real app, this would trigger share functionality
-    console.log('Share taste profile');
-  };
+  const handleShare = useCallback(() => {
+    // In a real app, this would trigger native share functionality
+    // TODO: Implement native share API or copy-to-clipboard
+    if (!user) return;
 
-  const handleFollowToggle = async () => {
+    if (navigator.share) {
+      navigator.share({
+        title: `${user.displayName}'s Taste Profile`,
+        url: window.location.href,
+      });
+    }
+  }, [user]);
+
+  const handleFollowToggle = useCallback(async () => {
     if (!user) return;
     followMutation.mutate({ follow: !isFollowingData });
-  };
+  }, [user, followMutation, isFollowingData]);
+
+  const handleSetNewGoal = useCallback(() => {
+    // TODO: Implement goal setting functionality
+    router.push('/challenge');
+  }, [router]);
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -171,7 +215,7 @@ export default function ProfilePage() {
             <div className="flex items-center gap-2 mt-4">
               <span className="text-lg font-semibold text-gray-900">@{user.username}</span>
               <span className="bg-primary text-white text-xs font-bold px-1.5 py-0.5 rounded">
-                SC
+                {SUPER_CLUB_BADGE}
               </span>
             </div>
             <p className="text-base text-gray-700 mt-1">
@@ -266,13 +310,13 @@ export default function ProfilePage() {
             icon="trophy"
             label="Rank on Beli"
             value={`#${user.stats.rank}`}
-            iconColor="#0B7B7F"
+            iconColor={COLORS.primary}
           />
           <ProfileStatCard
             icon="flame"
             label="Current Streak"
             value={`${user.stats.currentStreak} weeks`}
-            iconColor="#FF6B35"
+            iconColor={COLORS.accent.streak}
           />
         </div>
 
@@ -281,9 +325,9 @@ export default function ProfilePage() {
           <AchievementBanner
             emoji="🎉"
             text="Congrats! You reached your 2025 goal!"
-            progress={1}
-            daysLeft={104}
-            onSetNewGoal={() => {}}
+            progress={ACHIEVEMENT_PROGRESS_COMPLETE}
+            daysLeft={Math.ceil((new Date(new Date().getFullYear(), 11, 31).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} // Days remaining in current year
+            onSetNewGoal={handleSetNewGoal}
           />
         </div>
 
@@ -303,27 +347,22 @@ export default function ProfilePage() {
 
             <TabsContent value="activity" className="mt-0">
               <div className="bg-white">
-                {recentReviews.map((review) => {
-                  const restaurant = restaurants.find((r) => r.id === review.restaurantId);
-                  if (!restaurant) return null;
-
-                  return (
-                    <ProfileActivityCard
-                      key={review.id}
-                      userAvatar={user.avatar}
-                      userName="You"
-                      action="ranked"
-                      restaurantName={restaurant.name}
-                      cuisine={restaurant.cuisine[0]}
-                      location={`${restaurant.location.neighborhood}, ${restaurant.location.city}`}
-                      rating={review.rating}
-                      visitCount={1}
-                      image={review.photos?.[0] || restaurant.images?.[0]}
-                      notes={review.content}
-                      onPress={() => {}}
-                    />
-                  );
-                })}
+                {reviewsWithRestaurants.map(({ review, restaurant }) => (
+                  <ProfileActivityCard
+                    key={review.id}
+                    userAvatar={user.avatar}
+                    userName={isCurrentUser ? 'You' : user.displayName}
+                    action="ranked"
+                    restaurantName={restaurant.name}
+                    cuisine={restaurant.cuisine[0]}
+                    location={`${restaurant.location.neighborhood}, ${restaurant.location.city}`}
+                    rating={review.rating}
+                    visitCount={1}
+                    image={review.photos?.[0] || restaurant.images?.[0]}
+                    notes={review.content}
+                    onPress={() => router.push(`/restaurant/${restaurant.id}`)}
+                  />
+                ))}
               </div>
             </TabsContent>
 
