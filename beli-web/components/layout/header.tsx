@@ -26,7 +26,7 @@ const navigation = [
   { name: 'Tastemakers', href: '/tastemakers', icon: IoStar, outlineIcon: IoStarOutline },
   { name: 'Search', href: '/search', icon: IoAdd, outlineIcon: IoAdd, isSpecial: true },
   { name: 'Leaderboard', href: '/leaderboard', icon: IoTrophy, outlineIcon: IoTrophyOutline },
-  { name: 'Profile', href: '/profile/current', icon: IoPersonCircle, outlineIcon: IoPersonCircleOutline },
+  { name: 'Profile', href: '/profile/tor_iv', icon: IoPersonCircle, outlineIcon: IoPersonCircleOutline },
 ];
 
 export function Header() {

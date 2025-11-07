@@ -122,23 +122,8 @@ export default function ProfilePage() {
       }>;
   }, [recentReviews, restaurants]);
 
-  // Loading state
-  if (userLoading) {
-    return (
-      <div className="container mx-auto px-4 py-6 max-w-3xl">
-        <div className="flex justify-center items-center min-h-[400px]">
-          <div className="text-gray-700">Loading...</div>
-        </div>
-      </div>
-    );
-  }
-
-  // User not found
-  if (!user) {
-    notFound();
-  }
-
   // Event handlers wrapped in useCallback for performance
+  // IMPORTANT: These must be called BEFORE early returns to maintain consistent hook order
   const handleSortToggle = useCallback(() => {
     setSortBy(prev => prev === 'count' ? 'avgScore' : 'count');
   }, []);
@@ -176,6 +161,22 @@ export default function ProfilePage() {
     // TODO: Implement goal setting functionality
     router.push('/challenge');
   }, [router]);
+
+  // Loading state - early return AFTER all hooks are called
+  if (userLoading) {
+    return (
+      <div className="container mx-auto px-4 py-6 max-w-3xl">
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="text-gray-700">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // User not found - early return AFTER all hooks are called
+  if (!user) {
+    notFound();
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen">
