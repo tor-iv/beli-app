@@ -19,7 +19,10 @@ import {
   useUnreadNotificationCount,
   useFeed,
   useFeaturedLists,
-  useCurrentUser
+  useCurrentUser,
+  useLikeActivity,
+  useBookmarkActivity,
+  useAddComment
 } from "@/lib/hooks"
 import type { Activity, Restaurant, RankingResult } from "@/types"
 import type { RestaurantSubmissionData } from "@/components/modals/add-restaurant-modal"
@@ -40,7 +43,12 @@ export default function FeedPage() {
   const { data: featuredLists = [], isLoading: listsLoading } = useFeaturedLists()
   const { data: currentUser } = useCurrentUser()
   const { data: unreadCount = 0 } = useUnreadNotificationCount()
+
+  // React Query mutation hooks
   const addRankedRestaurantMutation = useAddRankedRestaurant()
+  const likeMutation = useLikeActivity()
+  const bookmarkMutation = useBookmarkActivity()
+  const addCommentMutation = useAddComment()
 
   // Combined modal state (reduces from 8 state variables to 1)
   const [modalState, setModalState] = React.useState<ModalState>({ type: null })
@@ -53,41 +61,19 @@ export default function FeedPage() {
     restaurantsOnly: false,
   })
 
-  // Local feed state for optimistic updates
-  const [localFeed, setLocalFeed] = React.useState<Activity[]>([])
-
-  // Sync feed data to local state for optimistic updates
-  React.useEffect(() => {
-    setLocalFeed(feed)
-  }, [feed])
-
   const loading = feedLoading || listsLoading
 
   // Interaction handlers with useCallback for performance
   const handleLike = React.useCallback((activityId: string) => {
     if (!currentUser) return
 
-    setLocalFeed((prevFeed) =>
-      prevFeed.map((activity) => {
-        if (activity.id === activityId) {
-          const likes = activity.interactions?.likes || []
-          const isLiked = likes.includes(currentUser.id)
+    // Find current like status
+    const activity = feed.find(a => a.id === activityId)
+    const isLiked = activity?.interactions?.likes.includes(currentUser.id) || false
 
-          return {
-            ...activity,
-            interactions: {
-              likes: isLiked
-                ? likes.filter((id) => id !== currentUser.id)
-                : [...likes, currentUser.id],
-              comments: activity.interactions?.comments || [],
-              bookmarks: activity.interactions?.bookmarks || [],
-            },
-          }
-        }
-        return activity
-      })
-    )
-  }, [currentUser])
+    // Trigger mutation with optimistic update
+    likeMutation.mutate({ activityId, userId: currentUser.id, isLiked })
+  }, [currentUser, feed, likeMutation])
 
   const handleComment = React.useCallback((activity: Activity) => {
     setModalState({ type: 'comments', activity })
@@ -100,27 +86,13 @@ export default function FeedPage() {
   const handleBookmark = React.useCallback((activityId: string) => {
     if (!currentUser) return
 
-    setLocalFeed((prevFeed) =>
-      prevFeed.map((activity) => {
-        if (activity.id === activityId) {
-          const bookmarks = activity.interactions?.bookmarks || []
-          const isBookmarked = bookmarks.includes(currentUser.id)
+    // Find current bookmark status
+    const activity = feed.find(a => a.id === activityId)
+    const isBookmarked = activity?.interactions?.bookmarks.includes(currentUser.id) || false
 
-          return {
-            ...activity,
-            interactions: {
-              likes: activity.interactions?.likes || [],
-              comments: activity.interactions?.comments || [],
-              bookmarks: isBookmarked
-                ? bookmarks.filter((id) => id !== currentUser.id)
-                : [...bookmarks, currentUser.id],
-            },
-          }
-        }
-        return activity
-      })
-    )
-  }, [currentUser])
+    // Trigger mutation with optimistic update
+    bookmarkMutation.mutate({ activityId, userId: currentUser.id, isBookmarked })
+  }, [currentUser, feed, bookmarkMutation])
 
   const handleAddPress = React.useCallback((restaurant: Restaurant) => {
     setModalState({ type: 'add', restaurant })
@@ -159,35 +131,19 @@ export default function FeedPage() {
   const handleAddComment = React.useCallback((content: string) => {
     if (modalState.type !== 'comments' || !currentUser) return
 
-    const selectedActivity = modalState.activity
+    const activityId = modalState.activity.id
 
-    setLocalFeed((prevFeed) =>
-      prevFeed.map((activity) => {
-        if (activity.id === selectedActivity.id) {
-          const newComment = {
-            id: `comment-${Date.now()}`,
-            userId: currentUser.id,
-            content,
-            timestamp: new Date(),
-          }
-
-          return {
-            ...activity,
-            interactions: {
-              likes: activity.interactions?.likes || [],
-              bookmarks: activity.interactions?.bookmarks || [],
-              comments: [...(activity.interactions?.comments || []), newComment],
-            },
-          }
-        }
-        return activity
-      })
-    )
-  }, [modalState, currentUser])
+    // Trigger mutation with optimistic update
+    addCommentMutation.mutate({
+      activityId,
+      userId: currentUser.id,
+      content
+    })
+  }, [modalState, currentUser, addCommentMutation])
 
   // Apply filters to feed
   const filteredFeed = React.useMemo(() => {
-    return localFeed.filter((item) => {
+    return feed.filter((item) => {
       // Rankings only filter
       if (filters.rankingsOnly && item.type !== "review") {
         return false
@@ -206,7 +162,7 @@ export default function FeedPage() {
       }
       return true
     })
-  }, [localFeed, filters])
+  }, [feed, filters])
 
   const handleApplyFilters = React.useCallback((newFilters: FeedFilters) => {
     setFilters(newFilters)

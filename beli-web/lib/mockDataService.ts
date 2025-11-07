@@ -1,4 +1,4 @@
-import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification, TastemakerPost, Reservation, ReservationPriorityLevel, MenuItem, OrderSuggestion, HungerLevel, MealTime } from '@/types';
+import { User, Restaurant, UserRestaurantRelation, FeedItem, List, ListCategory, ListScope, Notification, TastemakerPost, Reservation, ReservationPriorityLevel, MenuItem, OrderSuggestion, HungerLevel, MealTime, ActivityComment } from '@/types';
 import { mockUsers, currentUser } from '@/data/mock/users';
 import { mockRestaurants } from '@/data/mock/restaurants';
 import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
@@ -478,6 +478,50 @@ export class MockDataService {
         likes.splice(index, 1);
       }
     }
+  }
+
+  static async bookmarkActivity(activityId: string, userId: string): Promise<void> {
+    await delay();
+
+    const activity = mockActivities.find(a => a.id === activityId);
+    if (activity && activity.interactions) {
+      const bookmarks = activity.interactions.bookmarks;
+      if (!bookmarks.includes(userId)) {
+        bookmarks.push(userId);
+      }
+    }
+  }
+
+  static async unbookmarkActivity(activityId: string, userId: string): Promise<void> {
+    await delay();
+
+    const activity = mockActivities.find(a => a.id === activityId);
+    if (activity && activity.interactions) {
+      const bookmarks = activity.interactions.bookmarks;
+      const index = bookmarks.indexOf(userId);
+      if (index > -1) {
+        bookmarks.splice(index, 1);
+      }
+    }
+  }
+
+  static async addCommentToActivity(activityId: string, userId: string, content: string): Promise<ActivityComment> {
+    await delay();
+
+    const activity = mockActivities.find(a => a.id === activityId);
+    if (!activity || !activity.interactions) {
+      throw new Error('Activity not found');
+    }
+
+    const newComment: ActivityComment = {
+      id: `comment-${Date.now()}`,
+      userId,
+      content,
+      timestamp: new Date(),
+    };
+
+    activity.interactions.comments.push(newComment);
+    return newComment;
   }
 
   // Lists
