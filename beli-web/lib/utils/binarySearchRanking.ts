@@ -1,5 +1,6 @@
 import {
   Restaurant,
+  RankedRestaurant,
   RankingState,
   RankingComparison,
   RankingResult,
@@ -13,7 +14,7 @@ import {
 export function initializeRanking(
   targetRestaurantId: string,
   category: ListCategory,
-  rankedList: Restaurant[],
+  rankedList: RankedRestaurant[],
   initialSentiment: InitialSentiment
 ): RankingState {
   const totalCount = rankedList.length;
@@ -52,7 +53,7 @@ export function initializeRanking(
 /**
  * Get the next restaurant to compare against
  */
-export function getNextComparison(state: RankingState): Restaurant | null {
+export function getNextComparison(state: RankingState): RankedRestaurant | null {
   const { rankedList, currentLeftBound, currentRightBound } = state;
 
   // If bounds have converged, we're done
@@ -67,6 +68,13 @@ export function getNextComparison(state: RankingState): Restaurant | null {
 
 /**
  * Process a user's comparison choice
+ *
+ * @param state - Current ranking state
+ * @param comparisonRestaurant - The restaurant being compared against
+ * @param choice - User's choice:
+ *   - 'left': Target restaurant is better (narrow search to upper half)
+ *   - 'right': Comparison restaurant is better (narrow search to lower half)
+ *   - 'skip': Skip this comparison and move forward (limited uses)
  */
 export function processComparison(
   state: RankingState,
@@ -96,14 +104,10 @@ export function processComparison(
     // Comparison restaurant is better - search in lower half
     newLeftBound = midPoint + 1;
   } else if (choice === 'skip') {
-    // Skip this comparison with slight offset
+    // Skip this comparison - move forward to next comparison point
+    // We always skip forward for predictable behavior
     newSkipsRemaining = Math.max(0, skipsRemaining - 1);
-    // Move to next comparison point with small offset
-    if (midPoint - currentLeftBound > currentRightBound - midPoint) {
-      newRightBound = midPoint;
-    } else {
-      newLeftBound = midPoint + 1;
-    }
+    newLeftBound = midPoint + 1;
   }
 
   // Check if complete
@@ -150,6 +154,14 @@ export function undoLastComparison(state: RankingState): RankingState {
 
 /**
  * Calculate final rating based on position in ranked list
+ *
+ * Rating scale:
+ * - Position 0 (top): ~9.5
+ * - Middle position: ~7.5
+ * - Bottom position: ~5.0
+ *
+ * This maps positions to a 5.0-10.0 range, which is more realistic
+ * than using the full 0-10 scale.
  */
 export function calculateRating(
   position: number,
@@ -160,12 +172,21 @@ export function calculateRating(
     return 7.5; // Default rating for first restaurant
   }
 
-  // Calculate percentile (higher position = higher percentile)
-  const percentile = ((totalCount - position) / (totalCount + 1)) * 100;
+  // Handle edge cases for position
+  if (position === 0) {
+    return 9.5; // Top position gets excellent rating
+  }
 
-  // Convert percentile to 0-10 rating scale
-  // Top percentile gets higher ratings
-  const rating = (percentile / 100) * 10;
+  if (position >= totalCount) {
+    return 5.0; // Bottom position (shouldn't happen normally)
+  }
+
+  // Calculate percentile (0-100, where 100 is best)
+  const percentile = (1 - position / totalCount) * 100;
+
+  // Map percentile to 5.0-10.0 rating range
+  // This gives more realistic ratings than using full 0-10 scale
+  const rating = 5.0 + (percentile / 100) * 5.0;
 
   // Round to 1 decimal place
   return Math.round(rating * 10) / 10;

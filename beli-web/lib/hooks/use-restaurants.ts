@@ -20,7 +20,7 @@ export function useRestaurant(id: string) {
 
 export function useRestaurantsByIds(ids: string[]) {
   return useQuery({
-    queryKey: ['restaurants', 'byIds', ids.sort().join(',')],
+    queryKey: ['restaurants', 'byIds', [...ids].sort().join(',')], // Fix: Create copy before sorting to avoid mutation
     queryFn: () => MockDataService.getRestaurantsByIds(ids),
     enabled: ids.length > 0,
     staleTime: 10 * 60 * 1000, // 10 minutes
