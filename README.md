@@ -3,19 +3,19 @@
 > A full-stack restaurant discovery platform built to showcase my passion for food tech and demonstrate my ability to contribute from day one.
 
 **Built by Victor Cox IV**
-📧 vcox484@gmail.com | 📱 (651) 955-9920 | 📍 New York, NY
+vcox484@gmail.com | (651) 955-9920 | New York, NY
 [LinkedIn](https://www.linkedin.com/in/tor-iv/) • [GitHub](https://github.com/tor-iv) • [Portfolio](https://tor-iv.com)
 
 ---
 
-## 🎯 The Demo Experience
+## The Demo Experience
 
 This repository showcases three major features I built for Beli, demonstrating full-stack proficiency across mobile and web platforms. Each feature solves real user pain points in restaurant discovery and group dining coordination.
 
-## 🚀 Features I Built
+## Features I Built
 
-### 1. 🎭 Tastemakers
-**Status**: ✅ Fully Implemented (Web)
+### 1. Tastemakers
+**Status**: Fully Implemented (Web)
 **What it does**: Curated food expert profiles with specialized content and engagement tracking
 
 **Key Highlights**:
@@ -32,8 +32,8 @@ This repository showcases three major features I built for Beli, demonstrating f
 
 ---
 
-### 2. 🍽️ Group Dinner / Eat Now
-**Status**: ✅ Fully Implemented (Mobile)
+### 2. Group Dinner / Eat Now
+**Status**: Fully Implemented (Mobile)
 **What it does**: AI-powered group dining recommendations with swipe interface and intelligent matching
 
 **Key Highlights**:
@@ -59,8 +59,8 @@ This repository showcases three major features I built for Beli, demonstrating f
 
 ---
 
-### 3. 📋 What to Order
-**Status**: ✅ Fully Implemented (Mobile & Web)
+### 3. What to Order
+**Status**: Fully Implemented (Mobile & Web)
 **What it does**: Smart menu recommendation engine based on party size and hunger level
 
 **Key Highlights**:
@@ -103,7 +103,7 @@ Selection Strategy:
 
 ---
 
-## 💡 Why I Built This
+## Why I Built This
 
 As someone who uses restaurant discovery apps daily and genuinely loves food culture, I wanted to demonstrate three things:
 
@@ -113,7 +113,7 @@ As someone who uses restaurant discovery apps daily and genuinely loves food cul
 
 This wasn't just a coding exercise—it was about deeply understanding your product, tech stack, and users.
 
-## 🛠️ What I Learned
+## What I Learned
 
 - **Full-Stack Mobile Development**: Expo SDK 54, React Navigation 7, complex modal flows, gesture handling
 - **Modern Web Architecture**: Next.js 15 App Router, server/client components, dynamic routing
@@ -122,27 +122,27 @@ This wasn't just a coding exercise—it was about deeply understanding your prod
 - **Platform-Specific APIs**: Native Share, Clipboard, Animation libraries
 - **Documentation Culture**: Writing comprehensive specs and technical guides
 
-## 💭 Additional Features Designed
+## Additional Features Designed
 
 Beyond the three implemented features, I've created comprehensive specifications for **four additional major features** (see [new-features-spec.md](new-features-spec.md)):
 
-### 🎰 Lucky Spin
+### Lucky Spin
 **Playful random restaurant picker** - Slot machine-style UI with smart constraint system (distance, rating, price, cuisine, open now). Solves decision paralysis with fun randomness. 40 hours estimated.
 
-### 🗺️ Food Crawl
+### Food Crawl
 **Multi-restaurant adventures** - Curated routes like "NYC Pizza Pilgrimage" (4 stops) or "West Village Perfect Saturday" (5 stops). Group coordination, real-time navigation, crawl creation tools. 120 hours estimated.
 
-### 🏆 Scavenger Hunt
+### Scavenger Hunt
 **Competitive dining challenges** - Time-limited hunts like "Summer Taco Tour" (12 objectives) or "NYC Pizza Master" (15 legendary spots). Badge system, leaderboards, sponsored prizes. 160 hours estimated.
 
-### 🆕 New Openings
+### New Openings
 **Recently opened restaurant discovery** - Time-based filtering, early adopter badges, notification system. 40 hours estimated.
 
 **Total Specs Written**: 2,500+ lines covering data models, UI designs, user flows, algorithms, and implementation phases for ~360 hours of additional development work.
 
 ---
 
-## 📊 By The Numbers
+## By The Numbers
 
 ### Implemented Features
 - **~2,500+ lines** of feature code written
@@ -160,7 +160,7 @@ Beyond the three implemented features, I've created comprehensive specifications
 - **4 major features** fully designed and ready to build
 - **~360 hours** of spec'd development work
 
-## 📁 Project Structure
+## Project Structure
 
 This is a monorepo containing native mobile and web applications that share design systems and data models:
 
@@ -195,7 +195,7 @@ beli-app/
 └── README.md            # This file
 ```
 
-## 🎨 Core Platform Features
+## Core Platform Features
 
 Beyond the three custom features above, the platform includes:
 - **Feed**: Social feed with restaurant discoveries and friend activity
@@ -206,7 +206,7 @@ Beyond the three custom features above, the platform includes:
 
 All built with a consistent modern premium casual design system.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Mobile (beli-native/)
 - **Framework**: React Native with Expo SDK 54
@@ -222,7 +222,7 @@ All built with a consistent modern premium casual design system.
 - **State Management**: Zustand + React Query (TanStack Query)
 - **Deployment**: Vercel (auto-deploys from main branch)
 
-## 🚀 Getting Started
+## Getting Started
 
 Want to explore the code and run it locally? Here's how:
 
@@ -277,7 +277,7 @@ cd beli-native && npm start
 # Mobile: Open any restaurant → Tap "What to Order" button
 ```
 
-## 📚 Documentation
+## Documentation
 
 Each feature has comprehensive documentation showing my planning and technical thinking:
 
@@ -293,7 +293,7 @@ Each feature has comprehensive documentation showing my planning and technical t
   - New Openings (discovery feature)
   - Complete with data models, UI mockups, user flows, and implementation phases
 
-## 🎯 What's Next?
+## What's Next?
 
 Potential enhancements include:
 - Backend integration with real API
@@ -302,19 +302,19 @@ Potential enhancements include:
 - Photo upload functionality
 - Payment and reservation integration
 
-## 🤝 Let's Connect
+## Let's Connect
 
 I'd love to discuss how these features could evolve and what else I could build for Beli:
 
 **Victor Cox IV**
-- 📧 Email: vcox484@gmail.com
-- 📱 Phone: (651) 955-9920
-- 💼 LinkedIn: [linkedin.com/in/tor-iv](https://linkedin.com/in/tor-iv)
-- 💻 GitHub: [github.com/tor-iv](https://github.com/tor-iv)
-- 🌐 Portfolio: [tor-iv.com](https://tor-iv.com)
-- 🍽️ beli username: **tor_iv**
+- Email: vcox484@gmail.com
+- Phone: (651) 955-9920
+- LinkedIn: [linkedin.com/in/tor-iv](https://linkedin.com/in/tor-iv)
+- GitHub: [github.com/tor-iv](https://github.com/tor-iv)
+- Portfolio: [tor-iv.com](https://tor-iv.com)
+- beli username: **tor_iv**
 
-## 📝 Development Commands Reference
+## Development Commands Reference
 
 ### Mobile App (`beli-native/`)
 ```bash
@@ -334,4 +334,4 @@ npx tsc --noEmit       # TypeScript type checking
 
 ---
 
-**Built with passion for food tech and attention to detail** 🍽️
+**Built with passion for food tech and attention to detail**

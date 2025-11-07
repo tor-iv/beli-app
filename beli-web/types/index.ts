@@ -400,6 +400,11 @@ export interface TasteProfileStats {
 // Ranking types
 export type InitialSentiment = 'liked' | 'fine' | 'disliked';
 
+// Restaurant with user rating for ranking comparisons
+export interface RankedRestaurant extends Restaurant {
+  userRating?: number;
+}
+
 export interface RankingComparison {
   restaurantId: string;
   choice: 'left' | 'right' | 'skip';
@@ -412,7 +417,7 @@ export interface RankingState {
   targetRestaurantId: string;
   category: ListCategory;
   initialSentiment: InitialSentiment;
-  rankedList: Restaurant[];
+  rankedList: RankedRestaurant[];  // Type-safe with userRating
   comparisonHistory: RankingComparison[];
   currentLeftBound: number;
   currentRightBound: number;

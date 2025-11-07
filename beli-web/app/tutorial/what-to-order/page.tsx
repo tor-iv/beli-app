@@ -12,13 +12,17 @@ export default function WhatToOrderTutorialPage() {
   const router = useRouter()
   const [showModal, setShowModal] = React.useState(false)
 
-  const handleBack = () => {
+  const handleBack = React.useCallback(() => {
     router.push('/tutorial/group-dinner')
-  }
+  }, [router])
 
-  const handleNext = () => {
+  const handleNext = React.useCallback(() => {
     router.push('/tutorial/tastemakers')
-  }
+  }, [router])
+
+  const handleOpenModal = React.useCallback(() => {
+    setShowModal(true)
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pb-32 md:pb-4">
@@ -39,7 +43,7 @@ export default function WhatToOrderTutorialPage() {
               Get personalized menu recommendations based on your group's preferences and appetite.
             </p>
             <button
-              onClick={() => setShowModal(true)}
+              onClick={handleOpenModal}
               className="bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-3 rounded-xl transition-all inline-flex items-center gap-2"
             >
               <Sparkles className="w-5 h-5" />

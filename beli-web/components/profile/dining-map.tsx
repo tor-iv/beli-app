@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Share2 } from 'lucide-react';
 import { DiningLocation } from '@/types';
 import { positionDotsOnMap } from '@/lib/utils/mapProjection';
@@ -21,8 +22,10 @@ export function DiningMap({
   const cityText = totalCities === 1 ? 'city' : 'cities';
   const restaurantText = totalRestaurants === 1 ? 'restaurant' : 'restaurants';
 
-  // Position dots on map using projection
-  const positionedLocations = positionDotsOnMap(locations);
+  // OPTIMIZED: Memoize expensive map projection calculations
+  const positionedLocations = useMemo(() => {
+    return positionDotsOnMap(locations);
+  }, [locations]);
 
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-sm">
@@ -37,6 +40,7 @@ export function DiningMap({
           <button
             onClick={onShare}
             className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+            type="button"
             aria-label="Share dining map"
           >
             <Share2 className="w-5 h-5 text-gray-800" />

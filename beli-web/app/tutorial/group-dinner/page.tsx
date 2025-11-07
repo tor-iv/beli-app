@@ -3,7 +3,6 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Users, Plus, Sparkles } from "lucide-react"
-import { MockDataService } from "@/lib/mockDataService"
 import { RestaurantSwiper } from "@/components/group-dinner/restaurant-swiper"
 import { SelectionScreen } from "@/components/group-dinner/selection-screen"
 import { ConfirmationModal } from "@/components/group-dinner/confirmation-modal"
@@ -11,144 +10,138 @@ import { ParticipantSelector } from "@/components/group-dinner/participant-selec
 import { CategorySelectionModal } from "@/components/group-dinner/category-selection-modal"
 import { TutorialOverlay } from "@/components/tutorial/tutorial-overlay"
 import { TutorialBanner } from "@/components/tutorial/tutorial-banner"
+import { ErrorState } from "@/components/tutorial/error-state"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { useGroupDinnerState } from "@/lib/hooks/use-group-dinner-state"
+import { useModalState } from "@/lib/hooks/use-modal-state"
 import type { User, GroupDinnerMatch, ListCategory } from "@/types"
 
 export default function GroupDinnerTutorialPage() {
   const router = useRouter()
 
-  // State
-  const [currentUser, setCurrentUser] = React.useState<User>()
-  const [selectedParticipants, setSelectedParticipants] = React.useState<User[]>([])
-  const [matches, setMatches] = React.useState<GroupDinnerMatch[]>([])
-  const [currentIndex, setCurrentIndex] = React.useState(0)
-  const [savedRestaurants, setSavedRestaurants] = React.useState<GroupDinnerMatch[]>([])
-  const [showSelectionScreen, setShowSelectionScreen] = React.useState(false)
-  const [selectedMatch, setSelectedMatch] = React.useState<GroupDinnerMatch>()
-  const [showConfirmationModal, setShowConfirmationModal] = React.useState(false)
-  const [showParticipantSelector, setShowParticipantSelector] = React.useState(false)
-  const [selectedCategory, setSelectedCategory] = React.useState<ListCategory>('restaurants')
-  const [showCategoryModal, setShowCategoryModal] = React.useState(true)
-  const [loading, setLoading] = React.useState(true)
+  // Custom hooks
+  const {
+    currentUser,
+    selectedParticipants,
+    matches,
+    currentIndex,
+    savedRestaurants,
+    selectedMatch,
+    selectedCategory,
+    loading,
+    error,
+    loadMatches,
+    handleSwipeRight,
+    handleSwipeLeft,
+    selectRestaurant,
+    addParticipant,
+    removeParticipant,
+    setCategory,
+    resetSwiper,
+    retry,
+    shouldShowSelectionScreen,
+  } = useGroupDinnerState()
 
-  // Load initial data
-  React.useEffect(() => {
-    const init = async () => {
-      try {
-        const user = await MockDataService.getCurrentUser()
-        setCurrentUser(user)
-        // Don't load matches yet - wait for category selection
-      } catch (error) {
-        console.error("Failed to initialize:", error)
-      }
-    }
-    init()
-  }, [])
+  const {
+    modals,
+    closeCategoryModal,
+    openParticipantSelector,
+    closeParticipantSelector,
+    openSelectionScreen,
+    closeSelectionScreen,
+    openConfirmationModal,
+    closeConfirmationModal,
+  } = useModalState()
 
   // Load matches when category is selected or participants change
   React.useEffect(() => {
-    if (currentUser && !showCategoryModal) {
+    if (currentUser && !modals.showCategoryModal) {
       const participantIds = selectedParticipants.map(p => p.id)
       loadMatches(currentUser.id, participantIds, selectedCategory)
     }
-  }, [currentUser, selectedParticipants, selectedCategory, showCategoryModal])
+  }, [currentUser, selectedParticipants, selectedCategory, modals.showCategoryModal, loadMatches])
 
-  // Load suggestions based on participants
-  const loadMatches = async (userId: string, participantIds: string[], category?: ListCategory) => {
-    setLoading(true)
-    try {
-      const suggestions = await MockDataService.getGroupDinnerSuggestions(
-        userId,
-        participantIds.length > 0 ? participantIds : undefined,
-        category
-      )
-      setMatches(suggestions)
-      setCurrentIndex(0)
-    } catch (error) {
-      console.error("Failed to load matches:", error)
-    } finally {
-      setLoading(false)
+  // Show selection screen when 3 restaurants saved
+  React.useEffect(() => {
+    if (shouldShowSelectionScreen && !modals.showSelectionScreen) {
+      openSelectionScreen()
     }
-  }
-
-  // Handle swipe right (save)
-  const handleSwipeRight = (match: GroupDinnerMatch) => {
-    if (savedRestaurants.length < 3) {
-      const newSaved = [...savedRestaurants, match]
-      setSavedRestaurants(newSaved)
-
-      if (newSaved.length === 3) {
-        setShowSelectionScreen(true)
-      }
-    }
-    setCurrentIndex((prev) => prev + 1)
-  }
-
-  // Handle swipe left (pass)
-  const handleSwipeLeft = (match: GroupDinnerMatch) => {
-    setCurrentIndex((prev) => prev + 1)
-  }
+  }, [shouldShowSelectionScreen, modals.showSelectionScreen, openSelectionScreen])
 
   // Handle restaurant selection from selection screen
-  const handleSelectRestaurant = (match: GroupDinnerMatch) => {
-    setSelectedMatch(match)
-    setShowSelectionScreen(false)
-    setShowConfirmationModal(true)
-  }
+  const handleSelectRestaurant = React.useCallback((match: GroupDinnerMatch) => {
+    selectRestaurant(match)
+    closeSelectionScreen()
+    openConfirmationModal()
+  }, [selectRestaurant, closeSelectionScreen, openConfirmationModal])
 
   // Handle shuffle
-  const handleShuffle = async () => {
+  const handleShuffle = React.useCallback(async () => {
     if (!currentUser) return
     const participantIds = selectedParticipants.map((p) => p.id)
     await loadMatches(currentUser.id, participantIds, selectedCategory)
-    setSavedRestaurants([])
-    setShowSelectionScreen(false)
-  }
+    resetSwiper()
+    closeSelectionScreen()
+  }, [currentUser, selectedParticipants, selectedCategory, loadMatches, resetSwiper, closeSelectionScreen])
 
   // Handle start over
-  const handleStartOver = () => {
-    setSavedRestaurants([])
-    setShowSelectionScreen(false)
-    setCurrentIndex(0)
-  }
+  const handleStartOver = React.useCallback(() => {
+    resetSwiper()
+    closeSelectionScreen()
+  }, [resetSwiper, closeSelectionScreen])
 
   // Handle participant confirmation
-  const handleParticipantsConfirm = async (participants: User[]) => {
-    setSelectedParticipants(participants)
-    setShowParticipantSelector(false)
+  const handleParticipantsConfirm = React.useCallback(async (participants: User[]) => {
+    // Update participants
+    participants.forEach(p => addParticipant(p))
+    closeParticipantSelector()
+
     if (currentUser) {
       await loadMatches(currentUser.id, participants.map((p) => p.id), selectedCategory)
     }
-  }
+  }, [currentUser, selectedCategory, addParticipant, closeParticipantSelector, loadMatches])
 
   // Handle keep swiping from confirmation
-  const handleKeepSwiping = () => {
-    setShowConfirmationModal(false)
-    setSelectedMatch(undefined)
-    // User can continue swiping with remaining cards
-  }
+  const handleKeepSwiping = React.useCallback(() => {
+    closeConfirmationModal()
+    selectRestaurant(undefined as any) // Clear selection
+  }, [closeConfirmationModal, selectRestaurant])
 
   // Handle category selection
-  const handleSelectCategory = (category: ListCategory) => {
-    setSelectedCategory(category)
-    setShowCategoryModal(false)
-    // Reset saved restaurants when changing category
-    setSavedRestaurants([])
-  }
+  const handleSelectCategory = React.useCallback((category: ListCategory) => {
+    setCategory(category)
+    closeCategoryModal()
+  }, [setCategory, closeCategoryModal])
 
   // Tutorial navigation
-  const handleBack = () => {
+  const handleBack = React.useCallback(() => {
     router.push('/')
-  }
+  }, [router])
 
-  const handleNext = () => {
+  const handleNext = React.useCallback(() => {
     router.push('/tutorial/what-to-order')
-  }
+  }, [router])
 
-  if (!currentUser) {
+  // Loading state
+  if (loading && !currentUser) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted">Loading tutorial...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error && !currentUser) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <ErrorState
+          message={error.message || "Failed to load tutorial. Please try again."}
+          onRetry={retry}
+        />
       </div>
     )
   }
@@ -205,7 +198,7 @@ export default function GroupDinnerTutorialPage() {
       {/* Participant Section */}
       <div className="bg-white border-b p-4 flex-shrink-0">
         <button
-          onClick={() => setShowParticipantSelector(true)}
+          onClick={openParticipantSelector}
           className="w-full max-w-2xl mx-auto"
         >
           {selectedParticipants.length > 0 ? (
@@ -255,12 +248,17 @@ export default function GroupDinnerTutorialPage() {
               <p className="text-muted">Finding perfect matches...</p>
             </div>
           </div>
-        ) : showSelectionScreen ? (
+        ) : error ? (
+          <ErrorState
+            message={error.message || "Failed to load matches"}
+            onRetry={retry}
+          />
+        ) : modals.showSelectionScreen ? (
           <SelectionScreen
             savedRestaurants={savedRestaurants}
             onSelectRestaurant={handleSelectRestaurant}
             onStartOver={handleStartOver}
-            onBack={() => setShowSelectionScreen(false)}
+            onBack={closeSelectionScreen}
             onViewDetails={(id) => router.push(`/restaurant/${id}`)}
           />
         ) : (
@@ -285,28 +283,32 @@ export default function GroupDinnerTutorialPage() {
       />
 
       {/* Modals */}
-      <ParticipantSelector
-        open={showParticipantSelector}
-        selected={selectedParticipants}
-        currentUser={currentUser}
-        onClose={() => setShowParticipantSelector(false)}
-        onConfirm={handleParticipantsConfirm}
-      />
+      {currentUser && (
+        <>
+          <ParticipantSelector
+            open={modals.showParticipantSelector}
+            selected={selectedParticipants}
+            currentUser={currentUser}
+            onClose={closeParticipantSelector}
+            onConfirm={handleParticipantsConfirm}
+          />
 
-      <ConfirmationModal
-        open={showConfirmationModal}
-        match={selectedMatch}
-        participants={selectedParticipants}
-        onClose={() => setShowConfirmationModal(false)}
-        onKeepSwiping={handleKeepSwiping}
-      />
+          <ConfirmationModal
+            open={modals.showConfirmationModal}
+            match={selectedMatch}
+            participants={selectedParticipants}
+            onClose={closeConfirmationModal}
+            onKeepSwiping={handleKeepSwiping}
+          />
 
-      <CategorySelectionModal
-        open={showCategoryModal}
-        selectedCategory={selectedCategory}
-        onSelectCategory={handleSelectCategory}
-        onOpenChange={setShowCategoryModal}
-      />
+          <CategorySelectionModal
+            open={modals.showCategoryModal}
+            selectedCategory={selectedCategory}
+            onSelectCategory={handleSelectCategory}
+            onOpenChange={closeCategoryModal}
+          />
+        </>
+      )}
     </div>
   )
 }

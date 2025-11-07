@@ -105,7 +105,7 @@ A playful, slot machine-style random restaurant picker for users who can't decid
 
 ```
 ┌─────────────────────────────────────┐
-│  🎰 Lucky Spin                      │
+│  Lucky Spin                         │
 │  ─────────────────────────          │
 │                                     │
 │  Feeling adventurous?               │
@@ -114,21 +114,21 @@ A playful, slot machine-style random restaurant picker for users who can't decid
 │  ┌───────────────────────────┐     │
 │  │   [SLOT MACHINE UI]        │     │
 │  │                            │     │
-│  │   🍕  |  🍜  |  🍔         │     │
+│  │   Pizza | Ramen | Burger   │     │
 │  │  ────  ────  ────          │     │
 │  │  Italian | Asian | American │     │
 │  │                            │     │
 │  └───────────────────────────┘     │
 │                                     │
 │  Constraints (Optional)             │
-│  📍 Distance: [===●═══] 2.5mi      │
-│  ⭐ Min Rating: [7.0+]             │
-│  💰 Price: [$ $$ $$$ $$$$]         │
-│  🌱 Dietary: [Your restrictions]   │
-│  🕐 Open Now: [●]                  │
+│  Distance: [===●═══] 2.5mi         │
+│  Min Rating: [7.0+]                │
+│  Price: [$ $$ $$$ $$$$]            │
+│  Dietary: [Your restrictions]      │
+│  Open Now: [●]                     │
 │                                     │
 │  ┌─────────────────────────────┐   │
-│  │      🎲 SPIN THE WHEEL       │   │
+│  │      SPIN THE WHEEL          │   │
 │  └─────────────────────────────┘   │
 │                                     │
 │  Lucky finds history: 12 saved     │
@@ -139,7 +139,7 @@ A playful, slot machine-style random restaurant picker for users who can't decid
 
 ```
 ┌─────────────────────────────────────┐
-│  🎉 Your Lucky Pick!                │
+│  Your Lucky Pick!                   │
 │  ─────────────────────────          │
 │                                     │
 │  [Restaurant Hero Image]            │
@@ -147,7 +147,7 @@ A playful, slot machine-style random restaurant picker for users who can't decid
 │  │                             │   │
 │  │    Via Carota               │   │
 │  │    Italian • $$ • 0.8mi     │   │
-│  │    ⭐ 8.7 (456 reviews)     │   │
+│  │    8.7 (456 reviews)        │   │
 │  │                             │   │
 │  │    Why this might be great: │   │
 │  │    • 12 friends love it     │   │
@@ -157,7 +157,7 @@ A playful, slot machine-style random restaurant picker for users who can't decid
 │  └─────────────────────────────┘   │
 │                                     │
 │  ┌──────────────┐  ┌─────────────┐ │
-│  │ Let's Go! 🚀 │  │ Save 💾     │ │
+│  │ Let's Go!    │  │ Save        │ │
 │  └──────────────┘  └─────────────┘ │
 │                                     │
 │  [Not Feeling It? Spin Again]       │
@@ -238,7 +238,7 @@ interface LuckyFind {
 Prevent abuse while keeping it fun:
 
 - **Unlimited spins per day** (no hard limit)
-- **Soft encouragement**: "You've spun 10 times! Maybe it's time to pick one? 😄"
+- **Soft encouragement**: "You've spun 10 times! Maybe it's time to pick one?"
 - **Cooldown between spins**: 5 seconds (prevents spam)
 - **Track conversion rate**: Spins → Saves → Visits
 
@@ -246,9 +246,9 @@ Prevent abuse while keeping it fun:
 Share lucky finds:
 
 ```
-"🎰 Lucky Spin just picked Via Carota for me!
-8.7 ⭐ • Italian • West Village
-Should I go? 🤔"
+"Lucky Spin just picked Via Carota for me!
+8.7 • Italian • West Village
+Should I go?"
 ```
 
 - Share to feed (optional)
@@ -516,12 +516,12 @@ Historical or special achievements:
 
 ```
 ┌─────────────────────────────────────┐
-│  🏆 Scavenger Hunts                 │
+│   Scavenger Hunts                 │
 │  ─────────────────────────          │
 │                                     │
 │  Active Hunts (2)                   │
 │  ┌─────────────────────────────┐   │
-│  │ 🍕 NYC Pizza Master          │   │
+│  │  NYC Pizza Master          │   │
 │  │ 7 of 15 completed            │   │
 │  │ [▓▓▓▓▓░░░░░] 47%            │   │
 │  │ 12 days remaining            │   │
@@ -529,16 +529,16 @@ Historical or special achievements:
 │  └─────────────────────────────┘   │
 │                                     │
 │  ┌─────────────────────────────┐   │
-│  │ 🌮 Summer Taco Tour          │   │
+│  │  Summer Taco Tour          │   │
 │  │ 2 of 12 completed            │   │
 │  │ [▓▓░░░░░░░░░] 17%            │   │
 │  │ 45 days remaining            │   │
-│  │ Prize: $50 gift card 🎁     │   │
+│  │ Prize: $50 gift card      │   │
 │  └─────────────────────────────┘   │
 │                                     │
 │  Featured Hunts                     │
 │  ┌─────────────────────────────┐   │
-│  │ 🍝 Italian Connoisseur       │   │
+│  │  Italian Connoisseur       │   │
 │  │ For You: 98% Match           │   │
 │  │ 10 Italian spots • 30 days   │   │
 │  │ 234 participants             │   │
@@ -554,7 +554,7 @@ Historical or special achievements:
 
 ```
 ┌─────────────────────────────────────┐
-│  ← 🍕 NYC Pizza Master              │
+│  ←  NYC Pizza Master              │
 │  ─────────────────────────          │
 │                                     │
 │  [Hero Image: Pizza collage]        │
@@ -566,11 +566,11 @@ Historical or special achievements:
 │  [▓▓▓▓▓▓▓░░░░░░░░] 47%             │
 │                                     │
 │  Leaderboard:                       │
-│  🥇 #1: @pizzalover (15/15) ✓      │
-│  🥈 #2: @nycfoodie (14/15)         │
-│  🥉 #3: @eatsnyc (13/15)           │
+│   #1: @pizzalover (15/15) ✓      │
+│   #2: @nycfoodie (14/15)         │
+│   #3: @eatsnyc (13/15)           │
 │  ...                                │
-│  🏅 #23: You (7/15)                │
+│   #23: You (7/15)                │
 │                                     │
 │  ──────────────────────             │
 │  Checklist (7/15 complete):         │
@@ -599,9 +599,9 @@ Historical or special achievements:
 │  • No time limit                    │
 │                                     │
 │  Reward:                            │
-│  🏆 "Pizza Master" badge            │
-│  🎯 +500 achievement points         │
-│  ⭐ Featured on leaderboard         │
+│   "Pizza Master" badge            │
+│   +500 achievement points         │
+│   Featured on leaderboard         │
 └─────────────────────────────────────┘
 ```
 
@@ -610,14 +610,14 @@ Historical or special achievements:
 ```
 ┌─────────────────────────────────────┐
 │                                     │
-│         🎉🎉🎉🎉🎉                  │
+│                           │
 │                                     │
 │      HUNT COMPLETE!                 │
 │                                     │
-│     🍕 NYC Pizza Master              │
+│      NYC Pizza Master              │
 │                                     │
 │  [Animated badge rotation]          │
-│         🏆                          │
+│                                   │
 │                                     │
 │  You finished in 28 days!           │
 │  Final ranking: #23 of 847          │
@@ -870,7 +870,7 @@ interface UserHuntStats {
   badge: {
     id: 'badge-taco-tour-2025',
     name: 'Taco Tour Champion',
-    icon: '🌮',
+    icon: '',
     color: '#FAAD14',
     rarity: 'rare',
     displayOrder: 1
@@ -925,7 +925,7 @@ interface UserHuntStats {
   badge: {
     id: 'badge-pizza-master',
     name: 'Pizza Master',
-    icon: '🍕',
+    icon: '',
     color: '#EF4444',
     rarity: 'epic',
     displayOrder: 1
@@ -1010,7 +1010,7 @@ Current tabs:
 - Photos
 
 New tab:
-- 🏆 Hunts
+-  Hunts
 ```
 
 #### Hunt Leaderboard Tab
@@ -1024,22 +1024,22 @@ New tab:
 **Display:**
 ```
 ┌─────────────────────────────────────┐
-│  🏆 Hunt Leaderboard                │
+│   Hunt Leaderboard                │
 │  ─────────────────────────          │
 │                                     │
 │  [All Time ▼] [This Month] [Active] │
 │                                     │
 │  1. @huntmaster               847   │
-│     💎 Legend Tier • 47 completed   │
+│      Legend Tier • 47 completed   │
 │                                     │
 │  2. @foodexplorer             723   │
-│     💎 Legend Tier • 42 completed   │
+│      Legend Tier • 42 completed   │
 │                                     │
 │  3. @nycfoodie                651   │
-│     🥇 Platinum • 38 completed      │
+│      Platinum • 38 completed      │
 │  ...                                │
 │  23. You                       89   │
-│     🥈 Silver • 8 completed         │
+│      Silver • 8 completed         │
 │                                     │
 │  [View Global Leaderboard →]        │
 └─────────────────────────────────────┘
@@ -1054,8 +1054,8 @@ Hunt progress appears in social feed:
 
 ```
 [User Avatar] @username
-🏆 Completed checkpoint 7/12 in Summer Taco Tour!
-Just tried Los Tacos No. 1 - incredible al pastor! 🌮
+ Completed checkpoint 7/12 in Summer Taco Tour!
+Just tried Los Tacos No. 1 - incredible al pastor! 
 [Restaurant card preview]
 [Comment] [Like] [Bookmark]
 ```
@@ -1065,7 +1065,7 @@ Invite friends to join same hunt:
 
 ```
 "@friend1 and @friend2, I challenge you to the
-NYC Pizza Master hunt! Think you can beat my time? 🍕"
+NYC Pizza Master hunt! Think you can beat my time? "
 ```
 
 #### 3. **Hunt Groups**
@@ -1077,7 +1077,7 @@ Members: You, @sarah, @mike, @emma
 Hunt: Summer Taco Tour
 Progress:
 - You: 8/12 (67%)
-- Sarah: 10/12 (83%) 🥇
+- Sarah: 10/12 (83%) 
 - Mike: 5/12 (42%)
 - Emma: 7/12 (58%)
 
@@ -1349,7 +1349,7 @@ Limited-time special crawls:
 
 ```
 ┌─────────────────────────────────────┐
-│  🗺️ Food Crawls                    │
+│   Food Crawls                    │
 │  ─────────────────────────          │
 │                                     │
 │  Near You This Weekend              │
@@ -1358,7 +1358,7 @@ Limited-time special crawls:
 │  │                             │   │
 │  │ West Village Food Hop       │   │
 │  │ 5 stops • 3 hours • 2.1mi   │   │
-│  │ ⭐ 4.8 (234 crawlers)       │   │
+│  │  4.8 (234 crawlers)       │   │
 │  │ By @foodie_nyc              │   │
 │  │                             │   │
 │  │ [Start Crawl] [Save]        │   │
@@ -1366,14 +1366,14 @@ Limited-time special crawls:
 │                                     │
 │  Trending This Week                 │
 │  ┌─────────────────────────────┐   │
-│  │ Ultimate Taco Tour 🌮       │   │
+│  │ Ultimate Taco Tour        │   │
 │  │ 6 stops • 4 hrs • 3.5mi     │   │
-│  │ 847 crawlers • ⭐ 4.9       │   │
+│  │ 847 crawlers •  4.9       │   │
 │  └─────────────────────────────┘   │
 │                                     │
 │  Categories                         │
-│  [🍕 Cuisine] [🏘️ Neighborhood]   │
-│  [💰 Budget] [🎉 Themed]           │
+│  [ Cuisine] [ Neighborhood]   │
+│  [ Budget] [ Themed]           │
 │                                     │
 │  [Create Your Own Crawl +]          │
 │  [My Saved Crawls (8)]              │
@@ -1397,10 +1397,10 @@ Limited-time special crawls:
 │  └─────────────────────────────┘   │
 │                                     │
 │  Created by @foodie_nyc             │
-│  ⭐ 4.8 (234 completions)           │
+│   4.8 (234 completions)           │
 │                                     │
-│  ⏱️ 3 hours • 🚶 2.1 miles          │
-│  💰 $40-60 total • 👥 Great for 2-4 │
+│  ⏱️ 3 hours •  2.1 miles          │
+│   $40-60 total •  Great for 2-4 │
 │                                     │
 │  Description:                       │
 │  "Experience the best of West       │
@@ -1412,18 +1412,18 @@ Limited-time special crawls:
 │                                     │
 │  1️⃣ Jack's Wife Freda              │
 │     Breakfast • $$ • 0mi            │
-│     📝 "Get the green shakshuka"    │
+│      "Get the green shakshuka"    │
 │     ⏱️ 45 min suggested             │
 │     [View Restaurant →]             │
 │                                     │
 │  2️⃣ Blue Bottle Coffee              │
 │     Coffee • $ • 0.3mi walk         │
-│     📝 "Perfect cortado"            │
+│      "Perfect cortado"            │
 │     ⏱️ 15 min                       │
 │                                     │
 │  3️⃣ Via Carota                      │
 │     Lunch • $$ • 0.5mi              │
-│     📝 "Don't skip the cacio"       │
+│      "Don't skip the cacio"       │
 │     ⏱️ 1 hour                       │
 │                                     │
 │  [View All Stops →]                 │
@@ -1453,7 +1453,7 @@ Limited-time special crawls:
 │  │ [Restaurant photo]           │   │
 │  │                             │   │
 │  │ Italian • $$ • Open now     │   │
-│  │ ⭐ 8.7 rating               │   │
+│  │  8.7 rating               │   │
 │  │                             │   │
 │  │ Must Try:                   │   │
 │  │ • Cacio e pepe              │   │
@@ -1467,8 +1467,8 @@ Limited-time special crawls:
 │  │  it's legendary!"           │   │
 │  └─────────────────────────────┘   │
 │                                     │
-│  [📸 Add Photo]                     │
-│  [⭐ Rate This Stop]                │
+│  [ Add Photo]                     │
+│  [ Rate This Stop]                │
 │                                     │
 │  ┌─────────────────────────────┐   │
 │  │   ✓ Done, Next Stop →       │   │
@@ -1481,7 +1481,7 @@ Limited-time special crawls:
 │  Group Status (3 crawling):         │
 │  • You (Stop 3)                     │
 │  • Sarah (Stop 3) ✓                │
-│  • Mike (Stop 2) 🐌               │
+│  • Mike (Stop 2)                │
 │                                     │
 │  [End Crawl] [View Map] [Chat]      │
 └─────────────────────────────────────┘
@@ -1491,7 +1491,7 @@ Limited-time special crawls:
 
 ```
 ┌─────────────────────────────────────┐
-│  🎉 Crawl Complete!                 │
+│   Crawl Complete!                 │
 │  ─────────────────────────          │
 │                                     │
 │  West Village Food Hop              │
@@ -1503,7 +1503,7 @@ Limited-time special crawls:
 │  └───┴───┴───┴───┴───┘             │
 │                                     │
 │  Your Experience:                   │
-│  [Rate this crawl: ⭐⭐⭐⭐⭐]       │
+│  [Rate this crawl: ]       │
 │                                     │
 │  Which was your favorite?           │
 │  ○ Jack's Wife Freda                │
@@ -1513,13 +1513,13 @@ Limited-time special crawls:
 │  ○ I Sodi                           │
 │                                     │
 │  Journey Stats:                     │
-│  🚶 2.3 miles walked                │
+│   2.3 miles walked                │
 │  ⏱️ 3 hours 24 minutes              │
-│  💰 $48 total spent                 │
-│  📸 12 photos taken                 │
-│  ⭐ 8.6 avg rating                  │
+│   $48 total spent                 │
+│   12 photos taken                 │
+│   8.6 avg rating                  │
 │                                     │
-│  Achievement Unlocked! 🏆           │
+│  Achievement Unlocked!            │
 │  "West Village Explorer"            │
 │  Complete 3 more crawls to unlock   │
 │  "Crawl Master" badge              │
@@ -1554,22 +1554,22 @@ Limited-time special crawls:
 │                                     │
 │  1. [Drag handle ≡]                 │
 │     Di Fara Pizza                   │
-│     ⏱️ 30 min | 📝 "Classic NY"    │
+│     ⏱️ 30 min |  "Classic NY"    │
 │     [Edit] [Remove]                 │
 │                                     │
 │  2. [Drag handle ≡]                 │
 │     L'Industrie                     │
-│     ⏱️ 30 min | 📝 "Trendy spot"   │
+│     ⏱️ 30 min |  "Trendy spot"   │
 │     [Edit] [Remove]                 │
 │                                     │
 │  3. [Drag handle ≡]                 │
 │     Roberta's                       │
-│     ⏱️ 1 hour | 📝 "Full meal"     │
+│     ⏱️ 1 hour |  "Full meal"     │
 │     [Edit] [Remove]                 │
 │                                     │
 │  4. [Drag handle ≡]                 │
 │     Winner                          │
-│     ⏱️ 20 min | 📝 "Grandma slice" │
+│     ⏱️ 20 min |  "Grandma slice" │
 │     [Edit] [Remove]                 │
 │                                     │
 │  [+ Add Stop]                       │
@@ -1615,7 +1615,7 @@ Members: You, Sarah, Mike, Emma
 Progress:
 ├─ You: Stop 3 (Via Carota)
 ├─ Sarah: Stop 3 (Via Carota) ✓ Ready
-├─ Mike: Stop 2 (Blue Bottle) 🚶 Walking to Stop 3
+├─ Mike: Stop 2 (Blue Bottle)  Walking to Stop 3
 └─ Emma: Stop 3 (Via Carota) ✓ Ready
 
 [Notify when everyone's here]
@@ -2120,10 +2120,10 @@ Crawl activities appear in social feed:
 
 ```
 [User Avatar] @username
-🗺️ Completed "West Village Perfect Saturday"!
-5 stops • 7 hours • Amazing day ⭐⭐⭐⭐⭐
+ Completed "West Village Perfect Saturday"!
+5 stops • 7 hours • Amazing day 
 
-Favorite: Via Carota - that cacio e pepe! 🍝
+Favorite: Via Carota - that cacio e pepe! 
 
 [Photo carousel from all 5 stops]
 
@@ -2139,7 +2139,7 @@ Currently at: Prince Street Pizza (Stop 2 of 4)
 
 [Live photo from current stop]
 
-"That pepperoni square though! 🍕🔥"
+"That pepperoni square though! "
 
 [Follow Along] [Join Them]
 ```
@@ -2157,8 +2157,8 @@ Compare experiences:
 
 ```
 "NYC Pizza Pilgrimage"
-Your rating: ⭐⭐⭐⭐⭐
-Sarah's rating: ⭐⭐⭐⭐
+Your rating: 
+Sarah's rating: 
 
 Your favorite: Di Fara
 Sarah's favorite: Roberta's
@@ -2282,18 +2282,18 @@ Add new screens to existing bottom tab navigation:
 
 // Add to hamburger menu (SettingsHubScreen):
 {
-  icon: '🎲',
+  icon: '',
   title: 'Lucky Spin',
   screen: 'LuckySpinScreen'
 },
 {
-  icon: '🏆',
+  icon: '',
   title: 'Scavenger Hunts',
   screen: 'ScavengerHuntsScreen',
   badge: activeHuntsCount
 },
 {
-  icon: '🗺️',
+  icon: '',
   title: 'Food Crawls',
   screen: 'FoodCrawlsScreen',
   badge: savedCrawlsCount
@@ -2321,9 +2321,9 @@ Add sections to `ProfileScreen`:
 │  [User Avatar & Stats]              │
 │  ─────────────────────────          │
 │  Achievements                       │
-│  🏆 8 Hunt Badges                   │
-│  🗺️ 12 Crawls Completed             │
-│  🎲 23 Lucky Finds                  │
+│   8 Hunt Badges                   │
+│   12 Crawls Completed             │
+│   23 Lucky Finds                  │
 │  [View All →]                       │
 │  ─────────────────────────          │
 │  Recent Activity                    │
@@ -2721,7 +2721,7 @@ interface RestaurantOpening {
 4. Opening day arrives
    ↓
 5. Push notification:
-   "🎉 [Restaurant] just opened!
+   " [Restaurant] just opened!
    Be one of the first to visit."
    ↓
 6. Direct link to reservation/details
@@ -2741,8 +2741,8 @@ interface RestaurantOpening {
 │  [Now Open] [Coming Soon] [Recent]  │
 │                                     │
 │  Filter by:                         │
-│  📍 Within [2 miles ▼]              │
-│  🍽️ All Cuisines ▼                 │
+│   Within [2 miles ▼]              │
+│   All Cuisines ▼                 │
 │                                     │
 │  ──────────────────────             │
 │  OPENED THIS WEEK                   │
@@ -2753,9 +2753,9 @@ interface RestaurantOpening {
 │  │ Casa Luna                   │   │
 │  │ Italian • $$ • West Village │   │
 │  │                             │   │
-│  │ 🆕 Opened 3 days ago        │   │
-│  │ 👥 12 people want to try    │   │
-│  │ ⭐ 2 early reviews (8.5 avg)│   │
+│  │  Opened 3 days ago        │   │
+│  │  12 people want to try    │   │
+│  │  2 early reviews (8.5 avg)│   │
 │  │                             │   │
 │  │ "Modern Italian with house  │   │
 │  │  pasta. Chef from Via Carota"│   │
@@ -2765,8 +2765,8 @@ interface RestaurantOpening {
 │                                     │
 │  ┌─────────────────────────────┐   │
 │  │ The Midnight Kitchen         │   │
-│  │ 🆕 Opened 5 days ago         │   │
-│  │ ⭐ 7 reviews • Be #8!        │   │
+│  │  Opened 5 days ago         │   │
+│  │  7 reviews • Be #8!        │   │
 │  └─────────────────────────────┘   │
 │                                     │
 │  ──────────────────────             │
@@ -2774,9 +2774,9 @@ interface RestaurantOpening {
 │                                     │
 │  ┌─────────────────────────────┐   │
 │  │ Noodle Theory               │   │
-│  │ 🔔 Opening Dec 15, 2025     │   │
+│  │  Opening Dec 15, 2025     │   │
 │  │ 156 watching                │   │
-│  │ [Set Alert 🔔]              │   │
+│  │ [Set Alert ]              │   │
 │  └─────────────────────────────┘   │
 │                                     │
 │  [View All New Openings →]          │
@@ -2792,18 +2792,18 @@ interface RestaurantOpening {
 │                                     │
 │  [Hero restaurant image]            │
 │  ┌───────────────────┐              │
-│  │ 🆕 OPENED 3 DAYS AGO │           │
+│  │  OPENED 3 DAYS AGO │           │
 │  └───────────────────┘              │
 │                                     │
 │  Casa Luna                          │
 │  Italian • $$ • West Village        │
-│  📍 0.8 miles away                  │
+│   0.8 miles away                  │
 │                                     │
 │  Opening Stats:                     │
 │  🗓️ Opened: Oct 24, 2025           │
-│  👥 12 people on want-to-try        │
-│  ⭐ 2 early reviews (8.5 avg)       │
-│  🏆 Be among first 50 reviewers!    │
+│   12 people on want-to-try        │
+│   2 early reviews (8.5 avg)       │
+│   Be among first 50 reviewers!    │
 │                                     │
 │  About:                             │
 │  "Modern Italian restaurant from    │
@@ -2818,9 +2818,9 @@ interface RestaurantOpening {
 │  ✓ Full bar program                 │
 │                                     │
 │  Press Coverage:                    │
-│  📰 "Hotly anticipated opening"     │
+│   "Hotly anticipated opening"     │
 │     - Eater NY, Oct 20              │
-│  📰 "Chef's new venture"            │
+│   "Chef's new venture"            │
 │     - Grub Street, Oct 15           │
 │                                     │
 │  First Reviewers:                   │
@@ -2828,7 +2828,7 @@ interface RestaurantOpening {
 │  [Avatar] @mike: "Solid start" 8.0  │
 │                                     │
 │  ┌─────────────────────────────┐   │
-│  │ 🎯 Be a First Reviewer!      │   │
+│  │  Be a First Reviewer!      │   │
 │  └─────────────────────────────┘   │
 │                                     │
 │  [Add to Want-to-Try]               │
@@ -2846,16 +2846,16 @@ interface RestaurantOpening {
 │                                     │
 │  [Construction/concept photo]       │
 │  ┌───────────────────────┐          │
-│  │ 🔔 OPENING DEC 15, 2025 │        │
+│  │  OPENING DEC 15, 2025 │        │
 │  │    22 days away         │        │
 │  └───────────────────────┘          │
 │                                     │
 │  Noodle Theory                      │
 │  Ramen • $$ • Lower East Side       │
-│  📍 1.2 miles from you              │
+│   1.2 miles from you              │
 │                                     │
 │  156 people watching                │
-│  [Set Opening Alert 🔔]             │
+│  [Set Opening Alert ]             │
 │                                     │
 │  What We Know:                      │
 │  "Modern ramen shop from Tokyo-     │
@@ -2875,11 +2875,11 @@ interface RestaurantOpening {
 │  Oct 1: Build-out begins            │
 │                                     │
 │  Press Buzz:                        │
-│  📰 "Most anticipated winter opening"│
+│   "Most anticipated winter opening"│
 │     - Eater, Oct 10                 │
 │                                     │
 │  ┌─────────────────────────────┐   │
-│  │ Add to Calendar 📅           │   │
+│  │ Add to Calendar            │   │
 │  └─────────────────────────────┘   │
 │                                     │
 │  [Get Notified] [Share]             │
@@ -2895,11 +2895,11 @@ interface RestaurantOpening {
 Proactive notifications for new restaurants:
 
 **Alert Types:**
-- **Now Open**: "🎉 [Restaurant] just opened today!"
-- **Coming Soon Reminder**: "🔔 [Restaurant] opens in 3 days"
-- **Soft Opening Invite**: "🌟 [Restaurant] soft opening this weekend"
-- **Friend Visited**: "👥 Sarah just visited [New Restaurant]"
-- **First 50 Opportunity**: "🏆 Only 12 reviews, be in first 50!"
+- **Now Open**: " [Restaurant] just opened today!"
+- **Coming Soon Reminder**: " [Restaurant] opens in 3 days"
+- **Soft Opening Invite**: " [Restaurant] soft opening this weekend"
+- **Friend Visited**: " Sarah just visited [New Restaurant]"
+- **First 50 Opportunity**: " Only 12 reviews, be in first 50!"
 
 **Alert Preferences:**
 ```typescript
@@ -2943,7 +2943,7 @@ Gamification for being early:
 - **Neighborhood Scout** - First to try 5+ in same neighborhood (rare)
 
 **Badge Display:**
-- Shows on review: "🏆 First reviewer!"
+- Shows on review: " First reviewer!"
 - Profile showcase section
 - Leaderboard category
 - Special profile flair
@@ -2963,10 +2963,10 @@ Measure buzz before opening:
 **Visualizations:**
 ```
 Noodle Theory
-🔥 Anticipation: 8.5/10
-📊 156 watching
-💬 23 comments
-📰 4 press articles
+ Anticipation: 8.5/10
+ 156 watching
+ 23 comments
+ 4 press articles
 ```
 
 #### 4. **Opening Timeline**
@@ -2978,19 +2978,19 @@ Visual timeline of restaurant lifecycle:
 │  Casa Luna Timeline                 │
 │  ─────────────────────────          │
 │                                     │
-│  📅 Aug 2025: Announced             │
+│   Aug 2025: Announced             │
 │     "Chef announces new project"    │
 │                                     │
-│  🔨 Sep 2025: Build-out             │
+│   Sep 2025: Build-out             │
 │     Construction progress photos    │
 │                                     │
-│  📰 Oct 15: Press preview           │
+│   Oct 15: Press preview           │
 │     Reviews from media              │
 │                                     │
-│  🌟 Oct 20: Soft opening            │
+│   Oct 20: Soft opening            │
 │     Invite-only preview             │
 │                                     │
-│  🎉 Oct 24: Grand opening ← NOW     │
+│   Oct 24: Grand opening ← NOW     │
 │     Open to public                  │
 │     12 reviews (8.5 avg)            │
 │                                     │
@@ -3051,7 +3051,7 @@ interface OpeningEvent {
 
 **Example Event Card:**
 ```
-🌟 SOFT OPENING EVENT
+ SOFT OPENING EVENT
 
 Casa Luna Preview Night
 Oct 20, 2025 • 6-10pm
@@ -3080,15 +3080,15 @@ Aggregate opening coverage:
 ```
 Press Coverage (4 articles):
 
-📰 "The 10 Most Anticipated..."
+ "The 10 Most Anticipated..."
     Eater NY • Oct 15
     [Read article →]
 
-📰 "Chef's Long-Awaited Return"
+ "Chef's Long-Awaited Return"
     Grub Street • Oct 10
     [Read article →]
 
-📱 Social Buzz:
+ Social Buzz:
     23 Instagram posts
     8 TikTok videos
     [View social →]
@@ -3285,7 +3285,7 @@ New opening cards in main feed:
 ```
 Feed Items:
 ┌─────────────────────────────────────┐
-│ 🆕 NEW OPENING                      │
+│  NEW OPENING                      │
 │ Casa Luna opened 3 days ago!        │
 │ [Restaurant card]                   │
 │ Be among first 50 reviewers         │
@@ -3293,16 +3293,16 @@ Feed Items:
 └─────────────────────────────────────┘
 
 ┌─────────────────────────────────────┐
-│ 🔔 OPENING SOON                     │
+│  OPENING SOON                     │
 │ Noodle Theory opens Dec 15          │
 │ 156 people waiting                  │
 │ [Set Alert]                         │
 └─────────────────────────────────────┘
 
 ┌─────────────────────────────────────┐
-│ 🏆 @sarah was FIRST to review       │
+│  @sarah was FIRST to review       │
 │ Casa Luna (Opened Oct 24)           │
-│ "Amazing pasta! 9.0" ⭐⭐⭐⭐⭐      │
+│ "Amazing pasta! 9.0"       │
 │ [View Review]                       │
 └─────────────────────────────────────┘
 ```
@@ -3345,7 +3345,7 @@ Display opening achievements:
 ```
 Profile → Achievements:
 
-🏆 Opening Pioneer
+ Opening Pioneer
 ├─ First Reviewer: 3 times
 ├─ Top 10: 12 times
 ├─ Top 50: 23 times
@@ -3469,7 +3469,7 @@ SearchScreen → Filters:
 2. **Feed Section**
 ```
 FeedScreen → Top section:
-"🆕 New This Week (3)"
+" New This Week (3)"
 [Horizontal scroll of new restaurants]
 ```
 
@@ -3478,7 +3478,7 @@ FeedScreen → Top section:
 RestaurantCard:
 ┌─────────────────────┐
 │ Casa Luna           │
-│ [🆕 3 days old]     │
+│ [ 3 days old]     │
 │ Italian • $$        │
 └─────────────────────┘
 ```
@@ -3486,7 +3486,7 @@ RestaurantCard:
 4. **Notification**
 ```
 Push notification:
-"🎉 2 new restaurants opened near you this week!"
+" 2 new restaurants opened near you this week!"
 [View New Openings]
 ```
 
@@ -3683,7 +3683,7 @@ Restaurant Card Badges:
 
 ┌─────────────────────────┐
 │ Peter Luger             │
-│ [🔴 2hr wait • Packed]  │ ← Red when very busy
+│ [ 2hr wait • Packed]  │ ← Red when very busy
 │ Steakhouse • $$$$       │
 └─────────────────────────┘
 ```
@@ -3800,7 +3800,7 @@ interface TimingRecommendation {
 │  Via Carota - Best Times to Visit   │
 │  ─────────────────────────────      │
 │                                     │
-│  ⭐ BEST FOR YOU                    │
+│   BEST FOR YOU                    │
 │  Tuesday-Thursday, 5:30-6:30pm      │
 │  • Minimal wait (0-15min)           │
 │  • Better service (less crowded)    │
@@ -3820,7 +3820,7 @@ interface TimingRecommendation {
 │  • Rushed service                   │
 │  • Loud dining room                 │
 │                                     │
-│  💡 PRO TIP                         │
+│   PRO TIP                         │
 │  Arrive by 5:45pm on weeknights to  │
 │  avoid the dinner rush. Kitchen is  │
 │  at its best before 8pm.            │
@@ -3892,19 +3892,19 @@ interface ReservationIntelligence {
 │                                     │
 │  Difficulty: ⚠️ VERY HARD (92/100) │
 │                                     │
-│  📊 Booking Window                  │
+│   Booking Window                  │
 │  Typical: 28 days in advance        │
 │  Recommended: Book exactly 30 days  │
 │  out at 12am EST when reservations  │
 │  open                               │
 │                                     │
-│  📅 Success Rates by Timing         │
+│   Success Rates by Timing         │
 │  30 days ahead: 65% success         │
 │  14 days ahead: 12% success         │
 │  7 days ahead: 3% success           │
 │  Day-of: <1% success                │
 │                                     │
-│  💡 STRATEGIES                      │
+│   STRATEGIES                      │
 │                                     │
 │  1. **Midnight Release** (65% success)│
 │     Set alarm for 12:00am exactly   │
@@ -3921,7 +3921,7 @@ interface ReservationIntelligence {
 │     at 5:15pm or after 9pm. Full    │
 │     menu available.                 │
 │                                     │
-│  🔔 Set Cancellation Alert          │
+│   Set Cancellation Alert          │
 │  Notify me if a table opens up for: │
 │  [Friday, Nov 15 • 7-8pm]           │
 │  [Enable Alert →]                   │
@@ -3976,7 +3976,7 @@ type WaitTimeNotification =
 │  Wait Time Alerts                   │
 │  ─────────────────────────          │
 │                                     │
-│  🔔 Notify me when:                 │
+│   Notify me when:                 │
 │                                     │
 │  ☑ Favorite spots have no wait     │
 │     [Within 2 miles of me]          │
@@ -4045,14 +4045,14 @@ interface GroupTimingCoordinator {
 │  Group Dinner: Friday @ Via Carota  │
 │  ─────────────────────────────      │
 │                                     │
-│  👥 5 people (You, Sarah, Mike, +2) │
+│   5 people (You, Sarah, Mike, +2) │
 │                                     │
-│  ⭐ BEST TIME FOR YOUR GROUP        │
+│   BEST TIME FOR YOUR GROUP        │
 │  Friday, 6:00pm                     │
 │  ✅ All available                   │
 │  🟢 Moderate crowd (better than 7pm)│
 │  ⏱️ 15-20min wait expected          │
-│  💡 30min earlier = no wait         │
+│   30min earlier = no wait         │
 │                                     │
 │  ALTERNATIVE OPTIONS:               │
 │                                     │
@@ -4114,10 +4114,10 @@ interface ExperienceQualityMetrics {
 │  Via Carota - Experience Guide      │
 │  ─────────────────────────────      │
 │                                     │
-│  🌟 EXPERIENCE QUALITY BY TIME      │
+│   EXPERIENCE QUALITY BY TIME      │
 │                                     │
 │  Tuesday 6pm (Moderate crowd)       │
-│  ⭐⭐⭐⭐⭐ 9.2/10 Experience        │
+│   9.2/10 Experience        │
 │  • Attentive service                │
 │  • Fresh, properly paced dishes     │
 │  • Comfortable noise level          │
@@ -4125,14 +4125,14 @@ interface ExperienceQualityMetrics {
 │  • Kitchen at their best            │
 │                                     │
 │  Saturday 8pm (Very busy)           │
-│  ⭐⭐⭐ 6.8/10 Experience            │
+│   6.8/10 Experience            │
 │  • Service feels rushed             │
 │  • Longer waits between courses     │
 │  • Very loud dining room            │
 │  • Cramped table spacing            │
 │  • Food quality still excellent     │
 │                                     │
-│  💡 OPTIMAL CROWD LEVEL             │
+│   OPTIMAL CROWD LEVEL             │
 │  50-70% capacity                    │
 │  "Lively but not overcrowded.       │
 │  Great energy without sacrificing   │
@@ -4235,7 +4235,7 @@ interface ExperienceQualityMetrics {
 │                                     │
 │  Via Carota                         │
 │  Italian • $$ • 0.8mi               │
-│  ⭐ 8.7 • Perfect for date night    │
+│   8.7 • Perfect for date night    │
 │                                     │
 │  Timing: 🟢 Great time to visit     │
 │  Opens in 2 hours                   │
@@ -4257,12 +4257,12 @@ interface ExperienceQualityMetrics {
 │  Last updated: 5 min ago            │
 │  [Refresh]                          │
 │                                     │
-│  💡 Better Options:                 │
+│   Better Options:                 │
 │  • Go at 9:30pm tonight (no wait)   │
 │  • Try Tuesday 6pm (optimal)        │
 │                                     │
 │  [View Full Timing Guide →]         │
-│  [Set Wait Alert 🔔]                │
+│  [Set Wait Alert ]                │
 │                                     │
 │  Reservation Status:                │
 │  Hard to get (Book 2 weeks ahead)   │
@@ -4283,7 +4283,7 @@ interface ExperienceQualityMetrics {
 │                                     │
 │  Right Now: Tuesday, 6:15pm         │
 │  🟢 No wait • Quiet                 │
-│  ⭐ Excellent time to visit          │
+│   Excellent time to visit          │
 │                                     │
 │  Crowd Level: 35% capacity          │
 │  [░░░▓▓░░░░] Low                    │
@@ -4310,7 +4310,7 @@ interface ExperienceQualityMetrics {
 │                                     │
 │  ───────── BEST TIMES ──────────    │
 │                                     │
-│  ⭐ OPTIMAL FOR YOU                 │
+│   OPTIMAL FOR YOU                 │
 │  Tuesday-Thursday, 5:30-6:30pm      │
 │  • No wait                          │
 │  • Attentive service                │
@@ -4325,7 +4325,7 @@ interface ExperienceQualityMetrics {
 │  Fri-Sat, 7-9pm (60-120min)         │
 │  Sunday brunch                      │
 │                                     │
-│  💡 PRO TIPS                        │
+│   PRO TIPS                        │
 │  • Arrive before 5:45pm to avoid rush│
 │  • Bar seating = no wait, full menu  │
 │  • Kitchen best before 8pm          │
@@ -4374,20 +4374,20 @@ interface ExperienceQualityMetrics {
 │  ← Carbone - Reservation Guide      │
 │  ─────────────────────────          │
 │                                     │
-│  Difficulty: 🔴 Very Hard           │
+│  Difficulty:  Very Hard           │
 │  [████████░░] 92/100                │
 │                                     │
 │  ❗ HIGH DEMAND RESTAURANT           │
 │  Reservations book out 28+ days     │
 │  and fill within minutes.           │
 │                                     │
-│  📊 Success Rates                   │
+│   Success Rates                   │
 │  30 days ahead: 65% ✅              │
 │  14 days ahead: 12% ⚠️              │
-│  7 days ahead:   3% 🔴              │
-│  Day-of:        <1% 🔴              │
+│  7 days ahead:   3%               │
+│  Day-of:        <1%               │
 │                                     │
-│  🎯 BEST STRATEGY                   │
+│   BEST STRATEGY                   │
 │  Book exactly 30 days in advance    │
 │  at 12:00am when slots release.     │
 │                                     │
@@ -4397,11 +4397,11 @@ interface ExperienceQualityMetrics {
 │  3. Have your date selected         │
 │  4. Book instantly when it opens    │
 │                                     │
-│  [Set Booking Reminder 🔔]          │
+│  [Set Booking Reminder ]          │
 │                                     │
 │  ──────────────────────             │
 │                                     │
-│  🔄 ALTERNATIVE STRATEGIES          │
+│   ALTERNATIVE STRATEGIES          │
 │                                     │
 │  Cancellation Watch (25% success)   │
 │  • Check 11am, 3pm, 5pm daily       │
@@ -4422,12 +4422,12 @@ interface ExperienceQualityMetrics {
 │                                     │
 │  ──────────────────────             │
 │                                     │
-│  📅 CURRENT AVAILABILITY            │
+│   CURRENT AVAILABILITY            │
 │  No tables available next 30 days   │
 │  Last checked: 12 min ago           │
 │  [Refresh]                          │
 │                                     │
-│  🔔 Get notified when tables open   │
+│   Get notified when tables open   │
 │  for your preferred dates.          │
 │  [Set Cancellation Alert →]         │
 └─────────────────────────────────────┘
@@ -4454,21 +4454,21 @@ interface SpinConstraints {
 **UI Addition:**
 ```
 Lucky Spin Constraints:
-  📍 Distance: 2.5mi
-  ⭐ Min Rating: 7.0+
-  💰 Price: $$ $$$
-  🕐 Open Now: ●
+   Distance: 2.5mi
+   Min Rating: 7.0+
+   Price: $$ $$$
+   Open Now: ●
   ⏱️ Max Wait: [15 min ▼]  ← NEW
-  🌟 Optimal Times Only: ○  ← NEW
+   Optimal Times Only: ○  ← NEW
 ```
 
 **Spin Result Enhancement:**
 ```
-🎉 Your Lucky Pick!
+ Your Lucky Pick!
 
 Via Carota
 Italian • $$ • 0.8mi
-⭐ 8.7
+ 8.7
 
 🟢 GREAT TIMING!
 No wait right now
@@ -4543,7 +4543,7 @@ Stop 3 of 5
 
 Current Stop: Via Carota
 🟡 25min wait currently
-💡 Come back at 9pm (no wait)
+ Come back at 9pm (no wait)
 
 Options:
 • Wait here (25min)
@@ -4601,7 +4601,7 @@ Track how wait times evolve for new restaurants:
 Casa Luna - Opening Week Patterns
 
 Day 1 (Grand Opening)
-🔴 2-3 hour waits all day
+ 2-3 hour waits all day
 Peak hype, expect long lines
 
 Days 2-7 (Opening Week)
@@ -4618,7 +4618,7 @@ Days 15-30 (New Normal)
 🟢 Normal patterns emerging
 Best times: Weekday 6pm
 
-💡 OPTIMAL STRATEGY
+ OPTIMAL STRATEGY
 Wait 2-3 weeks after opening
 to avoid worst waits while
 still being an "early" visitor.
@@ -4628,10 +4628,10 @@ still being an "early" visitor.
 
 **Opening Timing Intel:**
 ```
-🆕 Casa Luna (Opened 3 days ago)
+ Casa Luna (Opened 3 days ago)
 
 Wait Intelligence:
-Current: 🔴 90min wait
+Current:  90min wait
 This is typical for new openings
 
 Predictions:

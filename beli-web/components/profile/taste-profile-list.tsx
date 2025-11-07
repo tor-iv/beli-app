@@ -31,6 +31,12 @@ export function TasteProfileList({
     return item.country;
   };
 
+  const getUniqueKey = (item: CuisineBreakdown | CityBreakdown | CountryBreakdown) => {
+    if ('cuisine' in item) return `cuisine-${item.cuisine}`;
+    if ('city' in item) return `city-${item.city}`;
+    return `country-${item.country}`;
+  };
+
   return (
     <div className="bg-white mt-4 rounded-lg shadow-sm">
       {/* Header */}
@@ -41,6 +47,8 @@ export function TasteProfileList({
         <button
           onClick={onSortPress}
           className="flex items-center gap-2 py-1 px-3 rounded-md border border-gray-200 hover:bg-gray-50 transition-colors"
+          type="button"
+          aria-label={`Change sort to ${sortBy === 'count' ? 'average score' : 'count'}`}
         >
           <ArrowUpDown className="w-4 h-4 text-gray-800" />
           <span className="text-sm text-gray-800">{getSortLabel()}</span>
@@ -49,14 +57,16 @@ export function TasteProfileList({
 
       {/* List */}
       <div className="divide-y divide-gray-100">
-        {data.map((item, index) => {
+        {data.map((item) => {
           const name = getItemName(item);
 
           return (
             <button
-              key={`${name}-${index}`}
+              key={getUniqueKey(item)}
               onClick={() => onItemPress(item)}
               className="w-full flex justify-between items-center py-4 px-6 hover:bg-gray-50 transition-colors group"
+              type="button"
+              aria-label={`View restaurants for ${name}`}
             >
               <div className="flex-1 text-left">
                 <p className="text-base font-semibold text-gray-900 mb-1">{name}</p>
