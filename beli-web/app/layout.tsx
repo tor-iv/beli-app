@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Analytics } from '@vercel/analytics/next';
 
 import './globals.css';
 import { Providers } from './providers';
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main className="flex-1 pb-16 md:pb-0">{children}</main>
           </div>
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
