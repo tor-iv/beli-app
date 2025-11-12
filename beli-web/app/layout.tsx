@@ -6,11 +6,33 @@ import { Providers } from './providers';
 import { Header } from '@/components/layout/header';
 
 export const metadata: Metadata = {
-  title: 'Beli - Discover Great Restaurants',
-  description: 'Your social restaurant discovery platform',
+  title: 'Beli - Restaurant Discovery Platform',
+  description: 'Built to demonstrate my interest in joining the beli team and showcase full-stack development skills. Features include Tastemakers (NYC food experts with badges), Group Dinner AI matching, What to Order recommendations, social feeds, and leaderboards. Built with React Native + Next.js + TypeScript.',
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-icon.png',
+  },
+  openGraph: {
+    title: 'Beli - Restaurant Discovery Platform',
+    description: 'Built to demonstrate my interest in joining the beli team and showcase full-stack development skills. Features include Tastemakers (NYC food experts with badges), Group Dinner AI matching, What to Order recommendations, social feeds, and leaderboards. Built with React Native + Next.js + TypeScript.',
+    url: 'https://belihire.me',
+    siteName: 'Beli',
+    images: [
+      {
+        url: 'https://belihire.me/beli-logo.webp',
+        width: 800,
+        height: 600,
+        alt: 'Beli Restaurant Discovery Platform',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Beli - Restaurant Discovery Platform',
+    description: 'Built to demonstrate my interest in joining the beli team and showcase full-stack development skills. Features include Tastemakers (NYC food experts with badges), Group Dinner AI matching, What to Order recommendations, social feeds, and leaderboards. Built with React Native + Next.js + TypeScript.',
+    images: ['https://belihire.me/beli-logo.webp'],
   },
 };
 

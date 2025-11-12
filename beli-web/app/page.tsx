@@ -11,7 +11,7 @@ export default function ResumePage() {
       <div className="container mx-auto max-w-4xl px-4 py-6 md:py-12">
         {/* Beli Project Banner */}
         <div className="mb-6 rounded-2xl bg-gradient-to-br from-primary to-primary/90 p-6 text-white shadow-card md:p-8">
-          <h2 className="mb-3 text-3xl font-bold">beli Web Clone</h2>
+          <h2 className="mb-3 text-3xl font-bold">Beli Web Clone</h2>
           <p className="mb-4 text-white/90">
             Built to demonstrate my interest in joining the beli team and showcase full-stack development skills.
             Features include Tastemakers (NYC food experts with badges), Group Dinner AI matching, What to Order recommendations,
