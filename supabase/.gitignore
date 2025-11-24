@@ -1,0 +1,11 @@
+# Supabase
+.env
+.env.local
+.branches
+.temp
+
+# Supabase CLI
+.supabase/
+
+# Logs
+*.log

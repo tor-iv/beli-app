@@ -1,0 +1,35 @@
+# Django and REST Framework
+Django==5.0.1
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+
+# Database - PostgreSQL with PostGIS for geospatial
+psycopg2-binary==2.9.9
+django-postgres-extra==2.0.8
+
+# Geospatial support
+django-geojson==4.1.0
+
+# Redis for caching
+redis==5.0.1
+django-redis==5.4.0
+
+# Environment variables
+python-decouple==3.8
+
+# API utilities
+djangorestframework-simplejwt==5.3.1
+django-filter==23.5
+
+# Development
+ipython==8.20.0
+django-extensions==3.2.3
+
+# Testing
+pytest==7.4.4
+pytest-django==4.7.0
+factory-boy==3.3.0
+
+# Code quality
+black==24.1.1
+flake8==7.0.0

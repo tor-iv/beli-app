@@ -1,0 +1,60 @@
+# Docker Compose for Beli App Local Development
+# Elasticsearch for restaurant search with fuzzy matching and geo-filtering
+
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: beli-elasticsearch
+    environment:
+      # Single node discovery for local development
+      - discovery.type=single-node
+      # Disable security for local development (simpler setup)
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      # Memory settings (512MB min/max for local dev)
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      # Cluster name
+      - cluster.name=beli-local
+      # Allow host to access
+      - http.host=0.0.0.0
+    ports:
+      - "9200:9200"  # REST API
+      - "9300:9300"  # Node communication (optional for single node)
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - beli-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"\\|\"status\":\"yellow\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # Optional: Kibana for ES visualization and debugging
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: beli-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - xpack.security.enabled=false
+    ports:
+      - "5601:5601"
+    networks:
+      - beli-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    profiles:
+      - debug  # Only starts with: docker compose --profile debug up
+    restart: unless-stopped
+
+volumes:
+  esdata:
+    driver: local
+
+networks:
+  beli-network:
+    driver: bridge

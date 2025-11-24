@@ -1,0 +1,22 @@
+{
+  "name": "beli-supabase-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Database scripts for Beli app",
+  "scripts": {
+    "fetch-restaurants": "npx ts-node fetch-nyc-restaurants.ts",
+    "fetch-restaurants:small": "npx ts-node fetch-nyc-restaurants.ts 100",
+    "fetch-restaurants:medium": "npx ts-node fetch-nyc-restaurants.ts 500",
+    "fetch-restaurants:large": "npx ts-node fetch-nyc-restaurants.ts 2000",
+    "sync:elasticsearch": "npx ts-node sync-to-elasticsearch.ts",
+    "sync:elasticsearch:recreate": "npx ts-node sync-to-elasticsearch.ts --recreate-index"
+  },
+  "dependencies": {
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0",
+    "@types/node": "^20.0.0",
+    "pg": "^8.11.0",
+    "@types/pg": "^8.10.0",
+    "dotenv": "^16.3.0"
+  }
+}
