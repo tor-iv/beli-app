@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Structure
 
-This is a monorepo containing two applications:
+This is a monorepo containing frontend applications and backend services:
 
 ### beli-native/
 React Native Expo app for iOS and Android mobile platforms.
@@ -12,7 +12,13 @@ React Native Expo app for iOS and Android mobile platforms.
 ### beli-web/
 Next.js web application for browser-based access.
 
-Both apps share the same design system, data models, and core features but have independent codebases and deployments.
+### beli-backend/
+Django REST API backend connecting to Supabase PostgreSQL.
+
+### supabase/
+Supabase configuration with PostgreSQL migrations, Edge Functions, and seed data.
+
+Both frontend apps share the same design system, data models, and core features but have independent codebases and deployments. The backend provides multiple data source options with automatic fallback.
 
 ---
 
@@ -61,6 +67,36 @@ cd beli-web && npx tsc --noEmit          # TypeScript type checking
 - Root directory configured as `beli-web/` in Vercel project settings
 - Production URL: https://beli-web.vercel.app (after Vercel setup)
 
+### Django Backend Commands (beli-backend/)
+Python Django REST API development happens in the `beli-backend/` directory:
+
+```bash
+cd beli-backend && source venv/bin/activate  # Activate virtual environment
+cd beli-backend && python manage.py runserver  # Start Django API (localhost:8000)
+./scripts/verify-django.sh  # Verify all Django API endpoints
+```
+
+**Development Notes:**
+- Django connects to Supabase PostgreSQL using `managed=False` models
+- API available at `http://localhost:8000/api/v1/`
+- Requires `.env` file with `DATABASE_URL` (see `.env.example`)
+- Uses domain-driven app structure: `apps/restaurants/`, `apps/users/`, `apps/feed/`, etc.
+
+### Supabase Commands
+Database and Edge Function management:
+
+```bash
+cd supabase && supabase start      # Start local Supabase (requires Docker)
+cd supabase && supabase db reset   # Apply all migrations
+cd supabase && supabase status     # Get API keys and URLs
+supabase functions deploy          # Deploy Edge Functions
+```
+
+**Local Supabase URLs:**
+- API: http://localhost:54321
+- Studio: http://localhost:54323
+- Database: postgresql://postgres:postgres@localhost:54322/postgres
+
 ---
 
 ## Architecture Overview
@@ -69,6 +105,9 @@ cd beli-web && npx tsc --noEmit          # TypeScript type checking
 This is a monorepo structure:
 - `beli-native/` - React Native mobile application (iOS/Android)
 - `beli-web/` - Next.js web application
+- `beli-backend/` - Django REST API connecting to Supabase PostgreSQL
+- `supabase/` - Database migrations, Edge Functions, and configuration
+- `scripts/` - Verification and utility scripts
 - `beli-images/` - Design assets and mockups
 - Root contains documentation files (requirements, design system, build guide, web implementation plan)
 
@@ -87,10 +126,23 @@ This is a monorepo structure:
 - **Framework**: Next.js 16 with App Router
 - **Navigation**: Next.js file-based routing
 - **State Management**: Zustand + React Query (TanStack Query)
-- **Data Layer**: 20 modular domain services (`lib/services/`)
+- **Data Layer**: Configurable provider with Django/Supabase/mock fallback (`lib/data-provider/`)
+- **Search**: Elasticsearch with Supabase full-text fallback (`lib/search/`)
 - **UI**: shadcn/ui component library + Tailwind CSS
 - **Linting**: ESLint with Airbnb-style config + Prettier
 - **Deployment**: Vercel with automatic CI/CD
+
+**Backend (beli-backend/):**
+- **Framework**: Django 5 with Django REST Framework
+- **Database**: Supabase PostgreSQL (managed=False models)
+- **Architecture**: Domain-driven apps (`apps/restaurants/`, `apps/users/`, `apps/feed/`, etc.)
+- **Auth**: JWT-ready (connects to Supabase Auth)
+
+**Database (supabase/):**
+- **Database**: PostgreSQL with PostGIS for geospatial queries
+- **Security**: Row Level Security (RLS) policies
+- **Functions**: PostgreSQL functions + Deno Edge Functions
+- **Migrations**: Version-controlled schema in `migrations/`
 
 ### Component Organization
 
@@ -228,6 +280,56 @@ Available hooks:
 - `useNotifications()` - User notifications
 - `useMediaQuery()` - Responsive breakpoint detection
 
+### Data Provider System
+
+The web app supports multiple data backends with automatic fallback:
+
+**Environment Variables (beli-web/.env.local):**
+```env
+NEXT_PUBLIC_DATA_PROVIDER=auto  # 'django' | 'supabase' | 'mock' | 'auto'
+NEXT_PUBLIC_DJANGO_API_URL=http://localhost:8000/api/v1
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+**Provider Modes:**
+- `django` - Use Django REST API exclusively
+- `supabase` - Use Supabase SDK exclusively
+- `mock` - Use mock data (for demos without database)
+- `auto` - Try Supabase → mock with automatic fallback
+
+**Usage:**
+```typescript
+import { withFallback, resolveProvider } from '@/lib/data-provider';
+
+// Wrap operations with automatic fallback
+const { data, provider } = await withFallback(
+  async () => supabaseQuery(),   // Try Supabase first
+  () => mockData,                 // Fall back to mock
+  { djangoOperation: async () => djangoClient.get('/restaurants/') }
+);
+```
+
+### Search Provider System
+
+Restaurant search supports Elasticsearch with Supabase fallback:
+
+**Environment Variables:**
+```env
+SEARCH_PROVIDER=auto  # 'elasticsearch' | 'supabase' | 'auto'
+ELASTICSEARCH_URL=https://your-cluster.bonsaisearch.net
+```
+
+**Usage:**
+```typescript
+import { searchRestaurants, autocomplete, geoSearch } from '@/lib/search';
+
+// Automatically uses best available provider
+const { results, provider } = await searchRestaurants({ query: 'pizza' });
+const suggestions = await autocomplete('piz');
+const nearby = await geoSearch(40.758, -73.985, '2km');
+```
+
 ### Navigation Structure
 
 **Mobile (React Navigation 7):**
@@ -332,9 +434,14 @@ All components and functions are fully typed with TypeScript strict mode enabled
 - Additional web features for full parity with mobile
 - List picker modal and mobile tabs (new files in beli-web/components/lists/)
 
+### Backend Status
+- **Django API**: Implemented with domain-driven apps, connects to Supabase PostgreSQL
+- **Supabase**: PostgreSQL + PostGIS schema with RLS policies and Edge Functions
+- **Data Provider**: Automatic fallback between Django → Supabase → mock data
+- **Search**: Elasticsearch (Bonsai.io) with Supabase full-text fallback
+
 ### Not Yet Implemented
-- Real backend integration (currently using mock data with domain services on web, MockDataService on mobile)
-- Authentication flow
+- Authentication flow UI (backend supports it)
 - Push notifications
 - Photo upload functionality
 - Real-time features (live updates, notifications)
@@ -406,10 +513,16 @@ import { cn } from '@/lib/utils';
 - **Image optimization** - Configured for Unsplash and Pravatar in [next.config.ts](beli-web/next.config.ts)
 - **Mobile-first responsive** - Design for mobile, then tablet, then desktop
 
+**Backend:**
+- **Django** uses Python 3.12+ with Django 5.x
+- **Supabase** requires Docker for local development (`supabase start`)
+- **PostgreSQL** uses PostGIS extension for geospatial queries
+- **Environment variables** required - see `.env.example` files in each project
+
 **Both Platforms:**
-- Mock data only - No real API integration yet
-- No authentication/authorization implemented
-- Data is ephemeral (resets on app restart)
+- Web supports Django/Supabase/mock data via `NEXT_PUBLIC_DATA_PROVIDER`
+- Mobile still uses MockDataService (backend integration in progress)
+- No authentication UI implemented (backend supports it)
 
 ## Project Context
 
