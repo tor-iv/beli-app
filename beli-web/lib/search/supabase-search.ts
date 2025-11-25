@@ -41,18 +41,21 @@ export async function searchWithSupabase(
     const sanitizedQuery = query.trim().replace(/[%_'"\\;]/g, '');
     if (sanitizedQuery.length > 0) {
       const searchTerm = `%${sanitizedQuery}%`;
-      // Note: cuisine search handled separately below to avoid injection
+      // Search name, neighborhood, and address only
+      // Cuisine search removed - it was causing JSON syntax errors with special characters
+      // ES handles cuisine search properly, PG fallback should be simple and reliable
       queryBuilder = queryBuilder.or(
         `name.ilike.${searchTerm},neighborhood.ilike.${searchTerm},address.ilike.${searchTerm}`
       );
-      // Safe cuisine array overlap - uses parameterized filter
-      queryBuilder = queryBuilder.or(`cuisine.cs.{"${sanitizedQuery}"}`);
     }
   }
 
   // Apply filters
+  // Note: cuisine is JSONB array, not TEXT[], so we use contains instead of overlaps
   if (filters?.cuisine?.length) {
-    queryBuilder = queryBuilder.overlaps('cuisine', filters.cuisine);
+    // For JSONB arrays, use @> (contains) - checks if cuisine contains any of the filter values
+    // This matches if the restaurant has ALL specified cuisines
+    queryBuilder = queryBuilder.contains('cuisine', filters.cuisine);
   }
 
   if (filters?.priceRange?.length) {
@@ -172,13 +175,13 @@ export async function geoSearchWithSupabase(
     if (sanitizedQuery.length > 0) {
       const searchTerm = `%${sanitizedQuery}%`;
       queryBuilder = queryBuilder.or(`name.ilike.${searchTerm}`);
-      // Safe cuisine array overlap
-      queryBuilder = queryBuilder.or(`cuisine.cs.{"${sanitizedQuery}"}`);
+      // Cuisine search removed - it was causing JSON syntax errors
     }
   }
 
   if (filters?.cuisine?.length) {
-    queryBuilder = queryBuilder.overlaps('cuisine', filters.cuisine);
+    // For JSONB arrays, use contains instead of overlaps
+    queryBuilder = queryBuilder.contains('cuisine', filters.cuisine);
   }
 
   if (filters?.minRating) {

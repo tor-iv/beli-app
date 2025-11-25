@@ -6,6 +6,38 @@ Beli-web uses a **dual-backend search system** with automatic failover:
 - **Primary**: Elasticsearch (via Bonsai.io in production)
 - **Fallback**: Supabase PostgreSQL
 
+---
+
+## Why Elasticsearch? (For Founders)
+
+**Every Beli search = Text + Location**. Users search for "pizza near me" or "sushi in Brooklyn" — combined geo + text queries are ES's sweet spot.
+
+### The Key Difference
+
+| Query Type | PostgreSQL | Elasticsearch | Winner |
+|------------|------------|---------------|--------|
+| Autocomplete ("piz") | 40-100ms | 5-15ms | **ES 5-8x faster** |
+| Fuzzy/typo ("itlaian") | 80-200ms | 10-30ms | **ES 3-6x faster** |
+| Geo + Text ("pizza near me") | Two operations | Single pass | **ES optimized** |
+| Under load (20 concurrent) | Connection pool stress | Built for concurrency | **ES handles scale** |
+
+### Why This Matters
+
+1. **Combined geo+text is the default** — ES handles in one optimized pass, PG needs two steps
+2. **Autocomplete must be instant** — ES edge n-grams are pre-computed at index time
+3. **Typo tolerance is expected** — ES fuzzy matching with `fuzziness: AUTO`
+4. **Scale to millions of users** — ES is built for high concurrency
+
+### Benchmark Dashboard
+
+Test it yourself: **`/dev/search-benchmark`**
+
+- Interactive side-by-side comparison
+- Stress test with 20 concurrent queries
+- Real data from production (~5,600 restaurants)
+
+---
+
 ## Search API
 
 **Endpoint**: `GET /api/search`
