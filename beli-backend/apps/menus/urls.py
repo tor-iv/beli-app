@@ -1,12 +1,12 @@
 """
-Restaurant URL configuration.
+Menus URL configuration.
 """
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import RestaurantViewSet
+from .views import MenusViewSet
 
 router = DefaultRouter()
-router.register(r'', RestaurantViewSet, basename='restaurant')
+router.register(r'', MenusViewSet, basename='menus')
 
 urlpatterns = [
     path('', include(router.urls)),

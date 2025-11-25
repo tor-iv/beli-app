@@ -1,140 +1,119 @@
-# Beli Backend API
+# Beli Django Backend
 
-Django REST Framework backend for the Beli restaurant discovery app.
+Django REST API backend for the Beli restaurant rating app. Connects to the existing Supabase PostgreSQL database.
 
-## Tech Stack
+## Quick Start
 
-- **Django 5.0** + **Django REST Framework**
-- **PostgreSQL 15+** with **PostGIS** extension (geospatial queries)
-- **Redis** (caching + sessions)
-- **Python 3.11+**
-
-## Architecture
-
-```
-Hybrid Architecture:
-- PostgreSQL: Primary data store (relational data)
-- Redis: Caching layer (feeds, leaderboards, match percentages)
-- Django Monolith: All services in one application
-```
-
-## Setup
-
-### Prerequisites
-
-1. **Python 3.11+**
-2. **PostgreSQL 15+** with PostGIS extension
-3. **Redis 7+**
-
-### Installation
+### 1. Set up Python environment
 
 ```bash
-# 1. Create virtual environment
+cd beli-backend
+
+# Create virtual environment
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# 2. Install dependencies
+# Install dependencies
 pip install -r requirements.txt
+```
 
-# 3. Copy environment file
+### 2. Configure environment
+
+```bash
+# Copy example env file
 cp .env.example .env
-# Edit .env with your database credentials
 
-# 4. Create PostgreSQL database with PostGIS
-createdb beli_db
-psql beli_db -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+# Edit .env with your Supabase database URL
+# DATABASE_URL=postgres://postgres:YOUR_PASSWORD@db.YOUR_PROJECT.supabase.co:5432/postgres
+```
 
-# 5. Run migrations
-python manage.py migrate
+### 3. Run the server
 
-# 6. Create superuser
-python manage.py createsuperuser
-
-# 7. Load seed data
-python manage.py seed_restaurants
-
-# 8. Run development server
+```bash
 python manage.py runserver
 ```
+
+The API will be available at `http://localhost:8000/api/v1/`
 
 ## API Endpoints
 
 ### Restaurants
 
-- `GET /api/restaurants/` - List all restaurants (with pagination)
-- `GET /api/restaurants/{id}/` - Get restaurant details
-- `GET /api/restaurants/search/?q=pizza` - Search restaurants
-- `GET /api/restaurants/nearby/?lat=40.7580&lng=-73.9855&radius=2` - Nearby restaurants
-- `GET /api/restaurants/trending/` - Trending restaurants
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/restaurants/` | GET | List all restaurants |
+| `/api/v1/restaurants/{id}/` | GET | Get single restaurant |
+| `/api/v1/restaurants/search/` | GET | Search restaurants |
+| `/api/v1/restaurants/trending/` | GET | Get trending restaurants |
+| `/api/v1/restaurants/batch/` | POST | Get multiple by IDs |
+| `/api/v1/restaurants/random/` | GET | Get random restaurants |
 
-### Coming Soon
+### Users
 
-- Users & Authentication
-- Lists (Been, Want-to-try, Recommendations)
-- Social Feed
-- Reviews & Ratings
-- Tastemakers
-- Group Dinner matching
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/users/` | GET | List all users |
+| `/api/v1/users/{id}/` | GET | Get single user |
+| `/api/v1/users/me/` | GET | Get current user |
+| `/api/v1/users/search/` | GET | Search users |
+| `/api/v1/users/leaderboard/` | GET | Get leaderboard |
+| `/api/v1/users/{id}/followers/` | GET | Get user's followers |
+| `/api/v1/users/{id}/following/` | GET | Get users followed |
+| `/api/v1/users/{id}/ratings/` | GET | Get user's ratings |
+| `/api/v1/users/{id}/watchlist/` | GET | Get user's watchlist |
+| `/api/v1/users/{id}/match/{targetId}/` | GET | Get match percentage |
+
+## Using with the Frontend
+
+### Enable Django in Next.js
+
+Add to your `.env.local`:
+
+```env
+NEXT_PUBLIC_DATA_PROVIDER=django
+NEXT_PUBLIC_DJANGO_API_URL=http://localhost:8000/api/v1
+```
+
+### Toggle Modes
+
+- `django` - Use Django REST API
+- `supabase` - Use Supabase SDK (default)
+- `mock` - Use mock data
+- `auto` - Try Supabase, fall back to mock
+
+## Architecture
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Next.js       │ →   │  Django API     │ →   │  Supabase       │
+│   localhost:3000│     │  localhost:8000 │     │  PostgreSQL     │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+Django uses `managed=False` models to read/write the existing Supabase tables without creating migrations.
 
 ## Project Structure
 
 ```
 beli-backend/
-├── config/              # Django project settings
-│   ├── settings.py
-│   ├── urls.py
+├── config/             # Django settings
+│   ├── settings.py     # Main configuration
+│   ├── urls.py         # Root URL routing
 │   └── wsgi.py
 ├── apps/
-│   ├── restaurants/     # Restaurant domain
-│   ├── users/          # User management (TODO)
-│   ├── social/         # Feed, follows (TODO)
-│   └── lists/          # User lists (TODO)
-├── common/             # Shared utilities
-│   ├── cache.py        # Redis caching helpers
-│   └── pagination.py   # Custom pagination
+│   ├── restaurants/    # Restaurant API
+│   │   ├── models.py   # Restaurant model
+│   │   ├── serializers.py
+│   │   ├── views.py
+│   │   └── urls.py
+│   ├── users/          # User API
+│   │   ├── models.py   # User, Rating, UserFollow models
+│   │   ├── serializers.py
+│   │   ├── views.py
+│   │   ├── urls.py
+│   │   └── services.py # Match % algorithm
+│   └── core/           # Shared utilities
 ├── manage.py
-└── requirements.txt
+├── requirements.txt
+└── .env.example
 ```
-
-## Development
-
-```bash
-# Run tests
-pytest
-
-# Format code
-black .
-
-# Run linter
-flake8
-
-# Create new migration
-python manage.py makemigrations
-
-# Django shell with IPython
-python manage.py shell_plus
-```
-
-## Database Design Philosophy
-
-**Denormalized "Fat Model" Approach:**
-- Restaurant data stored in single table with embedded location/hours
-- Optimized for read-heavy workload (95% reads)
-- JSON fields for flexible data (hours, tags, images)
-- PostGIS for geospatial queries
-
-**Why not microservices?**
-- Early stage: Monolith = faster iteration
-- Clear upgrade path: Extract services later when needed
-- Most apps don't need microservices until 1M+ DAU
-
-## Performance
-
-- Target: <100ms API response time
-- Redis caching for hot data
-- Database indexing on common queries
-- PostGIS spatial indexes for location queries
-
-## Contributing
-
-See main project README for contribution guidelines.

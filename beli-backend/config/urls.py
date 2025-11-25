@@ -1,25 +1,36 @@
 """
-URL configuration for Beli Backend API.
-"""
+URL configuration for beli-backend project.
 
+API endpoints are versioned under /api/v1/
+"""
 from django.contrib import admin
 from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
 
 urlpatterns = [
-    # Admin
-    path('admin/', admin.site.admin_view),
+    path('admin/', admin.site.urls),
 
-    # API endpoints
-    path('api/', include([
-        path('restaurants/', include('apps.restaurants.urls')),
-        # path('users/', include('apps.users.urls')),  # TODO
-        # path('feed/', include('apps.social.urls')),   # TODO
-        # path('lists/', include('apps.lists.urls')),   # TODO
-    ])),
+    # Authentication
+    path('api/v1/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/v1/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/v1/auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+
+    # Core resources
+    path('api/v1/restaurants/', include('apps.restaurants.urls')),
+    path('api/v1/users/', include('apps.users.urls')),
+
+    # Social features
+    path('api/v1/feed/', include('apps.feed.urls')),
+    path('api/v1/ratings/', include('apps.ratings.urls')),
+    path('api/v1/lists/', include('apps.lists.urls')),
+    path('api/v1/notifications/', include('apps.notifications.urls')),
+
+    # Discovery features
+    path('api/v1/group-dinner/', include('apps.group_dinner.urls')),
+    path('api/v1/tastemakers/', include('apps.tastemakers.urls')),
+    path('api/v1/menus/', include('apps.menus.urls')),
 ]
-
-# Serve media files in development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
