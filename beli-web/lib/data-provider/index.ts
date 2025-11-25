@@ -1,30 +1,30 @@
 /**
  * Data Provider Service
  *
- * Provides automatic fallback from Supabase to mock data for demo mode.
- * Mirrors the pattern used in lib/search/index.ts for search provider fallback.
+ * Provides automatic fallback between Django, Supabase, and mock data.
  *
  * Environment Variables:
- *   NEXT_PUBLIC_DATA_PROVIDER: 'supabase' | 'mock' | 'auto' (default: 'auto')
- *     - 'supabase': Always use Supabase (fails if unavailable)
+ *   NEXT_PUBLIC_DATA_PROVIDER: 'django' | 'supabase' | 'mock' | 'auto' (default: 'auto')
+ *     - 'django': Use Django REST API (localhost:8000 for development)
+ *     - 'supabase': Use Supabase SDK (direct client-side queries)
  *     - 'mock': Always use mock data (for demo without database)
- *     - 'auto': Try Supabase, fallback to mock if unavailable
+ *     - 'auto': Try Django → Supabase → mock in order of availability
  *
  * Usage:
  *   import { withFallback, useMockData } from '@/lib/data-provider';
  *
- *   // Wrap Supabase operations with mock fallback
+ *   // Wrap operations with automatic fallback
  *   const { data } = await withFallback(
- *     async () => {
- *       const { data, error } = await supabase.from('restaurants').select('*');
- *       if (error) throw error;
- *       return data;
- *     },
- *     () => mockRestaurants
+ *     async () => supabaseQuery(),  // Supabase operation
+ *     () => mockRestaurants,         // Mock fallback
+ *     {
+ *       djangoOperation: async () => djangoClient.get('/restaurants/'),  // Optional Django
+ *     }
  *   );
  */
 
-export type DataProviderMode = 'supabase' | 'mock' | 'auto';
+export type DataProviderMode = 'django' | 'supabase' | 'mock' | 'auto';
+export type ActiveProvider = 'django' | 'supabase' | 'mock';
 
 // Cache Supabase availability status to avoid repeated health checks
 let supabaseAvailabilityCache: { available: boolean; checkedAt: number } | null = null;
@@ -35,7 +35,7 @@ const SUPABASE_HEALTH_CHECK_INTERVAL = 30000; // 30 seconds
  */
 export function getDataProviderMode(): DataProviderMode {
   const mode = process.env.NEXT_PUBLIC_DATA_PROVIDER?.toLowerCase() as DataProviderMode;
-  if (mode === 'supabase' || mode === 'mock') {
+  if (mode === 'django' || mode === 'supabase' || mode === 'mock') {
     return mode;
   }
   return 'auto';
@@ -99,8 +99,13 @@ export async function isSupabaseAvailable(): Promise<boolean> {
 /**
  * Determine which provider to use based on config and availability
  */
-export async function resolveProvider(): Promise<'supabase' | 'mock'> {
+export async function resolveProvider(): Promise<ActiveProvider> {
   const configured = getDataProviderMode();
+
+  // Explicit provider modes
+  if (configured === 'django') {
+    return 'django';
+  }
 
   if (configured === 'supabase') {
     return 'supabase';
@@ -110,35 +115,52 @@ export async function resolveProvider(): Promise<'supabase' | 'mock'> {
     return 'mock';
   }
 
-  // Auto mode: prefer Supabase if available
+  // Auto mode: prefer Supabase if available (Django is opt-in only)
   const available = await isSupabaseAvailable();
   return available ? 'supabase' : 'mock';
 }
 
 /**
- * Execute an operation with automatic fallback to mock data
+ * Execute an operation with automatic fallback between providers
  *
- * @param supabaseOperation - The Supabase query to try first
- * @param mockFallback - The mock data to return if Supabase fails
- * @param options - Optional callbacks for logging/monitoring
+ * @param supabaseOperation - The Supabase query to try
+ * @param mockFallback - The mock data to return as last resort
+ * @param options - Optional Django operation and callbacks
  * @returns Object with data and which provider was used
  */
 export async function withFallback<T>(
   supabaseOperation: () => Promise<T>,
   mockFallback: () => T | Promise<T>,
   options?: {
+    djangoOperation?: () => Promise<T>;
     onFallback?: (error: Error) => void;
     operationName?: string;
   }
-): Promise<{ data: T; provider: 'supabase' | 'mock' }> {
+): Promise<{ data: T; provider: ActiveProvider }> {
   const provider = await resolveProvider();
 
-  // If configured for mock, skip Supabase entirely
+  // If configured for mock, skip everything
   if (provider === 'mock') {
     return { data: await mockFallback(), provider: 'mock' };
   }
 
-  // Try Supabase first
+  // If configured for Django and operation provided
+  if (provider === 'django' && options?.djangoOperation) {
+    try {
+      const data = await options.djangoOperation();
+      return { data, provider: 'django' };
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      console.warn(
+        `[DataProvider] Django ${options?.operationName || 'operation'} failed, falling back to mock:`,
+        errorMsg
+      );
+      options?.onFallback?.(error instanceof Error ? error : new Error(errorMsg));
+      return { data: await mockFallback(), provider: 'mock' };
+    }
+  }
+
+  // Try Supabase
   try {
     const data = await supabaseOperation();
     return { data, provider: 'supabase' };
@@ -146,7 +168,7 @@ export async function withFallback<T>(
     // Supabase failed, update cache and fallback to mock
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
     console.warn(
-      `[DataProvider] ${options?.operationName || 'Operation'} failed, falling back to mock:`,
+      `[DataProvider] Supabase ${options?.operationName || 'operation'} failed, falling back to mock:`,
       errorMsg
     );
 
@@ -171,21 +193,27 @@ export function invalidateDataProviderCache(): void {
  */
 export async function getDataProviderStatus(): Promise<{
   configured: DataProviderMode;
-  active: 'supabase' | 'mock';
+  active: ActiveProvider;
+  django: {
+    url: string;
+  };
   supabase: {
     available: boolean;
     url: string | undefined;
   };
 }> {
   const configured = getDataProviderMode();
-  const available = await isSupabaseAvailable();
+  const supabaseAvailable = await isSupabaseAvailable();
   const active = await resolveProvider();
 
   return {
     configured,
     active,
+    django: {
+      url: process.env.NEXT_PUBLIC_DJANGO_API_URL || 'http://localhost:8000/api/v1',
+    },
     supabase: {
-      available,
+      available: supabaseAvailable,
       url: process.env.NEXT_PUBLIC_SUPABASE_URL,
     },
   };
