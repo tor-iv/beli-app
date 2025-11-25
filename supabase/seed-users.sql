@@ -133,7 +133,14 @@ VALUES
   false,
   NOW() - INTERVAL '5 months'
 )
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+  username = EXCLUDED.username,
+  display_name = EXCLUDED.display_name,
+  avatar = EXCLUDED.avatar,
+  bio = EXCLUDED.bio,
+  city = EXCLUDED.city,
+  state = EXCLUDED.state,
+  is_tastemaker = EXCLUDED.is_tastemaker;
 
 -- ============================================
 -- Social Graph (who follows whom)
