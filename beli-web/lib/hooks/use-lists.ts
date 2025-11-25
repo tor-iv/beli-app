@@ -11,7 +11,7 @@ export function useLists(
 ) {
   return useQuery({
     queryKey: ['lists', userId],
-    queryFn: () => ListService.getUserLists(userId || '1'),
+    queryFn: () => ListService.getUserLists(userId || '00000000-0000-0000-0000-000000000001'),
     ...options,
   });
 }
