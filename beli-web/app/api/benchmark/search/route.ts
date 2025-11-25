@@ -54,6 +54,13 @@ interface BenchmarkResponse {
   speedupText: string;
 }
 
+interface TypeBreakdown {
+  es: { avg: number; count: number };
+  pg: { avg: number; count: number };
+  winner: 'elasticsearch' | 'supabase' | 'tie';
+  speedup: number;
+}
+
 interface StressTestResponse {
   queryType: 'stress';
   timestamp: string;
@@ -75,6 +82,12 @@ interface StressTestResponse {
     minTime: number;
     maxTime: number;
     failures: number;
+  };
+  byType: {
+    autocomplete: TypeBreakdown;
+    fulltext: TypeBreakdown;
+    geo: TypeBreakdown;
+    filtered: TypeBreakdown;
   };
   winner: 'elasticsearch' | 'supabase';
   loadAdvantage: string;
@@ -105,29 +118,131 @@ function percentile(sorted: number[], p: number): number {
   return sorted[Math.max(0, index)];
 }
 
-// Stress test queries - mix of different query types
+// NYC locations for geo queries
+const NYC_LOCATIONS = {
+  timesSquare: { lat: 40.758, lon: -73.9855 },
+  empireState: { lat: 40.7484, lon: -73.9857 },
+  brooklynHeights: { lat: 40.6959, lon: -73.9938 },
+  williamsburg: { lat: 40.7081, lon: -73.9571 },
+  upperEastSide: { lat: 40.7736, lon: -73.9566 },
+};
+
+// Stress test queries - 32 queries across 4 types (8 each)
+// Reduced from 100 to work within Bonsai free tier rate limits
 const STRESS_TEST_QUERIES = [
+  // ===== AUTOCOMPLETE (8 queries) =====
+  { type: 'autocomplete' as const, query: 'pi' },
+  { type: 'autocomplete' as const, query: 'su' },
   { type: 'autocomplete' as const, query: 'piz' },
   { type: 'autocomplete' as const, query: 'sus' },
   { type: 'autocomplete' as const, query: 'ital' },
+  { type: 'autocomplete' as const, query: 'mex' },
+  { type: 'autocomplete' as const, query: 'baltha' },
+  { type: 'autocomplete' as const, query: 'taver' },
+
+  // ===== FULLTEXT (8 queries) =====
   { type: 'fulltext' as const, query: 'pizza' },
-  { type: 'fulltext' as const, query: 'italian brooklyn' },
   { type: 'fulltext' as const, query: 'sushi' },
+  { type: 'fulltext' as const, query: 'italian brooklyn' },
   { type: 'fulltext' as const, query: 'mexican food' },
-  { type: 'fulltext' as const, query: 'thai restaurant' },
-  { type: 'geo' as const, query: 'pizza', lat: 40.758, lon: -73.9855 },
-  { type: 'geo' as const, query: 'sushi', lat: 40.7484, lon: -73.9857 },
-  { type: 'geo' as const, query: '', lat: 40.758, lon: -73.9855 },
+  // Typos (fuzzy matching - ES advantage)
+  { type: 'fulltext' as const, query: 'pizzza' },
+  { type: 'fulltext' as const, query: 'suhsi' },
+  { type: 'fulltext' as const, query: 'itlaian' },
+  { type: 'fulltext' as const, query: 'burgir' },
+
+  // ===== GEO (8 queries) =====
+  { type: 'geo' as const, query: 'pizza', ...NYC_LOCATIONS.timesSquare, distance: '2km' },
+  { type: 'geo' as const, query: 'sushi', ...NYC_LOCATIONS.timesSquare, distance: '2km' },
+  { type: 'geo' as const, query: '', ...NYC_LOCATIONS.timesSquare, distance: '2km' },
+  { type: 'geo' as const, query: 'ramen', ...NYC_LOCATIONS.empireState, distance: '2km' },
+  { type: 'geo' as const, query: '', ...NYC_LOCATIONS.empireState, distance: '2km' },
+  { type: 'geo' as const, query: 'pizza', ...NYC_LOCATIONS.brooklynHeights, distance: '2km' },
+  { type: 'geo' as const, query: 'tacos', ...NYC_LOCATIONS.williamsburg, distance: '2km' },
+  { type: 'geo' as const, query: 'french', ...NYC_LOCATIONS.upperEastSide, distance: '2km' },
+
+  // ===== FILTERED (8 queries) =====
   { type: 'filtered' as const, query: '', cuisine: ['Italian'] },
   { type: 'filtered' as const, query: '', cuisine: ['Japanese'] },
-  { type: 'filtered' as const, query: 'pasta', cuisine: ['Italian'], minRating: 7 },
-  { type: 'autocomplete' as const, query: 'bal' },
-  { type: 'fulltext' as const, query: 'burger' },
-  { type: 'fulltext' as const, query: 'chinese' },
-  { type: 'geo' as const, query: 'ramen', lat: 40.758, lon: -73.9855 },
   { type: 'filtered' as const, query: '', cuisine: ['Mexican'] },
-  { type: 'fulltext' as const, query: 'french bistro' },
+  { type: 'filtered' as const, query: '', minRating: 8 },
+  { type: 'filtered' as const, query: '', cuisine: ['Italian'], minRating: 7 },
+  { type: 'filtered' as const, query: '', cuisine: ['Japanese'], minRating: 8 },
+  { type: 'filtered' as const, query: 'pasta', cuisine: ['Italian'], minRating: 7 },
+  { type: 'filtered' as const, query: 'ramen', cuisine: ['Japanese'], minRating: 7 },
 ];
+
+// Helper to compute per-type breakdown
+function computeTypeBreakdown(
+  esTimings: number[],
+  pgTimings: number[]
+): TypeBreakdown {
+  const esAvg = esTimings.length > 0 ? esTimings.reduce((a, b) => a + b, 0) / esTimings.length : 0;
+  const pgAvg = pgTimings.length > 0 ? pgTimings.reduce((a, b) => a + b, 0) / pgTimings.length : 0;
+
+  let winner: 'elasticsearch' | 'supabase' | 'tie' = 'tie';
+  let speedup = 1;
+
+  if (esAvg < pgAvg * 0.95) {
+    winner = 'elasticsearch';
+    speedup = pgAvg / esAvg;
+  } else if (pgAvg < esAvg * 0.95) {
+    winner = 'supabase';
+    speedup = esAvg / pgAvg;
+  }
+
+  return {
+    es: { avg: Math.round(esAvg * 10) / 10, count: esTimings.length },
+    pg: { avg: Math.round(pgAvg * 10) / 10, count: pgTimings.length },
+    winner,
+    speedup: Math.round(speedup * 10) / 10,
+  };
+}
+
+// Helper to run a single benchmark query
+async function runBenchmarkQuery(q: typeof STRESS_TEST_QUERIES[number]) {
+  const distance = 'distance' in q ? q.distance : '2km';
+
+  const [esResult, pgResult] = await Promise.all([
+    runWithTiming(async () => {
+      switch (q.type) {
+        case 'autocomplete':
+          return esAutocomplete(q.query, 10);
+        case 'geo':
+          return esGeoSearch(q.lat!, q.lon!, distance, { query: q.query || undefined, limit: 20 });
+        case 'filtered':
+          return esSearch({
+            query: q.query || '',
+            filters: { cuisine: q.cuisine, minRating: q.minRating },
+            limit: 20,
+          });
+        default:
+          return esSearch({ query: q.query, limit: 20 });
+      }
+    }),
+    runWithTiming(async () => {
+      switch (q.type) {
+        case 'autocomplete':
+          return autocompleteWithSupabase(q.query, 10);
+        case 'geo':
+          return geoSearchWithSupabase(q.lat!, q.lon!, distance, {
+            query: q.query || undefined,
+            limit: 20,
+          });
+        case 'filtered':
+          return searchWithSupabase({
+            query: q.query || '',
+            filters: { cuisine: q.cuisine, minRating: q.minRating },
+            limit: 20,
+          });
+        default:
+          return searchWithSupabase({ query: q.query, limit: 20 });
+      }
+    }),
+  ]);
+
+  return { esResult, pgResult, type: q.type };
+}
 
 async function runStressTest(): Promise<StressTestResponse> {
   const esTimings: number[] = [];
@@ -135,56 +250,42 @@ async function runStressTest(): Promise<StressTestResponse> {
   let esFailures = 0;
   let pgFailures = 0;
 
-  // Run all queries in parallel against both backends
-  const results = await Promise.all(
-    STRESS_TEST_QUERIES.map(async (q) => {
-      const [esResult, pgResult] = await Promise.all([
-        runWithTiming(async () => {
-          switch (q.type) {
-            case 'autocomplete':
-              return esAutocomplete(q.query, 10);
-            case 'geo':
-              return esGeoSearch(q.lat!, q.lon!, '2km', { query: q.query || undefined, limit: 20 });
-            case 'filtered':
-              return esSearch({
-                query: q.query || '',
-                filters: { cuisine: q.cuisine, minRating: q.minRating },
-                limit: 20,
-              });
-            default:
-              return esSearch({ query: q.query, limit: 20 });
-          }
-        }),
-        runWithTiming(async () => {
-          switch (q.type) {
-            case 'autocomplete':
-              return autocompleteWithSupabase(q.query, 10);
-            case 'geo':
-              return geoSearchWithSupabase(q.lat!, q.lon!, '2km', {
-                query: q.query || undefined,
-                limit: 20,
-              });
-            case 'filtered':
-              return searchWithSupabase({
-                query: q.query || '',
-                filters: { cuisine: q.cuisine, minRating: q.minRating },
-                limit: 20,
-              });
-            default:
-              return searchWithSupabase({ query: q.query, limit: 20 });
-          }
-        }),
-      ]);
+  // Per-type timing tracking
+  const timingsByType: Record<string, { es: number[]; pg: number[] }> = {
+    autocomplete: { es: [], pg: [] },
+    fulltext: { es: [], pg: [] },
+    geo: { es: [], pg: [] },
+    filtered: { es: [], pg: [] },
+  };
 
+  // Run queries in batches of 4 to avoid overwhelming ES cluster
+  // Bonsai free tier has strict rate limits
+  const BATCH_SIZE = 4;
+  for (let i = 0; i < STRESS_TEST_QUERIES.length; i += BATCH_SIZE) {
+    const batch = STRESS_TEST_QUERIES.slice(i, i + BATCH_SIZE);
+
+    const batchResults = await Promise.all(batch.map(runBenchmarkQuery));
+
+    // Small delay between batches to avoid rate limiting
+    if (i + BATCH_SIZE < STRESS_TEST_QUERIES.length) {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+
+    // Process batch results
+    for (const { esResult, pgResult, type } of batchResults) {
       if (esResult.error) esFailures++;
-      else esTimings.push(esResult.timing);
+      else {
+        esTimings.push(esResult.timing);
+        timingsByType[type].es.push(esResult.timing);
+      }
 
       if (pgResult.error) pgFailures++;
-      else pgTimings.push(pgResult.timing);
-
-      return { esResult, pgResult };
-    })
-  );
+      else {
+        pgTimings.push(pgResult.timing);
+        timingsByType[type].pg.push(pgResult.timing);
+      }
+    }
+  }
 
   // Sort timings for percentile calculations
   esTimings.sort((a, b) => a - b);
@@ -195,6 +296,14 @@ async function runStressTest(): Promise<StressTestResponse> {
 
   const winner = avgEs <= avgPg ? 'elasticsearch' : 'supabase';
   const ratio = avgEs < avgPg ? avgPg / avgEs : avgEs / avgPg;
+
+  // Compute per-type breakdowns
+  const byType = {
+    autocomplete: computeTypeBreakdown(timingsByType.autocomplete.es, timingsByType.autocomplete.pg),
+    fulltext: computeTypeBreakdown(timingsByType.fulltext.es, timingsByType.fulltext.pg),
+    geo: computeTypeBreakdown(timingsByType.geo.es, timingsByType.geo.pg),
+    filtered: computeTypeBreakdown(timingsByType.filtered.es, timingsByType.filtered.pg),
+  };
 
   return {
     queryType: 'stress',
@@ -218,6 +327,7 @@ async function runStressTest(): Promise<StressTestResponse> {
       maxTime: Math.round(Math.max(...pgTimings) * 10) / 10,
       failures: pgFailures,
     },
+    byType,
     winner,
     loadAdvantage: `${winner === 'elasticsearch' ? 'ES' : 'PG'} is ${ratio.toFixed(1)}x faster under load`,
   };

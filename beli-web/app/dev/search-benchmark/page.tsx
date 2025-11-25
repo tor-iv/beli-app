@@ -42,6 +42,13 @@ interface BenchmarkResponse {
   speedupText: string;
 }
 
+interface TypeBreakdown {
+  es: { avg: number; count: number };
+  pg: { avg: number; count: number };
+  winner: 'elasticsearch' | 'supabase' | 'tie';
+  speedup: number;
+}
+
 interface StressTestResponse {
   queryType: 'stress';
   timestamp: string;
@@ -63,6 +70,12 @@ interface StressTestResponse {
     minTime: number;
     maxTime: number;
     failures: number;
+  };
+  byType: {
+    autocomplete: TypeBreakdown;
+    fulltext: TypeBreakdown;
+    geo: TypeBreakdown;
+    filtered: TypeBreakdown;
   };
   winner: 'elasticsearch' | 'supabase';
   loadAdvantage: string;
@@ -287,8 +300,54 @@ function BenchmarkHistory({ history }: { history: BenchmarkResponse[] }) {
   );
 }
 
+// Type breakdown row component
+function TypeBreakdownRow({ type, data, icon }: {
+  type: string;
+  data: TypeBreakdown;
+  icon: React.ReactNode;
+}) {
+  const winnerBg = data.winner === 'elasticsearch'
+    ? 'bg-teal-100 text-teal-700'
+    : data.winner === 'supabase'
+    ? 'bg-blue-100 text-blue-700'
+    : 'bg-gray-100 text-gray-700';
+
+  return (
+    <tr className="border-b border-gray-100">
+      <td className="py-3 px-3">
+        <div className="flex items-center gap-2">
+          {icon}
+          <span className="font-medium capitalize">{type}</span>
+          <span className="text-gray-400 text-xs">({data.es.count})</span>
+        </div>
+      </td>
+      <td className="py-3 px-3 text-right font-mono">{data.es.avg}ms</td>
+      <td className="py-3 px-3 text-right font-mono">{data.pg.avg}ms</td>
+      <td className="py-3 px-3 text-center">
+        <span className={`px-2 py-0.5 rounded text-xs font-medium ${winnerBg}`}>
+          {data.winner === 'elasticsearch' ? 'ES' : data.winner === 'supabase' ? 'PG' : 'Tie'}
+        </span>
+      </td>
+      <td className="py-3 px-3 text-right">
+        {data.speedup > 1 && (
+          <span className={`font-medium ${data.winner === 'elasticsearch' ? 'text-teal-600' : 'text-blue-600'}`}>
+            {data.speedup}x
+          </span>
+        )}
+      </td>
+    </tr>
+  );
+}
+
 // Stress test results display
 function StressTestResults({ results }: { results: StressTestResponse }) {
+  const typeIcons: Record<string, React.ReactNode> = {
+    autocomplete: <Search className="h-4 w-4 text-purple-500" />,
+    fulltext: <Search className="h-4 w-4 text-indigo-500" />,
+    geo: <MapPin className="h-4 w-4 text-green-500" />,
+    filtered: <Filter className="h-4 w-4 text-orange-500" />,
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
@@ -298,6 +357,39 @@ function StressTestResults({ results }: { results: StressTestResponse }) {
         <div className="text-lg text-gray-700">{results.loadAdvantage}</div>
       </div>
 
+      {/* Per-Type Breakdown Table */}
+      <div>
+        <h4 className="font-semibold text-gray-800 mb-3">Performance by Query Type</h4>
+        <div className="overflow-x-auto rounded-lg border">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left py-2 px-3 font-medium text-gray-600">Query Type</th>
+                <th className="text-right py-2 px-3 font-medium text-gray-600">
+                  <span className="flex items-center justify-end gap-1">
+                    <Zap className="h-3 w-3 text-yellow-500" /> ES Avg
+                  </span>
+                </th>
+                <th className="text-right py-2 px-3 font-medium text-gray-600">
+                  <span className="flex items-center justify-end gap-1">
+                    <Database className="h-3 w-3 text-blue-500" /> PG Avg
+                  </span>
+                </th>
+                <th className="text-center py-2 px-3 font-medium text-gray-600">Winner</th>
+                <th className="text-right py-2 px-3 font-medium text-gray-600">Speedup</th>
+              </tr>
+            </thead>
+            <tbody>
+              <TypeBreakdownRow type="autocomplete" data={results.byType.autocomplete} icon={typeIcons.autocomplete} />
+              <TypeBreakdownRow type="fulltext" data={results.byType.fulltext} icon={typeIcons.fulltext} />
+              <TypeBreakdownRow type="geo" data={results.byType.geo} icon={typeIcons.geo} />
+              <TypeBreakdownRow type="filtered" data={results.byType.filtered} icon={typeIcons.filtered} />
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Overall Stats Cards */}
       <div className="grid grid-cols-2 gap-4">
         <Card>
           <CardHeader className="pb-2">
@@ -575,8 +667,8 @@ export default function SearchBenchmarkPage() {
           </CardHeader>
           <CardContent>
             <p className="text-gray-600 text-sm mb-4">
-              Fire 20 concurrent queries of mixed types to simulate real-world load.
-              Shows average response time, P95, and P99 latencies.
+              Run 32 queries across 4 types (autocomplete, fulltext, geo, filtered)
+              to compare search performance. Shows per-type breakdown and percentile latencies.
             </p>
             <Button
               onClick={runStressTest}
@@ -587,7 +679,7 @@ export default function SearchBenchmarkPage() {
               {stressLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Running 20 concurrent queries...
+                  Running benchmark...
                 </>
               ) : (
                 <>

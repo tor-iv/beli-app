@@ -51,11 +51,11 @@ export async function searchWithSupabase(
   }
 
   // Apply filters
-  // Note: cuisine is JSONB array, not TEXT[], so we use contains instead of overlaps
+  // Note: cuisine is JSONB array, not TEXT[], so we use filter with explicit JSONB syntax
   if (filters?.cuisine?.length) {
-    // For JSONB arrays, use @> (contains) - checks if cuisine contains any of the filter values
-    // This matches if the restaurant has ALL specified cuisines
-    queryBuilder = queryBuilder.contains('cuisine', filters.cuisine);
+    // For JSONB arrays, use filter with 'cs' (contains) and JSON string
+    // This generates: cuisine @> '["Italian"]'::jsonb
+    queryBuilder = queryBuilder.filter('cuisine', 'cs', JSON.stringify(filters.cuisine));
   }
 
   if (filters?.priceRange?.length) {
@@ -180,8 +180,8 @@ export async function geoSearchWithSupabase(
   }
 
   if (filters?.cuisine?.length) {
-    // For JSONB arrays, use contains instead of overlaps
-    queryBuilder = queryBuilder.contains('cuisine', filters.cuisine);
+    // For JSONB arrays, use filter with 'cs' (contains) and JSON string
+    queryBuilder = queryBuilder.filter('cuisine', 'cs', JSON.stringify(filters.cuisine));
   }
 
   if (filters?.minRating) {
