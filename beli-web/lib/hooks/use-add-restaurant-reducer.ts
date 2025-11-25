@@ -4,8 +4,11 @@ import type {
   RatingType,
   ListTypeKey,
 } from '@/components/modals/add-restaurant/initial-rating-step';
-import type { RankedRestaurant, RankingState } from '@/types';
+import type { RankedRestaurant, RankingState, User } from '@/types';
 import type { Reducer } from 'react';
+
+// Modal types for sub-dialogs
+export type ActiveModalType = 'notes' | 'companions' | 'tags' | 'visitDate' | null;
 
 // Modal phases
 export type ModalPhase = 'initial' | 'ranking' | 'complete';
@@ -20,6 +23,13 @@ export interface AddRestaurantState {
   currentComparison: RankedRestaurant | null;
   loading: boolean;
   error: string | null;
+  // Metadata fields
+  notes: string;
+  companions: User[];
+  tags: string[];
+  visitDate: Date | null;
+  // Active sub-dialog
+  activeModal: ActiveModalType;
 }
 
 // Action types
@@ -32,7 +42,14 @@ export type AddRestaurantAction =
   | { type: 'COMPLETE_RANKING' }
   | { type: 'SET_LOADING'; loading: boolean }
   | { type: 'SET_ERROR'; error: string | null }
-  | { type: 'RESET' };
+  | { type: 'RESET' }
+  // Metadata actions
+  | { type: 'SET_NOTES'; notes: string }
+  | { type: 'SET_COMPANIONS'; companions: User[] }
+  | { type: 'SET_TAGS'; tags: string[] }
+  | { type: 'SET_VISIT_DATE'; visitDate: Date | null }
+  | { type: 'OPEN_MODAL'; modal: ActiveModalType }
+  | { type: 'CLOSE_MODAL' };
 
 // Initial state
 export const initialAddRestaurantState: AddRestaurantState = {
@@ -44,6 +61,12 @@ export const initialAddRestaurantState: AddRestaurantState = {
   currentComparison: null,
   loading: false,
   error: null,
+  // Metadata defaults
+  notes: '',
+  companions: [],
+  tags: [],
+  visitDate: null,
+  activeModal: null,
 };
 
 // Reducer function
@@ -115,6 +138,43 @@ const addRestaurantReducer: Reducer<AddRestaurantState, AddRestaurantAction> = (
 
     case 'RESET':
       return initialAddRestaurantState;
+
+    // Metadata actions
+    case 'SET_NOTES':
+      return {
+        ...state,
+        notes: action.notes,
+      };
+
+    case 'SET_COMPANIONS':
+      return {
+        ...state,
+        companions: action.companions,
+      };
+
+    case 'SET_TAGS':
+      return {
+        ...state,
+        tags: action.tags,
+      };
+
+    case 'SET_VISIT_DATE':
+      return {
+        ...state,
+        visitDate: action.visitDate,
+      };
+
+    case 'OPEN_MODAL':
+      return {
+        ...state,
+        activeModal: action.modal,
+      };
+
+    case 'CLOSE_MODAL':
+      return {
+        ...state,
+        activeModal: null,
+      };
 
     default:
       return state;

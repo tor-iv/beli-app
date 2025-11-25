@@ -1,5 +1,6 @@
 'use client';
 
+import { format } from 'date-fns';
 import {
   Utensils,
   Coffee,
@@ -15,6 +16,7 @@ import {
   ChevronRight,
   Check,
   ChevronDown,
+  CheckCircle2,
 } from 'lucide-react';
 import * as React from 'react';
 
@@ -29,7 +31,8 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 
-import type { Restaurant as RestaurantType, ListCategory } from '@/types';
+import type { Restaurant as RestaurantType, ListCategory, User } from '@/types';
+import type { ActiveModalType } from '@/lib/hooks/use-add-restaurant-reducer';
 
 const RATING_OPTIONS = [
   { key: 'liked' as const, label: 'I liked it!', color: 'bg-green-500' },
@@ -59,6 +62,13 @@ interface InitialRatingStepProps {
   onStealthModeChange: (enabled: boolean) => void;
   onSubmit: () => void;
   isLoading: boolean;
+  // Metadata state
+  notes: string;
+  companions: User[];
+  tags: string[];
+  visitDate: Date | null;
+  // Dialog handlers
+  onOpenModal: (modal: ActiveModalType) => void;
 }
 
 export const InitialRatingStep = ({
@@ -71,6 +81,11 @@ export const InitialRatingStep = ({
   onStealthModeChange,
   onSubmit,
   isLoading,
+  notes,
+  companions,
+  tags,
+  visitDate,
+  onOpenModal,
 }: InitialRatingStepProps) => {
   const [showListTypePicker, setShowListTypePicker] = React.useState(false);
 
@@ -125,60 +140,107 @@ export const InitialRatingStep = ({
         {/* Additional Options - Only show after rating is selected */}
         {rating !== null && (
           <div className="rounded-2xl bg-white px-4">
-            <button className="flex w-full items-center gap-3 border-b border-gray-200 py-3">
+            {/* Companions */}
+            <button
+              onClick={() => onOpenModal('companions')}
+              className="flex w-full items-center gap-3 border-b border-gray-200 py-3"
+            >
               <Users className="h-5 w-5 flex-shrink-0 text-foreground" />
               <span className="flex-1 text-left text-base text-foreground">
-                Who did you go with?
+                {companions.length > 0
+                  ? `With ${companions.map((c) => c.displayName).join(', ')}`
+                  : 'Who did you go with?'}
               </span>
-              <ChevronRight className="h-4 w-4 flex-shrink-0 text-secondary" />
+              {companions.length > 0 ? (
+                <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-primary" />
+              ) : (
+                <ChevronRight className="h-4 w-4 flex-shrink-0 text-secondary" />
+              )}
             </button>
 
-            <button className="flex w-full items-center gap-3 border-b border-gray-200 py-3">
+            {/* Tags/Labels */}
+            <button
+              onClick={() => onOpenModal('tags')}
+              className="flex w-full items-center gap-3 border-b border-gray-200 py-3"
+            >
               <Tag className="h-5 w-5 flex-shrink-0 text-foreground" />
+              <span className="flex-1 text-left text-base text-foreground">
+                {tags.length > 0 ? `${tags.length} labels added` : 'Add labels (good for, etc.)'}
+              </span>
+              {tags.length > 0 ? (
+                <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-primary" />
+              ) : (
+                <ChevronRight className="h-4 w-4 flex-shrink-0 text-secondary" />
+              )}
+            </button>
+
+            {/* Notes */}
+            <button
+              onClick={() => onOpenModal('notes')}
+              className="flex w-full items-center gap-3 border-b border-gray-200 py-3"
+            >
+              <Edit className="h-5 w-5 flex-shrink-0 text-foreground" />
+              <span className="flex-1 text-left text-base text-foreground">
+                {notes ? 'Notes added' : 'Add notes'}
+              </span>
+              {notes ? (
+                <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-primary" />
+              ) : (
+                <ChevronRight className="h-4 w-4 flex-shrink-0 text-secondary" />
+              )}
+            </button>
+
+            {/* Favorite dishes - Coming Soon */}
+            <button
+              disabled
+              className="flex w-full items-center gap-3 border-b border-gray-200 py-3 opacity-50"
+            >
+              <Utensils className="h-5 w-5 flex-shrink-0 text-foreground" />
               <div className="flex flex-1 items-center gap-2">
-                <span className="text-base text-foreground">Add labels (good for, etc.)</span>
-                <span className="rounded bg-teal-50 px-1.5 py-0.5 text-[11px] font-semibold text-primary">
-                  SC
+                <span className="text-base text-foreground">Add favorite dishes</span>
+                <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-semibold text-secondary">
+                  Soon
                 </span>
               </div>
               <ChevronRight className="h-4 w-4 flex-shrink-0 text-secondary" />
             </button>
 
-            <button className="flex w-full items-center gap-3 border-b border-gray-200 py-3">
-              <Edit className="h-5 w-5 flex-shrink-0 text-foreground" />
-              <span className="flex-1 text-left text-base text-foreground">Add notes</span>
-              <ChevronRight className="h-4 w-4 flex-shrink-0 text-secondary" />
-            </button>
-
-            <button className="flex w-full items-center gap-3 border-b border-gray-200 py-3">
-              <Utensils className="h-5 w-5 flex-shrink-0 text-foreground" />
-              <span className="flex-1 text-left text-base text-foreground">
-                Add favorite dishes
-              </span>
-              <ChevronRight className="h-4 w-4 flex-shrink-0 text-secondary" />
-            </button>
-
-            <button className="flex w-full items-center gap-3 border-b border-gray-200 py-3">
+            {/* Photos - Coming Soon */}
+            <button
+              disabled
+              className="flex w-full items-center gap-3 border-b border-gray-200 py-3 opacity-50"
+            >
               <Camera className="h-5 w-5 flex-shrink-0 text-foreground" />
-              <span className="flex-1 text-left text-base text-foreground">Add photos</span>
+              <div className="flex flex-1 items-center gap-2">
+                <span className="text-base text-foreground">Add photos</span>
+                <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-semibold text-secondary">
+                  Soon
+                </span>
+              </div>
               <ChevronRight className="h-4 w-4 flex-shrink-0 text-secondary" />
             </button>
 
-            <button className="flex w-full items-center gap-3 border-b border-gray-200 py-3">
+            {/* Visit Date */}
+            <button
+              onClick={() => onOpenModal('visitDate')}
+              className="flex w-full items-center gap-3 border-b border-gray-200 py-3"
+            >
               <Calendar className="h-5 w-5 flex-shrink-0 text-foreground" />
-              <span className="flex-1 text-left text-base text-foreground">Add visit date</span>
-              <ChevronRight className="h-4 w-4 flex-shrink-0 text-secondary" />
+              <span className="flex-1 text-left text-base text-foreground">
+                {visitDate ? `Visited ${format(visitDate, 'MMM d, yyyy')}` : 'Add visit date'}
+              </span>
+              {visitDate ? (
+                <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-primary" />
+              ) : (
+                <ChevronRight className="h-4 w-4 flex-shrink-0 text-secondary" />
+              )}
             </button>
 
+            {/* Stealth Mode */}
             <div className="flex w-full items-center gap-3 py-3">
               <Lock className="h-5 w-5 flex-shrink-0 text-foreground" />
               <div className="flex-1">
-                <div className="mb-1 flex items-center gap-2">
-                  <span className="text-base text-foreground">Stealth mode</span>
-                  <span className="rounded bg-teal-50 px-1.5 py-0.5 text-[11px] font-semibold text-primary">
-                    SC
-                  </span>
-                </div>
+                <span className="text-base text-foreground">Stealth mode</span>
                 <p className="text-[13px] text-secondary">Hide this activity from newsfeed</p>
               </div>
               <Switch checked={stealthMode} onCheckedChange={onStealthModeChange} />

@@ -8,7 +8,7 @@ import {
   BottomSheetTitle,
   BottomSheetClose,
 } from '@/components/ui/bottom-sheet';
-import { useRankedRestaurants } from '@/lib/hooks';
+import { useRankedRestaurants, useUser } from '@/lib/hooks';
 import { useAddRestaurantReducer } from '@/lib/hooks/use-add-restaurant-reducer';
 import {
   initializeRanking,
@@ -25,6 +25,10 @@ import {
 } from './add-restaurant/initial-rating-step';
 import { RankingComparisonStep } from './add-restaurant/ranking-comparison-step';
 import { RankingControls } from './add-restaurant/ranking-controls';
+import { NotesDialog } from './add-restaurant/notes-dialog';
+import { TagsDialog } from './add-restaurant/tags-dialog';
+import { CompanionsDialog } from './add-restaurant/companions-dialog';
+import { VisitDateDialog } from './add-restaurant/visit-date-dialog';
 
 
 import type {
@@ -66,8 +70,24 @@ export const AddRestaurantModal = ({
 }: AddRestaurantModalProps) => {
   // Use reducer for modal state management
   const [state, dispatch] = useAddRestaurantReducer();
-  const { phase, rating, listType, stealthMode, rankingState, currentComparison, loading, error } =
-    state;
+  const {
+    phase,
+    rating,
+    listType,
+    stealthMode,
+    rankingState,
+    currentComparison,
+    loading,
+    error,
+    notes,
+    companions,
+    tags,
+    visitDate,
+    activeModal,
+  } = state;
+
+  // Fetch user data for companions dialog
+  const { data: currentUser } = useUser(userId);
 
   // Fetch ranked restaurants for the ranking flow
   const { data: rankedList } = useRankedRestaurants(userId, listType);
@@ -179,22 +199,22 @@ export const AddRestaurantModal = ({
     dispatch({ type: 'UPDATE_RANKING', rankingState: newState, nextComparison: nextRestaurant });
   };
 
-  const handleRankingComplete = (state: RankingState) => {
+  const handleRankingComplete = (rankState: RankingState) => {
     if (!onRankingComplete) return;
 
     // Generate final result
-    const result = generateRankingResult(state);
+    const result = generateRankingResult(rankState);
 
-    // Create submission data
+    // Create submission data with real state values
     const data: RestaurantSubmissionData = {
       rating,
       listType,
-      companions: [],
-      labels: [],
-      notes: '',
+      companions: companions.map((c) => c.id),
+      labels: tags,
+      notes,
       favoriteDishes: [],
       photos: [],
-      visitDate: null,
+      visitDate,
       stealthMode,
     };
 
@@ -207,16 +227,16 @@ export const AddRestaurantModal = ({
       // Start the ranking flow
       startRankingFlow();
     } else if (onSubmit) {
-      // Old behavior - just submit
+      // Old behavior - just submit with real state values
       const data: RestaurantSubmissionData = {
         rating,
         listType,
-        companions: [],
-        labels: [],
-        notes: '',
+        companions: companions.map((c) => c.id),
+        labels: tags,
+        notes,
         favoriteDishes: [],
         photos: [],
-        visitDate: null,
+        visitDate,
         stealthMode,
       };
       onSubmit(data);
@@ -254,13 +274,18 @@ export const AddRestaurantModal = ({
             <InitialRatingStep
               restaurant={restaurant}
               rating={rating}
-              onRatingChange={(rating) => dispatch({ type: 'SET_RATING', rating })}
+              onRatingChange={(r) => dispatch({ type: 'SET_RATING', rating: r })}
               listType={listType}
-              onListTypeChange={(listType) => dispatch({ type: 'SET_LIST_TYPE', listType })}
+              onListTypeChange={(lt) => dispatch({ type: 'SET_LIST_TYPE', listType: lt })}
               stealthMode={stealthMode}
               onStealthModeChange={() => dispatch({ type: 'TOGGLE_STEALTH_MODE' })}
               onSubmit={handleRankIt}
               isLoading={loading}
+              notes={notes}
+              companions={companions}
+              tags={tags}
+              visitDate={visitDate}
+              onOpenModal={(modal) => dispatch({ type: 'OPEN_MODAL', modal })}
             />
           )}
 
@@ -283,6 +308,38 @@ export const AddRestaurantModal = ({
           )}
         </div>
       </BottomSheetContent>
+
+      {/* Sub-dialogs for metadata input */}
+      <NotesDialog
+        open={activeModal === 'notes'}
+        onOpenChange={(open) => !open && dispatch({ type: 'CLOSE_MODAL' })}
+        notes={notes}
+        onSave={(newNotes) => dispatch({ type: 'SET_NOTES', notes: newNotes })}
+      />
+
+      <TagsDialog
+        open={activeModal === 'tags'}
+        onOpenChange={(open) => !open && dispatch({ type: 'CLOSE_MODAL' })}
+        tags={tags}
+        onSave={(newTags) => dispatch({ type: 'SET_TAGS', tags: newTags })}
+      />
+
+      {currentUser && (
+        <CompanionsDialog
+          open={activeModal === 'companions'}
+          onOpenChange={(open) => !open && dispatch({ type: 'CLOSE_MODAL' })}
+          companions={companions}
+          currentUser={currentUser}
+          onSave={(newCompanions) => dispatch({ type: 'SET_COMPANIONS', companions: newCompanions })}
+        />
+      )}
+
+      <VisitDateDialog
+        open={activeModal === 'visitDate'}
+        onOpenChange={(open) => !open && dispatch({ type: 'CLOSE_MODAL' })}
+        visitDate={visitDate}
+        onSave={(newDate) => dispatch({ type: 'SET_VISIT_DATE', visitDate: newDate })}
+      />
     </BottomSheet>
   );
 }

@@ -45,6 +45,9 @@ interface FeedRow {
   notes: string | null;
   visit_date: string | null;
   created_at: string;
+  // Optional fields - added via secondary query or future PostgreSQL function update
+  photos?: string[];
+  tags?: string[];
 }
 
 /**
@@ -123,8 +126,8 @@ function mapFeedRowToActivity(row: FeedRow): Activity {
     user,
     rating: row.score ?? 0,
     comment: row.notes || '',
-    photos: [],
-    tags: [],
+    photos: row.photos || [],
+    tags: row.tags || [],
     timestamp: new Date(row.created_at),
     type: mapStatusToType(row.status),
     interactions: {
@@ -162,7 +165,31 @@ export class FeedService {
         });
 
         if (error) throw error;
-        return (data as FeedRow[] || []).map(mapFeedRowToActivity);
+        const feedRows = data as FeedRow[] || [];
+
+        // Secondary query to fetch photos/tags from ratings table
+        // This enriches the feed with metadata not returned by the RPC function
+        if (feedRows.length > 0) {
+          const ratingIds = feedRows.map((row) => row.id);
+          const { data: ratingsData } = await supabase
+            .from('ratings')
+            .select('id, photos, tags')
+            .in('id', ratingIds)
+            .returns<Array<{ id: string; photos: string[] | null; tags: string[] | null }>>();
+
+          if (ratingsData) {
+            const ratingsMap = new Map(ratingsData.map((r) => [r.id, r]));
+            feedRows.forEach((row) => {
+              const ratingData = ratingsMap.get(row.id);
+              if (ratingData) {
+                row.photos = ratingData.photos || [];
+                row.tags = ratingData.tags || [];
+              }
+            });
+          }
+        }
+
+        return feedRows.map(mapFeedRowToActivity);
       },
       () => {
         // Return mock activities sorted by timestamp
