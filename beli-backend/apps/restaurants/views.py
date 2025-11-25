@@ -1,326 +1,156 @@
 """
-Restaurant API Views.
+Restaurant API views.
 
-ViewSets provide CRUD operations + custom actions for restaurants.
+Provides REST endpoints for restaurant data, matching the frontend
+RestaurantService methods.
 """
-
-from django.contrib.gis.geos import Point
-from django.contrib.gis.measure import Distance
-from django.db.models import Q, F
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
+from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
-from .models import Restaurant, MenuItem
+from .models import Restaurant
 from .serializers import (
+    RestaurantSerializer,
     RestaurantListSerializer,
-    RestaurantDetailSerializer,
-    RestaurantCreateUpdateSerializer,
-    NearbyRestaurantSerializer,
-    MenuItemSerializer,
 )
 
 
-class RestaurantPagination(PageNumberPagination):
-    """Custom pagination for restaurants."""
-
-    page_size = 20
-    page_size_query_param = 'page_size'
-    max_page_size = 100
-
-
-class RestaurantViewSet(viewsets.ModelViewSet):
+class RestaurantViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    ViewSet for Restaurant CRUD operations.
+    API endpoint for restaurants.
 
-    Endpoints:
-    - GET    /api/restaurants/          - List all restaurants
-    - POST   /api/restaurants/          - Create restaurant (admin)
-    - GET    /api/restaurants/{id}/     - Retrieve restaurant detail
-    - PUT    /api/restaurants/{id}/     - Update restaurant (admin)
-    - DELETE /api/restaurants/{id}/     - Delete restaurant (admin)
-    - GET    /api/restaurants/search/   - Search with filters
-    - GET    /api/restaurants/nearby/   - Nearby restaurants (geospatial)
-    - GET    /api/restaurants/trending/ - Trending restaurants
+    Supports:
+    - GET /api/v1/restaurants/ - List all restaurants
+    - GET /api/v1/restaurants/{id}/ - Get single restaurant
+    - GET /api/v1/restaurants/search/ - Search restaurants
+    - GET /api/v1/restaurants/trending/ - Get trending restaurants
+    - POST /api/v1/restaurants/batch/ - Get multiple by IDs
     """
-
     queryset = Restaurant.objects.all()
-    pagination_class = RestaurantPagination
+    serializer_class = RestaurantSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-
-    # Filtering
-    filterset_fields = ['category', 'price_range', 'city', 'neighborhood', 'is_open']
-
-    # Search (full-text across multiple fields)
-    search_fields = ['name', 'cuisine', 'tags', 'popular_dishes', 'neighborhood', 'address']
-
-    # Sorting
-    ordering_fields = ['name', 'rating', 'created_at', 'rating_count']
-    ordering = ['-rating']  # Default: highest rated first
+    search_fields = ['name', 'cuisine', 'neighborhood', 'tags']
+    ordering_fields = ['rating', 'name', 'created_at']
+    ordering = ['-rating']
 
     def get_serializer_class(self):
-        """Return appropriate serializer based on action."""
-        if self.action == 'list' or self.action == 'search' or self.action == 'trending':
+        """Use lightweight serializer for list views."""
+        if self.action == 'list':
             return RestaurantListSerializer
-        elif self.action == 'retrieve':
-            return RestaurantDetailSerializer
-        elif self.action == 'nearby':
-            return NearbyRestaurantSerializer
-        elif self.action in ['create', 'update', 'partial_update']:
-            return RestaurantCreateUpdateSerializer
-        return RestaurantDetailSerializer
+        return RestaurantSerializer
 
-    def get_queryset(self):
-        """
-        Optimize queryset based on action.
-
-        - list/search: No joins needed (single table)
-        - retrieve: Prefetch menu items to avoid N+1
-        """
-        queryset = Restaurant.objects.all()
-
-        if self.action == 'retrieve':
-            # Prefetch menu items for detail view (avoid N+1 query)
-            queryset = queryset.prefetch_related('menu_items')
-
-        return queryset
-
-    @action(detail=False, methods=['get'], url_path='search')
+    @action(detail=False, methods=['get'])
     def search(self, request):
         """
-        Advanced search with multiple filters.
+        Search restaurants with filters.
 
-        Query Params:
-            ?q=pizza                  - Text search
-            ?cuisine=Italian          - Filter by cuisine (JSON array)
-            ?price_range=$$           - Filter by price
-            ?city=New York            - Filter by city
-            ?neighborhood=SoHo        - Filter by neighborhood
-            ?category=restaurants     - Filter by category
-            ?is_open=true             - Filter by open status
-            ?min_rating=7.5           - Minimum rating
-            ?ordering=-rating         - Sort order
+        Maps to: RestaurantService.searchRestaurants()
 
-        Example: /api/restaurants/search/?q=pizza&city=New%20York&min_rating=8.0
+        Query params:
+        - q: Search query (name, cuisine, neighborhood)
+        - cuisine: Filter by cuisine (can be comma-separated)
+        - priceRange: Filter by price range
+        - neighborhood: Filter by neighborhood
+        - category: Filter by category
+        - isOpen: Filter by open status
+
+        Note: cuisine, tags are stored as JSONB arrays in Supabase.
+        We use icontains for simple text matching within the JSON.
         """
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.get_queryset()
 
-        # Additional filters not covered by filterset_fields
+        # Text search - use icontains for JSONB fields
+        query = request.query_params.get('q', '')
+        if query:
+            queryset = queryset.filter(
+                Q(name__icontains=query) |
+                Q(neighborhood__icontains=query)
+            )
+            # For JSONB arrays, we can't use direct contains
+            # Instead, filter after fetching (or use raw SQL)
+            # For now, keep it simple with name/neighborhood match
 
-        # Filter by cuisine (JSON field contains)
-        cuisine_param = request.query_params.get('cuisine', None)
-        if cuisine_param:
-            queryset = queryset.filter(cuisine__contains=[cuisine_param])
+        # Cuisine filter - use icontains for JSONB text search
+        # Django's JSONField __contains doesn't work well with array elements,
+        # so we use icontains which searches within the JSON text representation
+        cuisines = request.query_params.get('cuisine', '')
+        if cuisines:
+            cuisine_list = [c.strip() for c in cuisines.split(',')]
+            # Build Q objects for each cuisine (OR logic)
+            cuisine_q = Q()
+            for cuisine in cuisine_list:
+                # This searches for the cuisine string within the JSONB text
+                cuisine_q |= Q(cuisine__icontains=cuisine)
+            queryset = queryset.filter(cuisine_q)
 
-        # Filter by minimum rating
-        min_rating = request.query_params.get('min_rating', None)
-        if min_rating:
-            try:
-                queryset = queryset.filter(rating__gte=float(min_rating))
-            except ValueError:
-                pass
+        # Price range filter
+        price_range = request.query_params.get('priceRange', '')
+        if price_range:
+            price_list = price_range.split(',')
+            queryset = queryset.filter(price_range__in=price_list)
 
-        # Filter by tags (JSON field overlap)
-        tags_param = request.query_params.get('tags', None)
-        if tags_param:
-            tag_list = tags_param.split(',')
-            # Filter restaurants that have ANY of the specified tags
-            queryset = queryset.filter(tags__overlap=tag_list)
+        # Neighborhood filter
+        neighborhood = request.query_params.get('neighborhood', '')
+        if neighborhood:
+            queryset = queryset.filter(neighborhood__icontains=neighborhood)
 
-        # Paginate
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+        # Category filter
+        category = request.query_params.get('category', '')
+        if category:
+            queryset = queryset.filter(category=category)
 
-        serializer = self.get_serializer(queryset, many=True)
+        # Open status filter
+        is_open = request.query_params.get('isOpen', '')
+        if is_open.lower() == 'true':
+            queryset = queryset.filter(is_open=True)
+
+        serializer = RestaurantListSerializer(queryset[:50], many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'], url_path='nearby')
-    def nearby(self, request):
-        """
-        Find restaurants near a location (geospatial query).
-
-        Query Params (required):
-            lat     - Latitude (e.g., 40.7580)
-            lng     - Longitude (e.g., -73.9855)
-
-        Query Params (optional):
-            radius  - Search radius in miles (default: 2.0)
-            limit   - Max results (default: 20)
-            min_rating - Minimum rating (default: 0.0)
-
-        Example: /api/restaurants/nearby/?lat=40.7580&lng=-73.9855&radius=1.5&min_rating=7.5
-
-        Returns: GeoJSON FeatureCollection with restaurants sorted by distance
-        """
-        # Get parameters
-        lat = request.query_params.get('lat')
-        lng = request.query_params.get('lng')
-        radius_miles = float(request.query_params.get('radius', 2.0))
-        limit = int(request.query_params.get('limit', 20))
-        min_rating = float(request.query_params.get('min_rating', 0.0))
-
-        # Validate required params
-        if not lat or not lng:
-            return Response(
-                {'error': 'Missing required parameters: lat and lng'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        try:
-            lat = float(lat)
-            lng = float(lng)
-        except ValueError:
-            return Response(
-                {'error': 'Invalid lat/lng values. Must be numbers.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Create Point for user location
-        user_location = Point(lng, lat, srid=4326)
-
-        # PostGIS distance query
-        # Distance() uses meters internally, convert miles to meters
-        radius_meters = radius_miles * 1609.34
-
-        queryset = Restaurant.objects.filter(
-            coordinates__distance_lte=(user_location, Distance(m=radius_meters)),
-            rating__gte=min_rating,
-            is_open=True,  # Only show open restaurants
-        ).annotate(
-            distance=F('coordinates__distance') * 0.000621371  # Convert meters to miles
-        ).order_by('distance')[:limit]
-
-        # Serialize to GeoJSON
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=['get'], url_path='trending')
+    @action(detail=False, methods=['get'])
     def trending(self, request):
         """
-        Get trending restaurants.
+        Get trending restaurants (high rated, recent activity).
 
-        For now, returns highest-rated restaurants with many reviews.
-        In production, would analyze recent activity from feed.
-
-        Query Params:
-            limit - Number of results (default: 10)
-
-        Example: /api/restaurants/trending/?limit=20
+        Maps to: RestaurantService.getTrendingRestaurants()
         """
         limit = int(request.query_params.get('limit', 10))
-
-        # Trending algorithm (simplified):
-        # High rating + Many recent reviews = Trending
-        # In production: Analyze FeedItem table for recent activity
-        queryset = Restaurant.objects.filter(
-            rating__gte=7.5,
-            rating_count__gte=10,
-        ).order_by('-rating_count', '-rating')[:limit]
+        queryset = self.get_queryset().filter(
+            rating__gte=7.5
+        ).order_by('-rating', '-rating_count')[:limit]
 
         serializer = RestaurantListSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['get'], url_path='menu')
-    def menu(self, request, pk=None):
+    @action(detail=False, methods=['post'])
+    def batch(self, request):
         """
-        Get full menu for a restaurant.
+        Get multiple restaurants by IDs.
 
-        Returns all menu items grouped by category.
+        Maps to: RestaurantService.getRestaurantsByIds()
 
-        Example: /api/restaurants/{id}/menu/
+        Request body: { "ids": ["uuid1", "uuid2", ...] }
         """
-        restaurant = self.get_object()
-        menu_items = restaurant.menu_items.all()
+        ids = request.data.get('ids', [])
+        if not ids:
+            return Response([], status=status.HTTP_200_OK)
 
-        serializer = MenuItemSerializer(menu_items, many=True)
+        queryset = self.get_queryset().filter(id__in=ids)
+        serializer = RestaurantSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['get'], url_path='recommendations')
-    def recommendations(self, request, pk=None):
+    @action(detail=False, methods=['get'])
+    def random(self, request):
         """
-        Get recommended restaurants similar to this one.
+        Get random restaurants.
 
-        Based on:
-        - Same cuisine
-        - Same neighborhood or nearby
-        - Similar rating
-        - Similar price range
-
-        Example: /api/restaurants/{id}/recommendations/
+        Maps to: RestaurantService.getRandomRestaurants()
         """
-        restaurant = self.get_object()
+        count = int(request.query_params.get('count', 5))
+        queryset = self.get_queryset().order_by('?')[:count]
 
-        # Find similar restaurants
-        similar = Restaurant.objects.filter(
-            cuisine__overlap=restaurant.cuisine,  # Share at least one cuisine
-            city=restaurant.city,  # Same city
-            rating__gte=restaurant.rating - 1.0,  # Within 1 point
-            rating__lte=restaurant.rating + 1.0,
-        ).exclude(
-            id=restaurant.id  # Exclude this restaurant
-        ).order_by('-rating')[:10]
-
-        serializer = RestaurantListSerializer(similar, many=True)
-        return Response(serializer.data)
-
-
-class MenuItemViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for MenuItem CRUD operations.
-
-    Endpoints:
-    - GET    /api/menu-items/          - List menu items
-    - POST   /api/menu-items/          - Create menu item (admin)
-    - GET    /api/menu-items/{id}/     - Retrieve menu item
-    - PUT    /api/menu-items/{id}/     - Update menu item (admin)
-    - DELETE /api/menu-items/{id}/     - Delete menu item (admin)
-    """
-
-    queryset = MenuItem.objects.select_related('restaurant').all()
-    serializer_class = MenuItemSerializer
-    pagination_class = RestaurantPagination
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-
-    filterset_fields = [
-        'restaurant',
-        'category',
-        'portion_size',
-        'is_vegetarian',
-        'is_vegan',
-        'is_gluten_free',
-    ]
-
-    search_fields = ['name', 'description', 'tags']
-    ordering_fields = ['name', 'price', 'popularity']
-    ordering = ['-popularity', 'name']
-
-    @action(detail=False, methods=['get'], url_path='popular')
-    def popular(self, request):
-        """
-        Get most popular menu items across all restaurants.
-
-        Query Params:
-            limit - Number of results (default: 20)
-            category - Filter by category (optional)
-
-        Example: /api/menu-items/popular/?category=entree&limit=10
-        """
-        limit = int(request.query_params.get('limit', 20))
-        category = request.query_params.get('category', None)
-
-        queryset = MenuItem.objects.select_related('restaurant').filter(
-            popularity__gte=70
-        )
-
-        if category:
-            queryset = queryset.filter(category=category)
-
-        queryset = queryset.order_by('-popularity')[:limit]
-
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = RestaurantListSerializer(queryset, many=True)
         return Response(serializer.data)
