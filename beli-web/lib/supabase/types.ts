@@ -72,17 +72,27 @@ export type Database = {
           state: string | null;
           is_tastemaker: boolean;
           watchlist: string[]; // Restaurant IDs user wants to try - SINGLE SOURCE OF TRUTH for want-to-try list
+          // Pre-computed stats (materialized from triggers, migration 00013)
+          followers_count: number;
+          following_count: number;
+          been_count: number;
+          recommended_count: number;
           created_at: string;
           updated_at: string;
         };
         Insert: Omit<
           Database['public']['Tables']['users']['Row'],
-          'id' | 'created_at' | 'updated_at' | 'watchlist'
+          'id' | 'created_at' | 'updated_at' | 'watchlist' | 'followers_count' | 'following_count' | 'been_count' | 'recommended_count'
         > & {
           id?: string;
           created_at?: string;
           updated_at?: string;
           watchlist?: string[];
+          // Stats default to 0 via database
+          followers_count?: number;
+          following_count?: number;
+          been_count?: number;
+          recommended_count?: number;
         };
         Update: Partial<Database['public']['Tables']['users']['Insert']>;
       };

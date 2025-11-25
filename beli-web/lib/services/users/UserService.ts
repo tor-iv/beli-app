@@ -71,9 +71,11 @@ const DEMO_USER_ID = '11111111-1111-1111-1111-111111111111';
 
 /**
  * Maps a Supabase database user row to the frontend User type.
- * Adds default values for fields not in the database.
+ * Stats are now read directly from the user row (materialized columns, migration 00013).
  */
 function mapDbToUser(row: DbUser, stats?: DbUserStats): User {
+  // Stats are now materialized on the users table directly (migration 00013)
+  // Fall back to stats object for backward compatibility during transition
   return {
     id: row.id,
     username: row.username,
@@ -81,11 +83,11 @@ function mapDbToUser(row: DbUser, stats?: DbUserStats): User {
     avatar: row.avatar || 'https://i.pravatar.cc/150?u=default',
     bio: row.bio || '',
     stats: {
-      followers: stats?.followers_count ?? 0,
-      following: stats?.following_count ?? 0,
+      followers: row.followers_count ?? stats?.followers_count ?? 0,
+      following: row.following_count ?? stats?.following_count ?? 0,
       rank: 0, // Not in database
-      beenCount: stats?.been_count ?? 0,
-      wantToTryCount: stats?.want_to_try_count ?? 0,
+      beenCount: row.been_count ?? stats?.been_count ?? 0,
+      wantToTryCount: row.watchlist?.length ?? stats?.want_to_try_count ?? 0,
       currentStreak: 0, // Not in database
     },
     location: {
@@ -104,11 +106,15 @@ export class UserService {
    * Get the current logged-in user
    * For demo purposes, returns the hardcoded demo user
    * @returns Current user
+   *
+   * Performance: Stats are now materialized on users table (migration 00013)
+   * so we only need a single query instead of users + user_stats.
    */
   static async getCurrentUser(): Promise<User> {
     const { data } = await withFallback(
       async () => {
         const supabase = await getSupabase();
+        // Single query - stats columns are now on users table!
         const { data: user, error: userError } = await supabase
           .from('users')
           .select('*')
@@ -117,14 +123,8 @@ export class UserService {
 
         if (userError || !user) throw userError || new Error('User not found');
 
-        // Get user stats from view
-        const { data: stats } = await supabase
-          .from('user_stats')
-          .select('*')
-          .eq('user_id', DEMO_USER_ID)
-          .single();
-
-        return mapDbToUser(user, stats ?? undefined);
+        // mapDbToUser now reads stats from the user row directly
+        return mapDbToUser(user);
       },
       () => getMockCurrentUser(),
       { operationName: 'getCurrentUser' }
@@ -137,11 +137,14 @@ export class UserService {
    * Get a user by ID
    * @param userId - ID of the user
    * @returns User or null if not found
+   *
+   * Performance: Stats are now materialized on users table (migration 00013)
    */
   static async getUserById(userId: string): Promise<User | null> {
     const { data } = await withFallback(
       async () => {
         const supabase = await getSupabase();
+        // Single query - stats columns are now on users table!
         const { data: user, error } = await supabase
           .from('users')
           .select('*')
@@ -150,14 +153,8 @@ export class UserService {
 
         if (error || !user) throw error || new Error('User not found');
 
-        // Get user stats from view
-        const { data: stats } = await supabase
-          .from('user_stats')
-          .select('*')
-          .eq('user_id', userId)
-          .single();
-
-        return mapDbToUser(user, stats ?? undefined);
+        // mapDbToUser now reads stats from the user row directly
+        return mapDbToUser(user);
       },
       () => mockUsers.find((u) => u.id === userId) || null,
       { operationName: 'getUserById' }
@@ -170,11 +167,14 @@ export class UserService {
    * Get a user by username
    * @param username - Username to search for
    * @returns User or null if not found
+   *
+   * Performance: Stats are now materialized on users table (migration 00013)
    */
   static async getUserByUsername(username: string): Promise<User | null> {
     const { data } = await withFallback(
       async () => {
         const supabase = await getSupabase();
+        // Single query - stats columns are now on users table!
         const { data: user, error } = await supabase
           .from('users')
           .select('*')
@@ -184,15 +184,8 @@ export class UserService {
 
         if (error || !user) throw error || new Error('User not found');
 
-        // Get user stats from view
-        const { data: stats } = await supabase
-          .from('user_stats')
-          .select('*')
-          .eq('user_id', user.id)
-          .returns<DbUserStats[]>()
-          .single();
-
-        return mapDbToUser(user, stats ?? undefined);
+        // mapDbToUser now reads stats from the user row directly
+        return mapDbToUser(user);
       },
       () => mockUsers.find((u) => u.username === username) || null,
       { operationName: 'getUserByUsername' }
@@ -205,6 +198,9 @@ export class UserService {
    * Search for users by username or display name
    * @param query - Search query
    * @returns Matching users
+   *
+   * Performance: Stats are now materialized on users table (migration 00013)
+   * Eliminated separate user_stats query.
    */
   static async searchUsers(query: string): Promise<User[]> {
     if (!query.trim()) return [];
@@ -214,6 +210,7 @@ export class UserService {
         const supabase = await getSupabase();
         const searchTerm = `%${query.trim()}%`;
 
+        // Single query - stats columns are now on users table!
         const { data: users, error } = await supabase
           .from('users')
           .select('*')
@@ -223,17 +220,8 @@ export class UserService {
 
         if (error) throw error;
 
-        // Get stats for all matching users
-        const userIds = (users || []).map((u) => u.id);
-        const { data: allStats } = await supabase
-          .from('user_stats')
-          .select('*')
-          .in('user_id', userIds)
-          .returns<DbUserStats[]>();
-
-        const statsMap = new Map((allStats || []).map((s) => [s.user_id, s]));
-
-        return (users || []).map((user) => mapDbToUser(user, statsMap.get(user.id)));
+        // mapDbToUser now reads stats from the user row directly
+        return (users || []).map((user) => mapDbToUser(user));
       },
       () => {
         const q = query.trim().toLowerCase();
