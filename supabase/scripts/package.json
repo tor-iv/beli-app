@@ -4,6 +4,16 @@
   "type": "module",
   "description": "Database scripts for Beli app",
   "scripts": {
+    "seed:restaurants": "npx ts-node seed-restaurants.ts",
+    "seed:restaurants:small": "npx ts-node seed-restaurants.ts --limit 100",
+    "seed:restaurants:medium": "npx ts-node seed-restaurants.ts --limit 500",
+    "seed:restaurants:large": "npx ts-node seed-restaurants.ts --limit 2000",
+    "seed:restaurants:clear": "npx ts-node seed-restaurants.ts --clear --limit 500",
+    "seed:users": "npx ts-node seed-users.ts",
+    "seed:ratings": "npx ts-node seed-ratings.ts",
+    "seed:all": "npm run seed:restaurants && npm run seed:users && npm run seed:ratings",
+    "seed:demo-user": "npx ts-node seed-demo-user.ts",
+    "seed:demo-user:clear": "npx ts-node seed-demo-user.ts --clear",
     "fetch-restaurants": "npx ts-node fetch-nyc-restaurants.ts",
     "fetch-restaurants:small": "npx ts-node fetch-nyc-restaurants.ts 100",
     "fetch-restaurants:medium": "npx ts-node fetch-nyc-restaurants.ts 500",
@@ -17,6 +27,7 @@
     "@types/node": "^20.0.0",
     "pg": "^8.11.0",
     "@types/pg": "^8.10.0",
-    "dotenv": "^16.3.0"
+    "dotenv": "^16.3.0",
+    "@supabase/supabase-js": "^2.39.0"
   }
 }
