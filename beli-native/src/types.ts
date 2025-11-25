@@ -46,8 +46,8 @@ export interface Restaurant {
   rating: number;
   priceRange: string;
   location: RestaurantLocation;
-  hours: Hours;
-  phone: string;
+  hours?: Hours;
+  phone?: string;
   website?: string;
   images: string[];
   popularDishes: string[];

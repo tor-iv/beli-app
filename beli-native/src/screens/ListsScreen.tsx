@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, Dimensions, Modal, TextInput, ScrollView, Share } from 'react-native';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { View, Text, StyleSheet, FlatList, Pressable, Dimensions, Modal, TextInput, ScrollView, Share, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MapView, { Marker, Region } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import { useQuery } from '@tanstack/react-query';
 import { colors, typography, spacing } from '../theme';
 import {
   RestaurantListItem,
@@ -17,6 +18,7 @@ import {
   ViewMapButton
 } from '../components';
 import { TabSelector } from '../components/lists/TabSelector';
+import { useCurrentUser, useListCounts } from '../lib/hooks';
 import { MockDataService } from '../data/mockDataService';
 import type { Restaurant, ListCategory } from '../types';
 import type { BottomTabParamList, AppStackParamList } from '../navigation/types';
@@ -239,8 +241,10 @@ export default function ListsScreen() {
   // Safely get initialTab from route params with fallback
   const initialTab = route.params?.initialTab || 'been';
 
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Data fetching with React Query
+  const { data: currentUser } = useCurrentUser();
+
+  // UI state
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [selectedTab, setSelectedTab] = useState<ListType>(initialTab);
   const [selectedCategory, setSelectedCategory] = useState<ListCategory>('restaurants');
@@ -272,14 +276,7 @@ export default function ListsScreen() {
   const [tagSearch, setTagSearch] = useState('');
   const [goodForSearch, setGoodForSearch] = useState('');
 
-  // Cache for loaded data by tab
-  const [cachedData, setCachedData] = useState<Partial<Record<ListType, Record<string, Restaurant[]>>>>({
-    been: {},
-    want: {},
-    recs: {},
-    playlists: {},
-  });
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  // Local list counts state (populated by useQuery side effect)
   const [listCounts, setListCounts] = useState<Record<string, number>>({});
 
   // Search functionality
@@ -287,9 +284,6 @@ export default function ListsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMapSearchModalVisible, setIsMapSearchModalVisible] = useState(false);
   const [isMoreOptionsVisible, setIsMoreOptionsVisible] = useState(false);
-
-  // Debounce timer ref
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   // Map ref for programmatic control
   const mapRef = useRef<MapView>(null);
@@ -345,212 +339,7 @@ export default function ListsScreen() {
     .map(id => PRICE_LOOKUP[id])
     .filter(Boolean) as string[];
 
-  const filteredRestaurants = useMemo(() => {
-    if (!searchQuery.trim()) return restaurants;
-    const query = searchQuery.toLowerCase();
-    return restaurants.filter(restaurant =>
-      restaurant.name.toLowerCase().includes(query) ||
-      (restaurant.cuisine || []).some(c => c.toLowerCase().includes(query)) ||
-      restaurant.location.neighborhood?.toLowerCase().includes(query)
-    );
-  }, [restaurants, searchQuery]);
-
-  const sortedRestaurants = useMemo(() => {
-    const restaurantsToSort = isSearchActive ? filteredRestaurants : restaurants;
-    const sorted = [...restaurantsToSort];
-
-    if (sortBy === 'rating') {
-      // Sort by score (rating) - use averageScore or recScore
-      sorted.sort((a, b) => {
-        const scoreA = a.scores?.averageScore ?? a.scores?.recScore ?? 0;
-        const scoreB = b.scores?.averageScore ?? b.scores?.recScore ?? 0;
-        return sortOrder === 'desc' ? scoreB - scoreA : scoreA - scoreB;
-      });
-    } else if (sortBy === 'distance') {
-      // Sort by distance
-      sorted.sort((a, b) => {
-        const distanceA = a.distance ?? Infinity;
-        const distanceB = b.distance ?? Infinity;
-        return sortOrder === 'asc' ? distanceA - distanceB : distanceB - distanceA;
-      });
-    }
-
-    return sorted;
-  }, [restaurants, filteredRestaurants, isSearchActive, sortBy, sortOrder]);
-
-  const mapMarkers = useMemo(() => {
-    const restaurantsToMap = isSearchActive ? filteredRestaurants : restaurants;
-    return restaurantsToMap
-      .map(restaurant => {
-        const key = restaurant.name.toLowerCase();
-        const override = COORDINATE_OVERRIDES[key];
-        const coordinates = override ?? restaurant.location?.coordinates;
-        if (!coordinates) return null;
-        const neighborhood = override?.neighborhood ?? restaurant.location.neighborhood;
-        return { restaurant, coordinates, neighborhood };
-      })
-      .filter((entry): entry is { restaurant: Restaurant; coordinates: { lat: number; lng: number }; neighborhood: string } => entry !== null);
-  }, [restaurants, filteredRestaurants, isSearchActive]);
-
-  const cityFilterDisplay = selectedCityLabels.length > 0
-    ? summarizeSelectionLabels(selectedCityLabels, 'City')
-    : undefined;
-
-  const cuisineFilterDisplay = selectedCuisineLabels.length > 0
-    ? summarizeSelectionLabels(selectedCuisineLabels, 'Cuisine')
-    : undefined;
-
-  const priceFilterDisplay = selectedPriceLabels.length > 0
-    ? summarizeSelectionLabels(selectedPriceLabels, 'Price')
-    : undefined;
-
-  const dropdownFilters = [
-    {
-      id: 'city',
-      label: 'City',
-      options: CITY_FILTER_OPTIONS,
-      displayLabel: cityFilterDisplay,
-      isActive: selectedCities.length > 0,
-      selectedOption: selectedCities[0],
-    },
-    {
-      id: 'cuisine',
-      label: 'Cuisine',
-      options: CUISINE_FILTER_OPTIONS,
-      displayLabel: cuisineFilterDisplay,
-      isActive: selectedCuisines.length > 0,
-      selectedOption: selectedCuisines[0],
-    },
-    {
-      id: 'price',
-      label: 'Price',
-      options: PRICE_FILTER_OPTIONS,
-      displayLabel: priceFilterDisplay,
-      isActive: selectedPriceTiers.length > 0,
-      selectedOption: selectedPriceTiers.length > 0 ? selectedPriceTiers[0] : 'all',
-    },
-  ];
-
-  const pendingCityLabels = pendingCitySelection
-    .map(id => CITY_LOOKUP[id]?.label)
-    .filter(Boolean) as string[];
-  const pendingCuisineLabels = pendingCuisineSelection
-    .map(id => CUISINE_LOOKUP[id]?.label)
-    .filter(Boolean) as string[];
-  const pendingPriceLabels = pendingPriceSelection
-    .map(id => PRICE_LOOKUP[id])
-    .filter(Boolean) as string[];
-  const pendingTagLabels = pendingTagSelection
-    .map(id => TAG_OPTIONS.find(option => option.id === id)?.label)
-    .filter(Boolean) as string[];
-  const pendingGoodForLabels = pendingGoodForSelection
-    .map(id => GOOD_FOR_OPTIONS.find(option => option.id === id)?.label)
-    .filter(Boolean) as string[];
-
-  const pendingCitySummary = summarizeSelectionLabels(pendingCityLabels, 'All cities');
-  const pendingGoodForSummary = summarizeSelectionLabels(pendingGoodForLabels, 'All options');
-  const pendingTagSummary = summarizeSelectionLabels(pendingTagLabels, 'All tags');
-  const pendingPriceSummary = summarizeSelectionLabels(pendingPriceLabels, 'All prices');
-  const pendingScoreSummary = SCORE_FILTER_OPTIONS.find(option => option.id === pendingScoreFilter)?.label ?? 'Any score';
-  const pendingFriendSummary = FRIEND_FILTER_OPTIONS.find(option => option.id === pendingFriendFilter)?.label ?? 'Any count';
-
-  useEffect(() => {
-    initializeData();
-  }, []);
-
-  // Handle route params for taste profile filtering
-  useEffect(() => {
-    if (route.params?.filterType && route.params?.filterValue) {
-      const { filterType, filterValue } = route.params;
-
-      // Apply filter based on type
-      if (filterType === 'cuisine') {
-        // Find matching cuisine ID
-        const cuisineOption = CUISINE_OPTIONS.find(
-          opt => opt.label.toLowerCase() === filterValue.toLowerCase()
-        );
-        if (cuisineOption) {
-          setSelectedCuisines([cuisineOption.id]);
-        }
-      } else if (filterType === 'city') {
-        // Find matching city ID
-        const cityOption = CITY_OPTIONS.find(
-          opt => opt.city?.toLowerCase() === filterValue.toLowerCase()
-        );
-        if (cityOption) {
-          setSelectedCities([cityOption.id]);
-        }
-      }
-      // Note: Country filtering is not directly supported in current filter system
-    }
-  }, [route.params]);
-
-  useEffect(() => {
-    loadRestaurants();
-  }, [
-    selectedTab,
-    selectedFilters,
-    selectedCities,
-    selectedCuisines,
-    selectedTags,
-    selectedGoodFors,
-    selectedPriceTiers,
-    sortBy,
-    sortOrder,
-    currentUser,
-    selectedCategory,
-  ]);
-
-  useEffect(() => {
-    if (!currentUser) return;
-
-    const preloadCounts = async () => {
-      try {
-        const [beenLists, wantLists] = await Promise.all([
-          MockDataService.getUserListsByType(currentUser.id, 'been', selectedCategory),
-          MockDataService.getUserListsByType(currentUser.id, 'want_to_try', selectedCategory),
-        ]);
-
-        const beenIds = new Set(beenLists.flatMap(list => list.restaurants));
-        const wantIds = new Set(wantLists.flatMap(list => list.restaurants));
-
-        setListCounts(prev => ({
-          ...prev,
-          [`been-${selectedCategory}`]: beenIds.size,
-          [`want-${selectedCategory}`]: wantIds.size,
-        }));
-      } catch (error) {
-        console.error('Failed to preload list counts:', error);
-      }
-    };
-
-    preloadCounts();
-  }, [currentUser, selectedCategory]);
-
-  // Cleanup debounce timer on unmount
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-    };
-  }, []);
-
-  const initializeData = async () => {
-    try {
-      setLoading(true);
-      const user = await MockDataService.getCurrentUser();
-      setCurrentUser(user);
-
-      // Preload the default tab data
-      await loadTabData('been', user, selectedCategory);
-    } catch (error) {
-      console.error('Failed to initialize data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Helper functions for category filtering
   const matchesCategory = (restaurant: Restaurant, category: ListCategory): boolean => {
     if (!category || category === 'restaurants') return true;
 
@@ -669,56 +458,62 @@ export default function ListsScreen() {
     });
   };
 
-  const loadTabData = async (tab: ListType, user: any, category: ListCategory) => {
-    try {
-      if (tab === 'more') {
-        return;
-      }
-
-      const cacheKey = category;
-
-      // Check cache first when no filters are applied
-      const hasNoFilters =
-        selectedFilters.length === 0 &&
-        selectedCities.length === 0 &&
-        selectedCuisines.length === 0 &&
-        selectedTags.length === 0 &&
-        selectedGoodFors.length === 0 &&
-        selectedPriceTiers.length === 0;
-
-      if (hasNoFilters && cachedData[tab] && cachedData[tab][cacheKey]) {
-        setRestaurants(cachedData[tab][cacheKey]);
-        return;
+  // Fetch restaurants data using React Query
+  // This replaces the old loadTabData + loadRestaurants approach
+  const {
+    data: restaurants = [],
+    isLoading: loading,
+    refetch: refetchRestaurants,
+    isRefetching: refreshing,
+  } = useQuery({
+    queryKey: [
+      'lists-restaurants',
+      currentUser?.id,
+      selectedTab,
+      selectedCategory,
+      selectedFilters,
+      selectedCities,
+      selectedCuisines,
+      selectedTags,
+      selectedGoodFors,
+      selectedPriceTiers,
+      selectedScoreFilter,
+      selectedFriendFilter,
+    ],
+    queryFn: async (): Promise<Restaurant[]> => {
+      if (!currentUser || selectedTab === 'more') {
+        return [];
       }
 
       let restaurantIds: string[] = [];
 
-      if (tab === 'been') {
-        const beenList = await MockDataService.getUserListsByType(user.id, 'been', category);
+      if (selectedTab === 'been') {
+        const beenList = await MockDataService.getUserListsByType(currentUser.id, 'been', selectedCategory);
         restaurantIds = beenList.flatMap(list => list.restaurants);
-      } else if (tab === 'want') {
-        const wantList = await MockDataService.getUserListsByType(user.id, 'want_to_try', category);
+      } else if (selectedTab === 'want') {
+        const wantList = await MockDataService.getUserListsByType(currentUser.id, 'want_to_try', selectedCategory);
         restaurantIds = wantList.flatMap(list => list.restaurants);
-      } else if (tab === 'recs') {
-        const recsList = await MockDataService.getUserListsByType(user.id, 'recs', category);
+      } else if (selectedTab === 'recs') {
+        const recsList = await MockDataService.getUserListsByType(currentUser.id, 'recs', selectedCategory);
         restaurantIds = recsList.flatMap(list => list.restaurants);
-      } else if (tab === 'playlists') {
-        const customLists = await MockDataService.getUserListsByType(user.id, 'playlists', category);
+      } else if (selectedTab === 'playlists') {
+        const customLists = await MockDataService.getUserListsByType(currentUser.id, 'playlists', selectedCategory);
         restaurantIds = customLists.flatMap(list => list.restaurants);
-      } else if (tab === 'recs_for_you') {
-        const recommendations = await MockDataService.getRestaurantRecommendations(user.id);
-        restaurantIds = filterByCategory(recommendations, category).map(r => r.id);
-      } else if (tab === 'recs_from_friends') {
-        const friendRecs = await MockDataService.getFriendRecommendations(user.id);
-        restaurantIds = filterByCategory(friendRecs, category).map(r => r.id);
-      } else if (tab === 'trending') {
+      } else if (selectedTab === 'recs_for_you') {
+        const recommendations = await MockDataService.getRestaurantRecommendations(currentUser.id);
+        restaurantIds = filterByCategory(recommendations, selectedCategory).map(r => r.id);
+      } else if (selectedTab === 'recs_from_friends') {
+        const friendRecs = await MockDataService.getFriendRecommendations(currentUser.id);
+        restaurantIds = filterByCategory(friendRecs, selectedCategory).map(r => r.id);
+      } else if (selectedTab === 'trending') {
         const trending = await MockDataService.getTrendingRestaurants();
-        restaurantIds = filterByCategory(trending, category).map(r => r.id);
+        restaurantIds = filterByCategory(trending, selectedCategory).map(r => r.id);
       }
 
+      // Fallback for special tabs if no results
       if (
         restaurantIds.length === 0 &&
-        (tab === 'recs_for_you' || tab === 'recs_from_friends' || tab === 'trending')
+        (selectedTab === 'recs_for_you' || selectedTab === 'recs_from_friends' || selectedTab === 'trending')
       ) {
         const fallbackScopes: Array<'recs' | 'want_to_try' | 'playlists' | 'been'> = [
           'recs',
@@ -728,7 +523,7 @@ export default function ListsScreen() {
         ];
 
         for (const scope of fallbackScopes) {
-          const fallbackLists = await MockDataService.getUserListsByType(user.id, scope, category);
+          const fallbackLists = await MockDataService.getUserListsByType(currentUser.id, scope, selectedCategory);
           const fallbackIds = Array.from(new Set(fallbackLists.flatMap(list => list.restaurants)));
           if (fallbackIds.length > 0) {
             restaurantIds = fallbackIds;
@@ -741,26 +536,16 @@ export default function ListsScreen() {
       restaurantIds = Array.from(new Set(restaurantIds));
 
       if (restaurantIds.length === 0) {
-        setRestaurants([]);
-        if (hasNoFilters) {
-          setCachedData(prev => ({
-            ...prev,
-            [tab]: {
-              ...(prev[tab] ?? {}),
-              [cacheKey]: []
-            }
-          }));
-        }
-        return;
+        return [];
       }
 
       let restaurantsData = await MockDataService.getRestaurantsWithStatus(restaurantIds, {
         openNow: selectedFilters.includes('open_now'),
         acceptsReservations: selectedFilters.includes('reserve'),
-        // Sorting is now handled by sortedRestaurants useMemo, not by the service
       });
 
-      restaurantsData = filterByCategory(restaurantsData, category);
+      // Apply client-side filters
+      restaurantsData = filterByCategory(restaurantsData, selectedCategory);
       restaurantsData = applyCityFilter(restaurantsData);
       restaurantsData = applyCuisineFilter(restaurantsData);
       restaurantsData = applyTagFilter(restaurantsData);
@@ -769,26 +554,176 @@ export default function ListsScreen() {
       restaurantsData = applyScoreFilter(restaurantsData);
       restaurantsData = applyFriendFilter(restaurantsData);
 
-      // Cache the data if no filters are applied
-      if (hasNoFilters) {
-        setCachedData(prev => ({
-          ...prev,
-          [tab]: {
-            ...(prev[tab] ?? {}),
-            [cacheKey]: restaurantsData
-          }
-        }));
+      // Update list counts for been/want tabs
+      if (selectedTab === 'been' || selectedTab === 'want') {
+        setListCounts(prev => ({ ...prev, [`${selectedTab}-${selectedCategory}`]: restaurantsData.length }));
       }
 
-      setRestaurants(restaurantsData);
+      return restaurantsData;
+    },
+    enabled: !!currentUser && selectedTab !== 'more',
+    staleTime: 2 * 60 * 1000, // 2 minute cache
+  });
 
-      if (tab === 'been' || tab === 'want') {
-        setListCounts(prev => ({ ...prev, [`${tab}-${category}`]: restaurantsData.length }));
-      }
-    } catch (error) {
-      console.error('Failed to load tab data:', error);
+  const filteredRestaurants = useMemo(() => {
+    if (!searchQuery.trim()) return restaurants;
+    const query = searchQuery.toLowerCase();
+    return restaurants.filter(restaurant =>
+      restaurant.name.toLowerCase().includes(query) ||
+      (restaurant.cuisine || []).some(c => c.toLowerCase().includes(query)) ||
+      restaurant.location.neighborhood?.toLowerCase().includes(query)
+    );
+  }, [restaurants, searchQuery]);
+
+  const sortedRestaurants = useMemo(() => {
+    const restaurantsToSort = isSearchActive ? filteredRestaurants : restaurants;
+    const sorted = [...restaurantsToSort];
+
+    if (sortBy === 'rating') {
+      // Sort by score (rating) - use averageScore or recScore
+      sorted.sort((a, b) => {
+        const scoreA = a.scores?.averageScore ?? a.scores?.recScore ?? 0;
+        const scoreB = b.scores?.averageScore ?? b.scores?.recScore ?? 0;
+        return sortOrder === 'desc' ? scoreB - scoreA : scoreA - scoreB;
+      });
+    } else if (sortBy === 'distance') {
+      // Sort by distance
+      sorted.sort((a, b) => {
+        const distanceA = a.distance ?? Infinity;
+        const distanceB = b.distance ?? Infinity;
+        return sortOrder === 'asc' ? distanceA - distanceB : distanceB - distanceA;
+      });
     }
-  };
+
+    return sorted;
+  }, [restaurants, filteredRestaurants, isSearchActive, sortBy, sortOrder]);
+
+  const mapMarkers = useMemo(() => {
+    const restaurantsToMap = isSearchActive ? filteredRestaurants : restaurants;
+    return restaurantsToMap
+      .map(restaurant => {
+        const key = restaurant.name.toLowerCase();
+        const override = COORDINATE_OVERRIDES[key];
+        const coordinates = override ?? restaurant.location?.coordinates;
+        if (!coordinates) return null;
+        const neighborhood = override?.neighborhood ?? restaurant.location.neighborhood;
+        return { restaurant, coordinates, neighborhood };
+      })
+      .filter((entry): entry is { restaurant: Restaurant; coordinates: { lat: number; lng: number }; neighborhood: string } => entry !== null);
+  }, [restaurants, filteredRestaurants, isSearchActive]);
+
+  const cityFilterDisplay = selectedCityLabels.length > 0
+    ? summarizeSelectionLabels(selectedCityLabels, 'City')
+    : undefined;
+
+  const cuisineFilterDisplay = selectedCuisineLabels.length > 0
+    ? summarizeSelectionLabels(selectedCuisineLabels, 'Cuisine')
+    : undefined;
+
+  const priceFilterDisplay = selectedPriceLabels.length > 0
+    ? summarizeSelectionLabels(selectedPriceLabels, 'Price')
+    : undefined;
+
+  const dropdownFilters = [
+    {
+      id: 'city',
+      label: 'City',
+      options: CITY_FILTER_OPTIONS,
+      displayLabel: cityFilterDisplay,
+      isActive: selectedCities.length > 0,
+      selectedOption: selectedCities[0],
+    },
+    {
+      id: 'cuisine',
+      label: 'Cuisine',
+      options: CUISINE_FILTER_OPTIONS,
+      displayLabel: cuisineFilterDisplay,
+      isActive: selectedCuisines.length > 0,
+      selectedOption: selectedCuisines[0],
+    },
+    {
+      id: 'price',
+      label: 'Price',
+      options: PRICE_FILTER_OPTIONS,
+      displayLabel: priceFilterDisplay,
+      isActive: selectedPriceTiers.length > 0,
+      selectedOption: selectedPriceTiers.length > 0 ? selectedPriceTiers[0] : 'all',
+    },
+  ];
+
+  const pendingCityLabels = pendingCitySelection
+    .map(id => CITY_LOOKUP[id]?.label)
+    .filter(Boolean) as string[];
+  const pendingCuisineLabels = pendingCuisineSelection
+    .map(id => CUISINE_LOOKUP[id]?.label)
+    .filter(Boolean) as string[];
+  const pendingPriceLabels = pendingPriceSelection
+    .map(id => PRICE_LOOKUP[id])
+    .filter(Boolean) as string[];
+  const pendingTagLabels = pendingTagSelection
+    .map(id => TAG_OPTIONS.find(option => option.id === id)?.label)
+    .filter(Boolean) as string[];
+  const pendingGoodForLabels = pendingGoodForSelection
+    .map(id => GOOD_FOR_OPTIONS.find(option => option.id === id)?.label)
+    .filter(Boolean) as string[];
+
+  const pendingCitySummary = summarizeSelectionLabels(pendingCityLabels, 'All cities');
+  const pendingGoodForSummary = summarizeSelectionLabels(pendingGoodForLabels, 'All options');
+  const pendingTagSummary = summarizeSelectionLabels(pendingTagLabels, 'All tags');
+  const pendingPriceSummary = summarizeSelectionLabels(pendingPriceLabels, 'All prices');
+  const pendingScoreSummary = SCORE_FILTER_OPTIONS.find(option => option.id === pendingScoreFilter)?.label ?? 'Any score';
+  const pendingFriendSummary = FRIEND_FILTER_OPTIONS.find(option => option.id === pendingFriendFilter)?.label ?? 'Any count';
+
+  // Handle route params for taste profile filtering
+  useEffect(() => {
+    if (route.params?.filterType && route.params?.filterValue) {
+      const { filterType, filterValue } = route.params;
+
+      // Apply filter based on type
+      if (filterType === 'cuisine') {
+        // Find matching cuisine ID
+        const cuisineOption = CUISINE_OPTIONS.find(
+          opt => opt.label.toLowerCase() === filterValue.toLowerCase()
+        );
+        if (cuisineOption) {
+          setSelectedCuisines([cuisineOption.id]);
+        }
+      } else if (filterType === 'city') {
+        // Find matching city ID
+        const cityOption = CITY_OPTIONS.find(
+          opt => opt.city?.toLowerCase() === filterValue.toLowerCase()
+        );
+        if (cityOption) {
+          setSelectedCities([cityOption.id]);
+        }
+      }
+      // Note: Country filtering is not directly supported in current filter system
+    }
+  }, [route.params]);
+
+  // Preload list counts using React Query
+  useQuery({
+    queryKey: ['list-counts', currentUser?.id, selectedCategory],
+    queryFn: async () => {
+      if (!currentUser) return null;
+      const [beenLists, wantLists] = await Promise.all([
+        MockDataService.getUserListsByType(currentUser.id, 'been', selectedCategory),
+        MockDataService.getUserListsByType(currentUser.id, 'want_to_try', selectedCategory),
+      ]);
+
+      const beenIds = new Set(beenLists.flatMap(list => list.restaurants));
+      const wantIds = new Set(wantLists.flatMap(list => list.restaurants));
+
+      setListCounts(prev => ({
+        ...prev,
+        [`been-${selectedCategory}`]: beenIds.size,
+        [`want-${selectedCategory}`]: wantIds.size,
+      }));
+      return { been: beenIds.size, want: wantIds.size };
+    },
+    enabled: !!currentUser,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const specialListOptions: ListType[] = ['recs_for_you', 'recs_from_friends', 'trending'];
 
@@ -800,11 +735,7 @@ export default function ListsScreen() {
 
     setIsListPickerOpen(false);
     setSelectedTab(tabId);
-
-    if (currentUser) {
-      setLoading(true);
-      loadTabData(tabId, currentUser, selectedCategory).finally(() => setLoading(false));
-    }
+    // React Query will automatically fetch when selectedTab changes
   };
 
   const validTabIds: ListType[] = ['been', 'want', 'recs', 'playlists', 'more'];
@@ -855,40 +786,6 @@ export default function ListsScreen() {
       icon: 'trending-up',
     },
   ];
-
-  const loadRestaurants = useCallback(async () => {
-    if (!currentUser) return;
-
-    // Clear existing debounce timer
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
-
-    // For filter changes, add debounce. For tab changes, load immediately
-    const delay = 300;
-
-    debounceRef.current = setTimeout(async () => {
-      try {
-        setLoading(true);
-        await loadTabData(selectedTab, currentUser, selectedCategory);
-      } finally {
-        setLoading(false);
-      }
-    }, delay);
-  }, [
-    selectedTab,
-    selectedFilters,
-    selectedCities,
-    selectedCuisines,
-    selectedTags,
-    selectedGoodFors,
-    selectedPriceTiers,
-    sortBy,
-    sortOrder,
-    currentUser,
-    cachedData,
-    selectedCategory,
-  ]);
 
   const handleFilterPress = (filterId: string) => {
     if (filterId === 'more_filters') {
@@ -1320,6 +1217,13 @@ export default function ListsScreen() {
           maxToRenderPerBatch={10}
           updateCellsBatchingPeriod={100}
           windowSize={10}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refetchRestaurants}
+              tintColor={colors.primary}
+            />
+          }
         />
       ) : (
         <View style={[styles.content, styles.mapContainer]}>

@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   tabActive: {
-    backgroundColor: colors.backgroundGray,
+    backgroundColor: colors.backgroundSecondary,
   },
   tabText: {
     fontSize: typography.sizes.base,

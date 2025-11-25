@@ -21,7 +21,7 @@ export const TasteProfileSummaryCard: React.FC<TasteProfileSummaryCardProps> = (
       colors={['#4338CA', '#3730A3']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      style={[styles.container, shadows.medium]}
+      style={[styles.container, shadows.card]}
     >
       {/* Header */}
       <View style={styles.header}>
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   statValue: {
-    fontSize: typography.sizes['4xl'],
+    fontSize: typography.sizes['3xl'],
     fontWeight: typography.weights.bold,
     color: colors.white,
     marginBottom: spacing.xs,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     fontSize: typography.sizes['2xl'],
-    fontWeight: typography.weights.light,
+    fontWeight: typography.weights.normal,
     color: colors.white,
     textAlign: 'center',
   },

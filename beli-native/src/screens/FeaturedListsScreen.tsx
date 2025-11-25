@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,10 +12,12 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import { useQueries } from '@tanstack/react-query';
 import { colors, spacing, typography } from '../theme';
 import { FeaturedListRow } from '../components/lists/FeaturedListRow';
 import { LoadingSpinner } from '../components/feedback/LoadingSpinner';
-import { MockDataService } from '../data/mockDataService';
+import { useFeaturedLists, useCurrentUser } from '../lib/hooks';
+import { ListService } from '../lib/services/lists/ListService';
 import type { List } from '../types';
 import type { AppStackParamList } from '../navigation/types';
 
@@ -29,43 +31,34 @@ interface ListWithProgress extends List {
 
 export default function FeaturedListsScreen() {
   const navigation = useNavigation<NavigationProp>();
-  const [lists, setLists] = useState<ListWithProgress[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
 
-  const loadLists = async () => {
-    try {
-      const featuredLists = await MockDataService.getFeaturedLists();
-      const currentUser = await MockDataService.getCurrentUser();
+  // Data fetching with React Query hooks
+  const { data: featuredLists = [], isLoading: listsLoading, refetch: refetchLists, isRefetching: listsRefetching } = useFeaturedLists();
+  const { data: currentUser, isLoading: userLoading } = useCurrentUser();
 
-      // Get progress for each list
-      const listsWithProgress = await Promise.all(
-        featuredLists.map(async (list) => {
-          const progress = await MockDataService.getUserListProgress(currentUser.id, list.id);
-          return {
-            ...list,
-            progressText: `You've been to ${progress.visited} of ${progress.total}`,
-          };
-        })
-      );
+  // Fetch progress for each list using useQueries
+  const progressQueries = useQueries({
+    queries: featuredLists.map((list) => ({
+      queryKey: ['lists', 'progress', currentUser?.id, list.id],
+      queryFn: () => ListService.getUserListProgress(currentUser!.id, list.id),
+      enabled: !!currentUser && !!list.id,
+      staleTime: 5 * 60 * 1000,
+    })),
+  });
 
-      setLists(listsWithProgress);
-    } catch (error) {
-      console.error('Failed to load featured lists:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
+  // Combine lists with progress data
+  const lists = useMemo((): ListWithProgress[] => {
+    return featuredLists.map((list, index) => {
+      const progressData = progressQueries[index]?.data;
+      const progressText = progressData
+        ? `You've been to ${progressData.visited} of ${progressData.total}`
+        : 'Loading...';
+      return { ...list, progressText };
+    });
+  }, [featuredLists, progressQueries]);
 
-  useEffect(() => {
-    loadLists();
-  }, []);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    loadLists();
-  };
+  const isLoading = listsLoading || userLoading;
+  const isRefetching = listsRefetching;
 
   const handleListPress = (listId: string) => {
     navigation.navigate('FeaturedListDetail', { listId });
@@ -73,6 +66,10 @@ export default function FeaturedListsScreen() {
 
   const handleSearchPress = () => {
     Alert.alert('Coming Soon', 'Search functionality will be added soon.');
+  };
+
+  const handleRefresh = () => {
+    refetchLists();
   };
 
   const renderListItem = ({ item, index }: { item: ListWithProgress; index: number }) => (
@@ -94,7 +91,7 @@ export default function FeaturedListsScreen() {
     </View>
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
@@ -142,8 +139,8 @@ export default function FeaturedListsScreen() {
         contentContainerStyle={lists.length === 0 ? styles.emptyListContent : undefined}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
+            refreshing={isRefetching}
+            onRefresh={handleRefresh}
             tintColor={colors.primary}
           />
         }

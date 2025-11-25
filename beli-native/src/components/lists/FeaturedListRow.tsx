@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   description: {
-    fontSize: typography.sizes.md,
+    fontSize: typography.sizes.base,
     fontWeight: typography.weights.regular,
     color: colors.textSecondary,
     lineHeight: 18,

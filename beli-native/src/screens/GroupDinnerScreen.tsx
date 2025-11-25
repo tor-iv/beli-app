@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import { useQuery } from '@tanstack/react-query';
 import { colors, spacing, typography } from '../theme';
 import {
   ParticipantSearchModal,
@@ -19,6 +19,7 @@ import {
   SelectionScreen,
   CategorySelectionModal,
 } from '../components/group-dinner';
+import { useCurrentUser } from '../lib/hooks';
 import { MockDataService } from '../data/mockDataService';
 import type { User, GroupDinnerMatch, ListCategory } from '../types';
 import type { AppStackParamList } from '../navigation/types';
@@ -27,10 +28,12 @@ type GroupDinnerScreenNavigationProp = StackNavigationProp<AppStackParamList>;
 
 export default function GroupDinnerScreen() {
   const navigation = useNavigation<GroupDinnerScreenNavigationProp>();
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  // Current user from React Query
+  const { data: currentUser } = useCurrentUser();
+
+  // UI state
   const [selectedParticipants, setSelectedParticipants] = useState<User[]>([]);
-  const [matches, setMatches] = useState<GroupDinnerMatch[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [savedRestaurants, setSavedRestaurants] = useState<GroupDinnerMatch[]>([]);
   const [showSelectionScreen, setShowSelectionScreen] = useState(false);
@@ -40,43 +43,28 @@ export default function GroupDinnerScreen() {
   const [selectedCategory, setSelectedCategory] = useState<ListCategory>('restaurants');
   const [showCategoryModal, setShowCategoryModal] = useState(true);
 
-  const loadUser = useCallback(async () => {
-    try {
-      const user = await MockDataService.getCurrentUser();
-      setCurrentUser(user);
-    } catch (error) {
-      console.error('Failed to load user:', error);
-    }
-  }, []);
+  // Memoize participant IDs for query key stability
+  const participantIds = useMemo(
+    () => selectedParticipants.map((p) => p.id),
+    [selectedParticipants]
+  );
 
-  const loadMatches = useCallback(async () => {
-    if (!currentUser) return;
-
-    setLoading(true);
-    try {
-      const participantIds = selectedParticipants.map(p => p.id);
-      const suggestions = await MockDataService.getGroupDinnerSuggestions(
-        currentUser.id,
+  // Fetch suggestions using React Query with MockDataService
+  // (GroupDinnerService doesn't support category filtering yet)
+  const {
+    data: matches = [],
+    isLoading: loading,
+  } = useQuery({
+    queryKey: ['group-dinner', 'suggestions', currentUser?.id, participantIds, selectedCategory, shuffleCount],
+    queryFn: () =>
+      MockDataService.getGroupDinnerSuggestions(
+        currentUser!.id,
         participantIds.length > 0 ? participantIds : undefined,
         selectedCategory
-      );
-      setMatches(suggestions);
-    } catch (error) {
-      console.error('Failed to load matches:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentUser, selectedParticipants, selectedCategory]);
-
-  useEffect(() => {
-    loadUser();
-  }, [loadUser]);
-
-  useEffect(() => {
-    if (currentUser && !showCategoryModal) {
-      loadMatches();
-    }
-  }, [currentUser, selectedParticipants, shuffleCount, selectedCategory, showCategoryModal, loadMatches]);
+      ),
+    enabled: !!currentUser && !showCategoryModal,
+    staleTime: 0, // Fresh data on each shuffle
+  });
 
   const handleSelectCategory = (category: ListCategory) => {
     setSelectedCategory(category);

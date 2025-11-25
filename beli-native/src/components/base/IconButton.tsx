@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { theme } from '../../theme';
 
 interface IconButtonProps {
@@ -8,7 +8,7 @@ interface IconButtonProps {
   size?: 'small' | 'medium' | 'large';
   variant?: 'default' | 'primary' | 'ghost';
   disabled?: boolean;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   testID?: string;
 }
 
@@ -29,22 +29,21 @@ export const IconButton: React.FC<IconButtonProps> = ({
 }) => {
   const buttonSize = BUTTON_SIZES[size];
 
-  const buttonStyle = [
-    styles.base,
-    styles[variant],
-    {
-      width: buttonSize,
-      height: buttonSize,
-      borderRadius: buttonSize / 2,
-    },
-    disabled && styles.disabled,
-    style,
-  ];
+  // Build the base button style
+  const baseButtonStyle: ViewStyle = {
+    ...styles.base,
+    ...styles[variant],
+    width: buttonSize,
+    height: buttonSize,
+    borderRadius: buttonSize / 2,
+    ...(disabled ? styles.disabled : {}),
+  };
 
   return (
     <Pressable
-      style={({ pressed }) => [
-        buttonStyle,
+      style={({ pressed }): StyleProp<ViewStyle> => [
+        baseButtonStyle,
+        style,
         pressed && !disabled && {
           opacity: theme.animations.opacity.pressed,
           transform: [{ scale: theme.animations.scale.press }],

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import { useQuery } from '@tanstack/react-query';
 import { colors, typography, spacing } from '../theme';
 import {
   Avatar,
@@ -20,8 +21,9 @@ import {
 } from '../components';
 import { TabSelector } from '../components/navigation/TabSelector';
 import { SortOptionsModal } from '../components/modals/SortOptionsModal';
+import { useCurrentUser, useRestaurants } from '../lib/hooks';
 import { MockDataService } from '../data/mockDataService';
-import type { User, Review, Restaurant, TasteProfileStats, CuisineBreakdown, CityBreakdown, CountryBreakdown } from '../types';
+import type { CuisineBreakdown, CityBreakdown, CountryBreakdown } from '../types';
 import type { AppStackParamList } from '../navigation/types';
 import type { TasteProfileCategory } from '../components/profile/TasteProfileCategoryTab';
 import type { SortOption } from '../components/profile/TasteProfileList';
@@ -31,47 +33,40 @@ type ProfileScreenNavigationProp = StackNavigationProp<AppStackParamList>;
 
 export default function ProfileScreen() {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabId>('activity');
-  const [recentReviews, setRecentReviews] = useState<Review[]>([]);
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [menuVisible, setMenuVisible] = useState(false);
 
-  // Taste profile state
-  const [tasteProfile, setTasteProfile] = useState<TasteProfileStats | null>(null);
+  // UI state
+  const [activeTab, setActiveTab] = useState<TabId>('activity');
+  const [menuVisible, setMenuVisible] = useState(false);
   const [activeCategory, setActiveCategory] = useState<TasteProfileCategory>('cuisines');
   const [sortBy, setSortBy] = useState<SortOption>('count');
   const [sortModalVisible, setSortModalVisible] = useState(false);
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
+  // Data fetching with React Query
+  const { data: user, isLoading: userLoading } = useCurrentUser();
+  const { data: restaurants = [] } = useRestaurants();
 
-  const loadProfile = async () => {
-    try {
-      const [currentUser, allRestaurants] = await Promise.all([
-        MockDataService.getCurrentUser(),
-        MockDataService.getAllRestaurants(),
-      ]);
+  // Fetch user reviews (no service yet, wrap MockDataService)
+  const { data: allReviews = [] } = useQuery({
+    queryKey: ['user-reviews', user?.id],
+    queryFn: () => MockDataService.getUserReviews(user!.id),
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+  });
 
-      const [reviews, tasteProfileData] = await Promise.all([
-        MockDataService.getUserReviews(currentUser.id),
-        MockDataService.getUserTasteProfile(currentUser.id),
-      ]);
+  // Get recent reviews (first 5)
+  const recentReviews = useMemo(() => allReviews.slice(0, 5), [allReviews]);
 
-      setUser(currentUser);
-      setRestaurants(allRestaurants);
-      setRecentReviews(reviews.slice(0, 5));
-      setTasteProfile(tasteProfileData);
-    } catch (error) {
-      console.error('Failed to load profile:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Fetch taste profile (no service yet, wrap MockDataService)
+  const { data: tasteProfile } = useQuery({
+    queryKey: ['taste-profile', user?.id],
+    queryFn: () => MockDataService.getUserTasteProfile(user!.id),
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+  });
 
-  if (loading) {
+  const isLoading = userLoading;
+
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>

@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, ViewStyle, Animated } from 'react-native';
+import { View, StyleSheet, ViewStyle, Animated, DimensionValue } from 'react-native';
 import { theme } from '../../theme';
 
 interface SkeletonProps {
-  width?: number | string;
+  width?: DimensionValue;
   height?: number;
   borderRadius?: number;
   style?: ViewStyle;
@@ -45,17 +45,16 @@ export const Skeleton: React.FC<SkeletonProps> = ({
     outputRange: [0.3, 0.7],
   });
 
+  // Build dimension style object
+  const dimensionStyle: ViewStyle = {
+    width,
+    height,
+    borderRadius,
+  };
+
   return (
     <View
-      style={[
-        styles.skeleton,
-        {
-          width,
-          height,
-          borderRadius,
-        },
-        style,
-      ]}
+      style={[styles.skeleton, dimensionStyle, style]}
       testID={testID}
     >
       <Animated.View

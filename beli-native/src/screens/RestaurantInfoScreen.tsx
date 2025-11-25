@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, StyleSheet, Pressable, ScrollView, Image, Text as RNText, Animated } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,8 +9,9 @@ import { Screen, Text, Caption, Badge, LoadingSpinner, RestaurantScoreCard, Avat
 import { AddRestaurantModal, RestaurantSubmissionData, WhatToOrderModal } from '../components/modals';
 import { RankingResultModal } from '../components/modals/RankingResultModal';
 import { colors, spacing, theme } from '../theme';
+import { useRestaurant, useCurrentUser } from '../lib/hooks';
 import { MockDataService } from '../data/mockDataService';
-import type { Restaurant, RankingResult, User } from '../types';
+import type { Restaurant, RankingResult } from '../types';
 import type { AppStackParamList } from '../navigation/types';
 
 type RestaurantInfoRouteProp = RouteProp<AppStackParamList, 'RestaurantInfo'>;
@@ -124,52 +125,21 @@ const RestaurantInfoScreen: React.FC = () => {
   const route = useRoute<RestaurantInfoRouteProp>();
 
   const { restaurantId } = route.params ?? { restaurantId: '' };
-  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-  const [loading, setLoading] = useState(true);
+
+  // Data fetching with React Query hooks
+  const { data: restaurant, isLoading: restaurantLoading } = useRestaurant(restaurantId);
+  const { data: currentUser } = useCurrentUser();
+
+  // UI state
   const [isSaved, setIsSaved] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [submissionData, setSubmissionData] = useState<RestaurantSubmissionData | null>(null);
   const [rankingResult, setRankingResult] = useState<RankingResult | null>(null);
 
   const scrollY = new Animated.Value(0);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadData = async () => {
-      if (!restaurantId) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const [restaurantResult, userResult] = await Promise.all([
-          MockDataService.getRestaurantById(restaurantId),
-          MockDataService.getCurrentUser(),
-        ]);
-
-        if (isMounted) {
-          setRestaurant(restaurantResult ?? null);
-          setCurrentUser(userResult);
-        }
-      } catch (error) {
-        console.error('Failed to load data', error);
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadData();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [restaurantId]);
+  const loading = restaurantLoading;
 
 
   const popularImages = useMemo<string[]>(() => {

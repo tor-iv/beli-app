@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -13,8 +13,16 @@ import {
   MatchPercentage,
 } from '../components';
 import { TabSelector } from '../components/navigation/TabSelector';
+import {
+  useUser,
+  useCurrentUser,
+  useIsFollowing,
+  useMatchPercentage,
+  useFollowUser,
+  useUnfollowUser,
+} from '../lib/hooks';
 import { MockDataService } from '../data/mockDataService';
-import type { User, Review, Restaurant } from '../types';
+import type { Review } from '../types';
 import type { AppStackParamList } from '../navigation/types';
 
 type TabId = 'activity' | 'taste' | 'curated';
@@ -26,62 +34,57 @@ export default function UserProfileScreen() {
   const route = useRoute<UserProfileScreenRouteProp>();
   const { userId } = route.params;
 
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Data fetching with React Query hooks
+  const { data: currentUser } = useCurrentUser();
+  const { data: user, isLoading: userLoading } = useUser(userId);
+  const { data: isFollowingUser = false } = useIsFollowing(currentUser?.id || '', userId);
+  const { data: matchPercentage = 0 } = useMatchPercentage(currentUser?.id || '', userId);
+
+  // Mutation hooks
+  const followUser = useFollowUser();
+  const unfollowUser = useUnfollowUser();
+
+  // Local UI state
   const [activeTab, setActiveTab] = useState<TabId>('activity');
   const [recentReviews, setRecentReviews] = useState<Review[]>([]);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [followLoading, setFollowLoading] = useState(false);
-  const [matchPercentage, setMatchPercentage] = useState(0);
   const [sharedWantToTryCount, setSharedWantToTryCount] = useState(0);
 
+  // Load additional data that doesn't have hooks yet
   useEffect(() => {
-    loadProfile();
-  }, [userId]);
-
-  const loadProfile = async () => {
-    try {
-      const [userData, following, match, sharedRestaurants] = await Promise.all([
-        MockDataService.getUserById(userId),
-        MockDataService.isFollowing(userId),
-        MockDataService.getUserMatchPercentage(userId),
-        MockDataService.getSharedWantToTry(userId),
-      ]);
-
-      if (userData) {
-        setUser(userData);
-        setIsFollowing(following);
-        setMatchPercentage(match);
+    const loadAdditionalData = async () => {
+      if (!user) return;
+      try {
+        const [sharedRestaurants, reviews] = await Promise.all([
+          MockDataService.getSharedWantToTry(userId),
+          MockDataService.getUserReviews(user.id),
+        ]);
         setSharedWantToTryCount(sharedRestaurants.length);
-
-        const reviews = await MockDataService.getUserReviews(userData.id);
         setRecentReviews(reviews.slice(0, 5));
+      } catch (error) {
+        console.error('Failed to load additional data:', error);
       }
-    } catch (error) {
-      console.error('Failed to load profile:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    loadAdditionalData();
+  }, [user, userId]);
 
-  const handleFollowPress = async () => {
-    setFollowLoading(true);
+  const handleFollowPress = useCallback(async () => {
+    if (!currentUser?.id) return;
+
     try {
-      if (isFollowing) {
-        await MockDataService.unfollowUser(userId);
-        setIsFollowing(false);
+      if (isFollowingUser) {
+        await unfollowUser.mutateAsync({ userId: currentUser.id, targetUserId: userId });
       } else {
-        await MockDataService.followUser(userId);
-        setIsFollowing(true);
+        await followUser.mutateAsync({ userId: currentUser.id, targetUserId: userId });
       }
     } catch (error) {
       console.error('Failed to toggle follow:', error);
-    } finally {
-      setFollowLoading(false);
     }
-  };
+  }, [currentUser, isFollowingUser, userId, followUser, unfollowUser]);
 
-  if (loading) {
+  const isLoading = userLoading;
+  const followLoading = followUser.isPending || unfollowUser.isPending;
+
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
@@ -159,7 +162,7 @@ export default function UserProfileScreen() {
           {/* Follow Button */}
           <View style={styles.followButtonContainer}>
             <FollowButton
-              isFollowing={isFollowing}
+              isFollowing={isFollowingUser}
               onPress={handleFollowPress}
               disabled={followLoading}
             />

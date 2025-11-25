@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { colors, spacing } from '../theme';
 import { Avatar } from '../components';
-import { MockDataService } from '../data/mockDataService';
+import { useLeaderboard } from '../lib/hooks';
 import type { User } from '../data/mock/types';
 import type { AppStackNavigationProp } from '../navigation/types';
 
@@ -17,79 +17,66 @@ interface LeaderboardUser extends User {
 
 export default function LeaderboardScreen() {
   const navigation = useNavigation<AppStackNavigationProp>();
-  const [users, setUsers] = useState<LeaderboardUser[]>([]);
-  const [allUsers, setAllUsers] = useState<LeaderboardUser[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  // UI state (kept as useState)
   const [selectedTab, setSelectedTab] = useState<TabType>('Been');
   const [memberFilter, setMemberFilter] = useState('All Members');
   const [cityFilter, setCityFilter] = useState('All Cities');
   const [showMemberDropdown, setShowMemberDropdown] = useState(false);
   const [showCityDropdown, setShowCityDropdown] = useState(false);
 
-  useEffect(() => {
-    loadLeaderboard();
-  }, [selectedTab]);
+  // Data fetching with React Query hook
+  const { data: rawUsers = [], isLoading, refetch, isRefetching } = useLeaderboard();
 
-  useEffect(() => {
-    applyFilters();
-  }, [memberFilter, cityFilter, allUsers]);
+  // Transform and sort data based on selected tab (using useMemo for performance)
+  const allUsers = useMemo((): LeaderboardUser[] => {
+    if (!rawUsers.length) return [];
 
-  const loadLeaderboard = async () => {
-    try {
-      const allUsers = await MockDataService.getLeaderboard();
+    // Sort based on selected tab
+    let sortedUsers = [...rawUsers];
+    switch (selectedTab) {
+      case 'Been':
+        sortedUsers.sort((a, b) => b.stats.beenCount - a.stats.beenCount);
+        break;
+      case 'Influence':
+        sortedUsers.sort((a, b) => b.stats.followers - a.stats.followers);
+        break;
+      case 'Notes':
+        sortedUsers.sort((a, b) => (b.stats.totalReviews || 0) - (a.stats.totalReviews || 0));
+        break;
+      case 'Photos':
+        sortedUsers.sort((a, b) => b.stats.beenCount - a.stats.beenCount);
+        break;
+    }
 
-      // Sort based on selected tab
-      let sortedUsers = [...allUsers];
+    return sortedUsers.map((user, index) => {
+      let score = 0;
       switch (selectedTab) {
         case 'Been':
-          sortedUsers.sort((a, b) => b.stats.beenCount - a.stats.beenCount);
+          score = user.stats.beenCount;
           break;
         case 'Influence':
-          sortedUsers.sort((a, b) => b.stats.followers - a.stats.followers);
+          score = user.stats.followers;
           break;
         case 'Notes':
-          sortedUsers.sort((a, b) => (b.stats.totalReviews || 0) - (a.stats.totalReviews || 0));
+          score = user.stats.totalReviews || 0;
           break;
         case 'Photos':
-          sortedUsers.sort((a, b) => b.stats.beenCount - a.stats.beenCount);
+          score = user.stats.beenCount;
           break;
       }
 
-      const leaderboardUsers = sortedUsers.map((user, index) => {
-        let score = 0;
-        switch (selectedTab) {
-          case 'Been':
-            score = user.stats.beenCount;
-            break;
-          case 'Influence':
-            score = user.stats.followers;
-            break;
-          case 'Notes':
-            score = user.stats.totalReviews || 0;
-            break;
-          case 'Photos':
-            score = user.stats.beenCount;
-            break;
-        }
+      return {
+        ...user,
+        rank: index + 1,
+        matchPercentage: Math.floor(Math.random() * 30) + 30, // 30-60%
+        score,
+      };
+    });
+  }, [rawUsers, selectedTab]);
 
-        return {
-          ...user,
-          rank: index + 1,
-          matchPercentage: Math.floor(Math.random() * 30) + 30, // 30-60%
-          score,
-        };
-      });
-
-      setAllUsers(leaderboardUsers);
-      setUsers(leaderboardUsers);
-    } catch (error) {
-      console.error('Failed to load leaderboard:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const applyFilters = () => {
+  // Apply filters (using useMemo for performance)
+  const users = useMemo((): LeaderboardUser[] => {
     let filtered = [...allUsers];
 
     // Apply city filter
@@ -98,20 +85,17 @@ export default function LeaderboardScreen() {
     }
 
     // Apply member filter (could filter by following status, etc.)
-    // For now, 'All Members' vs 'Friends' as example
     if (memberFilter === 'Friends') {
       // You could filter based on following list
       // filtered = filtered.filter(user => currentUser.following.includes(user.id));
     }
 
     // Re-rank after filtering
-    filtered = filtered.map((user, index) => ({
+    return filtered.map((user, index) => ({
       ...user,
       rank: index + 1,
     }));
-
-    setUsers(filtered);
-  };
+  }, [allUsers, memberFilter, cityFilter]);
 
   const getUniqueCities = () => {
     const cities = new Set(allUsers.map(user => user.location.city));
@@ -161,7 +145,7 @@ export default function LeaderboardScreen() {
     );
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
@@ -270,6 +254,13 @@ export default function LeaderboardScreen() {
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetching}
+              onRefresh={refetch}
+              tintColor={colors.primary}
+            />
+          }
         />
       </View>
     </SafeAreaView>

@@ -1,3 +1,7 @@
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { CompositeNavigationProp } from '@react-navigation/native';
+
 export type BottomTabParamList = {
   Feed: undefined;
   Lists: {
@@ -62,3 +66,13 @@ export type AppStackParamList = {
   MutedAccountsScreen: undefined;
   CookiePreferencesScreen: undefined;
 };
+
+// Navigation prop types
+export type AppStackNavigationProp = NativeStackNavigationProp<AppStackParamList>;
+export type BottomTabNavProp = BottomTabNavigationProp<BottomTabParamList>;
+
+// Composite type for screens that need both tab and stack navigation
+export type FeedScreenNavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<BottomTabParamList, 'Feed'>,
+  NativeStackNavigationProp<AppStackParamList>
+>;

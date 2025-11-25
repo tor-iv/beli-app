@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,9 +12,15 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import { useQueries } from '@tanstack/react-query';
 import { colors, spacing, typography } from '../theme';
 import { CategoryPills, FeaturedListRow, LoadingSpinner, TastemakerPostCard } from '../components';
-import { MockDataService } from '../data/mockDataService';
+import {
+  useFeaturedLists,
+  useCurrentUser,
+  useTastemakerPosts,
+} from '../lib/hooks';
+import { ListService } from '../lib/services/lists/ListService';
 import type { List, TastemakerPost } from '../types';
 import type { AppStackParamList } from '../navigation/types';
 
@@ -27,49 +33,53 @@ interface ListWithProgress extends List {
 
 export default function TastemakersScreen() {
   const navigation = useNavigation<NavigationProp>();
+
+  // UI state
   const [mode, setMode] = useState<ViewMode>('lists');
-  const [featuredLists, setFeaturedLists] = useState<ListWithProgress[]>([]);
-  const [tastemakerPosts, setTastemakerPosts] = useState<TastemakerPost[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
 
-  const loadData = async () => {
-    try {
-      // Load featured lists with progress
-      const lists = await MockDataService.getFeaturedLists();
-      const currentUser = await MockDataService.getCurrentUser();
+  // Data fetching with React Query hooks
+  const { data: currentUser } = useCurrentUser();
+  const {
+    data: rawFeaturedLists = [],
+    isLoading: listsLoading,
+    refetch: refetchLists,
+    isRefetching: listsRefetching,
+  } = useFeaturedLists();
+  const {
+    data: tastemakerPosts = [],
+    isLoading: postsLoading,
+    refetch: refetchPosts,
+    isRefetching: postsRefetching,
+  } = useTastemakerPosts();
 
-      const listsWithProgress = await Promise.all(
-        lists.map(async (list) => {
-          const progress = await MockDataService.getUserListProgress(currentUser.id, list.id);
-          return {
-            ...list,
-            progressText: `You've been to ${progress.visited} of ${progress.total}`,
-          };
-        })
-      );
+  // Fetch progress for each list using useQueries
+  const progressQueries = useQueries({
+    queries: rawFeaturedLists.map((list) => ({
+      queryKey: ['lists', 'progress', currentUser?.id, list.id],
+      queryFn: () => ListService.getUserListProgress(currentUser!.id, list.id),
+      enabled: !!currentUser && !!list.id,
+      staleTime: 5 * 60 * 1000,
+    })),
+  });
 
-      setFeaturedLists(listsWithProgress);
+  // Combine lists with progress data
+  const featuredLists = useMemo((): ListWithProgress[] => {
+    return rawFeaturedLists.map((list, index) => {
+      const progressData = progressQueries[index]?.data;
+      const progressText = progressData
+        ? `You've been to ${progressData.visited} of ${progressData.total}`
+        : 'Loading...';
+      return { ...list, progressText };
+    });
+  }, [rawFeaturedLists, progressQueries]);
 
-      // Load tastemaker posts
-      const posts = await MockDataService.getTastemakerPosts();
-      setTastemakerPosts(posts);
-    } catch (error) {
-      console.error('Failed to load tastemakers data:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
+  const isLoading = listsLoading || postsLoading;
+  const isRefetching = listsRefetching || postsRefetching;
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    loadData();
+  const handleRefresh = () => {
+    refetchLists();
+    refetchPosts();
   };
 
   const handleListPress = (listId: string) => {
@@ -91,7 +101,7 @@ export default function TastemakersScreen() {
         post.tags.includes(selectedCategory)
       );
 
-  if (loading) {
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
@@ -165,8 +175,8 @@ export default function TastemakersScreen() {
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
+              refreshing={isRefetching}
+              onRefresh={handleRefresh}
               tintColor={colors.primary}
             />
           }
@@ -196,8 +206,8 @@ export default function TastemakersScreen() {
             showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
+                refreshing={isRefetching}
+                onRefresh={handleRefresh}
                 tintColor={colors.primary}
               />
             }

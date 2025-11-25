@@ -2,8 +2,11 @@ import React from 'react';
 import { View, ViewStyle } from 'react-native';
 import { theme } from '../../theme';
 
+// Extract numeric spacing keys (excluding borderRadius which is an object)
+type NumericSpacingKey = Exclude<keyof typeof theme.spacing, 'borderRadius'>;
+
 interface SpacerProps {
-  size?: keyof typeof theme.spacing | number;
+  size?: NumericSpacingKey | number;
   horizontal?: boolean;
   style?: ViewStyle;
   testID?: string;
@@ -15,11 +18,11 @@ export const Spacer: React.FC<SpacerProps> = ({
   style,
   testID,
 }) => {
-  const spacingValue = typeof size === 'number' ? size : theme.spacing[size];
+  const spacingValue = typeof size === 'number' ? size : theme.spacing[size] as number;
 
-  const spacerStyle: ViewStyle = {
-    ...(horizontal ? { width: spacingValue } : { height: spacingValue }),
-  };
+  const spacerStyle: ViewStyle = horizontal
+    ? { width: spacingValue }
+    : { height: spacingValue };
 
   return <View style={[spacerStyle, style]} testID={testID} />;
 };

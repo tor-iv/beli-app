@@ -20,19 +20,16 @@ export const Row: React.FC<RowProps> = ({
   style,
   testID,
 }) => {
-  const rowStyle = [
-    styles.row,
-    {
-      alignItems: align,
-      justifyContent: justify,
-      flexWrap: wrap ? 'wrap' : 'nowrap',
-      gap,
-    },
-    style,
-  ];
+  // Build the row style with proper typing
+  const dynamicStyle: ViewStyle = {
+    alignItems: align,
+    justifyContent: justify,
+    flexWrap: wrap ? 'wrap' : 'nowrap',
+    gap,
+  };
 
   return (
-    <View style={rowStyle} testID={testID}>
+    <View style={[styles.row, dynamicStyle, style]} testID={testID}>
       {children}
     </View>
   );

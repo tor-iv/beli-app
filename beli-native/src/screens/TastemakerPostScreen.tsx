@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,9 +7,11 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import Markdown from 'react-native-markdown-display';
 import { colors, typography, spacing, shadows } from '../theme';
 import { LoadingSpinner, RestaurantCard } from '../components';
+import { useCurrentUser } from '../lib/hooks';
 import { MockDataService } from '../data/mockDataService';
 import type { TastemakerPost } from '../types';
 import type { AppStackParamList } from '../navigation/types';
+import { useQuery } from '@tanstack/react-query';
 
 type TastemakerPostScreenNavigationProp = StackNavigationProp<
   AppStackParamList,
@@ -23,66 +25,60 @@ export default function TastemakerPostScreen() {
   const route = useRoute<TastemakerPostScreenRouteProp>();
   const { postId } = route.params;
 
-  const [post, setPost] = useState<TastemakerPost | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Data fetching with React Query
+  const { data: currentUser } = useCurrentUser();
+  const { data: post, isLoading } = useQuery({
+    queryKey: ['tastemaker-post-full', postId],
+    queryFn: () => MockDataService.getTastemakerPostById(postId),
+    enabled: !!postId,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Local UI state for interactions (these are optimistic updates)
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState<string>('');
+  const [hasInitialized, setHasInitialized] = useState(false);
 
-  useEffect(() => {
-    loadPostData();
-  }, [postId]);
-
-  const loadPostData = async () => {
-    try {
-      setLoading(true);
-      const postData = await MockDataService.getTastemakerPostById(postId);
-      const user = await MockDataService.getCurrentUser();
-
-      if (postData) {
-        setPost(postData);
-        setCurrentUserId(user.id);
-        setIsLiked(postData.interactions.likes.includes(user.id));
-        setIsBookmarked(postData.interactions.bookmarks.includes(user.id));
-      }
-    } catch (error) {
-      console.error('Failed to load post:', error);
-    } finally {
-      setLoading(false);
+  // Initialize like/bookmark state from post data
+  useMemo(() => {
+    if (post && currentUser && !hasInitialized) {
+      setIsLiked(post.interactions.likes.includes(currentUser.id));
+      setIsBookmarked(post.interactions.bookmarks.includes(currentUser.id));
+      setHasInitialized(true);
     }
-  };
+  }, [post, currentUser, hasInitialized]);
 
-  const handleLikeToggle = async () => {
-    if (!post || !currentUserId) return;
+  const handleLikeToggle = useCallback(async () => {
+    if (!post || !currentUser?.id) return;
 
     try {
       if (isLiked) {
-        await MockDataService.unlikeTastemakerPost(post.id, currentUserId);
+        await MockDataService.unlikeTastemakerPost(post.id, currentUser.id);
         setIsLiked(false);
       } else {
-        await MockDataService.likeTastemakerPost(post.id, currentUserId);
+        await MockDataService.likeTastemakerPost(post.id, currentUser.id);
         setIsLiked(true);
       }
     } catch (error) {
       console.error('Failed to toggle like:', error);
     }
-  };
+  }, [post, currentUser, isLiked]);
 
-  const handleBookmarkToggle = async () => {
-    if (!post || !currentUserId) return;
+  const handleBookmarkToggle = useCallback(async () => {
+    if (!post || !currentUser?.id) return;
 
     try {
       if (isBookmarked) {
-        await MockDataService.unbookmarkTastemakerPost(post.id, currentUserId);
+        await MockDataService.unbookmarkTastemakerPost(post.id, currentUser.id);
         setIsBookmarked(false);
       } else {
-        await MockDataService.bookmarkTastemakerPost(post.id, currentUserId);
+        await MockDataService.bookmarkTastemakerPost(post.id, currentUser.id);
         setIsBookmarked(true);
       }
     } catch (error) {
       console.error('Failed to toggle bookmark:', error);
     }
-  };
+  }, [post, currentUser, isBookmarked]);
 
   const handleShare = () => {
     console.log('Share post:', postId);
@@ -104,7 +100,7 @@ export default function TastemakerPostScreen() {
     return Math.ceil(wordCount / 200);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>

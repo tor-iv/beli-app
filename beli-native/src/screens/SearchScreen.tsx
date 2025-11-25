@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, Pressable, ScrollView, TextInput, GestureResponderEvent } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -7,6 +7,12 @@ import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { colors, typography, spacing } from '../theme';
 import { SearchBar, LoadingSpinner, EmptyState, UserSearchResultCard } from '../components';
+import {
+  useRestaurants,
+  useSearchRestaurants,
+  useSearchUsers,
+  useCurrentUser,
+} from '../lib/hooks';
 import { MockDataService } from '../data/mockDataService';
 import type { Restaurant, User } from '../data/mock/types';
 import type { BottomTabParamList, AppStackParamList } from '../navigation/types';
@@ -22,19 +28,39 @@ export default function SearchScreen() {
   const navigation = useNavigation<SearchScreenNavigationProp>();
   const route = useRoute<SearchScreenRouteProp>();
   const searchInputRef = useRef<TextInput | null>(null);
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
-  const [recentRestaurants, setRecentRestaurants] = useState<Restaurant[]>([]);
+
+  // UI state
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [searchingRestaurants, setSearchingRestaurants] = useState(false);
   const [activeSegment, setActiveSegment] = useState<'Restaurants' | 'Members'>('Restaurants');
   const [location, setLocation] = useState('Current Location');
-
-  // Member search state
-  const [filteredMembers, setFilteredMembers] = useState<User[]>([]);
-  const [searchingMembers, setSearchingMembers] = useState(false);
+  const [recentRestaurants, setRecentRestaurants] = useState<Restaurant[]>([]);
   const [memberMatchPercentages, setMemberMatchPercentages] = useState<Record<string, number>>({});
+
+  // Data fetching with React Query hooks
+  const { data: currentUser } = useCurrentUser();
+  const { data: allRestaurants = [], isLoading: restaurantsLoading } = useRestaurants();
+
+  // Search hooks - automatically handles debouncing via staleTime
+  const trimmedQuery = searchQuery.trim();
+  const {
+    data: searchedRestaurants = [],
+    isFetching: searchingRestaurants,
+  } = useSearchRestaurants(trimmedQuery, undefined, activeSegment === 'Restaurants' && trimmedQuery.length > 0);
+
+  const {
+    data: searchedMembers = [],
+    isFetching: searchingMembers,
+  } = useSearchUsers(trimmedQuery, activeSegment === 'Members' && trimmedQuery.length > 0);
+
+  // Derive filtered results
+  const filteredRestaurants = useMemo(() => {
+    if (trimmedQuery && activeSegment === 'Restaurants') {
+      return searchedRestaurants;
+    }
+    return allRestaurants;
+  }, [trimmedQuery, activeSegment, searchedRestaurants, allRestaurants]);
+
+  const filteredMembers = searchedMembers;
 
   const handleLocationPress = () => {};
 
@@ -46,6 +72,7 @@ export default function SearchScreen() {
     navigation.navigate('UserProfile', { userId });
   };
 
+  // Handle autoFocus from navigation params
   useEffect(() => {
     if (route.params?.autoFocus) {
       setTimeout(() => {
@@ -58,123 +85,30 @@ export default function SearchScreen() {
     }
   }, [route.params?.autoFocus, navigation]);
 
+  // Set recent restaurants from all restaurants
   useEffect(() => {
-    loadRestaurants();
-  }, []);
+    if (allRestaurants.length > 0 && recentRestaurants.length === 0) {
+      setRecentRestaurants(allRestaurants.slice(0, 6));
+    }
+  }, [allRestaurants, recentRestaurants.length]);
 
+  // Load match percentages for member search results
   useEffect(() => {
-    if (activeSegment !== 'Restaurants') {
-      setSearchingRestaurants(false);
-      setFilteredRestaurants([]);
-      return;
-    }
+    if (searchedMembers.length === 0 || !currentUser) return;
 
-    const trimmedQuery = searchQuery.trim();
-
-    if (!trimmedQuery) {
-      setFilteredRestaurants(restaurants);
-      setSearchingRestaurants(false);
-      return;
-    }
-
-    let isCancelled = false;
-    setSearchingRestaurants(true);
-
-    const timeoutId = setTimeout(() => {
-      MockDataService.searchRestaurants(trimmedQuery)
-        .then(results => {
-          if (!isCancelled) {
-            setFilteredRestaurants(results);
-          }
-        })
-        .catch(error => {
-          if (!isCancelled) {
-            console.error('Restaurant search failed:', error);
-            setFilteredRestaurants([]);
-          }
-        })
-        .finally(() => {
-          if (!isCancelled) {
-            setSearchingRestaurants(false);
-          }
-        });
-    }, 200);
-
-    return () => {
-      isCancelled = true;
-      clearTimeout(timeoutId);
-    };
-  }, [searchQuery, restaurants, activeSegment]);
-
-  // Member search effect
-  useEffect(() => {
-    if (activeSegment !== 'Members') {
-      setSearchingMembers(false);
-      setFilteredMembers([]);
-      return;
-    }
-
-    const trimmedQuery = searchQuery.trim();
-
-    if (!trimmedQuery) {
-      setFilteredMembers([]);
-      setSearchingMembers(false);
-      return;
-    }
-
-    let isCancelled = false;
-    setSearchingMembers(true);
-
-    const timeoutId = setTimeout(async () => {
-      try {
-        const results = await MockDataService.searchUsers(trimmedQuery);
-        if (isCancelled) return;
-
-        setFilteredMembers(results);
-
-        // Load match percentages for all results
-        const percentages: Record<string, number> = {};
-
-        // Process match percentages with cancellation checks
-        for (const user of results) {
-          if (isCancelled) return;
-          const match = await MockDataService.getUserMatchPercentage(user.id);
-          percentages[user.id] = match;
-        }
-
-        if (!isCancelled) {
-          setMemberMatchPercentages(percentages);
-        }
-      } catch (error) {
-        if (!isCancelled) {
-          console.error('Member search failed:', error);
-          setFilteredMembers([]);
-        }
-      } finally {
-        if (!isCancelled) {
-          setSearchingMembers(false);
-        }
+    const loadMatchPercentages = async () => {
+      const percentages: Record<string, number> = {};
+      for (const user of searchedMembers) {
+        const match = await MockDataService.getUserMatchPercentage(user.id);
+        percentages[user.id] = match;
       }
-    }, 200);
-
-    return () => {
-      isCancelled = true;
-      clearTimeout(timeoutId);
+      setMemberMatchPercentages(percentages);
     };
-  }, [searchQuery, activeSegment]);
 
-  const loadRestaurants = async () => {
-    try {
-      const restaurantData = await MockDataService.getAllRestaurants();
-      setRestaurants(restaurantData);
-      setFilteredRestaurants(restaurantData);
-      setRecentRestaurants(restaurantData.slice(0, 6));
-    } catch (error) {
-      console.error('Failed to load restaurants:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    loadMatchPercentages();
+  }, [searchedMembers, currentUser]);
+
+  const isLoading = restaurantsLoading;
 
   const segments = [
     {
@@ -461,7 +395,7 @@ export default function SearchScreen() {
     );
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>

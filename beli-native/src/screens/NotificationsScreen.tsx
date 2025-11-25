@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, RefreshControl, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -6,7 +6,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { colors, spacing, typography } from '../theme';
 import { NotificationListItem } from '../components/social/NotificationListItem';
 import { LoadingSpinner } from '../components';
-import { MockDataService } from '../data/mockDataService';
+import { useNotifications, useMarkAsRead } from '../lib/hooks';
 import type { Notification } from '../types';
 import type { AppStackParamList } from '../navigation/types';
 
@@ -14,34 +14,18 @@ type NotificationsScreenNavigationProp = StackNavigationProp<AppStackParamList, 
 
 export default function NotificationsScreen() {
   const navigation = useNavigation<NotificationsScreenNavigationProp>();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
 
-  const loadNotifications = async () => {
-    try {
-      const notificationData = await MockDataService.getNotifications();
-      setNotifications(notificationData);
-    } catch (error) {
-      console.error('Failed to load notifications:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+  // Data fetching with React Query hooks
+  const { data: notifications = [], isLoading, refetch, isRefetching } = useNotifications();
+
+  // Mutation hook for marking notifications as read
+  const markAsRead = useMarkAsRead();
+
+  const handleNotificationPress = (notification: Notification) => {
+    // Mark as read (optimistic update via mutation hook)
+    if (!notification.isRead) {
+      markAsRead.mutate(notification.id);
     }
-  };
-
-  useEffect(() => {
-    loadNotifications();
-  }, []);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    loadNotifications();
-  };
-
-  const handleNotificationPress = async (notification: Notification) => {
-    // Mark as read
-    await MockDataService.markNotificationAsRead(notification.id);
 
     // Navigate based on notification type
     if (notification.type === 'rating_liked' || notification.type === 'bookmark_liked' || notification.type === 'comment' || notification.type === 'list_bookmark') {
@@ -74,7 +58,7 @@ export default function NotificationsScreen() {
 
   const renderSeparator = () => <View style={styles.separator} />;
 
-  if (loading) {
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
@@ -110,8 +94,8 @@ export default function NotificationsScreen() {
         ItemSeparatorComponent={renderSeparator}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
+            refreshing={isRefetching}
+            onRefresh={refetch}
             tintColor={colors.primary}
           />
         }

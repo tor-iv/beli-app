@@ -1,13 +1,16 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle, Pressable } from 'react-native';
+import { View, StyleSheet, ViewStyle, Pressable, StyleProp } from 'react-native';
 import { theme } from '../../theme';
+
+// Extract numeric spacing keys (excluding borderRadius which is an object)
+type NumericSpacingKey = Exclude<keyof typeof theme.spacing, 'borderRadius'>;
 
 interface CardProps {
   children: React.ReactNode;
   onPress?: () => void;
   variant?: 'default' | 'elevated' | 'outlined';
-  padding?: keyof typeof theme.spacing | number;
-  margin?: keyof typeof theme.spacing | number;
+  padding?: NumericSpacingKey | number;
+  margin?: NumericSpacingKey | number;
   style?: ViewStyle;
   testID?: string;
 }
@@ -21,23 +24,30 @@ export const Card: React.FC<CardProps> = ({
   style,
   testID,
 }) => {
-  const cardStyle = [
-    styles.base,
-    styles[variant],
-    {
-      padding: typeof padding === 'number' ? padding : theme.spacing[padding],
-      ...(margin && {
-        margin: typeof margin === 'number' ? margin : theme.spacing[margin],
-      }),
-    },
-    style,
-  ];
+  // Compute padding value
+  const paddingValue = typeof padding === 'number'
+    ? padding
+    : theme.spacing[padding] as number;
+
+  // Compute margin value if provided
+  const marginValue = margin
+    ? (typeof margin === 'number' ? margin : theme.spacing[margin] as number)
+    : undefined;
+
+  // Build the base card style
+  const baseCardStyle: ViewStyle = {
+    ...styles.base,
+    ...styles[variant],
+    padding: paddingValue,
+    ...(marginValue !== undefined && { margin: marginValue }),
+    ...style,
+  };
 
   if (onPress) {
     return (
       <Pressable
-        style={({ pressed }) => [
-          cardStyle,
+        style={({ pressed }): StyleProp<ViewStyle> => [
+          baseCardStyle,
           pressed && {
             transform: [{ scale: theme.animations.scale.press }],
             opacity: theme.animations.opacity.pressed,
@@ -52,7 +62,7 @@ export const Card: React.FC<CardProps> = ({
   }
 
   return (
-    <View style={cardStyle} testID={testID}>
+    <View style={baseCardStyle} testID={testID}>
       {children}
     </View>
   );

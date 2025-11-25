@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, RefreshControl, ScrollView, Pressable, Image, Alert } from 'react-native';
+import React, { useState, useMemo, useCallback } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, FlatList, RefreshControl, ScrollView, Pressable, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import type { CompositeNavigationProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import type { StackNavigationProp } from '@react-navigation/stack';
+import type { CompositeNavigationProp } from '@react-navigation/native';
+import { useQueryClient } from '@tanstack/react-query';
 import { colors, typography, spacing } from '../theme';
 import { ActivityCard, LoadingSpinner, AddRestaurantModal, FeaturedListCard } from '../components';
 import { RankingResultModal } from '../components/modals/RankingResultModal';
@@ -13,26 +14,43 @@ import HamburgerMenu from '../components/modals/HamburgerMenu';
 import { FeedFiltersModal, type FeedFilters } from '../components/modals/FeedFiltersModal';
 import { ShareModal } from '../components/modals/ShareModal';
 import { CommentsModal } from '../components/modals/CommentsModal';
+import {
+  useFeed,
+  useFeaturedLists,
+  useUnreadCount,
+  useCurrentUser,
+} from '../lib/hooks';
 import { MockDataService } from '../data/mockDataService';
 import type { Activity } from '../data/mock/types';
-import type { Restaurant, List, User, RankingResult } from '../types';
+import type { Restaurant, RankingResult } from '../types';
 import type { BottomTabParamList, AppStackParamList } from '../navigation/types';
 
 type FeedScreenNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabParamList, 'Feed'>,
-  StackNavigationProp<AppStackParamList>
+  NativeStackNavigationProp<AppStackParamList>
 >;
 
 export default function FeedScreen() {
   const navigation = useNavigation<FeedScreenNavigationProp>();
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
-  const [featuredLists, setFeaturedLists] = useState<List[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const queryClient = useQueryClient();
+
+  // Data fetching with React Query hooks
+  const { data: currentUser } = useCurrentUser();
+  const {
+    data: activities = [],
+    isLoading: feedLoading,
+    refetch: refetchFeed,
+    isRefetching: feedRefetching,
+  } = useFeed(currentUser?.id);
+  const { data: allFeaturedLists = [] } = useFeaturedLists();
+  const { data: unreadNotificationCount = 0, refetch: refetchUnread } = useUnreadCount(currentUser?.id);
+
+  // Get first 6 featured lists for display
+  const featuredLists = useMemo(() => allFeaturedLists.slice(0, 6), [allFeaturedLists]);
+
+  // UI state
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
-  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
   const [showMenu, setShowMenu] = useState(false);
   const [showFiltersModal, setShowFiltersModal] = useState(false);
   const [feedFilters, setFeedFilters] = useState<FeedFilters>({
@@ -43,32 +61,23 @@ export default function FeedScreen() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [showResultModal, setShowResultModal] = useState(false);
   const [rankingResult, setRankingResult] = useState<RankingResult | null>(null);
   const [submissionData, setSubmissionData] = useState<RestaurantSubmissionData | null>(null);
 
-  const applyFilters = (activitiesData: Activity[]) => {
-    let filtered = [...activitiesData];
+  // Memoized filter function
+  const filteredActivities = useMemo(() => {
+    let filtered = [...activities];
 
     if (feedFilters.rankingsOnly) {
-      // Show only activities with ratings (reviews/visits with ratings)
-      filtered = filtered.filter(activity =>
-        activity.rating && activity.rating > 0
-      );
+      filtered = filtered.filter(activity => activity.rating && activity.rating > 0);
     }
 
     if (feedFilters.topRatedOnly) {
-      // Show only top-rated activities (9.0+)
-      filtered = filtered.filter(activity =>
-        activity.rating && activity.rating >= 9
-      );
+      filtered = filtered.filter(activity => activity.rating && activity.rating >= 9);
     }
 
     if (feedFilters.restaurantsOnly) {
-      // Show only restaurants (exclude bars, bakeries, etc.)
-      // Assuming restaurants don't have specific tags marking them as bars/bakeries
-      // This is a simple filter - could be enhanced with restaurant category data
       filtered = filtered.filter(activity =>
         !activity.restaurant.tags?.some(tag =>
           ['bar', 'bakery', 'cafe', 'coffee', 'dessert'].includes(tag.toLowerCase())
@@ -77,68 +86,16 @@ export default function FeedScreen() {
     }
 
     return filtered;
-  };
+  }, [activities, feedFilters]);
 
-  const loadFeed = async () => {
-    try {
-      const feedData = await MockDataService.getActivityFeed();
-      setActivities(feedData);
-      const filtered = applyFilters(feedData);
-      setFilteredActivities(filtered);
-    } catch (error) {
-      console.error('Failed to load feed:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  const loadFeaturedLists = async () => {
-    try {
-      const lists = await MockDataService.getFeaturedLists();
-      // Show first 6 featured lists in the feed
-      setFeaturedLists(lists.slice(0, 6));
-    } catch (error) {
-      console.error('Failed to load featured lists:', error);
-    }
-  };
-
-  const loadNotificationCount = async () => {
-    try {
-      const count = await MockDataService.getUnreadNotificationCount();
-      setUnreadNotificationCount(count);
-    } catch (error) {
-      console.error('Failed to load notification count:', error);
-    }
-  };
-
-  const loadCurrentUser = async () => {
-    try {
-      const user = await MockDataService.getCurrentUser();
-      setCurrentUser(user);
-    } catch (error) {
-      console.error('Failed to load current user:', error);
-    }
-  };
-
-  useEffect(() => {
-    loadFeed();
-    loadFeaturedLists();
-    loadNotificationCount();
-    loadCurrentUser();
-  }, []);
-
-  // Reapply filters when filter settings change or activities update
-  useEffect(() => {
-    const filtered = applyFilters(activities);
-    setFilteredActivities(filtered);
-  }, [feedFilters, activities]);
+  const loading = feedLoading;
+  const refreshing = feedRefetching;
 
   // Refresh notification count when screen gains focus
   useFocusEffect(
-    React.useCallback(() => {
-      loadNotificationCount();
-    }, [])
+    useCallback(() => {
+      refetchUnread();
+    }, [refetchUnread])
   );
 
   const handleApplyFilters = (filters: FeedFilters) => {
@@ -146,8 +103,8 @@ export default function FeedScreen() {
   };
 
   const onRefresh = () => {
-    setRefreshing(true);
-    loadFeed();
+    refetchFeed();
+    refetchUnread();
   };
 
   const handleSearchPress = () => {
@@ -177,11 +134,9 @@ export default function FeedScreen() {
   };
 
   const handleModalSubmit = async (data: RestaurantSubmissionData) => {
-    if (!selectedRestaurant) return;
+    if (!selectedRestaurant || !currentUser) return;
 
     try {
-      const currentUser = await MockDataService.getCurrentUser();
-
       // Convert rating to numeric value
       const ratingValue = data.rating === 'liked' ? 8 : data.rating === 'fine' ? 5 : 3;
 
@@ -204,7 +159,7 @@ export default function FeedScreen() {
       );
 
       // Refresh the feed to show any updates
-      loadFeed();
+      refetchFeed();
     } catch (error) {
       console.error('Failed to add restaurant:', error);
       Alert.alert(
@@ -243,7 +198,7 @@ export default function FeedScreen() {
       setShowResultModal(true);
 
       // Refresh the feed to show any updates
-      loadFeed();
+      refetchFeed();
     } catch (error) {
       console.error('Error saving ranked restaurant:', error);
       Alert.alert(
@@ -264,8 +219,10 @@ export default function FeedScreen() {
   const handleLike = (activityId: string) => {
     if (!currentUser) return;
 
-    setActivities((prevActivities) =>
-      prevActivities.map((activity) => {
+    // Optimistic update using queryClient
+    queryClient.setQueryData(['feed', currentUser.id], (oldData: Activity[] | undefined) => {
+      if (!oldData) return oldData;
+      return oldData.map((activity) => {
         if (activity.id === activityId) {
           const likes = activity.interactions?.likes || [];
           const isLiked = likes.includes(currentUser.id);
@@ -283,8 +240,8 @@ export default function FeedScreen() {
           };
         }
         return activity;
-      })
-    );
+      });
+    });
   };
 
   const handleComment = (activity: Activity) => {
@@ -300,8 +257,10 @@ export default function FeedScreen() {
   const handleBookmark = (activityId: string) => {
     if (!currentUser) return;
 
-    setActivities((prevActivities) =>
-      prevActivities.map((activity) => {
+    // Optimistic update using queryClient
+    queryClient.setQueryData(['feed', currentUser.id], (oldData: Activity[] | undefined) => {
+      if (!oldData) return oldData;
+      return oldData.map((activity) => {
         if (activity.id === activityId) {
           const bookmarks = activity.interactions?.bookmarks || [];
           const isBookmarked = bookmarks.includes(currentUser.id);
@@ -319,23 +278,25 @@ export default function FeedScreen() {
           };
         }
         return activity;
-      })
-    );
+      });
+    });
   };
 
   const handleAddComment = (content: string) => {
     if (!selectedActivity || !currentUser) return;
 
-    setActivities((prevActivities) =>
-      prevActivities.map((activity) => {
-        if (activity.id === selectedActivity.id) {
-          const newComment = {
-            id: `comment-${Date.now()}`,
-            userId: currentUser.id,
-            content,
-            timestamp: new Date(),
-          };
+    const newComment = {
+      id: `comment-${Date.now()}`,
+      userId: currentUser.id,
+      content,
+      timestamp: new Date(),
+    };
 
+    // Optimistic update using queryClient
+    queryClient.setQueryData(['feed', currentUser.id], (oldData: Activity[] | undefined) => {
+      if (!oldData) return oldData;
+      return oldData.map((activity) => {
+        if (activity.id === selectedActivity.id) {
           return {
             ...activity,
             interactions: {
@@ -347,8 +308,8 @@ export default function FeedScreen() {
           };
         }
         return activity;
-      })
-    );
+      });
+    });
   };
 
   const renderActivity = ({ item }: { item: Activity }) => (

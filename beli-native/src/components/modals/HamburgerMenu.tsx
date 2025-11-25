@@ -34,7 +34,9 @@ interface MenuItem {
 interface HamburgerMenuProps {
   visible: boolean;
   onClose: () => void;
-  navigation: NavigationProp<AppStackParamList>;
+  // Accept any navigation object that can navigate to AppStackParamList screens
+  // This allows both stack and composite (tab+stack) navigation props
+  navigation: { navigate: (screen: keyof AppStackParamList, params?: unknown) => void };
 }
 
 export default function HamburgerMenu({

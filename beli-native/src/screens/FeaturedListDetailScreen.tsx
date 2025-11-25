@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,6 @@ import {
   Pressable,
   RefreshControl,
   Dimensions,
-  ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,8 +17,13 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import type { RouteProp } from '@react-navigation/native';
 import { colors, spacing } from '../theme';
 import { RestaurantCard, LoadingSpinner } from '../components';
-import { MockDataService } from '../data/mockDataService';
-import type { List, Restaurant, UserRestaurantRelation } from '../types';
+import {
+  useList,
+  useRestaurantsByIds,
+  useCurrentUser,
+  useUserRelations,
+} from '../lib/hooks';
+import type { Restaurant } from '../types';
 import type { AppStackParamList } from '../navigation/types';
 
 type FeaturedListDetailScreenNavigationProp = StackNavigationProp<AppStackParamList, 'FeaturedListDetail'>;
@@ -32,59 +36,66 @@ export default function FeaturedListDetailScreen() {
   const route = useRoute<FeaturedListDetailScreenRouteProp>();
   const { listId } = route.params;
 
-  const [list, setList] = useState<List | null>(null);
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [userProgress, setUserProgress] = useState({ been: 0, total: 0 });
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  // UI state
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
-  useEffect(() => {
-    loadListDetails();
-  }, [listId]);
+  // Data fetching with React Query hooks
+  const { data: currentUser } = useCurrentUser();
+  const {
+    data: list,
+    isLoading: listLoading,
+    refetch: refetchList,
+    isRefetching: listRefetching,
+  } = useList(listId);
 
-  const loadListDetails = async () => {
-    try {
-      const listData = await MockDataService.getListById(listId);
-      if (!listData) {
-        navigation.goBack();
-        return;
-      }
+  // Get restaurant IDs from the list
+  const restaurantIds = useMemo(() => list?.restaurants || [], [list]);
 
-      setList(listData);
+  // Fetch restaurants by IDs
+  const {
+    data: restaurants = [],
+    isLoading: restaurantsLoading,
+    refetch: refetchRestaurants,
+    isRefetching: restaurantsRefetching,
+  } = useRestaurantsByIds(restaurantIds);
 
-      // Load restaurants in the list
-      const restaurantData = await Promise.all(
-        listData.restaurants.map((id) => MockDataService.getRestaurantById(id))
-      );
-      const validRestaurants = restaurantData.filter((r): r is Restaurant => r !== null);
-      setRestaurants(validRestaurants);
+  // Get user relations to calculate progress
+  const {
+    data: userRelations = [],
+    refetch: refetchRelations,
+    isRefetching: relationsRefetching,
+  } = useUserRelations(currentUser?.id);
 
-      // Load user progress
-      const currentUser = await MockDataService.getCurrentUser();
-      const userRelations = await MockDataService.getUserRestaurantRelations(currentUser.id);
-
-      const beenCount = listData.restaurants.filter(restaurantId =>
-        userRelations.some(
-          (rel: UserRestaurantRelation) => rel.restaurantId === restaurantId && rel.status === 'been'
-        )
-      ).length;
-
-      setUserProgress({
-        been: beenCount,
-        total: listData.restaurants.length,
-      });
-    } catch (error) {
-      console.error('Failed to load list details:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+  // Calculate user progress
+  const userProgress = useMemo(() => {
+    if (!list || !userRelations) {
+      return { been: 0, total: 0 };
     }
-  };
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    loadListDetails();
+    const beenCount = list.restaurants.filter((restaurantId) =>
+      userRelations.some((rel) => rel.restaurantId === restaurantId && rel.status === 'been')
+    ).length;
+
+    return {
+      been: beenCount,
+      total: list.restaurants.length,
+    };
+  }, [list, userRelations]);
+
+  const isLoading = listLoading || restaurantsLoading;
+  const isRefetching = listRefetching || restaurantsRefetching || relationsRefetching;
+
+  // Navigate back if list not found after loading
+  useEffect(() => {
+    if (!listLoading && !list) {
+      navigation.goBack();
+    }
+  }, [listLoading, list, navigation]);
+
+  const handleRefresh = () => {
+    refetchList();
+    refetchRestaurants();
+    refetchRelations();
   };
 
   const handleRestaurantPress = (restaurantId: string) => {
@@ -207,7 +218,7 @@ export default function FeaturedListDetailScreen() {
     </View>
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
@@ -237,8 +248,8 @@ export default function FeaturedListDetailScreen() {
         contentContainerStyle={styles.listContent}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
+            refreshing={isRefetching}
+            onRefresh={handleRefresh}
             tintColor={colors.primary}
           />
         }
