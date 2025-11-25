@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { ListService } from '@/lib/services';
+import { ListService, UserRestaurantService } from '@/lib/services';
+
+import type { ListCategory } from '@/types';
 
 interface ListCounts {
   been: number;
@@ -9,29 +11,36 @@ interface ListCounts {
   playlists: number;
 }
 
-export function useListCounts(userId: string = 'current-user', category: string = 'restaurants') {
+/**
+ * Hook to get restaurant counts for each list type
+ *
+ * Uses UserRestaurantService for personal lists (been, want_to_try, recs)
+ * and ListService for custom playlists.
+ *
+ * @param userId - User ID (defaults to 'current-user')
+ * @param category - Optional category filter ('all' shows all, specific category filters)
+ */
+export function useListCounts(
+  userId: string = 'current-user',
+  category?: ListCategory | 'all'
+) {
   return useQuery<ListCounts>({
     queryKey: ['list-counts', userId, category],
     queryFn: async () => {
-      // Fetch all list types
-      const [beenLists, wantLists, recsLists, playlistsLists] = await Promise.all([
-        ListService.getUserListsByType(userId, 'been', category as any),
-        ListService.getUserListsByType(userId, 'want_to_try', category as any),
-        ListService.getUserListsByType(userId, 'recs', category as any),
-        ListService.getUserListsByType(userId, 'playlists', category as any),
+      // Fetch personal lists from UserRestaurantService (the correct data source)
+      // and playlists from ListService
+      const [beenRestaurants, wantRestaurants, recsRestaurants, playlistsLists] = await Promise.all([
+        UserRestaurantService.getUserRestaurantsByStatus(userId, 'been', category),
+        UserRestaurantService.getUserRestaurantsByStatus(userId, 'want_to_try', category),
+        UserRestaurantService.getUserRestaurantsByStatus(userId, 'recommended', category),
+        ListService.getUserListsByType(userId, 'playlists', (category as ListCategory) || 'restaurants'),
       ]);
 
-      // Count unique restaurants in each list type
-      const beenRestaurants = new Set(beenLists.flatMap((list) => list.restaurants));
-      const wantRestaurants = new Set(wantLists.flatMap((list) => list.restaurants));
-      const recsRestaurants = new Set(recsLists.flatMap((list) => list.restaurants));
-      const playlistsCount = playlistsLists.length;
-
       return {
-        been: beenRestaurants.size,
-        want_to_try: wantRestaurants.size,
-        recs: recsRestaurants.size,
-        playlists: playlistsCount,
+        been: beenRestaurants.length,
+        want_to_try: wantRestaurants.length,
+        recs: recsRestaurants.length,
+        playlists: playlistsLists.length,
       };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

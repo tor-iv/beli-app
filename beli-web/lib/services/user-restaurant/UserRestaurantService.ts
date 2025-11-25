@@ -94,14 +94,16 @@ export class UserRestaurantService {
   }
 
   /**
-   * Get restaurants filtered by user's status
+   * Get restaurants filtered by user's status and optional category
    * @param userId - ID of the user
    * @param status - Filter by been/want_to_try/recommended
-   * @returns Restaurants matching the status
+   * @param category - Optional category filter ('all' means no filter)
+   * @returns Restaurants matching the status and category
    */
   static async getUserRestaurantsByStatus(
     userId: string,
-    status: 'been' | 'want_to_try' | 'recommended'
+    status: 'been' | 'want_to_try' | 'recommended',
+    category?: ListCategory | 'all'
   ): Promise<Restaurant[]> {
     const { data } = await withFallback(
       async () => {
@@ -122,11 +124,14 @@ export class UserRestaurantService {
 
         // Get the restaurant details
         const restaurantIds = ratings.map((r) => r.restaurant_id);
-        const { data: restaurants, error: restaurantsError } = await supabase
-          .from('restaurants')
-          .select('*')
-          .in('id', restaurantIds)
-          .returns<DbRestaurant[]>();
+        let query = supabase.from('restaurants').select('*').in('id', restaurantIds);
+
+        // Apply category filter if specified (and not 'all')
+        if (category && category !== 'all') {
+          query = query.eq('category', category);
+        }
+
+        const { data: restaurants, error: restaurantsError } = await query.returns<DbRestaurant[]>();
 
         if (restaurantsError) throw restaurantsError;
 
@@ -138,7 +143,14 @@ export class UserRestaurantService {
           .filter((r) => r.userId === userId && r.status === status)
           .map((r) => r.restaurantId);
 
-        return mockRestaurants.filter((r) => restaurantIds.includes(r.id));
+        let restaurants = mockRestaurants.filter((r) => restaurantIds.includes(r.id));
+
+        // Apply category filter if specified (and not 'all')
+        if (category && category !== 'all') {
+          restaurants = restaurants.filter((r) => r.category === category);
+        }
+
+        return restaurants;
       },
       { operationName: 'getUserRestaurantsByStatus' }
     );

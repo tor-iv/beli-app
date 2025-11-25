@@ -36,6 +36,24 @@ const TARGET_BEEN_COUNT = 156;
 const TARGET_WANT_TO_TRY_COUNT = 89;
 const RANDOM_SEED = 42; // Change to regenerate different data
 
+// Category distribution to ensure diversity across all list categories
+// This guarantees tor_iv has data in every category for filtering to work
+const BEEN_CATEGORY_DISTRIBUTION: Record<string, number> = {
+  restaurants: 120, // ~77% restaurants (main category)
+  bars: 12, // ~8% bars
+  bakeries: 10, // ~6% bakeries
+  coffee_tea: 8, // ~5% coffee/tea
+  dessert: 6, // ~4% dessert
+};
+
+const WANT_TO_TRY_CATEGORY_DISTRIBUTION: Record<string, number> = {
+  restaurants: 65, // ~73% restaurants
+  bars: 8, // ~9% bars
+  bakeries: 6, // ~7% bakeries
+  coffee_tea: 5, // ~6% coffee/tea
+  dessert: 5, // ~6% dessert
+};
+
 // ============================================================================
 // Seeded Random Number Generator (for reproducibility)
 // ============================================================================
@@ -277,15 +295,57 @@ interface Restaurant {
   cuisine: string[];
   neighborhood: string;
   price_range: string;
+  category: string;
 }
 
 async function getRestaurants(pool: pg.Pool): Promise<Restaurant[]> {
   const result = await pool.query(`
-    SELECT id, name, cuisine, neighborhood, price_range
+    SELECT id, name, cuisine, neighborhood, price_range, category
     FROM public.restaurants
     ORDER BY rating DESC
   `);
   return result.rows;
+}
+
+/**
+ * Select restaurants with guaranteed category diversity
+ * Ensures each category has its target count, fills remaining slots randomly
+ */
+function selectRestaurantsByCategoryDistribution(
+  restaurants: Restaurant[],
+  distribution: Record<string, number>,
+  random: () => number
+): Restaurant[] {
+  const selected: Restaurant[] = [];
+  const usedIds = new Set<string>();
+
+  // Group restaurants by category
+  const byCategory = new Map<string, Restaurant[]>();
+  for (const r of restaurants) {
+    const cat = r.category || 'restaurants';
+    if (!byCategory.has(cat)) {
+      byCategory.set(cat, []);
+    }
+    byCategory.get(cat)!.push(r);
+  }
+
+  // Select target count from each category
+  for (const [category, targetCount] of Object.entries(distribution)) {
+    const categoryRestaurants = byCategory.get(category) || [];
+    const shuffled = [...categoryRestaurants].sort(() => random() - 0.5);
+    const toSelect = shuffled.slice(0, Math.min(targetCount, shuffled.length));
+
+    for (const r of toSelect) {
+      if (!usedIds.has(r.id)) {
+        selected.push(r);
+        usedIds.add(r.id);
+      }
+    }
+
+    console.log(`     ${category}: selected ${toSelect.length}/${targetCount} (available: ${categoryRestaurants.length})`);
+  }
+
+  return selected;
 }
 
 async function verifyTorIvExists(pool: pg.Pool): Promise<boolean> {
@@ -308,11 +368,15 @@ async function insertBeenRatings(
   restaurants: Restaurant[],
   random: () => number
 ): Promise<string[]> {
-  console.log(`\n   Generating ${TARGET_BEEN_COUNT} "been" ratings...`);
+  console.log(`\n   Generating ${TARGET_BEEN_COUNT} "been" ratings with category diversity...`);
+  console.log('   Category breakdown:');
 
-  // Select restaurants for "been" list (shuffle with seeded random)
-  const shuffled = [...restaurants].sort(() => random() - 0.5);
-  const beenRestaurants = shuffled.slice(0, TARGET_BEEN_COUNT);
+  // Select restaurants with guaranteed category diversity
+  const beenRestaurants = selectRestaurantsByCategoryDistribution(
+    restaurants,
+    BEEN_CATEGORY_DISTRIBUTION,
+    random
+  );
 
   const client = await pool.connect();
   const usedIds: string[] = [];
@@ -364,12 +428,18 @@ async function updateWatchlist(
   usedRestaurantIds: Set<string>,
   random: () => number
 ): Promise<void> {
-  console.log(`\n   Generating ${TARGET_WANT_TO_TRY_COUNT} "want to try" entries...`);
+  console.log(`\n   Generating ${TARGET_WANT_TO_TRY_COUNT} "want to try" entries with category diversity...`);
+  console.log('   Category breakdown:');
 
   // Select restaurants NOT in "been" list for "want to try"
   const available = restaurants.filter((r) => !usedRestaurantIds.has(r.id));
-  const shuffled = [...available].sort(() => random() - 0.5);
-  const wantToTryRestaurants = shuffled.slice(0, TARGET_WANT_TO_TRY_COUNT);
+
+  // Select with category diversity
+  const wantToTryRestaurants = selectRestaurantsByCategoryDistribution(
+    available,
+    WANT_TO_TRY_CATEGORY_DISTRIBUTION,
+    random
+  );
 
   const watchlistIds = wantToTryRestaurants.map((r) => r.id);
 

@@ -3,11 +3,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ListService, UserRestaurantService } from '@/lib/services';
 
 import type { List } from '@/types';
+import type { UseQueryOptions } from '@tanstack/react-query';
 
-export function useLists(userId?: string) {
+export function useLists(
+  userId?: string,
+  options?: Omit<UseQueryOptions<List[], Error>, 'queryKey' | 'queryFn'>
+) {
   return useQuery({
     queryKey: ['lists', userId],
     queryFn: () => ListService.getUserLists(userId || '1'),
+    ...options,
   });
 }
 
@@ -50,6 +55,11 @@ export function useAddToList() {
         queryKey: ['restaurant-relations', variables.userId],
       });
 
+      // Invalidate user-restaurants (new query key for UserRestaurantService)
+      queryClient.invalidateQueries({
+        queryKey: ['user-restaurants', variables.userId],
+      });
+
       // Invalidate feed
       queryClient.invalidateQueries({
         queryKey: ['feed'],
@@ -81,6 +91,11 @@ export function useRemoveFromList() {
       // Invalidate restaurant relations
       queryClient.invalidateQueries({
         queryKey: ['restaurant-relations', variables.userId],
+      });
+
+      // Invalidate user-restaurants (new query key for UserRestaurantService)
+      queryClient.invalidateQueries({
+        queryKey: ['user-restaurants', variables.userId],
       });
 
       // Invalidate feed (may show remove activity)
