@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useLeaderboard } from '@/lib/hooks/use-leaderboard';
+import { useBatchMatchPercentages } from '@/lib/hooks/use-users';
 
 import type { User } from '@/types';
 
@@ -18,6 +19,16 @@ interface LeaderboardUser extends User {
 
 export default function LeaderboardPage() {
   const { data: allUsersData, isLoading } = useLeaderboard();
+
+  // Get current user ID for match percentage calculation
+  const currentUserId = '1'; // Demo user - replace with auth context when available
+
+  // Extract user IDs for batch match percentage query
+  const userIds = useMemo(() => allUsersData?.map((u) => u.id) || [], [allUsersData]);
+
+  // Fetch match percentages from service (cached for 5 minutes)
+  const { data: matchPercentages = {} } = useBatchMatchPercentages(currentUserId, userIds);
+
   const [selectedTab, setSelectedTab] = useState<TabType>('Been');
   const [memberFilter, setMemberFilter] = useState('All Members');
   const [cityFilter, setCityFilter] = useState('All Cities');
@@ -65,11 +76,11 @@ export default function LeaderboardPage() {
       return {
         ...user,
         rank: index + 1,
-        matchPercentage: Math.floor(Math.random() * 30) + 30, // 30-60%
+        matchPercentage: matchPercentages[user.id] ?? 0,
         score,
       };
     });
-  }, [allUsersData, selectedTab]);
+  }, [allUsersData, selectedTab, matchPercentages]);
 
   // Memoize filtered users - only recalculate when filters or allUsers change
   const users = useMemo(() => {

@@ -16,6 +16,8 @@ import type {
   UserRestaurantRelation,
   Hours,
   ListCategory,
+  ListScope,
+  List,
   Review,
   FeedItem,
 } from '@/types';
@@ -30,6 +32,7 @@ export type DbRating = Database['public']['Tables']['ratings']['Row'];
 export type DbUserStats = Database['public']['Views']['user_stats']['Row'];
 export type DbMenuItem = Database['public']['Tables']['menu_items']['Row'];
 export type DbUserFollow = Database['public']['Tables']['user_follows']['Row'];
+export type DbList = Database['public']['Tables']['lists']['Row'];
 
 // Feed item row from get_user_feed RPC
 export type DbFeedItem = Database['public']['Functions']['get_user_feed']['Returns'][0];
@@ -227,4 +230,27 @@ export function mapDbToLeaderboardUser(
   const user = mapDbToUser(row, stats);
   user.stats.rank = rank;
   return user;
+}
+
+// ============================================
+// List Mapper
+// ============================================
+
+/**
+ * Maps a Supabase list row to the frontend List type.
+ */
+export function mapDbToList(row: DbList): List {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    name: row.name,
+    description: row.description || '',
+    restaurants: row.restaurant_ids || [],
+    isPublic: row.is_public,
+    category: row.category as ListCategory,
+    listType: row.list_type as ListScope,
+    thumbnailImage: row.thumbnail_image ?? undefined,
+    createdAt: new Date(row.created_at),
+    updatedAt: new Date(row.updated_at),
+  };
 }

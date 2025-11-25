@@ -151,6 +151,47 @@ export type Database = {
         };
         Update: Partial<Database['public']['Tables']['menu_items']['Insert']>;
       };
+      lists: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          description: string;
+          category: 'restaurants' | 'bars' | 'bakeries' | 'coffee_tea' | 'dessert' | 'other';
+          list_type: 'been' | 'want_to_try' | 'recs' | 'playlists';
+          restaurant_ids: string[];
+          is_public: boolean;
+          thumbnail_image: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          name: string;
+          description?: string;
+          category?: 'restaurants' | 'bars' | 'bakeries' | 'coffee_tea' | 'dessert' | 'other';
+          list_type?: 'been' | 'want_to_try' | 'recs' | 'playlists';
+          restaurant_ids?: string[];
+          is_public?: boolean;
+          thumbnail_image?: string | null;
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          name?: string;
+          description?: string;
+          category?: 'restaurants' | 'bars' | 'bakeries' | 'coffee_tea' | 'dessert' | 'other';
+          list_type?: 'been' | 'want_to_try' | 'recs' | 'playlists';
+          restaurant_ids?: string[];
+          is_public?: boolean;
+          thumbnail_image?: string | null;
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Views: {
       user_stats: {
@@ -263,4 +304,5 @@ export type MenuItem = Database['public']['Tables']['menu_items']['Row'];
 export type UserStats = Database['public']['Views']['user_stats']['Row'];
 export type FeedItem = Database['public']['Functions']['get_user_feed']['Returns'][0];
 export type FriendRecommendation = Database['public']['Functions']['get_friend_recommendations']['Returns'][0];
+export type DbList = Database['public']['Tables']['lists']['Row'];
 export type CuisinePreference = Database['public']['Functions']['get_user_cuisine_preferences']['Returns'][0];

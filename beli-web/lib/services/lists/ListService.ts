@@ -5,15 +5,29 @@
  * - Fetching lists by user or ID
  * - Creating, updating, and deleting lists
  * - Tracking list progress
+ *
+ * Now connected to Supabase PostgreSQL database.
+ * Supports automatic fallback to mock data via withFallback().
  */
 
+import { withFallback } from '@/lib/data-provider';
 import { mockLists, getUserListsByType, featuredLists } from '@/data/mock/lists';
 import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
-
-import { delay } from '../base/BaseService';
+import { mapDbToList, DbList } from '../mappers';
 
 import type { List, ListScope, ListCategory } from '@/types';
+import type { Database } from '@/lib/supabase/types';
 
+// Type alias for lists table operations
+type ListRow = Database['public']['Tables']['lists']['Row'];
+type ListInsert = Database['public']['Tables']['lists']['Insert'];
+type ListUpdate = Database['public']['Tables']['lists']['Update'];
+
+// Lazy import supabase to avoid throwing when env vars missing in mock mode
+const getSupabase = async () => {
+  const { supabase } = await import('@/lib/supabase/client');
+  return supabase;
+};
 
 export class ListService {
   /**
@@ -22,8 +36,23 @@ export class ListService {
    * @returns Lists owned by the user
    */
   static async getUserLists(userId: string): Promise<List[]> {
-    await delay();
-    return mockLists.filter((list) => list.userId === userId);
+    const { data } = await withFallback(
+      async () => {
+        const supabase = await getSupabase();
+        // Use type assertion for lists table
+        const { data, error } = await (supabase.from('lists') as any)
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return ((data || []) as ListRow[]).map(mapDbToList);
+      },
+      () => mockLists.filter((list) => list.userId === userId),
+      { operationName: 'getUserLists' }
+    );
+
+    return data;
   }
 
   /**
@@ -38,8 +67,25 @@ export class ListService {
     type: ListScope,
     category: ListCategory
   ): Promise<List[]> {
-    await delay();
-    return getUserListsByType(userId, type, category);
+    const { data } = await withFallback(
+      async () => {
+        const supabase = await getSupabase();
+        // Use type assertion for lists table
+        const { data, error } = await (supabase.from('lists') as any)
+          .select('*')
+          .eq('user_id', userId)
+          .eq('list_type', type)
+          .eq('category', category)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return ((data || []) as ListRow[]).map(mapDbToList);
+      },
+      () => getUserListsByType(userId, type, category),
+      { operationName: 'getUserListsByType' }
+    );
+
+    return data;
   }
 
   /**
@@ -47,8 +93,25 @@ export class ListService {
    * @returns Featured lists
    */
   static async getFeaturedLists(): Promise<List[]> {
-    await delay();
-    return featuredLists;
+    const { data } = await withFallback(
+      async () => {
+        const supabase = await getSupabase();
+        // Use type assertion for lists table
+        const { data, error } = await (supabase.from('lists') as any)
+          .select('*')
+          .eq('is_public', true)
+          .not('thumbnail_image', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (error) throw error;
+        return ((data || []) as ListRow[]).map(mapDbToList);
+      },
+      () => featuredLists,
+      { operationName: 'getFeaturedLists' }
+    );
+
+    return data;
   }
 
   /**
@@ -57,8 +120,23 @@ export class ListService {
    * @returns The list or null if not found
    */
   static async getListById(listId: string): Promise<List | null> {
-    await delay();
-    return mockLists.find((list) => list.id === listId) || null;
+    const { data } = await withFallback(
+      async () => {
+        const supabase = await getSupabase();
+        // Use type assertion for lists table
+        const { data, error } = await (supabase.from('lists') as any)
+          .select('*')
+          .eq('id', listId)
+          .single();
+
+        if (error || !data) throw error || new Error('List not found');
+        return mapDbToList(data as ListRow);
+      },
+      () => mockLists.find((list) => list.id === listId) || null,
+      { operationName: 'getListById' }
+    );
+
+    return data;
   }
 
   /**
@@ -67,18 +145,43 @@ export class ListService {
    * @returns The created list with generated fields
    */
   static async createList(list: Omit<List, 'id' | 'createdAt' | 'updatedAt'>): Promise<List> {
-    await delay();
+    const { data } = await withFallback(
+      async () => {
+        const supabase = await getSupabase();
+        const insertData: ListInsert = {
+          user_id: list.userId,
+          name: list.name,
+          description: list.description,
+          category: list.category,
+          list_type: list.listType,
+          restaurant_ids: list.restaurants,
+          is_public: list.isPublic,
+          thumbnail_image: list.thumbnailImage || null,
+        };
+        // Use type assertion to work around Supabase generic inference issues
+        const { data, error } = await (supabase.from('lists') as any)
+          .insert(insertData)
+          .select()
+          .single();
 
-    const newList: List = {
-      ...list,
-      id: `list-${Date.now()}`,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+        if (error || !data) throw error || new Error('Failed to create list');
+        return mapDbToList(data as ListRow);
+      },
+      () => {
+        const newList: List = {
+          ...list,
+          id: `list-${Date.now()}`,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        // In mock mode, push to mock array for consistency
+        mockLists.push(newList);
+        return newList;
+      },
+      { operationName: 'createList' }
+    );
 
-    // In a real app, this would save to the backend
-    mockLists.push(newList);
-    return newList;
+    return data;
   }
 
   /**
@@ -88,20 +191,49 @@ export class ListService {
    * @returns The updated list or null if not found
    */
   static async updateList(listId: string, updates: Partial<List>): Promise<List | null> {
-    await delay();
+    const { data } = await withFallback(
+      async () => {
+        const supabase = await getSupabase();
 
-    const listIndex = mockLists.findIndex((list) => list.id === listId);
-    if (listIndex === -1) {
-      return null;
-    }
+        // Build update object with snake_case keys
+        const dbUpdates: ListUpdate = {};
+        if (updates.name !== undefined) dbUpdates.name = updates.name;
+        if (updates.description !== undefined) dbUpdates.description = updates.description;
+        if (updates.category !== undefined) dbUpdates.category = updates.category;
+        if (updates.listType !== undefined) dbUpdates.list_type = updates.listType;
+        if (updates.restaurants !== undefined) dbUpdates.restaurant_ids = updates.restaurants;
+        if (updates.isPublic !== undefined) dbUpdates.is_public = updates.isPublic;
+        if (updates.thumbnailImage !== undefined)
+          dbUpdates.thumbnail_image = updates.thumbnailImage || null;
 
-    mockLists[listIndex] = {
-      ...mockLists[listIndex],
-      ...updates,
-      updatedAt: new Date(),
-    };
+        // Use type assertion to work around Supabase generic inference issues
+        const { data, error } = await (supabase.from('lists') as any)
+          .update(dbUpdates)
+          .eq('id', listId)
+          .select()
+          .single();
 
-    return mockLists[listIndex];
+        if (error || !data) throw error || new Error('List not found');
+        return mapDbToList(data as ListRow);
+      },
+      () => {
+        const listIndex = mockLists.findIndex((list) => list.id === listId);
+        if (listIndex === -1) {
+          return null;
+        }
+
+        mockLists[listIndex] = {
+          ...mockLists[listIndex],
+          ...updates,
+          updatedAt: new Date(),
+        };
+
+        return mockLists[listIndex];
+      },
+      { operationName: 'updateList' }
+    );
+
+    return data;
   }
 
   /**
@@ -109,12 +241,24 @@ export class ListService {
    * @param listId - ID of the list to delete
    */
   static async deleteList(listId: string): Promise<void> {
-    await delay();
+    await withFallback(
+      async () => {
+        const supabase = await getSupabase();
+        // Use type assertion for lists table
+        const { error } = await (supabase.from('lists') as any).delete().eq('id', listId);
 
-    const index = mockLists.findIndex((list) => list.id === listId);
-    if (index > -1) {
-      mockLists.splice(index, 1);
-    }
+        if (error) throw error;
+        return undefined;
+      },
+      () => {
+        const index = mockLists.findIndex((list) => list.id === listId);
+        if (index > -1) {
+          mockLists.splice(index, 1);
+        }
+        return undefined;
+      },
+      { operationName: 'deleteList' }
+    );
   }
 
   /**
@@ -128,29 +272,67 @@ export class ListService {
     userId: string,
     listId: string
   ): Promise<{ visited: number; total: number }> {
-    await delay();
+    const { data } = await withFallback(
+      async () => {
+        const supabase = await getSupabase();
 
-    const list = mockLists.find((l) => l.id === listId);
-    if (!list) {
-      return { visited: 0, total: 0 };
-    }
+        // Get the list first (use type assertion for lists table)
+        const { data: listData, error: listError } = await (supabase.from('lists') as any)
+          .select('restaurant_ids')
+          .eq('id', listId)
+          .single();
 
-    // Get user's been list to check which restaurants they've visited (direct access to avoid nested delay)
-    const userRelations = mockUserRestaurantRelations.filter(
-      (relation) => relation.userId === userId
+        if (listError || !listData) {
+          return { visited: 0, total: 0 };
+        }
+
+        const restaurantIds = (listData as { restaurant_ids: string[] }).restaurant_ids || [];
+        if (restaurantIds.length === 0) {
+          return { visited: 0, total: 0 };
+        }
+
+        // Get user's been restaurants
+        const { data: ratings, error: ratingsError } = await supabase
+          .from('ratings')
+          .select('restaurant_id')
+          .eq('user_id', userId)
+          .eq('status', 'been')
+          .in('restaurant_id', restaurantIds);
+
+        if (ratingsError) throw ratingsError;
+
+        return {
+          visited: ratings?.length || 0,
+          total: restaurantIds.length,
+        };
+      },
+      () => {
+        const list = mockLists.find((l) => l.id === listId);
+        if (!list) {
+          return { visited: 0, total: 0 };
+        }
+
+        // Get user's been list to check which restaurants they've visited
+        const userRelations = mockUserRestaurantRelations.filter(
+          (relation) => relation.userId === userId
+        );
+        const visitedRestaurantIds = userRelations
+          .filter((rel) => rel.status === 'been')
+          .map((rel) => rel.restaurantId);
+
+        // Count how many restaurants in the list the user has been to
+        const visited = list.restaurants.filter((restaurantId) =>
+          visitedRestaurantIds.includes(restaurantId)
+        ).length;
+
+        return {
+          visited,
+          total: list.restaurants.length,
+        };
+      },
+      { operationName: 'getUserListProgress' }
     );
-    const visitedRestaurantIds = userRelations
-      .filter((rel) => rel.status === 'been')
-      .map((rel) => rel.restaurantId);
 
-    // Count how many restaurants in the list the user has been to
-    const visited = list.restaurants.filter((restaurantId) =>
-      visitedRestaurantIds.includes(restaurantId)
-    ).length;
-
-    return {
-      visited,
-      total: list.restaurants.length,
-    };
+    return data;
   }
 }
