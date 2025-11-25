@@ -1,18 +1,24 @@
 'use client';
 
-import { Search, MapPin, X, Clock, Store, Users, Calendar, Heart, TrendingUp } from 'lucide-react';
+import { Search, X, Clock, Store, Users, Calendar, Heart, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect, useMemo } from 'react';
 
 import { RestaurantCard } from '@/components/restaurant/restaurant-card';
 import { RestaurantDetailPreview } from '@/components/restaurant/restaurant-detail-preview';
 import { RestaurantListItemCompact } from '@/components/restaurant/restaurant-list-item-compact';
+import {
+  LocationAutocomplete,
+  type SelectedLocation,
+} from '@/components/search/location-autocomplete';
 import { UserCard } from '@/components/social/user-card';
 import { UserPreview } from '@/components/social/user-preview';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { MatchPercentageBadge } from '@/components/ui/match-percentage-badge';
+import { DEFAULT_CITY } from '@/lib/constants/cities';
+import { useGeolocation } from '@/lib/hooks/use-geolocation';
 import { useSearchRestaurants } from '@/lib/hooks/use-restaurants';
 import { useUser } from '@/lib/hooks/use-user';
 import {
@@ -22,7 +28,6 @@ import {
 } from '@/lib/hooks/use-users';
 import { SearchHistoryService } from '@/lib/services';
 import { cn } from '@/lib/utils';
-
 
 import type { Restaurant, User, RecentSearch } from '@/types';
 
@@ -84,14 +89,41 @@ const UserListItem = ({
 export default function SearchPage() {
   const [activeTab, setActiveTab] = useState<SearchTab>('restaurants');
   const [query, setQuery] = useState('');
-  const [location, setLocation] = useState('Current Location');
+  const [selectedLocation, setSelectedLocation] = useState<SelectedLocation | null>(null);
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
+  // Geolocation - auto-request on page load
+  const {
+    coordinates: geoCoords,
+    status: geoStatus,
+    requestLocation,
+  } = useGeolocation({ autoRequest: true });
+
+  // Set location when geolocation resolves
+  useEffect(() => {
+    if (geoStatus === 'granted' && geoCoords && !selectedLocation) {
+      setSelectedLocation({
+        type: 'current',
+        displayName: 'Current Location',
+        coordinates: geoCoords,
+      });
+    } else if ((geoStatus === 'denied' || geoStatus === 'error') && !selectedLocation) {
+      // Fall back to NYC (where most mock data is)
+      setSelectedLocation({
+        type: 'city',
+        displayName: DEFAULT_CITY.displayName,
+        coordinates: DEFAULT_CITY.coordinates,
+      });
+    }
+  }, [geoStatus, geoCoords, selectedLocation]);
+
   const { data: currentUser } = useUser('1'); // Current user ID
-  const { data: restaurantResults, isLoading: restaurantsLoading } = useSearchRestaurants(query);
+  const { data: restaurantResults, isLoading: restaurantsLoading } = useSearchRestaurants(query, {
+    location: selectedLocation?.coordinates,
+  });
   const { data: userResults, isLoading: usersLoading } = useSearchUsers(query);
 
   // Batch fetch match percentages for all user results (avoids N+1 queries)
@@ -192,24 +224,14 @@ export default function SearchPage() {
 
         {/* Location Input (only for restaurants) */}
         {activeTab === 'restaurants' && (
-          <div className="relative mb-4">
-            <MapPin className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
-            <Input
-              type="text"
-              placeholder="Location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="h-12 pl-10 pr-10 text-base"
-            />
-            {location && location !== 'Current Location' && (
-              <button
-                onClick={() => setLocation('Current Location')}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
-              >
-                <X className="h-5 w-5 text-muted hover:text-foreground" />
-              </button>
-            )}
-          </div>
+          <LocationAutocomplete
+            value={selectedLocation?.displayName || 'Current Location'}
+            onLocationSelect={setSelectedLocation}
+            geoStatus={geoStatus}
+            geoCoordinates={geoCoords}
+            onRequestLocation={requestLocation}
+            className="mb-4"
+          />
         )}
 
         {/* Filter Chips (only for restaurants) */}
