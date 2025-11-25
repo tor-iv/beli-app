@@ -27,7 +27,10 @@ export const mockActivities: Activity[] = [
     user: mockUsers.find((u) => u.displayName === 'Ryan Tanaka')!,
     rating: 9.7,
     comment: 'It was so good and so cheap',
-    photos: [],
+    photos: [
+      'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400',
+      'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=400',
+    ],
     tags: ['Ukrainian', 'Good Value'],
     timestamp: new Date(Date.now() - 37 * 60 * 1000), // 37 minutes ago
     type: 'visit',

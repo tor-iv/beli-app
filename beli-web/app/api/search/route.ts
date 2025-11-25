@@ -2,16 +2,18 @@
  * Search API Route
  *
  * Provides restaurant search with fuzzy matching, autocomplete, and geo-filtering.
- * Uses Elasticsearch for fast full-text search.
+ * Automatically uses Elasticsearch when available, falls back to Supabase.
  *
  * Endpoints:
  *   GET /api/search?q=pizza&limit=20
  *   GET /api/search?q=sushi&lat=40.758&lon=-73.9855&distance=2km
  *   GET /api/search?q=bal&autocomplete=true
+ *   GET /api/search?status=true  (returns provider status)
  *
  * Query Parameters:
  *   q: Search query (required)
  *   autocomplete: If "true", returns name suggestions only
+ *   status: If "true", returns current search provider status
  *   limit: Max results (default: 20, max: 100)
  *   offset: Pagination offset (default: 0)
  *   cuisine: Filter by cuisine (comma-separated)
@@ -21,10 +23,14 @@
  *   lat: Latitude for geo-search
  *   lon: Longitude for geo-search
  *   distance: Distance for geo-search (default: 5km)
+ *
+ * Environment Variables:
+ *   SEARCH_PROVIDER: 'elasticsearch' | 'supabase' | 'auto' (default: 'auto')
+ *   ELASTICSEARCH_URL: ES instance URL (Docker, Bonsai, Elastic Cloud)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { searchRestaurants, autocomplete, geoSearch } from '@/lib/elasticsearch/client';
+import { searchRestaurants, autocomplete, geoSearch, getSearchStatus } from '@/lib/search';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
