@@ -6,15 +6,26 @@
  * - Restaurant availability checking
  * - AI-powered group dinner matching algorithm
  * - Complex scoring based on want-to-try overlap, dietary restrictions, and location
+ * - Reservation management (claiming, sharing, reminders)
+ *
+ * NOTE: Reservation functionality (claim, share, reminders) was merged from ReservationService.
  */
 
 import { mockRestaurants } from '@/data/mock/restaurants';
 import { mockUserRestaurantRelations } from '@/data/mock/userRestaurantRelations';
 import { mockUsers } from '@/data/mock/users';
+import {
+  mockReservations,
+  getUserPriorityLevel,
+  getAvailableReservations,
+  getClaimedReservationsByUser,
+  getSharedReservationsByUser,
+  getReservationReminders,
+} from '@/data/mock/reservations';
 
 import { delay } from '../base/BaseService';
 
-import type { User, GroupDinnerMatch, ListCategory } from '@/types';
+import type { User, GroupDinnerMatch, ListCategory, Reservation, ReservationPriorityLevel } from '@/types';
 
 
 export class GroupDinnerService {
@@ -194,5 +205,152 @@ export class GroupDinnerService {
     matches.sort((a, b) => b.score - a.score);
 
     return matches;
+  }
+
+  // ============================================
+  // Reservation Methods (merged from ReservationService)
+  // ============================================
+
+  /**
+   * Get user's reservations with optional filtering
+   * @param userId - ID of the user
+   * @param filter - Optional filter: 'available', 'claimed', or 'shared'
+   * @returns Filtered reservations
+   */
+  static async getUserReservations(
+    userId: string,
+    filter?: 'available' | 'claimed' | 'shared'
+  ): Promise<Reservation[]> {
+    await delay();
+
+    if (filter === 'available') {
+      return getAvailableReservations();
+    } else if (filter === 'claimed') {
+      return getClaimedReservationsByUser(userId);
+    } else if (filter === 'shared') {
+      return getSharedReservationsByUser(userId);
+    }
+
+    // Return all user's reservations (owned, claimed, or shared)
+    return mockReservations.filter(
+      (r) => r.userId === userId || r.claimedBy === userId || r.sharedWith?.includes(userId)
+    );
+  }
+
+  /**
+   * Get all available reservations
+   * @returns Available reservations
+   */
+  static async getAvailableReservations(): Promise<Reservation[]> {
+    await delay();
+    return getAvailableReservations();
+  }
+
+  /**
+   * Get reservations claimed by a user
+   * @param userId - ID of the user
+   * @returns Claimed reservations
+   */
+  static async getClaimedReservations(userId: string): Promise<Reservation[]> {
+    await delay();
+    return getClaimedReservationsByUser(userId);
+  }
+
+  /**
+   * Get reservations shared with a user
+   * @param userId - ID of the user
+   * @returns Shared reservations
+   */
+  static async getSharedReservations(userId: string): Promise<Reservation[]> {
+    await delay();
+    return getSharedReservationsByUser(userId);
+  }
+
+  /**
+   * Claim an available reservation
+   * @param reservationId - ID of the reservation to claim
+   * @param userId - ID of the user claiming the reservation
+   * @returns True if successfully claimed
+   */
+  static async claimReservation(reservationId: string, userId: string): Promise<boolean> {
+    await delay();
+
+    const reservation = mockReservations.find((r) => r.id === reservationId);
+    if (!reservation || reservation.status !== 'available') {
+      return false;
+    }
+
+    reservation.status = 'claimed';
+    reservation.claimedBy = userId;
+    return true;
+  }
+
+  /**
+   * Share a reservation with other users
+   * @param reservationId - ID of the reservation to share
+   * @param recipientUserIds - Array of user IDs to share with
+   * @returns True if successfully shared
+   */
+  static async shareReservation(
+    reservationId: string,
+    recipientUserIds: string[]
+  ): Promise<boolean> {
+    await delay();
+
+    const reservation = mockReservations.find((r) => r.id === reservationId);
+    if (!reservation) {
+      return false;
+    }
+
+    reservation.status = 'shared';
+    reservation.sharedWith = recipientUserIds;
+    return true;
+  }
+
+  /**
+   * Cancel a reservation share
+   * @param reservationId - ID of the reservation to cancel
+   * @returns True if successfully cancelled
+   */
+  static async cancelReservationShare(reservationId: string): Promise<boolean> {
+    await delay();
+
+    const reservation = mockReservations.find((r) => r.id === reservationId);
+    if (!reservation) {
+      return false;
+    }
+
+    reservation.status = 'cancelled';
+    return true;
+  }
+
+  /**
+   * Get user's reservation priority level
+   * @param userId - ID of the user
+   * @returns User's priority level
+   */
+  static async getUserReservationPriority(userId: string): Promise<ReservationPriorityLevel> {
+    await delay();
+    return getUserPriorityLevel(userId);
+  }
+
+  /**
+   * Get upcoming reservation reminders for a user
+   * @param userId - ID of the user
+   * @returns Upcoming reservations
+   */
+  static async getReservationReminders(userId: string): Promise<Reservation[]> {
+    await delay();
+    return getReservationReminders(userId);
+  }
+
+  /**
+   * Get a reservation by ID
+   * @param reservationId - ID of the reservation
+   * @returns Reservation or null if not found
+   */
+  static async getReservationById(reservationId: string): Promise<Reservation | null> {
+    await delay();
+    return mockReservations.find((r) => r.id === reservationId) || null;
   }
 }

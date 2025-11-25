@@ -4,44 +4,153 @@
  * Manages restaurant menus and AI-powered order suggestions including:
  * - Fetching restaurant menus
  * - Generating personalized order suggestions based on party size, hunger level, dietary restrictions
+ *
+ * Now connected to Supabase PostgreSQL database via menu_items table.
+ * Supports automatic fallback to mock data via withFallback().
  */
 
-import { allMenuItems, restaurantMenus } from '@/data/mock/menuItems';
+import { withFallback } from '@/lib/data-provider';
+import { allMenuItems } from '@/data/mock/menuItems';
 
 import { delay } from '../base/BaseService';
 
-import type { MenuItem, OrderSuggestion, HungerLevel, MealTime } from '@/types';
+import type { Database } from '@/lib/supabase/types';
+import type { MenuItem, MenuItemCategory, PortionSize, OrderSuggestion, HungerLevel, MealTime } from '@/types';
 
+// Lazy import supabase to avoid throwing when env vars missing in mock mode
+const getSupabase = async () => {
+  const { supabase } = await import('@/lib/supabase/client');
+  return supabase;
+};
+
+// Database row type
+type DbMenuItem = Database['public']['Tables']['menu_items']['Row'];
+
+/**
+ * Maps a Supabase menu_items row to the frontend MenuItem type.
+ * The database has simpler fields, so we compute/default some frontend-specific fields.
+ */
+function mapDbToMenuItem(row: DbMenuItem): MenuItem {
+  // Parse dietary info to set vegetarian/gluten-free flags
+  const dietaryInfo = row.dietary_info || [];
+  const isVegetarian = dietaryInfo.some((d) =>
+    ['vegetarian', 'vegan', 'plant-based'].includes(d.toLowerCase())
+  );
+  const isGlutenFree = dietaryInfo.some((d) =>
+    ['gluten-free', 'gf', 'gluten free'].includes(d.toLowerCase())
+  );
+
+  // Map database category to frontend category type
+  const categoryMap: Record<string, MenuItemCategory> = {
+    appetizer: 'appetizer',
+    appetizers: 'appetizer',
+    starter: 'appetizer',
+    entree: 'entree',
+    entrees: 'entree',
+    main: 'entree',
+    mains: 'entree',
+    side: 'side',
+    sides: 'side',
+    dessert: 'dessert',
+    desserts: 'dessert',
+    drink: 'drink',
+    drinks: 'drink',
+    beverage: 'drink',
+    beverages: 'drink',
+  };
+
+  const category: MenuItemCategory =
+    categoryMap[(row.category || 'entree').toLowerCase()] || 'entree';
+
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description || '',
+    price: row.price || 0,
+    category,
+    imageUrl: row.image_url || '',
+    portionSize: 'medium' as PortionSize, // Default - DB doesn't store this
+    tags: dietaryInfo, // Use dietary info as tags
+    popularity: row.is_popular ? 90 : 50, // Convert boolean to score
+    isVegetarian,
+    isGlutenFree,
+    mealTime: ['any-time' as MealTime], // Default - DB doesn't store this
+  };
+}
 
 export class MenuService {
   /**
-   * Get restaurant menu
-   * Returns menu items sorted by category and popularity
+   * Get restaurant menu from Supabase
+   * Returns menu items sorted by popularity (popular items first), then by category
    *
    * @param restaurantId - ID of the restaurant
-   * @returns Menu items sorted by category, then by popularity
+   * @returns Menu items sorted by popularity and category
    */
   static async getRestaurantMenu(restaurantId: string): Promise<MenuItem[]> {
-    await delay();
+    const { data } = await withFallback(
+      async () => {
+        const supabase = await getSupabase();
+        const { data, error } = await supabase
+          .from('menu_items')
+          .select('*')
+          .eq('restaurant_id', restaurantId)
+          .order('is_popular', { ascending: false })
+          .order('category')
+          .order('name');
 
-    const menuItemIds = restaurantMenus[restaurantId] || [];
-    const menu = allMenuItems.filter((item) => menuItemIds.includes(item.id));
+        if (error) throw error;
 
-    // Sort by category, then by popularity
-    return menu.sort((a, b) => {
-      const categoryOrder: Record<string, number> = {
-        appetizer: 1,
-        entree: 2,
-        side: 3,
-        dessert: 4,
-        drink: 5,
-      };
+        const menuItems = (data || []).map(mapDbToMenuItem);
 
-      const categoryDiff = (categoryOrder[a.category] || 0) - (categoryOrder[b.category] || 0);
-      if (categoryDiff !== 0) return categoryDiff;
+        // Sort by category order, then by popularity
+        return menuItems.sort((a, b) => {
+          const categoryOrder: Record<string, number> = {
+            appetizer: 1,
+            entree: 2,
+            side: 3,
+            dessert: 4,
+            drink: 5,
+          };
 
-      return b.popularity - a.popularity;
-    });
+          const categoryDiff = (categoryOrder[a.category] || 0) - (categoryOrder[b.category] || 0);
+          if (categoryDiff !== 0) return categoryDiff;
+
+          return b.popularity - a.popularity;
+        });
+      },
+      () => {
+        // Filter mock menu items by restaurantId if they have restaurant association
+        // Otherwise return all menu items as a generic fallback
+        const mockMenu = allMenuItems.filter((item) => {
+          // Check if item has restaurantId association
+          const itemRestaurantId = (item as any).restaurantId;
+          if (itemRestaurantId) {
+            return itemRestaurantId === restaurantId;
+          }
+          // Return items without restaurant association as fallback
+          return true;
+        });
+
+        // Sort by category order, then by popularity
+        return mockMenu.sort((a, b) => {
+          const categoryOrder: Record<string, number> = {
+            appetizer: 1,
+            entree: 2,
+            side: 3,
+            dessert: 4,
+            drink: 5,
+          };
+
+          const categoryDiff = (categoryOrder[a.category] || 0) - (categoryOrder[b.category] || 0);
+          if (categoryDiff !== 0) return categoryDiff;
+
+          return b.popularity - a.popularity;
+        });
+      },
+      { operationName: 'getRestaurantMenu' }
+    );
+
+    return data;
   }
 
   /**
@@ -119,7 +228,6 @@ export class MenuService {
     const entrees = availableMenu.filter((i) => i.category === 'entree');
     const sides = availableMenu.filter((i) => i.category === 'side');
     const desserts = availableMenu.filter((i) => i.category === 'dessert');
-    const drinks = availableMenu.filter((i) => i.category === 'drink');
 
     // Build the order
     const selectedItems: Array<MenuItem & { quantity: number }> = [];

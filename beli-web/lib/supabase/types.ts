@@ -2,7 +2,13 @@
  * Supabase Database Types
  *
  * These types mirror the PostgreSQL schema for type-safe queries.
- * Generated based on the simplified schema (migration 00009).
+ * Updated for migrations 00011-00012 (unified watchlist, removed score columns).
+ *
+ * IMPORTANT STORAGE PATTERNS:
+ * - Want-to-try list: Use users.watchlist array (NOT ratings table)
+ * - Been list: Use ratings table with status='been'
+ * - Recommendations: Computed via get_friend_recommendations() RPC
+ * - Restaurant score: Single 'rating' column (triple-score removed for simplicity)
  */
 
 export type Json =
@@ -40,12 +46,8 @@ export type Database = {
           accepts_reservations: boolean;
           rating: number;
           rating_count: number;
-          rec_score: number | null;
-          rec_score_sample_size: number;
-          friend_score: number | null;
-          friend_score_sample_size: number;
-          average_score: number | null;
-          average_score_sample_size: number;
+          // NOTE: rec_score, friend_score, average_score columns removed in migration 00012
+          // Single 'rating' column is now the source of truth for restaurant score
           created_at: string;
           updated_at: string;
         };
@@ -69,16 +71,18 @@ export type Database = {
           city: string | null;
           state: string | null;
           is_tastemaker: boolean;
+          watchlist: string[]; // Restaurant IDs user wants to try - SINGLE SOURCE OF TRUTH for want-to-try list
           created_at: string;
           updated_at: string;
         };
         Insert: Omit<
           Database['public']['Tables']['users']['Row'],
-          'id' | 'created_at' | 'updated_at'
+          'id' | 'created_at' | 'updated_at' | 'watchlist'
         > & {
           id?: string;
           created_at?: string;
           updated_at?: string;
+          watchlist?: string[];
         };
         Update: Partial<Database['public']['Tables']['users']['Insert']>;
       };
@@ -87,6 +91,8 @@ export type Database = {
           id: string;
           user_id: string;
           restaurant_id: string;
+          // NOTE: 'want_to_try' status is DEPRECATED - use users.watchlist array instead
+          // Only 'been' and 'recommended' should be stored in ratings table
           status: 'been' | 'want_to_try' | 'recommended';
           rating: number | null;
           rank_index: number | null;
@@ -183,6 +189,67 @@ export type Database = {
           created_at: string;
         }[];
       };
+      add_to_watchlist: {
+        Args: {
+          p_user_id: string;
+          p_restaurant_id: string;
+        };
+        Returns: boolean;
+      };
+      remove_from_watchlist: {
+        Args: {
+          p_user_id: string;
+          p_restaurant_id: string;
+        };
+        Returns: boolean;
+      };
+      is_in_watchlist: {
+        Args: {
+          p_user_id: string;
+          p_restaurant_id: string;
+        };
+        Returns: boolean;
+      };
+      get_friend_recommendations: {
+        Args: {
+          p_user_id: string;
+          p_min_rating?: number;
+          p_limit?: number;
+        };
+        Returns: {
+          id: string;
+          name: string;
+          cuisine: string[];
+          category: string;
+          price_range: string;
+          address: string;
+          city: string;
+          state: string;
+          neighborhood: string;
+          rating: number;
+          rating_count: number;
+          images: string[];
+          is_open: boolean;
+          accepts_reservations: boolean;
+          friend_rating: number;
+          recommender_name: string;
+          recommender_username: string;
+          recommender_count: number;
+        }[];
+      };
+      get_user_cuisine_preferences: {
+        Args: {
+          p_user_id: string;
+          p_min_visits?: number;
+        };
+        Returns: {
+          cuisine: string;
+          visit_count: number;
+          avg_rating: number;
+          max_rating: number;
+          min_rating: number;
+        }[];
+      };
     };
   };
 };
@@ -195,3 +262,5 @@ export type UserFollow = Database['public']['Tables']['user_follows']['Row'];
 export type MenuItem = Database['public']['Tables']['menu_items']['Row'];
 export type UserStats = Database['public']['Views']['user_stats']['Row'];
 export type FeedItem = Database['public']['Functions']['get_user_feed']['Returns'][0];
+export type FriendRecommendation = Database['public']['Functions']['get_friend_recommendations']['Returns'][0];
+export type CuisinePreference = Database['public']['Functions']['get_user_cuisine_preferences']['Returns'][0];
