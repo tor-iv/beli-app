@@ -27,9 +27,22 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 // Configuration
 const POSTGRES_URL = process.env.POSTGRES_CONNECTION_STR;
-const ES_URL = process.env.ELASTICSEARCH_URL || 'http://localhost:9200';
+const ES_URL_RAW = process.env.ELASTICSEARCH_URL || 'http://localhost:9200';
 const INDEX_NAME = 'restaurants';
 const RECREATE_INDEX = process.argv.includes('--recreate-index');
+
+// Parse ES URL to extract credentials for Basic Auth header (Node fetch doesn't allow creds in URL)
+function parseESUrl(urlString: string): { baseUrl: string; authHeader: string | null } {
+  const url = new URL(urlString);
+  const auth = url.username && url.password
+    ? `Basic ${Buffer.from(`${url.username}:${url.password}`).toString('base64')}`
+    : null;
+  url.username = '';
+  url.password = '';
+  return { baseUrl: url.toString().replace(/\/$/, ''), authHeader: auth };
+}
+
+const { baseUrl: ES_URL, authHeader: ES_AUTH } = parseESUrl(ES_URL_RAW);
 
 // Elasticsearch index mappings for restaurant search
 const INDEX_MAPPINGS = {
@@ -143,9 +156,13 @@ async function esRequest(
   body?: object
 ): Promise<{ status: number; data: unknown }> {
   const url = `${ES_URL}${path}`;
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (ES_AUTH) {
+    headers['Authorization'] = ES_AUTH;
+  }
   const options: RequestInit = {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers,
   };
 
   if (body) {
@@ -279,9 +296,13 @@ async function bulkIndexRestaurants(restaurants: PostgresRestaurant[]): Promise<
   const body = bulkBody.join('\n') + '\n';
 
   // Use fetch directly for bulk (different content type)
+  const headers: Record<string, string> = { 'Content-Type': 'application/x-ndjson' };
+  if (ES_AUTH) {
+    headers['Authorization'] = ES_AUTH;
+  }
   const response = await fetch(`${ES_URL}/_bulk`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-ndjson' },
+    headers,
     body,
   });
 
@@ -294,6 +315,9 @@ async function bulkIndexRestaurants(restaurants: PostgresRestaurant[]): Promise<
   }
 
   console.log(`Successfully indexed ${restaurants.length} restaurants`);
+
+  // Force refresh so documents are immediately searchable
+  await esRequest('POST', `/${INDEX_NAME}/_refresh`);
 }
 
 // Verify the indexed data

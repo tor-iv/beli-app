@@ -16,13 +16,13 @@ ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_id_fkey;
 
 INSERT INTO public.users (id, username, display_name, avatar, bio, city, state, is_tastemaker, created_at)
 VALUES
--- Main demo user (you/founder)
+-- Main demo user (Tor - founder)
 (
   '11111111-1111-1111-1111-111111111111',
-  'demo_user',
-  'Demo User',
-  'https://i.pravatar.cc/150?u=demo',
-  'Food lover exploring NYC one restaurant at a time',
+  'tor_iv',
+  'Tor Cox',
+  '/profile-tor.jpg',
+  'Food enthusiast exploring NYC. Always hunting for the perfect slice',
   'New York',
   'NY',
   false,

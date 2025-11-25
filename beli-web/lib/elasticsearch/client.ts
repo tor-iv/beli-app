@@ -8,8 +8,33 @@
  *   import { searchRestaurants, autocomplete, geoSearch } from '@/lib/elasticsearch/client';
  */
 
-const ES_URL = process.env.ELASTICSEARCH_URL || 'http://localhost:9200';
+const ES_URL_RAW = process.env.ELASTICSEARCH_URL || 'http://localhost:9200';
 const INDEX_NAME = 'restaurants';
+
+// Parse ES URL to extract credentials for Basic Auth header (Node fetch doesn't allow creds in URL)
+function parseESUrl(urlString: string): { baseUrl: string; authHeader: string | null } {
+  try {
+    const url = new URL(urlString);
+    const auth = url.username && url.password
+      ? `Basic ${Buffer.from(`${url.username}:${url.password}`).toString('base64')}`
+      : null;
+    url.username = '';
+    url.password = '';
+    return { baseUrl: url.toString().replace(/\/$/, ''), authHeader: auth };
+  } catch {
+    return { baseUrl: urlString, authHeader: null };
+  }
+}
+
+const { baseUrl: ES_URL, authHeader: ES_AUTH } = parseESUrl(ES_URL_RAW);
+
+/**
+ * Helper: Normalize ES 7.x vs 8.x hits.total format
+ * ES 7.x can return number directly, ES 8.x returns { value: number, relation: string }
+ */
+function getTotalHits(total: number | { value: number; relation?: string }): number {
+  return typeof total === 'number' ? total : total.value;
+}
 
 // Types
 export interface SearchResult {
@@ -64,9 +89,14 @@ async function esRequest<T>(
   path: string,
   body?: object
 ): Promise<T> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (ES_AUTH) {
+    headers['Authorization'] = ES_AUTH;
+  }
+
   const response = await fetch(`${ES_URL}${path}`, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: body ? JSON.stringify(body) : undefined,
   });
 
@@ -162,7 +192,7 @@ export async function searchRestaurants(
   interface ESSearchResponse {
     took: number;
     hits: {
-      total: { value: number };
+      total: number | { value: number; relation?: string }; // ES 7.x returns number, ES 8.x returns object
       hits: Array<{
         _id: string;
         _score: number;
@@ -184,7 +214,7 @@ export async function searchRestaurants(
       id: hit._id,
       score: hit._score || 0,
     })),
-    total: response.hits.total.value,
+    total: getTotalHits(response.hits.total),
     took: response.took,
     aggregations: response.aggregations
       ? {
