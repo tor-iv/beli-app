@@ -46,9 +46,9 @@ const ActionButton = ({ icon: Icon, title, subtitle, onClick }: ActionButtonProp
       </div>
       <div className="flex-1 text-left">
         <p className="text-[15px] font-semibold leading-tight">{title}</p>
-        <p className="text-[13px] leading-tight text-secondary">{subtitle}</p>
+        <p className="text-[13px] leading-tight text-muted">{subtitle}</p>
       </div>
-      <ChevronRight className="h-5 w-5 flex-shrink-0 text-secondary" />
+      <ChevronRight className="h-5 w-5 flex-shrink-0 text-muted" />
     </button>
   );
 }
@@ -142,7 +142,7 @@ export const ConfirmationModal = ({
           </p>
 
           {/* Address */}
-          <p className="text-sm text-secondary">{restaurant.location.address}</p>
+          <p className="text-sm text-muted">{restaurant.location.address}</p>
 
           {/* Availability Card */}
           {availability && (
@@ -157,7 +157,7 @@ export const ConfirmationModal = ({
           {/* Dining With Section */}
           {participants.length > 0 && (
             <div className="mt-4">
-              <h4 className="mb-2 text-xs font-semibold text-secondary">DINING WITH</h4>
+              <h4 className="mb-2 text-xs font-semibold text-muted">DINING WITH</h4>
               <div className="flex flex-wrap gap-2">
                 {participants.map((user) => (
                   <div
@@ -177,7 +177,7 @@ export const ConfirmationModal = ({
 
           {/* Next Steps */}
           <div className="mt-6">
-            <h4 className="mb-3 text-xs font-semibold text-secondary">NEXT STEPS</h4>
+            <h4 className="mb-3 text-xs font-semibold text-muted">NEXT STEPS</h4>
 
             <div className="space-y-2">
               <ActionButton
