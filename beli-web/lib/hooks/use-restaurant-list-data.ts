@@ -75,7 +75,7 @@ function mapTabToStatus(tab: ListType): 'been' | 'want_to_try' | 'recommended' |
 export function useRestaurantListData(
   viewParam: ViewType,
   activeTab: ListType,
-  userId: string = '00000000-0000-0000-0000-000000000001',
+  userId: string = '1',
   category?: ListCategory
 ): RestaurantListDataResult {
   // Map tab to service status (null if not a personal list tab)
